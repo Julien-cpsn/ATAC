@@ -13,7 +13,6 @@ pub enum RequestTabs {
     Body
 }
 
-#[warn(dead_code)]
 pub fn next_request_tab(current_tab: RequestTabs) -> RequestTabs {
     match current_tab {
         RequestTabs::Params => RequestTabs::Auth,

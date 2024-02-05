@@ -68,7 +68,7 @@ impl App<'_> {
                     .style(Style::default().bg(Color::DarkGray));
 
 
-                let area = centered_rect(40, 20, frame.size());
+                let area = centered_rect(40, 20, 3, 50, frame.size());
                 let new_request_area = popup_block.inner(area);
 
                 let new_request_paragraph = Paragraph::new(self.new_request_input.text.as_str());
@@ -84,13 +84,16 @@ impl App<'_> {
             _ => {}
         }
 
-        // MAIN LAYOUT
-
         // FOOTER
 
         let footer_text = match self.state {
-            AppState::Normal => "Visual",
-            AppState::EditingUrl | AppState::CreatingNewRequest | AppState::EditingBody => "Insert"
+            AppState::Normal | AppState::CreatingNewRequest => self.state.to_string(),
+            AppState::EditingUrl | AppState::EditingBody => {
+                let selected_request_index = self.collection.selected.unwrap();
+                let selected_request = &self.collection.items[selected_request_index];
+
+                format!("{} > {}", selected_request.name, self.state.to_string())
+            }
         };
 
         let footer = Block::new()
@@ -212,8 +215,7 @@ impl App<'_> {
         // REQUEST PARAMS
 
         let params_block = Block::new()
-            .borders(Borders::RIGHT)
-            .padding(Padding::horizontal(1));
+            .borders(Borders::RIGHT);
 
         let request_params_area = params_block.inner(request_main_layout[0]);
 
@@ -222,7 +224,7 @@ impl App<'_> {
         let request_params_layout = Layout::new(
             Direction::Vertical,
             [
-                Constraint::Length(1),
+                Constraint::Length(2),
                 Constraint::Fill(1)
             ]
         )
@@ -235,7 +237,10 @@ impl App<'_> {
 
         let params_tab = Tabs::new(tabs)
             .highlight_style(Style::default().yellow())
-            .select(selected_tab_index);
+            .select(selected_tab_index)
+            .block(
+                Block::new().borders(Borders::BOTTOM)
+            );
 
         frame.render_widget(params_tab, request_params_layout[0]);
 
@@ -246,9 +251,16 @@ impl App<'_> {
             RequestTabs::Auth => {}
             RequestTabs::Headers => {}
             RequestTabs::Body => {
-                self.body_text_area.set_line_number_style(Style::new().fg(Color::DarkGray));
-
-                frame.render_widget(self.body_text_area.widget(), request_params_layout[1]);
+                match selected_request.body {
+                    None => {
+                        let body_paragraph = Paragraph::new("\nNo body").centered();
+                        frame.render_widget(body_paragraph, request_params_layout[1]);
+                    }
+                    Some(_) => {
+                        self.body_text_area.set_line_number_style(Style::new().fg(Color::DarkGray));
+                        frame.render_widget(self.body_text_area.widget(), request_params_layout[1]);
+                    }
+                }
             }
         }
 
@@ -288,7 +300,7 @@ impl App<'_> {
 
     fn render_homepage(&mut self, frame: &mut Frame, rect: Rect) {
         frame.render_widget(
-            Paragraph::new("Welcome to TUI-Quest").centered(),
+            Paragraph::new("\nWelcome to TUI-Quest\nhttps://github.com/Julien-cpsn/TUI-Quest").centered(),
             rect
         );
     }

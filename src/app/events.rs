@@ -1,16 +1,18 @@
 use crossterm::event;
-use crossterm::event::{Event, KeyCode, KeyEventKind};
+use crossterm::event::{Event, KeyCode, KeyEventKind, KeyModifiers};
 use std::io::Result;
 use tui_textarea::CursorMove;
 use crate::app::app::{App, AppState};
-use crate::app::tabs::tabs::{RequestTabs};
+use crate::app::tabs::tabs::next_request_tab;
 
 impl App<'_> {
     /// Handle events
     pub async fn handle_events(&mut self) -> Result<bool> {
         if let Event::Key(key) = event::read()? {
-            if key.kind == KeyEventKind::Press {
 
+            let control_pressed: bool = key.modifiers == KeyModifiers::CONTROL;
+
+            if key.kind == KeyEventKind::Press {
                 match self.state {
                     AppState::Normal => match key.code {
                         KeyCode::Char('q') => return Ok(true),
@@ -43,11 +45,11 @@ impl App<'_> {
                 if self.collection.selected.is_some() {
                     match self.state {
                         AppState::Normal => match key.code {
-                            KeyCode::Char('b') => {
-                                self.request_tab = RequestTabs::Body;
-                                self.state = AppState::EditingBody;
+                            KeyCode::Char('b') if control_pressed => self.toggle_request_body(),
+                            KeyCode::Char('b') => self.load_request_body_tab(),
+                            KeyCode::Tab => {
+                                self.request_tab = next_request_tab(self.request_tab);
                             },
-                            //next_request_tab(self.request_tab),
 
                             KeyCode::Char('u') => self.state = AppState::EditingUrl,
                             KeyCode::Char('m') => self.modify_request_method(),
@@ -72,12 +74,25 @@ impl App<'_> {
                         }
 
                         AppState::EditingBody => match key.code {
+                            KeyCode::Char('c') if control_pressed => self.body_text_area.copy(),
+                            KeyCode::Char('v') if control_pressed => {
+                                self.body_text_area.paste();
+                            },
+                            KeyCode::Char('z') if control_pressed => {
+                                self.body_text_area.undo();
+                            },
+                            KeyCode::Char('y') if control_pressed => {
+                                self.body_text_area.redo();
+                            },
+                            KeyCode::Char('s') if control_pressed => self.modify_request_body(),
+
                             KeyCode::Char(char) => self.body_text_area.insert_char(char),
 
-                            KeyCode::Esc => self.modify_request_body(),
+                            KeyCode::Esc => self.quit_request_body(),
                             KeyCode::Enter => self.body_text_area.insert_newline(),
 
                             KeyCode::Tab => {
+                                self.body_text_area.set_hard_tab_indent(true);
                                 self.body_text_area.insert_tab();
                             },
                             KeyCode::Backspace => {
@@ -86,6 +101,9 @@ impl App<'_> {
                             KeyCode::Delete => {
                                 self.body_text_area.delete_next_char();
                             },
+
+                            KeyCode::Right if control_pressed => self.body_text_area.move_cursor(CursorMove::WordForward),
+                            KeyCode::Left if control_pressed => self.body_text_area.move_cursor(CursorMove::WordBack),
 
                             KeyCode::Up => self.body_text_area.move_cursor(CursorMove::Up),
                             KeyCode::Down => self.body_text_area.move_cursor(CursorMove::Bottom),
@@ -98,6 +116,8 @@ impl App<'_> {
                         _ => {}
                     };
                 }
+
+                //dbg!(&key);
             }
         }
 

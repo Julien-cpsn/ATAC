@@ -1,6 +1,7 @@
 use reqwest::{Client, Method};
-use tui_textarea::{CursorMove, TextArea};
+use tui_textarea::{TextArea};
 use crate::app::app::{App, AppState};
+use crate::app::tabs::tabs::RequestTabs;
 use crate::request::method::next_method;
 use crate::request::request::Request;
 
@@ -14,11 +15,8 @@ impl<'a> App<'a> {
             let selected_request = &self.collection.items[selected_request_index];
             self.url_text_input.enter_str(selected_request.url);
 
-            // TODO
-            if let Some(body) = &selected_request.body {
-                self.body_text_area = TextArea::default();
-                self.body_text_area.insert_str(body);
-            }
+            let body = selected_request.body.clone().unwrap_or(String::new());
+            self.refresh_body_textarea(body);
         }
     }
 
@@ -69,13 +67,65 @@ impl<'a> App<'a> {
         self.collection.items[selected_request_index].method = next_method;
     }
 
+    pub fn load_request_body_tab(&mut self) {
+        self.request_tab = RequestTabs::Body;
+
+        let selected_request_index = self.collection.selected.unwrap();
+        let selected_request = &self.collection.items[selected_request_index];
+
+        if selected_request.body.is_some() {
+            self.state = AppState::EditingBody;
+        }
+    }
+
+    pub fn refresh_body_textarea(&mut self, text: String) {
+        let lines: Vec<String> = text
+            .lines()
+            .map(|line| line.to_string())
+            .collect();
+
+        self.body_text_area = TextArea::new(lines);
+    }
+
     pub fn modify_request_body(&mut self) {
         let selected_request_index = self.collection.selected.unwrap();
-        let body = self.body_text_area.yank_text();
-        self.collection.items[selected_request_index].body = Some(body);
+
+        let body: String = self.body_text_area.lines().join("\n");
+
+        self.collection.items[selected_request_index].body = Some(body.clone());
 
         self.state = AppState::Normal;
-        self.body_text_area.move_cursor(CursorMove::Top)
+        self.refresh_body_textarea(body);
+    }
+
+    pub fn toggle_request_body(&mut self) {
+        let selected_request_index = self.collection.selected.unwrap();
+        let selected_request = &self.collection.items[selected_request_index];
+
+        let body = String::new();
+
+        match selected_request.body {
+            None => {
+                self.collection.items[selected_request_index].body = Some(body.clone());
+                self.state = AppState::EditingBody;
+            }
+            Some(_) => {
+                self.collection.items[selected_request_index].body = None;
+                self.state = AppState::Normal;
+            }
+        }
+
+        self.refresh_body_textarea(body);
+    }
+
+    pub fn quit_request_body(&mut self) {
+        let selected_request_index = self.collection.selected.unwrap();
+        let selected_request = &mut self.collection.items[selected_request_index];
+
+        let body = selected_request.body.clone().unwrap_or(String::new());
+
+        self.refresh_body_textarea(body);
+        self.state = AppState::Normal;
     }
 
     pub async fn send_request(&mut self) {
@@ -84,10 +134,14 @@ impl<'a> App<'a> {
 
         let client = Client::new();
 
-        let request = client.request(
+        let mut request = client.request(
             selected_request.method.clone(),
             selected_request.url
         );
+
+        if let Some(body) = selected_request.body.clone() {
+            request = request.body(body);
+        }
 
 
         let result = match request.send().await {

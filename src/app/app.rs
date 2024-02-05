@@ -1,6 +1,7 @@
 use ratatui::backend::Backend;
 use ratatui::Terminal;
 use reqwest::Method;
+use strum::Display;
 use tui_textarea::TextArea;
 use crate::app::tabs::tabs::RequestTabs;
 use crate::request::request::Request;
@@ -23,10 +24,16 @@ pub struct App<'a> {
     pub result_scrollbar: StatefulScrollbar
 }
 
+#[derive(Default, Display)]
 pub enum AppState {
+    #[default]
+    #[strum(to_string = "Main menu")]
     Normal,
+    #[strum(to_string = "Editing request URL")]
     EditingUrl,
+    #[strum(to_string = "Creating new request")]
     CreatingNewRequest,
+    #[strum(to_string = "Editing request body")]
     EditingBody
 }
 
@@ -37,7 +44,9 @@ impl App<'_> {
                 name: "Add User",
                 url: "http://127.0.0.1:8080/api/add_user",
                 method: Method::POST,
-                body: None,
+                body: Some(String::from(r#"{
+    "json": 32
+}"#)),
                 result: None,
             },
             Request {
