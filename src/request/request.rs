@@ -9,7 +9,13 @@ pub struct Request<'a> {
     pub url: &'a str,
     pub method: Method,
     pub body: Option<String>,
-    pub result: Option<String>
+    pub result: RequestResult
+}
+
+pub struct RequestResult {
+    pub body: Option<String>,
+    pub cookies: Option<String>,
+    pub headers: Option<String>
 }
 
 impl Request<'_> {

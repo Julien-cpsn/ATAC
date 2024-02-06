@@ -8,7 +8,9 @@ use ratatui::widgets::{Block, Borders, List, ListItem, Padding, Paragraph, Scrol
 use strum::IntoEnumIterator;
 use tui_big_text::{BigTextBuilder, PixelSize};
 use crate::app::app::{App, AppState};
-use crate::app::tabs::tabs::RequestTabs;
+use crate::app::request_ui::param_tabs::RequestParamsTabs;
+use crate::app::request_ui::result_tabs::RequestResultTabs;
+use crate::app::request_ui::views::RequestView;
 use crate::request::method::get_method_bg;
 use crate::utils::centered_rect::centered_rect;
 
@@ -204,12 +206,24 @@ impl App<'_> {
 
         // REQUEST MAIN LAYOUT
 
-        let request_main_layout = Layout::new(
-            Direction::Horizontal,
-            [
+        let request_main_layout_constraints = match self.request_view {
+            RequestView::Normal => [
                 Constraint::Percentage(50),
                 Constraint::Percentage(50)
             ],
+            RequestView::OnlyResult => [
+                Constraint::Percentage(0),
+                Constraint::Percentage(100)
+            ],
+            RequestView::OnlyParams => [
+                Constraint::Percentage(100),
+                Constraint::Percentage(0)
+            ]
+        };
+
+        let request_main_layout = Layout::new(
+            Horizontal,
+            request_main_layout_constraints,
         )
             .split(request_layout[2]);
 
@@ -224,7 +238,7 @@ impl App<'_> {
         frame.render_widget(params_block, request_main_layout[0]);
 
         let request_params_layout = Layout::new(
-            Direction::Vertical,
+            Vertical,
             [
                 Constraint::Length(2),
                 Constraint::Fill(1)
@@ -234,25 +248,25 @@ impl App<'_> {
 
         // REQUEST PARAM TABS
 
-        let tabs = RequestTabs::iter().map(|tab| tab.to_string());
-        let selected_tab_index = self.request_tab as usize;
+        let param_tabs = RequestParamsTabs::iter().map(|tab| tab.to_string());
+        let selected_param_tab_index = self.request_param_tab as usize;
 
-        let params_tab = Tabs::new(tabs)
+        let params_tabs = Tabs::new(param_tabs)
             .highlight_style(Style::default().yellow())
-            .select(selected_tab_index)
+            .select(selected_param_tab_index)
             .block(
                 Block::new().borders(Borders::BOTTOM)
             );
 
-        frame.render_widget(params_tab, request_params_layout[0]);
+        frame.render_widget(params_tabs, request_params_layout[0]);
 
         // REQUEST PARAM TABS CONTENT
 
-        match self.request_tab {
-            RequestTabs::Params => {}
-            RequestTabs::Auth => {}
-            RequestTabs::Headers => {}
-            RequestTabs::Body => {
+        match self.request_param_tab {
+            RequestParamsTabs::Params => {}
+            RequestParamsTabs::Auth => {}
+            RequestParamsTabs::Headers => {}
+            RequestParamsTabs::Body => {
                 match selected_request.body {
                     None => {
                         let body_paragraph = Paragraph::new("\nNo body").centered();
@@ -266,29 +280,72 @@ impl App<'_> {
             }
         }
 
-        // REQUEST RESULT
+        // REQUEST RESULT LAYOUT
 
-        let result_block = Block::new()
-            .title("Result").title_style(Style::new().underlined())
-            .padding(Padding::horizontal(1));
+        let result_block = Block::new();
 
         let result_block_area = result_block.inner(request_main_layout[1]);
 
-        let result_text = match &selected_request.result {
-            None => "",
-            Some(result) => result
+        let request_result_layout = Layout::new(
+            Vertical,
+            [
+                Constraint::Length(2),
+                Constraint::Fill(1)
+            ]
+        )
+            .split(result_block_area);
+
+        frame.render_widget(result_block, request_main_layout[1]);
+
+        // REQUEST RESULT TABS
+
+        let result_tabs = RequestResultTabs::iter().map(|tab| tab.to_string());
+        let selected_result_tab_index = self.request_result_tab as usize;
+
+        let result_tabs = Tabs::new(result_tabs)
+            .highlight_style(Style::default().yellow())
+            .select(selected_result_tab_index)
+            .block(
+                Block::new().borders(Borders::BOTTOM)
+            );
+
+        frame.render_widget(result_tabs, request_result_layout[0]);
+
+        // REQUEST RESULT CONTENT
+
+        let mut result_widget: Paragraph = match self.request_result_tab {
+            RequestResultTabs::Body => {
+                let result_body = match &selected_request.result.body {
+                    None => "",
+                    Some(result) => result
+                };
+
+                Paragraph::new(result_body)
+            }
+            RequestResultTabs::Cookies => {
+                let result_cookies = match &selected_request.result.cookies {
+                    None => "",
+                    Some(cookies) => cookies
+                };
+
+                Paragraph::new(result_cookies)
+            }
+            RequestResultTabs::Headers => {
+                let result_headers = match &selected_request.result.headers {
+                    None => "",
+                    Some(headers) => headers
+                };
+
+                Paragraph::new(result_headers)
+            }
         };
 
+        result_widget = result_widget.scroll((self.result_scrollbar.scroll, 0));
 
-        let result_paragraph = Paragraph::new(result_text)
-            .scroll((self.result_scrollbar.scroll, 0));
-
+        frame.render_widget(result_widget, request_result_layout[1]);
 
         let result_scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight);
 
-
-        frame.render_widget(result_block, request_main_layout[1]);
-        frame.render_widget(result_paragraph, result_block_area);
         frame.render_stateful_widget(
             result_scrollbar,
             result_block_area.inner(&Margin {

@@ -3,7 +3,8 @@ use crossterm::event::{Event, KeyCode, KeyEventKind, KeyModifiers};
 use std::io::Result;
 use tui_textarea::CursorMove;
 use crate::app::app::{App, AppState};
-use crate::app::tabs::tabs::next_request_tab;
+use crate::app::request_ui::param_tabs::next_request_tab;
+use crate::app::request_ui::views::next_request_view;
 
 impl App<'_> {
     /// Handle events
@@ -11,6 +12,10 @@ impl App<'_> {
         if let Event::Key(key) = event::read()? {
 
             let control_pressed: bool = key.modifiers == KeyModifiers::CONTROL;
+            let shift_pressed: bool = key.modifiers == KeyModifiers::SHIFT;
+
+            // Debug tool
+            //println!("{:?} {:?}", key.modifiers, key.code);
 
             if key.kind == KeyEventKind::Press {
                 match self.state {
@@ -47,17 +52,18 @@ impl App<'_> {
                         AppState::Normal => match key.code {
                             KeyCode::Char('b') if control_pressed => self.toggle_request_body(),
                             KeyCode::Char('b') => self.load_request_body_tab(),
-                            KeyCode::Tab => {
-                                self.request_tab = next_request_tab(self.request_tab);
-                            },
+
+                            KeyCode::PageUp => self.result_scrollbar.page_up(),
+                            KeyCode::PageDown => self.result_scrollbar.page_down(),
+
+                            KeyCode::BackTab if shift_pressed => self.request_view = next_request_view(self.request_view),
+                            KeyCode::Tab if control_pressed => self.next_request_result_tab(),
+                            KeyCode::Tab => self.request_param_tab = next_request_tab(self.request_param_tab),
 
                             KeyCode::Char('u') => self.state = AppState::EditingUrl,
                             KeyCode::Char('m') => self.modify_request_method(),
 
                             KeyCode::Enter => self.send_request().await,
-
-                            KeyCode::PageUp => self.result_scrollbar.page_up(),
-                            KeyCode::PageDown => self.result_scrollbar.page_down(),
 
                             _ => {}
 

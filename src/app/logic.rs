@@ -1,9 +1,9 @@
 use reqwest::{Client, Method};
 use tui_textarea::{TextArea};
 use crate::app::app::{App, AppState};
-use crate::app::tabs::tabs::RequestTabs;
+use crate::app::request_ui::param_tabs::RequestParamsTabs;
 use crate::request::method::next_method;
-use crate::request::request::Request;
+use crate::request::request::{Request, RequestResult};
 
 impl<'a> App<'a> {
     pub fn select_request(&mut self) {
@@ -37,7 +37,11 @@ impl<'a> App<'a> {
             url: "",
             method: Method::GET,
             body: None,
-            result: None,
+            result: RequestResult {
+                body: None,
+                cookies: None,
+                headers: None
+            },
         };
 
         self.collection.items.push(new_request);
@@ -68,7 +72,7 @@ impl<'a> App<'a> {
     }
 
     pub fn load_request_body_tab(&mut self) {
-        self.request_tab = RequestTabs::Body;
+        self.request_param_tab = RequestParamsTabs::Body;
 
         let selected_request_index = self.collection.selected.unwrap();
         let selected_request = &self.collection.items[selected_request_index];
@@ -143,17 +147,38 @@ impl<'a> App<'a> {
             request = request.body(body);
         }
 
+        match request.send().await {
+            Ok(response) => {
+                let headers = response.headers().clone()
+                    .iter()
+                    .map(|(header_name, header_value)| {
+                        format!("{:?}: {:?}", header_name, header_value)
+                    })
+                    .collect::<Vec<String>>()
+                    .join("\n");
 
-        let result = match request.send().await {
-            Ok(result) => result.text().await.unwrap(),
-            Err(error) => error.to_string()
+                let cookies = response.cookies()
+                    .map(|cookie| {
+                        format!("{}: {}", cookie.name(), cookie.value())
+                    })
+                    .collect::<Vec<String>>()
+                    .join("\n");
+
+                let result_body = response.text().await.unwrap();
+
+                selected_request.result.body = Some(result_body);
+                selected_request.result.cookies = Some(cookies);
+                selected_request.result.headers = Some(headers);
+            },
+            Err(error) => {
+                let result_body = error.to_string();
+
+                selected_request.result.body = Some(result_body);
+                selected_request.result.cookies = None;
+                selected_request.result.headers = None;
+            }
         };
 
-
-        let lines_count = result.lines().count();
-
-        self.result_scrollbar.set_scroll(lines_count);
-
-        selected_request.result = Some(result);
+        self.refresh_result_scrollbar();
     }
 }

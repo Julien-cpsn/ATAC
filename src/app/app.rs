@@ -3,8 +3,10 @@ use ratatui::Terminal;
 use reqwest::Method;
 use strum::Display;
 use tui_textarea::TextArea;
-use crate::app::tabs::tabs::RequestTabs;
-use crate::request::request::Request;
+use crate::app::request_ui::param_tabs::RequestParamsTabs;
+use crate::app::request_ui::result_tabs::RequestResultTabs;
+use crate::app::request_ui::views::RequestView;
+use crate::request::request::{Request, RequestResult};
 use crate::utils::stateful_list::StatefulList;
 use crate::utils::stateful_scrollbar::StatefulScrollbar;
 use crate::utils::text_input::TextInput;
@@ -15,7 +17,9 @@ pub struct App<'a> {
 
     pub collection: StatefulList<Request<'a>>,
 
-    pub request_tab: RequestTabs,
+    pub request_view: RequestView,
+    pub request_param_tab: RequestParamsTabs,
+    pub request_result_tab: RequestResultTabs,
 
     pub new_request_input: TextInput,
     pub url_text_input: TextInput,
@@ -47,21 +51,44 @@ impl App<'_> {
                 body: Some(String::from(r#"{
     "json": 32
 }"#)),
-                result: None,
+                result: RequestResult {
+                    body: None,
+                    cookies: None,
+                    headers: None,
+                },
             },
             Request {
                 name: "Get User",
                 url: "http://127.0.0.1:8080/api/get_user",
                 method: Method::GET,
                 body: None,
-                result: None,
+                result: RequestResult {
+                    body: None,
+                    cookies: None,
+                    headers: None,
+                },
             },
             Request {
                 name: "Rust Homepage",
                 url: "https://www.rust-lang.org",
                 method: Method::GET,
                 body: None,
-                result: None,
+                result: RequestResult {
+                    body: None,
+                    cookies: None,
+                    headers: None,
+                },
+            },
+            Request {
+                name: "Google fr",
+                url: "https://www.google.fr/",
+                method: Method::GET,
+                body: None,
+                result: RequestResult {
+                    body: None,
+                    cookies: None,
+                    headers: None,
+                },
             },
         ];
 
@@ -74,7 +101,9 @@ impl App<'_> {
                 selected: None,
                 last_selected: None,
             },
-            request_tab: Default::default(),
+            request_view: RequestView::Normal,
+            request_param_tab: RequestParamsTabs::Params,
+            request_result_tab: RequestResultTabs::Body,
             new_request_input: TextInput {
                 text: String::new(),
                 cursor_position: 0,
