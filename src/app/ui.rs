@@ -278,6 +278,7 @@ impl App<'_> {
                     }
                 }
             }
+            RequestParamsTabs::Cookies => {}
         }
 
         // REQUEST RESULT LAYOUT

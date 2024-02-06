@@ -10,7 +10,9 @@ pub enum RequestParamsTabs {
     #[strum(to_string = "Headers")]
     Headers,
     #[strum(to_string = "Body")]
-    Body
+    Body,
+    #[strum(to_string = "Cookies")]
+    Cookies
 }
 
 pub fn next_request_tab(current_tab: RequestParamsTabs) -> RequestParamsTabs {
@@ -18,6 +20,7 @@ pub fn next_request_tab(current_tab: RequestParamsTabs) -> RequestParamsTabs {
         RequestParamsTabs::Params => RequestParamsTabs::Auth,
         RequestParamsTabs::Auth => RequestParamsTabs::Headers,
         RequestParamsTabs::Headers => RequestParamsTabs::Body,
-        RequestParamsTabs::Body => RequestParamsTabs::Params
+        RequestParamsTabs::Body => RequestParamsTabs::Cookies,
+        RequestParamsTabs::Cookies => RequestParamsTabs::Params
     }
 }
