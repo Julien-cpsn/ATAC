@@ -1,4 +1,5 @@
 use strum::{Display, EnumIter, FromRepr};
+use crate::app::app::App;
 
 #[derive(Default, Clone, Copy, Display, FromRepr, EnumIter)]
 pub enum RequestParamsTabs {
@@ -15,12 +16,14 @@ pub enum RequestParamsTabs {
     Cookies
 }
 
-pub fn next_request_tab(current_tab: RequestParamsTabs) -> RequestParamsTabs {
-    match current_tab {
-        RequestParamsTabs::Params => RequestParamsTabs::Auth,
-        RequestParamsTabs::Auth => RequestParamsTabs::Headers,
-        RequestParamsTabs::Headers => RequestParamsTabs::Body,
-        RequestParamsTabs::Body => RequestParamsTabs::Cookies,
-        RequestParamsTabs::Cookies => RequestParamsTabs::Params
+impl App<'_> {
+    pub fn next_request_param_tab(&mut self) {
+        self.request_param_tab = match self.request_param_tab {
+            RequestParamsTabs::Params => RequestParamsTabs::Auth,
+            RequestParamsTabs::Auth => RequestParamsTabs::Headers,
+            RequestParamsTabs::Headers => RequestParamsTabs::Body,
+            RequestParamsTabs::Body => RequestParamsTabs::Cookies,
+            RequestParamsTabs::Cookies => RequestParamsTabs::Params
+        };
     }
 }

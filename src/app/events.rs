@@ -4,8 +4,6 @@ use std::io::Result;
 use tui_textarea::CursorMove;
 use crate::app::app::{App};
 use crate::app::app_states::AppState;
-use crate::app::request_ui::param_tabs::{next_request_tab, RequestParamsTabs};
-use crate::app::request_ui::views::next_request_view;
 
 impl App<'_> {
     /// Handle events
@@ -28,7 +26,7 @@ impl App<'_> {
                         KeyCode::Right => self.select_request(),
                         KeyCode::Left => self.unselect_request(),
 
-                        KeyCode::Char('n') => self.state = AppState::CreatingNewRequest,
+                        KeyCode::Char('n') => self.create_new_request_state(),
                         KeyCode::Char('d') => self.delete_request(),
 
                         _ => {}
@@ -37,7 +35,7 @@ impl App<'_> {
                     AppState::CreatingNewRequest => match key.code {
                         KeyCode::Char(char) => self.new_request_input.enter_char(char),
 
-                        KeyCode::Esc => self.state = AppState::Normal,
+                        KeyCode::Esc => self.normal_state(),
                         KeyCode::Enter => self.new_request(),
 
                         KeyCode::Backspace => self.new_request_input.delete_char(),
@@ -46,23 +44,23 @@ impl App<'_> {
                         _ => {}
                     },
 
-                    /* /!\ Below, a request has been selected /!\ */
+                    /* /!\ Below, consider that a request has been selected /!\ */
 
                     AppState::SelectedRequest => match key.code {
-                        KeyCode::Esc => self.state = AppState::Normal,
+                        KeyCode::Esc => self.normal_state(),
 
                         KeyCode::Char('b') if control_pressed => self.toggle_request_body(),
-                        KeyCode::Char('b') => self.request_param_tab = RequestParamsTabs::Body,
+                        KeyCode::Char('b') => self.edit_request_body_state(),
 
-                        KeyCode::Char('u') => self.state = AppState::EditingRequestUrl,
+                        KeyCode::Char('u') => self.edit_request_url_state(),
                         KeyCode::Char('m') => self.modify_request_method(),
 
                         KeyCode::PageUp => self.result_scrollbar.page_up(),
                         KeyCode::PageDown => self.result_scrollbar.page_down(),
 
-                        KeyCode::BackTab if shift_pressed => self.request_view = next_request_view(self.request_view),
+                        KeyCode::BackTab if shift_pressed => self.next_request_view(),
                         KeyCode::Tab if control_pressed => self.next_request_result_tab(),
-                        KeyCode::Tab => self.request_param_tab = next_request_tab(self.request_param_tab),
+                        KeyCode::Tab => self.next_request_param_tab(),
 
                         KeyCode::Enter => self.send_request().await,
 
@@ -72,7 +70,7 @@ impl App<'_> {
 
                     AppState::EditingRequestUrl => match key.code {
                         KeyCode::Char(char) => self.url_text_input.enter_char(char),
-                        KeyCode::Esc => self.state = AppState::SelectedRequest,
+                        KeyCode::Esc => self.select_request_state(),
                         KeyCode::Enter => self.modify_request_url(),
                         KeyCode::Backspace => self.url_text_input.delete_char(),
                         KeyCode::Left => self.url_text_input.move_cursor_left(),

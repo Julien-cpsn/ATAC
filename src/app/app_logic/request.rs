@@ -1,70 +1,16 @@
-use reqwest::{Client, Method};
-use tui_textarea::{TextArea};
-use crate::app::app::{App};
-use crate::app::app_states::AppState;
+use reqwest::Client;
+use tui_textarea::TextArea;
+use crate::app::app::App;
 use crate::request::method::next_method;
-use crate::request::request::{Request, RequestResult};
 
-impl<'a> App<'a> {
-    pub fn select_request(&mut self) {
-        self.url_text_input.reset_input();
-        self.collection.select();
-        self.result_scrollbar.set_scroll(0);
-
-        if let Some(selected_request_index) = self.collection.selected {
-            let selected_request = &self.collection.items[selected_request_index];
-            self.url_text_input.enter_str(selected_request.url);
-
-            let body = selected_request.body.clone().unwrap_or(String::new());
-            self.refresh_body_textarea(body);
-
-            self.state = AppState::SelectedRequest;
-        }
-    }
-
-    pub fn unselect_request(&mut self) {
-        self.url_text_input.reset_input();
-        self.collection.unselect();
-    }
-
-    pub fn new_request(&mut self) {
-        let new_request_name = &self.new_request_input.text;
-
-        if new_request_name.len() == 0 {
-            return;
-        }
-
-        let new_request = Request::<'a> {
-            name: new_request_name.clone().leak(),
-            url: "",
-            method: Method::GET,
-            body: None,
-            result: RequestResult {
-                body: None,
-                cookies: None,
-                headers: None
-            },
-        };
-
-        self.collection.items.push(new_request);
-
-        self.state = AppState::Normal;
-    }
-
-    pub fn delete_request(&mut self) {
-        if let Some(selected_request_index) = self.collection.state.selected() {
-            self.collection.unselect();
-            self.collection.items.remove(selected_request_index);
-        }
-    }
-
+impl App<'_> {
     pub fn modify_request_url(&mut self) {
         let input_text = self.url_text_input.text.clone();
         let selected_request_index = self.collection.selected.unwrap();
 
         self.collection.items[selected_request_index].url = input_text.leak();
 
-        self.state = AppState::SelectedRequest;
+        self.select_request_state();
     }
 
     pub fn modify_request_method(&mut self) {
@@ -89,8 +35,8 @@ impl<'a> App<'a> {
 
         self.collection.items[selected_request_index].body = Some(body.clone());
 
-        self.state = AppState::SelectedRequest;
         self.refresh_body_textarea(body);
+        self.select_request_state();
     }
 
     pub fn toggle_request_body(&mut self) {
@@ -102,11 +48,11 @@ impl<'a> App<'a> {
         match selected_request.body {
             None => {
                 self.collection.items[selected_request_index].body = Some(body.clone());
-                self.state = AppState::EditingRequestBody;
+                self.edit_request_body_state();
             }
             Some(_) => {
                 self.collection.items[selected_request_index].body = None;
-                self.state = AppState::SelectedRequest;
+                self.select_request_state();
             }
         }
 
@@ -120,7 +66,7 @@ impl<'a> App<'a> {
         let body = selected_request.body.clone().unwrap_or(String::new());
 
         self.refresh_body_textarea(body);
-        self.state = AppState::SelectedRequest;
+        self.select_request_state();
     }
 
     pub async fn send_request(&mut self) {
