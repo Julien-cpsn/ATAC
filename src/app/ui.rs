@@ -1,10 +1,12 @@
 use ratatui::backend::Backend;
 use ratatui::{Frame, Terminal};
 use ratatui::layout::{Alignment, Constraint, Direction, Layout, Margin, Rect};
+use ratatui::layout::Direction::{Horizontal, Vertical};
 use ratatui::prelude::{Modifier, Style};
 use ratatui::style::{Color, Stylize};
 use ratatui::widgets::{Block, Borders, List, ListItem, Padding, Paragraph, Scrollbar, ScrollbarOrientation, Tabs};
 use strum::IntoEnumIterator;
+use tui_big_text::{BigTextBuilder, PixelSize};
 use crate::app::app::{App, AppState};
 use crate::app::tabs::tabs::RequestTabs;
 use crate::request::method::get_method_bg;
@@ -28,7 +30,7 @@ impl App<'_> {
         // HEADER
 
         let header = Block::new()
-            .title("* TUI-Quest *")
+            .title("* ATAC *")
             .add_modifier(Modifier::BOLD)
             .add_modifier(Modifier::ITALIC)
             .title_alignment(Alignment::Center)
@@ -299,10 +301,50 @@ impl App<'_> {
     }
 
     fn render_homepage(&mut self, frame: &mut Frame, rect: Rect) {
-        frame.render_widget(
-            Paragraph::new("\nWelcome to TUI-Quest\nhttps://github.com/Julien-cpsn/TUI-Quest").centered(),
-            rect
-        );
+        let block = Block::new();
+
+        let inner_block_area = block.inner(rect);
+
+        let inner_layout = Layout::new(
+            Vertical,
+            [
+                Constraint::Percentage(50),
+                Constraint::Length(1),
+                Constraint::Length(4),
+                Constraint::Length(1),
+                Constraint::Percentage(50)
+            ]
+        )
+            .split(inner_block_area);
+
+        let title_length = 16;
+
+        let title_layout = Layout::new(
+            Horizontal,
+            [
+                Constraint::Percentage((100-title_length)/2+2),
+                Constraint::Length(title_length),
+                Constraint::Percentage((100-title_length)/2),
+            ]
+        )
+            .split(inner_layout[2]);
+
+        let title = BigTextBuilder::default()
+            .pixel_size(PixelSize::Quadrant)
+            .lines([
+                "ATAC".into(),
+            ])
+            .build()
+            .unwrap();
+
+
+        let welcome_to = Paragraph::new("Welcome to").centered();
+        let description = Paragraph::new("{A}rguably a {T}UI {A}PI {C}lient").centered();
+
+        frame.render_widget(block, rect);
+        frame.render_widget(welcome_to, inner_layout[1]);
+        frame.render_widget(title, title_layout[1]);
+        frame.render_widget(description, inner_layout[3]);
     }
 
     pub fn draw(&mut self, terminal: &mut Terminal<impl Backend>) -> std::io::Result<()> {

@@ -1,5 +1,5 @@
 [package]
-name = "tui-quest"
+name = "atac"
 version = "0.1.0"
 edition = "2021"
 
@@ -12,4 +12,5 @@ reqwest = "0.11.24"
 strum = "0.26.1"
 throbber-widgets-tui = "0.3.0"
 tokio = { version = "1.0.0", features = ["rt", "rt-multi-thread", "macros"] }
+tui-big-text = "0.3.6"
 tui-textarea = { version = "0.4.0", features = ["ratatui"] }
