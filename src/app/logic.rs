@@ -1,7 +1,7 @@
 use reqwest::{Client, Method};
 use tui_textarea::{TextArea};
-use crate::app::app::{App, AppState};
-use crate::app::request_ui::param_tabs::RequestParamsTabs;
+use crate::app::app::{App};
+use crate::app::app_states::AppState;
 use crate::request::method::next_method;
 use crate::request::request::{Request, RequestResult};
 
@@ -17,6 +17,8 @@ impl<'a> App<'a> {
 
             let body = selected_request.body.clone().unwrap_or(String::new());
             self.refresh_body_textarea(body);
+
+            self.state = AppState::SelectedRequest;
         }
     }
 
@@ -57,29 +59,18 @@ impl<'a> App<'a> {
     }
 
     pub fn modify_request_url(&mut self) {
-        self.state = AppState::Normal;
-
         let input_text = self.url_text_input.text.clone();
         let selected_request_index = self.collection.selected.unwrap();
 
         self.collection.items[selected_request_index].url = input_text.leak();
+
+        self.state = AppState::SelectedRequest;
     }
 
     pub fn modify_request_method(&mut self) {
         let selected_request_index = self.collection.selected.unwrap();
         let next_method = next_method(&self.collection.items[selected_request_index].method);
         self.collection.items[selected_request_index].method = next_method;
-    }
-
-    pub fn load_request_body_tab(&mut self) {
-        self.request_param_tab = RequestParamsTabs::Body;
-
-        let selected_request_index = self.collection.selected.unwrap();
-        let selected_request = &self.collection.items[selected_request_index];
-
-        if selected_request.body.is_some() {
-            self.state = AppState::EditingBody;
-        }
     }
 
     pub fn refresh_body_textarea(&mut self, text: String) {
@@ -98,7 +89,7 @@ impl<'a> App<'a> {
 
         self.collection.items[selected_request_index].body = Some(body.clone());
 
-        self.state = AppState::Normal;
+        self.state = AppState::SelectedRequest;
         self.refresh_body_textarea(body);
     }
 
@@ -111,11 +102,11 @@ impl<'a> App<'a> {
         match selected_request.body {
             None => {
                 self.collection.items[selected_request_index].body = Some(body.clone());
-                self.state = AppState::EditingBody;
+                self.state = AppState::EditingRequestBody;
             }
             Some(_) => {
                 self.collection.items[selected_request_index].body = None;
-                self.state = AppState::Normal;
+                self.state = AppState::SelectedRequest;
             }
         }
 
@@ -129,7 +120,7 @@ impl<'a> App<'a> {
         let body = selected_request.body.clone().unwrap_or(String::new());
 
         self.refresh_body_textarea(body);
-        self.state = AppState::Normal;
+        self.state = AppState::SelectedRequest;
     }
 
     pub async fn send_request(&mut self) {

@@ -5,9 +5,11 @@ use ratatui::layout::Direction::{Horizontal, Vertical};
 use ratatui::prelude::{Modifier, Style};
 use ratatui::style::{Color, Stylize};
 use ratatui::widgets::{Block, Borders, List, ListItem, Padding, Paragraph, Scrollbar, ScrollbarOrientation, Tabs};
+use ratatui::widgets::block::Title;
 use strum::IntoEnumIterator;
 use tui_big_text::{BigTextBuilder, PixelSize};
-use crate::app::app::{App, AppState};
+use crate::app::app::{App};
+use crate::app::app_states::{AppState, get_available_keys};
 use crate::app::request_ui::param_tabs::RequestParamsTabs;
 use crate::app::request_ui::result_tabs::RequestResultTabs;
 use crate::app::request_ui::views::RequestView;
@@ -90,18 +92,26 @@ impl App<'_> {
 
         // FOOTER
 
-        let footer_text = match self.state {
+        let state_text = match self.state {
             AppState::Normal | AppState::CreatingNewRequest => self.state.to_string(),
-            AppState::EditingUrl | AppState::EditingBody => {
+            AppState::SelectedRequest | AppState::EditingRequestUrl | AppState::EditingRequestBody => {
                 let selected_request_index = self.collection.selected.unwrap();
                 let selected_request = &self.collection.items[selected_request_index];
 
-                format!("{} > {}", selected_request.name, self.state.to_string())
+                if self.state == AppState::SelectedRequest {
+                    self.state.to_string()
+                }
+                else {
+                    format!("Request > {} > {}", selected_request.name, self.state.to_string())
+                }
             }
         };
 
+        let available_keys = get_available_keys(self.state);
+
         let footer = Block::new()
-            .title(footer_text);
+            .title(Title::from(state_text).alignment(Alignment::Left))
+            .title(Title::from(available_keys.dark_gray()).alignment(Alignment::Right));
 
         frame.render_widget(footer, main_layout[2]);
     }
@@ -195,7 +205,7 @@ impl App<'_> {
         frame.render_widget(url_paragraph, request_header_layout[1]);
 
         match self.state {
-            AppState::EditingUrl => {
+            AppState::EditingRequestUrl => {
                 frame.set_cursor(
                     request_header_layout[1].x + self.url_text_input.cursor_position as u16 + 2,
                     request_header_layout[1].y + 1

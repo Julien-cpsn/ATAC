@@ -1,8 +1,8 @@
 use ratatui::backend::Backend;
 use ratatui::Terminal;
 use reqwest::Method;
-use strum::Display;
 use tui_textarea::TextArea;
+use crate::app::app_states::AppState;
 use crate::app::request_ui::param_tabs::RequestParamsTabs;
 use crate::app::request_ui::result_tabs::RequestResultTabs;
 use crate::app::request_ui::views::RequestView;
@@ -26,19 +26,6 @@ pub struct App<'a> {
     pub body_text_area: TextArea<'a>,
 
     pub result_scrollbar: StatefulScrollbar
-}
-
-#[derive(Default, Display)]
-pub enum AppState {
-    #[default]
-    #[strum(to_string = "Main menu")]
-    Normal,
-    #[strum(to_string = "Editing request URL")]
-    EditingUrl,
-    #[strum(to_string = "Creating new request")]
-    CreatingNewRequest,
-    #[strum(to_string = "Editing request body")]
-    EditingBody
 }
 
 impl App<'_> {
