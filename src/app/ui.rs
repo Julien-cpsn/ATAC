@@ -19,7 +19,7 @@ impl App<'_> {
         // MAIN LAYOUT
 
         let main_layout = Layout::new(
-            Direction::Vertical,
+            Vertical,
             [
                 Constraint::Length(1),
                 Constraint::Min(1),
@@ -43,10 +43,10 @@ impl App<'_> {
         // INNER LAYOUT
 
         let inner_layout = Layout::new(
-            Direction::Horizontal,
+            Horizontal,
             [
-                Constraint::Percentage(20),
-                Constraint::Percentage(80)
+                Constraint::Percentage(18),
+                Constraint::Percentage(82)
             ],
         )
             .split(main_layout[1]);

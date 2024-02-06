@@ -152,7 +152,7 @@ impl<'a> App<'a> {
                 let headers = response.headers().clone()
                     .iter()
                     .map(|(header_name, header_value)| {
-                        format!("{:?}: {:?}", header_name, header_value)
+                        format!("{}: {:?}", header_name.to_string(), header_value)
                     })
                     .collect::<Vec<String>>()
                     .join("\n");
