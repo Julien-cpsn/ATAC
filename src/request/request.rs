@@ -4,6 +4,7 @@ use ratatui::widgets::ListItem;
 use reqwest::Method;
 use crate::request::method::get_method_bg;
 
+#[derive(Clone)]
 pub struct Request<'a> {
     pub name: &'a str,
     pub url: &'a str,
@@ -12,6 +13,7 @@ pub struct Request<'a> {
     pub result: RequestResult
 }
 
+#[derive(Clone)]
 pub struct RequestResult {
     pub body: Option<String>,
     pub cookies: Option<String>,
