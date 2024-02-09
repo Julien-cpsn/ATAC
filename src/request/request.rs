@@ -2,18 +2,19 @@ use ratatui::prelude::{Line, Modifier, Span};
 use ratatui::style::Stylize;
 use ratatui::widgets::ListItem;
 use reqwest::Method;
+use crate::request::body::ContentType;
 use crate::request::method::get_method_bg;
 
-#[derive(Clone)]
+#[derive(Default, Clone)]
 pub struct Request<'a> {
     pub name: &'a str,
     pub url: &'a str,
     pub method: Method,
-    pub body: Option<String>,
+    pub body: ContentType,
     pub result: RequestResult
 }
 
-#[derive(Clone)]
+#[derive(Default, Clone)]
 pub struct RequestResult {
     pub body: Option<String>,
     pub cookies: Option<String>,

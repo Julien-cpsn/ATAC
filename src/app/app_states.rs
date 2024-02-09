@@ -21,6 +21,6 @@ pub fn get_available_keys(app_state: AppState) -> String {
         AppState::SelectedRequest => String::from("Esc Tab ^(U)rl ^(B)ody"),
         AppState::EditingRequestUrl => String::from("Esc Enter ← → copy paste"),
         AppState::CreatingNewRequest => String::from("Esc Enter ← → copy paste"),
-        AppState::EditingRequestBody => String::from("Esc Enter Tab ↑ ↓ ← → copy paste")
+        AppState::EditingRequestBody => String::from("Esc Enter Tab ^(s)ave ↑ ↓ ← → copy paste")
     }
 }

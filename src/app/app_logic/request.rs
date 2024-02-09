@@ -1,6 +1,8 @@
 use reqwest::Client;
+use reqwest::header::CONTENT_TYPE;
 use tui_textarea::TextArea;
 use crate::app::app::App;
+use crate::request::body::{ContentType, next_content_type};
 use crate::request::method::next_method;
 
 impl App<'_> {
@@ -30,31 +32,31 @@ impl App<'_> {
 
     pub fn modify_request_body(&mut self) {
         let selected_request_index = self.collection.selected.unwrap();
+        let selected_request = &self.collection.items[selected_request_index];
 
         let body: String = self.body_text_area.lines().join("\n");
 
-        self.collection.items[selected_request_index].body = Some(body.clone());
+        let new_body = match selected_request.body {
+            ContentType::NoBody => ContentType::NoBody,
+            ContentType::Raw(_) => ContentType::Raw(body.clone()),
+            ContentType::JSON(_) => ContentType::JSON(body.clone()),
+            ContentType::XML(_) => ContentType::XML(body.clone()),
+            ContentType::HTML(_) => ContentType::HTML(body.clone())
+        };
+
+        self.collection.items[selected_request_index].body = new_body;
 
         self.refresh_body_textarea(body);
         self.select_request_state();
     }
 
-    pub fn toggle_request_body(&mut self) {
+    pub fn modify_request_content_type(&mut self) {
         let selected_request_index = self.collection.selected.unwrap();
         let selected_request = &self.collection.items[selected_request_index];
 
-        let body = String::new();
+        let body = selected_request.body.get_body_as_string();
 
-        match selected_request.body {
-            None => {
-                self.collection.items[selected_request_index].body = Some(body.clone());
-                self.edit_request_body_state();
-            }
-            Some(_) => {
-                self.collection.items[selected_request_index].body = None;
-                self.select_request_state();
-            }
-        }
+        self.collection.items[selected_request_index].body = next_content_type(&selected_request.body);
 
         self.refresh_body_textarea(body);
     }
@@ -63,7 +65,7 @@ impl App<'_> {
         let selected_request_index = self.collection.selected.unwrap();
         let selected_request = &mut self.collection.items[selected_request_index];
 
-        let body = selected_request.body.clone().unwrap_or(String::new());
+        let body = selected_request.body.get_body_as_string();
 
         self.refresh_body_textarea(body);
         self.select_request_state();
@@ -80,9 +82,14 @@ impl App<'_> {
             selected_request.url
         );
 
-        if let Some(body) = selected_request.body.clone() {
-            request = request.body(body);
-        }
+        match &selected_request.body {
+            ContentType::NoBody => {},
+            ContentType::Raw(body) | ContentType::JSON(body) | ContentType::XML(body) | ContentType::HTML(body) => {
+                request = request
+                    .header(CONTENT_TYPE, selected_request.body.to_content_type())
+                    .body(body.to_string());
+            }
+        };
 
         match request.send().await {
             Ok(response) => {

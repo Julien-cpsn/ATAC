@@ -6,6 +6,8 @@ use ratatui::style::Stylize;
 use ratatui::widgets::{Block, Borders, Paragraph, Tabs};
 use strum::{Display, EnumIter, FromRepr, IntoEnumIterator};
 use crate::app::app::App;
+use crate::app::request_ui::param_tabs::RequestParamsTabs::{Auth, Body, Cookies, Headers, Params};
+use crate::request::body::ContentType::{NoBody, HTML, JSON, Raw, XML};
 use crate::request::request::Request;
 
 #[derive(Default, Clone, Copy, Display, FromRepr, EnumIter)]
@@ -26,11 +28,11 @@ pub enum RequestParamsTabs {
 impl App<'_> {
     pub fn next_request_param_tab(&mut self) {
         self.request_param_tab = match self.request_param_tab {
-            RequestParamsTabs::Params => RequestParamsTabs::Auth,
-            RequestParamsTabs::Auth => RequestParamsTabs::Headers,
-            RequestParamsTabs::Headers => RequestParamsTabs::Body,
-            RequestParamsTabs::Body => RequestParamsTabs::Cookies,
-            RequestParamsTabs::Cookies => RequestParamsTabs::Params
+            Params => Auth,
+            Auth => Headers,
+            Headers => Body,
+            Body => Cookies,
+            Cookies => Params
         };
     }
 
@@ -46,7 +48,22 @@ impl App<'_> {
 
         // REQUEST PARAM TABS
 
-        let param_tabs = RequestParamsTabs::iter().map(|tab| tab.to_string());
+        let param_tabs = RequestParamsTabs::iter()
+            .map(|tab| {
+                match tab {
+                    Params => tab.to_string(),
+                    Auth => tab.to_string(),
+                    Headers => tab.to_string(),
+                    Body => match &request.body {
+                        NoBody => tab.to_string(),
+                        Raw(_) | JSON(_) | XML(_) | HTML(_) => {
+                            format!("{} ({})", tab.to_string(), &request.body.to_string())
+                        }
+                    }
+                    Cookies => tab.to_string(),
+                }
+            });
+
         let selected_param_tab_index = self.request_param_tab as usize;
 
         let params_tabs = Tabs::new(param_tabs)
@@ -61,22 +78,22 @@ impl App<'_> {
         // REQUEST PARAM TABS CONTENT
 
         match self.request_param_tab {
-            RequestParamsTabs::Params => {}
-            RequestParamsTabs::Auth => {}
-            RequestParamsTabs::Headers => {}
-            RequestParamsTabs::Body => {
-                match request.body {
-                    None => {
+            Params => {}
+            Auth => {}
+            Headers => {}
+            Body => {
+                match &request.body {
+                    NoBody => {
                         let body_paragraph = Paragraph::new("\nNo body").centered();
                         frame.render_widget(body_paragraph, request_params_layout[1]);
                     }
-                    Some(_) => {
+                    Raw(_) | JSON(_) | XML(_) | HTML(_) => {
                         self.body_text_area.set_line_number_style(Style::new().fg(Color::DarkGray));
                         frame.render_widget(self.body_text_area.widget(), request_params_layout[1]);
                     }
                 }
             }
-            RequestParamsTabs::Cookies => {}
+            Cookies => {}
         }
     }
 }

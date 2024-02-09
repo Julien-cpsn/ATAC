@@ -1,6 +1,7 @@
 use crate::app::app::App;
 use crate::app::app_states::AppState;
 use crate::app::request_ui::param_tabs::RequestParamsTabs;
+use crate::request::body::ContentType;
 
 impl App<'_> {
     pub fn normal_state(&mut self) {
@@ -25,8 +26,11 @@ impl App<'_> {
         let selected_request_index = self.collection.selected.unwrap();
         let selected_request = &self.collection.items[selected_request_index];
 
-        if selected_request.body.is_some() {
-            self.state = AppState::EditingRequestBody;
+        match &selected_request.body {
+            ContentType::NoBody => {},
+            ContentType::Raw(_) | ContentType::JSON(_) | ContentType::XML(_) | ContentType::HTML(_) => {
+                self.state = AppState::EditingRequestBody;
+            }
         }
     }
 }

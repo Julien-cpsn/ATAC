@@ -6,7 +6,8 @@ use crate::app::app_states::AppState;
 use crate::app::request_ui::param_tabs::RequestParamsTabs;
 use crate::app::request_ui::result_tabs::RequestResultTabs;
 use crate::app::request_ui::views::RequestView;
-use crate::request::request::{Request, RequestResult};
+use crate::request::body::ContentType::{JSON};
+use crate::request::request::{Request};
 use crate::utils::stateful_list::StatefulList;
 use crate::utils::stateful_scrollbar::StatefulScrollbar;
 use crate::utils::text_input::TextInput;
@@ -32,50 +33,31 @@ impl App<'_> {
     pub fn new<'a>() -> App<'a> {
         let items = vec![
             Request {
-                name: "Add User",
-                url: "http://127.0.0.1:8080/api/add_user",
-                method: Method::POST,
-                body: Some(String::from(r#"{
+                name: "Check headers",
+                url: "https://httpbin.org/headers",
+                method: Method::GET,
+                body: JSON(String::from(r#"{
     "json": 32
 }"#)),
-                result: RequestResult {
-                    body: None,
-                    cookies: None,
-                    headers: None,
-                },
+                ..Default::default()
             },
             Request {
                 name: "Get User",
                 url: "http://127.0.0.1:8080/api/get_user",
                 method: Method::GET,
-                body: None,
-                result: RequestResult {
-                    body: None,
-                    cookies: None,
-                    headers: None,
-                },
+                ..Default::default()
             },
             Request {
                 name: "Rust Homepage",
                 url: "https://www.rust-lang.org",
                 method: Method::GET,
-                body: None,
-                result: RequestResult {
-                    body: None,
-                    cookies: None,
-                    headers: None,
-                },
+                ..Default::default()
             },
             Request {
                 name: "Google fr",
                 url: "https://www.google.fr/",
                 method: Method::GET,
-                body: None,
-                result: RequestResult {
-                    body: None,
-                    cookies: None,
-                    headers: None,
-                },
+                ..Default::default()
             },
         ];
 

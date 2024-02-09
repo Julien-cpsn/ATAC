@@ -49,7 +49,7 @@ impl App<'_> {
                     AppState::SelectedRequest => match key.code {
                         KeyCode::Esc => self.normal_state(),
 
-                        KeyCode::Char('b') if control_pressed => self.toggle_request_body(),
+                        KeyCode::Char('b') if control_pressed => self.modify_request_content_type(),
                         KeyCode::Char('b') => self.edit_request_body_state(),
 
                         KeyCode::Char('u') => self.edit_request_url_state(),
