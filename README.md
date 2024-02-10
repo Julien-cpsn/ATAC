@@ -1,7 +1,7 @@
 ATAC
 ===
 
-[![Rust](https://github.com/Julien-cpsn/ATAC/actions/workflows/badge.svg)](https://github.com/Julien-cpsn/ATAC/actions/workflows/rust.yml)
+[![Rust](https://github.com/Julien-cpsn/ATAC/actions/workflows/rust.yml/badge.svg)](https://github.com/Julien-cpsn/ATAC/actions/workflows/rust.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Description
