@@ -11,7 +11,7 @@ use crate::request::request::Request;
 #[derive(Default, Clone, Copy, Display, FromRepr, EnumIter)]
 pub enum RequestResultTabs {
     #[default]
-    #[strum(to_string = "Body")]
+    #[strum(to_string = "Result body")]
     Body,
     #[strum(to_string = "Cookies")]
     Cookies,
@@ -72,7 +72,20 @@ impl App<'_> {
 
         // REQUEST RESULT TABS
 
-        let result_tabs = RequestResultTabs::iter().map(|tab| tab.to_string());
+        let result_tabs = RequestResultTabs::iter()
+            .map(|tab| {
+                match tab {
+                    RequestResultTabs::Body => {
+                        if let Some(status_code) = request.result.status_code {
+                            format!("{} ({})", tab.to_string(), status_code)
+                        }
+                        else {
+                            format!("{}", tab.to_string())
+                        }
+                    },
+                    RequestResultTabs::Cookies | RequestResultTabs::Headers => tab.to_string()
+                }
+            });
         let selected_result_tab_index = self.request_result_tab as usize;
 
         let result_tabs = Tabs::new(result_tabs)

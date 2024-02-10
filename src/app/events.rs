@@ -19,6 +19,7 @@ impl App<'_> {
             if key.kind == KeyEventKind::Press {
                 match self.state {
                     AppState::Normal => match key.code {
+                        KeyCode::Char('c') if control_pressed => return Ok(true),
                         KeyCode::Char('q') => return Ok(true),
 
                         KeyCode::Up => self.collection.previous(),
@@ -49,6 +50,9 @@ impl App<'_> {
                     AppState::SelectedRequest => match key.code {
                         KeyCode::Esc => self.normal_state(),
 
+                        KeyCode::Char('a') if control_pressed => self.modify_request_auth(),
+                        KeyCode::Char('a') => self.edit_request_auth_state(),
+
                         KeyCode::Char('b') if control_pressed => self.modify_request_content_type(),
                         KeyCode::Char('b') => self.edit_request_body_state(),
 
@@ -70,13 +74,48 @@ impl App<'_> {
 
                     AppState::EditingRequestUrl => match key.code {
                         KeyCode::Char(char) => self.url_text_input.enter_char(char),
+
                         KeyCode::Esc => self.select_request_state(),
                         KeyCode::Enter => self.modify_request_url(),
+
                         KeyCode::Backspace => self.url_text_input.delete_char(),
                         KeyCode::Left => self.url_text_input.move_cursor_left(),
                         KeyCode::Right => self.url_text_input.move_cursor_right(),
                         _ => {}
                     }
+
+                    AppState::EditingRequestAuth => match key.code {
+                        KeyCode::Esc => self.select_request_state(),
+                        KeyCode::Enter => self.select_request_auth_input_text(),
+
+                        KeyCode::Up => self.auth_text_input_selection.previous(),
+                        KeyCode::Down => self.auth_text_input_selection.next(),
+                        _ => {}
+                    },
+
+                    AppState::EditingRequestAuthUsername => match key.code {
+                        KeyCode::Char(char) => self.auth_basic_username_text_input.enter_char(char),
+
+                        KeyCode::Esc => self.edit_request_auth_state(),
+                        KeyCode::Enter => self.modify_request_auth_basic_username(),
+
+                        KeyCode::Backspace => self.auth_basic_username_text_input.delete_char(),
+                        KeyCode::Left => self.auth_basic_username_text_input.move_cursor_left(),
+                        KeyCode::Right => self.auth_basic_username_text_input.move_cursor_right(),
+                        _ => {}
+                    },
+
+                    AppState::EditingRequestAuthPassword => match key.code {
+                        KeyCode::Char(char) => self.auth_basic_password_text_input.enter_char(char),
+
+                        KeyCode::Esc => self.edit_request_auth_state(),
+                        KeyCode::Enter => self.modify_request_auth_basic_password(),
+
+                        KeyCode::Backspace => self.auth_basic_password_text_input.delete_char(),
+                        KeyCode::Left => self.auth_basic_password_text_input.move_cursor_left(),
+                        KeyCode::Right => self.auth_basic_password_text_input.move_cursor_right(),
+                        _ => {}
+                    },
 
                     AppState::EditingRequestBody => match key.code {
                         KeyCode::Char('c') if control_pressed => self.body_text_area.copy(),
@@ -118,8 +157,6 @@ impl App<'_> {
                         _ => {}
                     },
                 };
-
-                //dbg!(&key);
             }
         }
 

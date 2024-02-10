@@ -6,8 +6,11 @@ use ratatui::style::Stylize;
 use ratatui::widgets::{Block, Borders, Paragraph, Tabs};
 use strum::{Display, EnumIter, FromRepr, IntoEnumIterator};
 use crate::app::app::App;
-use crate::app::request_ui::param_tabs::RequestParamsTabs::{Auth, Body, Cookies, Headers, Params};
-use crate::request::body::ContentType::{NoBody, HTML, JSON, Raw, XML};
+use crate::app::app_states::AppState;
+use crate::app::app_states::AppState::{EditingRequestAuthUsername, EditingRequestAuthPassword};
+use crate::app::request_ui::param_tabs::RequestParamsTabs::*;
+use crate::request::auth::Auth::*;
+use crate::request::body::ContentType::*;
 use crate::request::request::Request;
 
 #[derive(Default, Clone, Copy, Display, FromRepr, EnumIter)]
@@ -52,13 +55,14 @@ impl App<'_> {
             .map(|tab| {
                 match tab {
                     Params => tab.to_string(),
-                    Auth => tab.to_string(),
+                    Auth => match &request.auth {
+                        NoAuth => tab.to_string(),
+                        BasicAuth(_, _) | BearerToken(_) => format!("{} ({})", tab.to_string(), &request.auth.to_string())
+                    },
                     Headers => tab.to_string(),
                     Body => match &request.body {
                         NoBody => tab.to_string(),
-                        Raw(_) | JSON(_) | XML(_) | HTML(_) => {
-                            format!("{} ({})", tab.to_string(), &request.body.to_string())
-                        }
+                        Raw(_) | JSON(_) | XML(_) | HTML(_) => format!("{} ({})", tab.to_string(), &request.body.to_string())
                     }
                     Cookies => tab.to_string(),
                 }
@@ -79,7 +83,79 @@ impl App<'_> {
 
         match self.request_param_tab {
             Params => {}
-            Auth => {}
+            Auth => {
+                match &request.auth {
+                    NoAuth => {
+                        let body_paragraph = Paragraph::new("\nNo auth").centered();
+                        frame.render_widget(body_paragraph, request_params_layout[1]);
+                    }
+                    BasicAuth(_, _) => {
+                        let basic_auth_layout = Layout::new(
+                            Vertical,
+                            [
+                                Constraint::Length(3),
+                                Constraint::Length(3),
+                            ]
+                        )
+                            .vertical_margin(1)
+                            .horizontal_margin(4)
+                            .split(request_params_layout[1]);
+
+                        let mut username_block = Block::new()
+                            .title("Username")
+                            .borders(Borders::ALL);
+
+
+                        let mut password_block = Block::new()
+                            .title("Password")
+                            .borders(Borders::ALL);
+
+
+                        let mut should_color_blocks = false;
+                        let mut should_display_cursor = false;
+
+                        // Prevent from rendering the cursor while no input text has been selected
+                        match self.state {
+                            AppState::EditingRequestAuth => {
+                                should_color_blocks = true;
+                            }
+                            EditingRequestAuthUsername | EditingRequestAuthPassword => {
+                                should_color_blocks = true;
+                                should_display_cursor = true;
+                            },
+                            _ => {}
+                        };
+
+                        let input_selected = self.auth_text_input_selection.selected;
+
+                        let input_cursor_position = match input_selected {
+                            0 if should_color_blocks => {
+                                username_block = username_block.yellow();
+                                self.auth_basic_username_text_input.cursor_position as u16
+                            },
+                            1 if should_color_blocks => {
+                                password_block = password_block.yellow();
+                                self.auth_basic_password_text_input.cursor_position as u16
+                            },
+                            _ => 0
+                        };
+
+                        if should_display_cursor {
+                            frame.set_cursor(
+                                basic_auth_layout[input_selected].x + input_cursor_position + 1,
+                                basic_auth_layout[input_selected].y + 1
+                            );
+                        }
+
+                        let username_paragraph = Paragraph::new(self.auth_basic_username_text_input.text.as_str()).block(username_block);
+                        let password_paragraph = Paragraph::new(self.auth_basic_password_text_input.text.as_str()).block(password_block);
+
+                        frame.render_widget(username_paragraph, basic_auth_layout[0]);
+                        frame.render_widget(password_paragraph, basic_auth_layout[1]);
+                    }
+                    BearerToken(_) => {}
+                }
+            }
             Headers => {}
             Body => {
                 match &request.body {

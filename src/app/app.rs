@@ -11,6 +11,7 @@ use crate::request::request::{Request};
 use crate::utils::stateful_list::StatefulList;
 use crate::utils::stateful_scrollbar::StatefulScrollbar;
 use crate::utils::text_input::TextInput;
+use crate::utils::text_input_selection::TextInputSelection;
 
 pub struct App<'a> {
     pub should_quit: bool,
@@ -23,7 +24,14 @@ pub struct App<'a> {
     pub request_result_tab: RequestResultTabs,
 
     pub new_request_input: TextInput,
+
     pub url_text_input: TextInput,
+
+    pub auth_text_input_selection: TextInputSelection,
+    pub auth_basic_username_text_input: TextInput,
+    pub auth_basic_password_text_input: TextInput,
+    pub auth_bearer_token_text_input: TextInput,
+
     pub body_text_area: TextArea<'a>,
 
     pub result_scrollbar: StatefulScrollbar
@@ -36,9 +44,11 @@ impl App<'_> {
                 name: "Check headers",
                 url: "https://httpbin.org/headers",
                 method: Method::GET,
-                body: JSON(String::from(r#"{
+                body: JSON(String::from(
+r#"{
     "json": 32
-}"#)),
+}"#
+                )),
                 ..Default::default()
             },
             Request {
@@ -63,30 +73,33 @@ impl App<'_> {
 
         App {
             should_quit: false,
+
             state: AppState::Normal,
+
             collection: StatefulList {
                 state: Default::default(),
                 items,
                 selected: None,
                 last_selected: None,
             },
+
             request_view: RequestView::Normal,
+
             request_param_tab: RequestParamsTabs::Params,
             request_result_tab: RequestResultTabs::Body,
-            new_request_input: TextInput {
-                text: String::new(),
-                cursor_position: 0,
-            },
-            url_text_input: TextInput {
-                text: String::new(),
-                cursor_position: 0,
-            },
+
+            new_request_input: TextInput::default(),
+
+            url_text_input: TextInput::default(),
+
+            auth_text_input_selection: TextInputSelection::default(),
+            auth_basic_username_text_input: TextInput::default(),
+            auth_basic_password_text_input: TextInput::default(),
+            auth_bearer_token_text_input: TextInput::default(),
+
             body_text_area: TextArea::default(),
-            result_scrollbar: StatefulScrollbar {
-                scroll: 0,
-                max_scroll: 0,
-                state: Default::default(),
-            }
+
+            result_scrollbar: StatefulScrollbar::default()
         }
     }
 

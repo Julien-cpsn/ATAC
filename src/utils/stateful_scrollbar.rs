@@ -1,5 +1,6 @@
 use ratatui::widgets::{ScrollbarState};
 
+#[derive(Default)]
 pub struct StatefulScrollbar {
     pub scroll: u16,
     pub max_scroll: u16,

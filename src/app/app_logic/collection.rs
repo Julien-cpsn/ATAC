@@ -1,27 +1,48 @@
 use crate::app::app::App;
 use crate::app::app_states::AppState;
+use crate::request::auth::Auth;
 use crate::request::request::{Request};
 
 impl<'a> App<'a> {
-    pub fn select_request(&mut self) {
+    pub fn reset_inputs(&mut self) {
         self.url_text_input.reset_input();
+        self.auth_basic_username_text_input.reset_input();
+        self.auth_basic_password_text_input.reset_input();
+    }
+
+    pub fn update_inputs(&mut self) {
+        self.reset_inputs();
+
+        let selected_request_index = self.collection.selected.unwrap();
+        let selected_request = &self.collection.items[selected_request_index];
+
+        self.url_text_input.enter_str(selected_request.url);
+
+        match &selected_request.auth {
+            Auth::NoAuth => {}
+            Auth::BasicAuth(username, password) => {
+                self.auth_basic_username_text_input.enter_str(username);
+                self.auth_basic_password_text_input.enter_str(password);
+            }
+            Auth::BearerToken(_token) => {}
+        }
+
+        let body = selected_request.body.get_body_as_string();
+        self.refresh_body_textarea(body);
+    }
+
+    pub fn select_request(&mut self) {
         self.collection.select();
         self.result_scrollbar.set_scroll(0);
 
-        if let Some(selected_request_index) = self.collection.selected {
-            let selected_request = &self.collection.items[selected_request_index];
-            self.url_text_input.enter_str(selected_request.url);
-
-            let body = selected_request.body.get_body_as_string();
-
-            self.refresh_body_textarea(body);
-
+        if self.collection.selected.is_some() {
+            self.update_inputs();
             self.state = AppState::SelectedRequest;
         }
     }
 
     pub fn unselect_request(&mut self) {
-        self.url_text_input.reset_input();
+        self.reset_inputs();
         self.collection.unselect();
     }
 

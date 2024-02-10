@@ -2,6 +2,7 @@ use ratatui::prelude::{Line, Modifier, Span};
 use ratatui::style::Stylize;
 use ratatui::widgets::ListItem;
 use reqwest::Method;
+use crate::request::auth::{Auth};
 use crate::request::body::ContentType;
 use crate::request::method::get_method_bg;
 
@@ -11,11 +12,13 @@ pub struct Request<'a> {
     pub url: &'a str,
     pub method: Method,
     pub body: ContentType,
+    pub auth: Auth,
     pub result: RequestResult
 }
 
 #[derive(Default, Clone)]
 pub struct RequestResult {
+    pub status_code: Option<u16>,
     pub body: Option<String>,
     pub cookies: Option<String>,
     pub headers: Option<String>

@@ -1,3 +1,4 @@
+#[derive(Default)]
 pub struct TextInput {
     pub text: String,
     pub cursor_position: usize,

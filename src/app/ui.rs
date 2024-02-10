@@ -8,7 +8,8 @@ use ratatui::widgets::{Block, Borders, List, ListItem, Padding, Paragraph};
 use ratatui::widgets::block::Title;
 use tui_big_text::{BigTextBuilder, PixelSize};
 use crate::app::app::{App};
-use crate::app::app_states::{AppState, get_available_keys};
+use crate::app::app_states::{get_available_keys};
+use crate::app::app_states::AppState::*;
 use crate::app::request_ui::views::RequestView;
 use crate::request::method::get_method_bg;
 use crate::request::request::Request;
@@ -69,7 +70,7 @@ impl App<'_> {
         // NEW REQUEST DIALOG
 
         match self.state {
-            AppState::CreatingNewRequest => {
+            CreatingNewRequest => {
                 let popup_block = Block::default()
                     .title("Enter the new request name")
                     .borders(Borders::ALL)
@@ -95,13 +96,13 @@ impl App<'_> {
         // FOOTER
 
         let state_text = match self.state {
-            AppState::Normal | AppState::CreatingNewRequest => self.state.to_string(),
-            AppState::SelectedRequest | AppState::EditingRequestUrl | AppState::EditingRequestBody => {
+            Normal | CreatingNewRequest => self.state.to_string(),
+            _ => {
                 let selected_request_index = self.collection.selected.unwrap();
                 let selected_request = &self.collection.items[selected_request_index];
 
-                if self.state == AppState::SelectedRequest {
-                    self.state.to_string()
+                if self.state == SelectedRequest {
+                    format!("Request > {}", selected_request.name)
                 }
                 else {
                     format!("Request > {} > {}", selected_request.name, self.state.to_string())
@@ -198,13 +199,12 @@ impl App<'_> {
             .borders(Borders::ALL)
             .padding(Padding::horizontal(1));
 
-        let url_paragraph = Paragraph::new(self.url_text_input.text.as_str())
-            .block(url_block);
+        let url_paragraph = Paragraph::new(self.url_text_input.text.as_str()).block(url_block);
 
         frame.render_widget(url_paragraph, request_header_layout[1]);
 
         match self.state {
-            AppState::EditingRequestUrl => {
+            EditingRequestUrl => {
                 frame.set_cursor(
                     request_header_layout[1].x + self.url_text_input.cursor_position as u16 + 2,
                     request_header_layout[1].y + 1
