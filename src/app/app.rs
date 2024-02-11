@@ -1,3 +1,4 @@
+use std::fs::{File, OpenOptions};
 use ratatui::backend::Backend;
 use ratatui::Terminal;
 use reqwest::Method;
@@ -16,6 +17,8 @@ use crate::utils::text_input_selection::TextInputSelection;
 pub struct App<'a> {
     pub should_quit: bool,
     pub state: AppState,
+
+    pub log_file: File,
 
     pub collection: StatefulList<Request<'a>>,
 
@@ -73,8 +76,14 @@ r#"{
 
         App {
             should_quit: false,
-
             state: AppState::Normal,
+
+            log_file: OpenOptions::new()
+                .write(true)
+                .create(true)
+                .truncate(true)
+                .open("atac.log")
+                .expect("Could not open file"),
 
             collection: StatefulList {
                 state: Default::default(),

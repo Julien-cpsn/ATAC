@@ -1,6 +1,6 @@
 use crossterm::event;
 use crossterm::event::{Event, KeyCode, KeyEventKind, KeyModifiers};
-use std::io::Result;
+use std::io::{Result, Write};
 use tui_textarea::CursorMove;
 use crate::app::app::{App};
 use crate::app::app_states::AppState;
@@ -171,6 +171,10 @@ impl App<'_> {
                         _ => {}
                     },
                 };
+
+                self.log_file
+                    .write_fmt(format_args!("{:?}\t{:?}\t{}\n", key.modifiers, key.code, self.state.to_string()))
+                    .expect("Could not write to log file");
             }
         }
 
