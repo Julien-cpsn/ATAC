@@ -11,6 +11,7 @@ impl App<'_> {
     pub async fn handle_events(&mut self) -> Result<bool> {
         if let Event::Key(key) = event::read()? {
 
+            let mut miss_input = false;
             let control_pressed: bool = key.modifiers == KeyModifiers::CONTROL;
             let shift_pressed: bool = key.modifiers == KeyModifiers::SHIFT;
 
@@ -31,7 +32,7 @@ impl App<'_> {
                         KeyCode::Char('n') => self.create_new_request_state(),
                         KeyCode::Char('d') => self.delete_request(),
 
-                        _ => {}
+                        _ => miss_input = true
                     },
 
                     AppState::CreatingNewRequest => match key.code {
@@ -43,7 +44,8 @@ impl App<'_> {
                         KeyCode::Backspace => self.new_request_input.delete_char(),
                         KeyCode::Left => self.new_request_input.move_cursor_left(),
                         KeyCode::Right => self.new_request_input.move_cursor_right(),
-                        _ => {}
+
+                        _ => miss_input = true
                     },
 
                     /* /!\ Below, consider that a request has been selected /!\ */
@@ -90,8 +92,7 @@ impl App<'_> {
 
                             KeyCode::Char(' ') => self.send_request().await,
 
-                            _ => {}
-
+                            _ => miss_input = true
                         }
                     },
 
@@ -104,7 +105,8 @@ impl App<'_> {
                         KeyCode::Backspace => self.url_text_input.delete_char(),
                         KeyCode::Left => self.url_text_input.move_cursor_left(),
                         KeyCode::Right => self.url_text_input.move_cursor_right(),
-                        _ => {}
+
+                        _ => miss_input = true
                     }
 
                     AppState::EditingRequestAuthUsername => match key.code {
@@ -116,7 +118,8 @@ impl App<'_> {
                         KeyCode::Backspace => self.auth_basic_username_text_input.delete_char(),
                         KeyCode::Left => self.auth_basic_username_text_input.move_cursor_left(),
                         KeyCode::Right => self.auth_basic_username_text_input.move_cursor_right(),
-                        _ => {}
+
+                        _ => miss_input = true
                     },
 
                     AppState::EditingRequestAuthPassword => match key.code {
@@ -128,7 +131,8 @@ impl App<'_> {
                         KeyCode::Backspace => self.auth_basic_password_text_input.delete_char(),
                         KeyCode::Left => self.auth_basic_password_text_input.move_cursor_left(),
                         KeyCode::Right => self.auth_basic_password_text_input.move_cursor_right(),
-                        _ => {}
+
+                        _ => miss_input = true
                     },
 
                     AppState::EditingRequestBody => match key.code {
@@ -168,13 +172,15 @@ impl App<'_> {
                         KeyCode::Right => self.body_text_area.move_cursor(CursorMove::Forward),
                         KeyCode::Left => self.body_text_area.move_cursor(CursorMove::Back),
 
-                        _ => {}
+                        _ => miss_input = true
                     },
                 };
 
-                self.log_file
-                    .write_fmt(format_args!("{:?}\t{:?}\t{}\n", key.modifiers, key.code, self.state.to_string()))
-                    .expect("Could not write to log file");
+                if !miss_input {
+                    self.log_file
+                        .write_fmt(format_args!("{:?}\t{:?}\t{}\n", key.modifiers, key.code, self.state.to_string()))
+                        .expect("Could not write to log file");
+                }
             }
         }
 
