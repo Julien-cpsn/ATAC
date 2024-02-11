@@ -15,6 +15,7 @@ impl App<'_> {
 
         self.collection.items[selected_request_index].url = input_text.leak();
 
+        self.update_inputs();
         self.select_request_state();
     }
 
@@ -35,7 +36,7 @@ impl App<'_> {
 
         self.collection.items[selected_request_index].auth = next_auth(&selected_request.auth);
 
-        self.update_inputs();
+        self.load_request_auth_param_tab();
     }
 
     pub fn select_request_auth_input_text(&mut self) {
@@ -59,7 +60,8 @@ impl App<'_> {
             _ => {}
         }
 
-        self.edit_request_auth_state();
+        self.update_inputs();
+        self.select_request_state();
     }
 
     pub fn modify_request_auth_basic_password(&mut self) {
@@ -75,7 +77,8 @@ impl App<'_> {
             _ => {}
         }
 
-        self.edit_request_auth_state();
+        self.update_inputs();
+        self.select_request_state();
     }
 
     /* BODY */
@@ -105,7 +108,7 @@ impl App<'_> {
 
         self.collection.items[selected_request_index].body = new_body;
 
-        self.refresh_body_textarea(body);
+        self.update_inputs();
         self.select_request_state();
     }
 
@@ -113,20 +116,13 @@ impl App<'_> {
         let selected_request_index = self.collection.selected.unwrap();
         let selected_request = &self.collection.items[selected_request_index];
 
-        let body = selected_request.body.get_body_as_string();
-
         self.collection.items[selected_request_index].body = next_content_type(&selected_request.body);
 
-        self.refresh_body_textarea(body);
+        self.load_request_body_param_tab();
     }
 
     pub fn quit_request_body(&mut self) {
-        let selected_request_index = self.collection.selected.unwrap();
-        let selected_request = &mut self.collection.items[selected_request_index];
-
-        let body = selected_request.body.get_body_as_string();
-
-        self.refresh_body_textarea(body);
+        self.update_inputs();
         self.select_request_state();
     }
 

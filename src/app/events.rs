@@ -4,6 +4,7 @@ use std::io::Result;
 use tui_textarea::CursorMove;
 use crate::app::app::{App};
 use crate::app::app_states::AppState;
+use crate::app::request_ui::param_tabs::RequestParamsTabs;
 
 impl App<'_> {
     /// Handle events
@@ -47,29 +48,51 @@ impl App<'_> {
 
                     /* /!\ Below, consider that a request has been selected /!\ */
 
-                    AppState::SelectedRequest => match key.code {
-                        KeyCode::Esc => self.normal_state(),
+                    AppState::SelectedRequest => {
+                        // Param tabs
+                        match self.request_param_tab {
+                            RequestParamsTabs::Params => {}
+                            RequestParamsTabs::Auth if self.auth_text_input_selection.usable => match key.code {
+                                KeyCode::Enter => self.select_request_auth_input_text(),
 
-                        KeyCode::Char('a') if control_pressed => self.modify_request_auth(),
-                        KeyCode::Char('a') => self.edit_request_auth_state(),
+                                KeyCode::Up => self.auth_text_input_selection.previous(),
+                                KeyCode::Down => self.auth_text_input_selection.next(),
 
-                        KeyCode::Char('b') if control_pressed => self.modify_request_content_type(),
-                        KeyCode::Char('b') => self.edit_request_body_state(),
+                                _ => {}
+                            }
+                            RequestParamsTabs::Headers => {}
+                            RequestParamsTabs::Body => match key.code {
+                                KeyCode::Enter => self.edit_request_body_state(),
+                                _ => {}
+                            }
+                            RequestParamsTabs::Cookies => {},
+                            _ => {}
+                        }
 
-                        KeyCode::Char('u') => self.edit_request_url_state(),
-                        KeyCode::Char('m') => self.modify_request_method(),
+                        match key.code {
+                            KeyCode::Esc => self.normal_state(),
 
-                        KeyCode::PageUp => self.result_scrollbar.page_up(),
-                        KeyCode::PageDown => self.result_scrollbar.page_down(),
+                            KeyCode::Char('a') if control_pressed => self.modify_request_auth(),
+                            KeyCode::Char('a') => self.load_request_auth_param_tab(),
 
-                        KeyCode::BackTab if shift_pressed => self.next_request_view(),
-                        KeyCode::Tab if control_pressed => self.next_request_result_tab(),
-                        KeyCode::Tab => self.next_request_param_tab(),
+                            KeyCode::Char('b') if control_pressed => self.modify_request_content_type(),
+                            KeyCode::Char('b') => self.load_request_body_param_tab(),
 
-                        KeyCode::Enter => self.send_request().await,
+                            KeyCode::Char('u') => self.edit_request_url_state(),
+                            KeyCode::Char('m') => self.modify_request_method(),
 
-                        _ => {}
+                            KeyCode::PageUp => self.result_scrollbar.page_up(),
+                            KeyCode::PageDown => self.result_scrollbar.page_down(),
 
+                            KeyCode::BackTab if shift_pressed => self.next_request_view(),
+                            KeyCode::Tab if control_pressed => self.next_request_result_tab(),
+                            KeyCode::Tab => self.next_request_param_tab(),
+
+                            KeyCode::Char(' ') => self.send_request().await,
+
+                            _ => {}
+
+                        }
                     },
 
                     AppState::EditingRequestUrl => match key.code {
@@ -84,19 +107,10 @@ impl App<'_> {
                         _ => {}
                     }
 
-                    AppState::EditingRequestAuth => match key.code {
-                        KeyCode::Esc => self.select_request_state(),
-                        KeyCode::Enter => self.select_request_auth_input_text(),
-
-                        KeyCode::Up => self.auth_text_input_selection.previous(),
-                        KeyCode::Down => self.auth_text_input_selection.next(),
-                        _ => {}
-                    },
-
                     AppState::EditingRequestAuthUsername => match key.code {
                         KeyCode::Char(char) => self.auth_basic_username_text_input.enter_char(char),
 
-                        KeyCode::Esc => self.edit_request_auth_state(),
+                        KeyCode::Esc => self.select_request_state(),
                         KeyCode::Enter => self.modify_request_auth_basic_username(),
 
                         KeyCode::Backspace => self.auth_basic_username_text_input.delete_char(),
@@ -108,7 +122,7 @@ impl App<'_> {
                     AppState::EditingRequestAuthPassword => match key.code {
                         KeyCode::Char(char) => self.auth_basic_password_text_input.enter_char(char),
 
-                        KeyCode::Esc => self.edit_request_auth_state(),
+                        KeyCode::Esc => self.select_request_state(),
                         KeyCode::Enter => self.modify_request_auth_basic_password(),
 
                         KeyCode::Backspace => self.auth_basic_password_text_input.delete_char(),

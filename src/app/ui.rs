@@ -8,7 +8,6 @@ use ratatui::widgets::{Block, Borders, List, ListItem, Padding, Paragraph};
 use ratatui::widgets::block::Title;
 use tui_big_text::{BigTextBuilder, PixelSize};
 use crate::app::app::{App};
-use crate::app::app_states::{get_available_keys};
 use crate::app::app_states::AppState::*;
 use crate::app::request_ui::views::RequestView;
 use crate::request::method::get_method_bg;
@@ -110,7 +109,7 @@ impl App<'_> {
             }
         };
 
-        let available_keys = get_available_keys(self.state);
+        let available_keys = self.get_available_keys();
 
         let footer = Block::new()
             .title(Title::from(state_text).alignment(Alignment::Left))

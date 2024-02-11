@@ -19,12 +19,21 @@ impl<'a> App<'a> {
         self.url_text_input.enter_str(selected_request.url);
 
         match &selected_request.auth {
-            Auth::NoAuth => {}
+            Auth::NoAuth => {
+                self.auth_text_input_selection.max_selection = 0;
+                self.auth_text_input_selection.usable = false;
+            }
             Auth::BasicAuth(username, password) => {
+                self.auth_text_input_selection.max_selection = 2;
+                self.auth_text_input_selection.usable = true;
+
                 self.auth_basic_username_text_input.enter_str(username);
                 self.auth_basic_password_text_input.enter_str(password);
             }
-            Auth::BearerToken(_token) => {}
+            Auth::BearerToken(_token) => {
+                self.auth_text_input_selection.max_selection = 1;
+                self.auth_text_input_selection.usable = true;
+            }
         }
 
         let body = selected_request.body.get_body_as_string();

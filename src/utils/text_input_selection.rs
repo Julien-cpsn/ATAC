@@ -1,12 +1,13 @@
 #[derive(Default)]
 pub struct TextInputSelection {
+    pub usable: bool,
     pub selected: usize,
     pub max_selection: usize,
 }
 
 impl TextInputSelection {
     pub fn previous(&mut self) {
-        if self.selected as i16 - 1 >= 0 {
+        if self.selected as isize - 1 >= 0 {
             self.selected -= 1;
         }
         else {

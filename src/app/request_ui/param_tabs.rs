@@ -6,9 +6,7 @@ use ratatui::style::Stylize;
 use ratatui::widgets::{Block, Borders, Paragraph, Tabs};
 use strum::{Display, EnumIter, FromRepr, IntoEnumIterator};
 use crate::app::app::App;
-use crate::app::app_states::AppState;
-use crate::app::app_states::AppState::{EditingRequestAuthUsername, EditingRequestAuthPassword};
-use crate::app::request_ui::param_tabs::RequestParamsTabs::*;
+use crate::app::app_states::AppState::*;
 use crate::request::auth::Auth::*;
 use crate::request::body::ContentType::*;
 use crate::request::request::Request;
@@ -31,15 +29,43 @@ pub enum RequestParamsTabs {
 impl App<'_> {
     pub fn next_request_param_tab(&mut self) {
         self.request_param_tab = match self.request_param_tab {
-            Params => Auth,
-            Auth => Headers,
-            Headers => Body,
-            Body => Cookies,
-            Cookies => Params
+            RequestParamsTabs::Params => RequestParamsTabs::Auth,
+            RequestParamsTabs::Auth => RequestParamsTabs::Headers,
+            RequestParamsTabs::Headers => RequestParamsTabs::Body,
+            RequestParamsTabs::Body => RequestParamsTabs::Cookies,
+            RequestParamsTabs::Cookies => RequestParamsTabs::Params
         };
+
+        self.load_request_param_tab();
     }
 
-    pub(crate) fn render_request_params(&mut self, frame: &mut Frame, rect: Rect, request: &Request) {
+    pub fn load_request_param_tab(&mut self) {
+        self.update_inputs();
+
+        match self.request_param_tab {
+            RequestParamsTabs::Params => {}
+            RequestParamsTabs::Auth => self.load_request_auth_param_tab(),
+            RequestParamsTabs::Headers => {}
+            RequestParamsTabs::Body => self.load_request_body_param_tab(),
+            RequestParamsTabs::Cookies => {}
+        }
+    }
+
+    pub fn load_request_auth_param_tab(&mut self) {
+        self.auth_text_input_selection.selected = 0;
+
+        self.request_param_tab = RequestParamsTabs::Auth;
+
+        self.update_inputs();
+    }
+
+    pub fn load_request_body_param_tab(&mut self) {
+        self.request_param_tab = RequestParamsTabs::Body;
+
+        self.update_inputs();
+    }
+
+    pub fn render_request_params(&mut self, frame: &mut Frame, rect: Rect, request: &Request) {
         let request_params_layout = Layout::new(
             Vertical,
             [
@@ -54,17 +80,17 @@ impl App<'_> {
         let param_tabs = RequestParamsTabs::iter()
             .map(|tab| {
                 match tab {
-                    Params => tab.to_string(),
-                    Auth => match &request.auth {
+                    RequestParamsTabs::Params => tab.to_string(),
+                    RequestParamsTabs::Auth => match &request.auth {
                         NoAuth => tab.to_string(),
                         BasicAuth(_, _) | BearerToken(_) => format!("{} ({})", tab.to_string(), &request.auth.to_string())
                     },
-                    Headers => tab.to_string(),
-                    Body => match &request.body {
+                    RequestParamsTabs::Headers => tab.to_string(),
+                    RequestParamsTabs::Body => match &request.body {
                         NoBody => tab.to_string(),
                         Raw(_) | JSON(_) | XML(_) | HTML(_) => format!("{} ({})", tab.to_string(), &request.body.to_string())
                     }
-                    Cookies => tab.to_string(),
+                    RequestParamsTabs::Cookies => tab.to_string(),
                 }
             });
 
@@ -82,8 +108,8 @@ impl App<'_> {
         // REQUEST PARAM TABS CONTENT
 
         match self.request_param_tab {
-            Params => {}
-            Auth => {
+            RequestParamsTabs::Params => {}
+            RequestParamsTabs::Auth => {
                 match &request.auth {
                     NoAuth => {
                         let body_paragraph = Paragraph::new("\nNo auth").centered();
@@ -116,9 +142,9 @@ impl App<'_> {
 
                         // Prevent from rendering the cursor while no input text has been selected
                         match self.state {
-                            AppState::EditingRequestAuth => {
+                            SelectedRequest => {
                                 should_color_blocks = true;
-                            }
+                            },
                             EditingRequestAuthUsername | EditingRequestAuthPassword => {
                                 should_color_blocks = true;
                                 should_display_cursor = true;
@@ -156,8 +182,8 @@ impl App<'_> {
                     BearerToken(_) => {}
                 }
             }
-            Headers => {}
-            Body => {
+            RequestParamsTabs::Headers => {}
+            RequestParamsTabs::Body => {
                 match &request.body {
                     NoBody => {
                         let body_paragraph = Paragraph::new("\nNo body").centered();
@@ -169,7 +195,7 @@ impl App<'_> {
                     }
                 }
             }
-            Cookies => {}
+            RequestParamsTabs::Cookies => {}
         }
     }
 }
