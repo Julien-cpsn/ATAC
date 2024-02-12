@@ -33,13 +33,13 @@ pub enum AppState {
 impl App<'_> {
     pub fn get_available_keys(&self) -> String {
         match self.state {
-            Normal => String::from("q or ^c ↑ ↓ ← → n d"),
+            Normal => String::from("(q)uit or ^c ↑ ↓ ← → (n)ew (d)elete"),
 
             SelectedRequest => {
                 let selected_request_index = self.collection.selected.unwrap();
                 let selected_request = &self.collection.items[selected_request_index];
 
-                let mut base_keys = String::from("Esc Space Tab ^(U)rl ^(B)ody");
+                let mut base_keys = String::from("Esc Space Tab ^(u)rl ^(a)uth ^(b)ody");
 
                 let additional_keys = match self.request_param_tab {
                     RequestParamsTabs::Params => None,
