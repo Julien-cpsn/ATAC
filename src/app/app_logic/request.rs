@@ -2,8 +2,8 @@ use reqwest::Client;
 use reqwest::header::CONTENT_TYPE;
 use tui_textarea::TextArea;
 use crate::app::app::App;
-use crate::request::auth::{Auth, next_auth};
-use crate::request::auth::Auth::BasicAuth;
+use crate::request::auth::{next_auth};
+use crate::request::auth::Auth::*;
 use crate::request::body::{ContentType, next_content_type};
 use crate::request::method::next_method;
 
@@ -40,10 +40,20 @@ impl App<'_> {
     }
 
     pub fn select_request_auth_input_text(&mut self) {
-        match self.auth_text_input_selection.selected {
-            0 => self.edit_request_auth_username_state(),
-            1 => self.edit_request_auth_password_state(),
-            _ => {}
+        let selected_request_index = self.collection.selected.unwrap();
+        let selected_request = &self.collection.items[selected_request_index];
+
+        match selected_request.auth {
+            NoAuth => {}
+            BasicAuth(_, _) => match self.auth_text_input_selection.selected {
+                0 => self.edit_request_auth_username_state(),
+                1 => self.edit_request_auth_password_state(),
+                _ => {}
+            },
+            BearerToken(_) => match self.auth_text_input_selection.selected {
+                0 => self.edit_request_auth_bearer_token_state(),
+                _ => {}
+            }
         }
     }
 
@@ -73,6 +83,23 @@ impl App<'_> {
         match &selected_request.auth {
             BasicAuth(username, _) => {
                 self.collection.items[selected_request_index].auth = BasicAuth(username.to_string(), input_text);
+            }
+            _ => {}
+        }
+
+        self.update_inputs();
+        self.select_request_state();
+    }
+
+    pub fn modify_request_auth_bearer_token(&mut self) {
+        let input_text = self.auth_bearer_token_text_input.text.clone();
+
+        let selected_request_index = self.collection.selected.unwrap();
+        let selected_request = &self.collection.items[selected_request_index];
+
+        match &selected_request.auth {
+            BearerToken(_) => {
+                self.collection.items[selected_request_index].auth = BearerToken(input_text);
             }
             _ => {}
         }
@@ -140,11 +167,13 @@ impl App<'_> {
         );
 
         match &selected_request.auth {
-            Auth::NoAuth => {}
+            NoAuth => {}
             BasicAuth(username, password) => {
                 request = request.basic_auth(username, Some(password));
             }
-            Auth::BearerToken(_token) => {}
+            BearerToken(bearer_token) => {
+                request = request.bearer_auth(bearer_token);
+            }
         }
 
         match &selected_request.body {

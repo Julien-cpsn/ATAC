@@ -7,7 +7,6 @@ use crate::app::app_states::AppState;
 use crate::app::request_ui::param_tabs::RequestParamsTabs;
 use crate::app::request_ui::result_tabs::RequestResultTabs;
 use crate::app::request_ui::views::RequestView;
-use crate::request::body::ContentType::{JSON};
 use crate::request::request::{Request};
 use crate::utils::stateful_list::StatefulList;
 use crate::utils::stateful_scrollbar::StatefulScrollbar;
@@ -47,16 +46,11 @@ impl App<'_> {
                 name: "Check headers",
                 url: "https://httpbin.org/headers",
                 method: Method::GET,
-                body: JSON(String::from(
-r#"{
-    "json": 32
-}"#
-                )),
                 ..Default::default()
             },
             Request {
-                name: "Get User",
-                url: "http://127.0.0.1:8080/api/get_user",
+                name: "Test Bearer",
+                url: "https://httpbin.org/bearer",
                 method: Method::GET,
                 ..Default::default()
             },

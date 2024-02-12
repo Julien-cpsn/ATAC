@@ -136,6 +136,19 @@ impl App<'_> {
                         _ => miss_input = true
                     },
 
+                    AppState::EditingRequestAuthBearerToken => match key.code {
+                        KeyCode::Char(char) => self.auth_bearer_token_text_input.enter_char(char),
+
+                        KeyCode::Esc => self.select_request_state(),
+                        KeyCode::Enter => self.modify_request_auth_bearer_token(),
+
+                        KeyCode::Backspace => self.auth_bearer_token_text_input.delete_char(),
+                        KeyCode::Left => self.auth_bearer_token_text_input.move_cursor_left(),
+                        KeyCode::Right => self.auth_bearer_token_text_input.move_cursor_right(),
+
+                        _ => miss_input = true
+                    }
+
                     AppState::EditingRequestBody => match key.code {
                         KeyCode::Char('c') if control_pressed => self.body_text_area.copy(),
                         KeyCode::Char('v') if control_pressed => {

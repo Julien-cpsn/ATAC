@@ -29,6 +29,10 @@ impl App<'_> {
         self.state = AppState::EditingRequestAuthPassword;
     }
 
+    pub fn edit_request_auth_bearer_token_state(&mut self) {
+        self.state = AppState::EditingRequestAuthBearerToken;
+    }
+
     pub fn edit_request_body_state(&mut self) {
         self.request_param_tab = RequestParamsTabs::Body;
 

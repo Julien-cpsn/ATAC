@@ -8,6 +8,7 @@ impl<'a> App<'a> {
         self.url_text_input.reset_input();
         self.auth_basic_username_text_input.reset_input();
         self.auth_basic_password_text_input.reset_input();
+        self.auth_bearer_token_text_input.reset_input();
     }
 
     pub fn update_inputs(&mut self) {
@@ -30,9 +31,12 @@ impl<'a> App<'a> {
                 self.auth_basic_username_text_input.enter_str(username);
                 self.auth_basic_password_text_input.enter_str(password);
             }
-            Auth::BearerToken(_token) => {
+            Auth::BearerToken(bearer_token) => {
                 self.auth_text_input_selection.max_selection = 1;
                 self.auth_text_input_selection.usable = true;
+
+                self.auth_bearer_token_text_input.enter_str(bearer_token);
+
             }
         }
 
