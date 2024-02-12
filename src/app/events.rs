@@ -12,6 +12,7 @@ impl App<'_> {
         if let Event::Key(key) = event::read()? {
 
             let mut miss_input = false;
+            let previous_app_state = self.state;
             let control_pressed: bool = key.modifiers == KeyModifiers::CONTROL;
             let shift_pressed: bool = key.modifiers == KeyModifiers::SHIFT;
 
@@ -178,7 +179,12 @@ impl App<'_> {
 
                 if !miss_input {
                     self.log_file
-                        .write_fmt(format_args!("{:?}\t{:?}\t{}\n", key.modifiers, key.code, self.state.to_string()))
+                        .write_fmt(format_args!(
+                            "{:25}{:25}{:40}\n",
+                            format!("{:?}", key.modifiers),
+                            format!("{:?}", key.code),
+                            previous_app_state.to_string(),
+                        ))
                         .expect("Could not write to log file");
                 }
             }
