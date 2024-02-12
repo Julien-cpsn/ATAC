@@ -42,7 +42,7 @@ impl App<'_> {
                 let selected_request_index = self.collection.selected.unwrap();
                 let selected_request = &self.collection.items[selected_request_index];
 
-                let mut base_keys = String::from("Esc Space Tab ^(u)rl ^(a)uth ^(b)ody");
+                let mut base_keys = String::from("Esc Space Tab (u)rl (m)ethod ^(a)uth ^(b)ody");
 
                 let additional_keys = match self.request_param_tab {
                     RequestParamsTabs::Params => None,
