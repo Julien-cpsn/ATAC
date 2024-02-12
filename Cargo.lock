@@ -1433,9 +1433,9 @@ checksum = "e421abadd41a4225275504ea4d6566923418b7f05506fbc9c0fe86ba7396114b"
 
 [[package]]
 name = "tui-big-text"
-version = "0.3.6"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cd71532f612eeb8ea652cff38f4517771b8c90c39a2242e637145cc6668616b0"
+checksum = "b97b69c490b93c7ff8e41c877b326d3d178bf3cf6ea3a93f5e2628d008d3f45b"
 dependencies = [
  "derive_builder",
  "font8x8",

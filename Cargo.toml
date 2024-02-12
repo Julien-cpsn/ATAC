@@ -1,7 +1,9 @@
 [package]
 name = "atac"
+description = "Arguably a Terminal API Client"
 version = "0.1.0"
 edition = "2021"
+authors = ["julien-cpsn"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -12,5 +14,5 @@ reqwest = { version = "0.11.24", features = ["cookies"] }
 strum = "0.26.1"
 throbber-widgets-tui = "0.3.0"
 tokio = { version = "1.0.0", features = ["rt", "rt-multi-thread", "macros"] }
-tui-big-text = "0.3.6"
+tui-big-text = "0.4.0"
 tui-textarea = { version = "0.4.0", features = ["ratatui"] }
