@@ -292,7 +292,7 @@ impl App<'_> {
 
 
         let welcome_to = Paragraph::new("Welcome to").centered();
-        let description = Paragraph::new("{A}rguably a {T}UI {A}PI {C}lient").centered();
+        let description = Paragraph::new("{A}rguably a {T}erminal {A}PI {C}lient").centered();
 
         frame.render_widget(block, rect);
         frame.render_widget(welcome_to, inner_layout[1]);
