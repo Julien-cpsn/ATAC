@@ -40,9 +40,9 @@ name = "atac"
 version = "0.1.0"
 dependencies = [
  "crossterm",
- "ratatui 0.26.0",
+ "ratatui",
  "reqwest",
- "strum 0.26.1",
+ "strum",
  "throbber-widgets-tui",
  "tokio",
  "tui-big-text",
@@ -578,15 +578,6 @@ checksum = "8f518f335dce6725a761382244631d86cf0ccb2863413590b31338feb467f9c3"
 
 [[package]]
 name = "itertools"
-version = "0.11.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b1c173a5686ce8bfa551b3563d0c2170bf24ca44da99c7ca4bfdab5418c3fe57"
-dependencies = [
- "either",
-]
-
-[[package]]
-name = "itertools"
 version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ba291022dbbd398a455acf126c1e341954079855bc60dfdda641363bd6922569"
@@ -903,24 +894,6 @@ dependencies = [
 
 [[package]]
 name = "ratatui"
-version = "0.24.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0ebc917cfb527a566c37ecb94c7e3fd098353516fb4eb6bea17015ade0182425"
-dependencies = [
- "bitflags 2.4.2",
- "cassowary",
- "crossterm",
- "indoc",
- "itertools 0.11.0",
- "lru",
- "paste",
- "strum 0.25.0",
- "unicode-segmentation",
- "unicode-width",
-]
-
-[[package]]
-name = "ratatui"
 version = "0.26.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "154b85ef15a5d1719bcaa193c3c81fe645cd120c156874cd660fe49fd21d1373"
@@ -930,11 +903,11 @@ dependencies = [
  "compact_str",
  "crossterm",
  "indoc",
- "itertools 0.12.1",
+ "itertools",
  "lru",
  "paste",
  "stability",
- "strum 0.26.1",
+ "strum",
  "unicode-segmentation",
  "unicode-width",
 ]
@@ -1190,33 +1163,11 @@ checksum = "73473c0e59e6d5812c5dfe2a064a6444949f089e20eec9a2e5506596494e4623"
 
 [[package]]
 name = "strum"
-version = "0.25.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "290d54ea6f91c969195bdbcd7442c8c2a2ba87da8bf60a7ee86a235d4bc1e125"
-dependencies = [
- "strum_macros 0.25.3",
-]
-
-[[package]]
-name = "strum"
 version = "0.26.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "723b93e8addf9aa965ebe2d11da6d7540fa2283fcea14b3371ff055f7ba13f5f"
 dependencies = [
- "strum_macros 0.26.1",
-]
-
-[[package]]
-name = "strum_macros"
-version = "0.25.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "23dc1fa9ac9c169a78ba62f0b841814b7abae11bdd047b9c58f893439e309ea0"
-dependencies = [
- "heck",
- "proc-macro2",
- "quote",
- "rustversion",
- "syn 2.0.48",
+ "strum_macros",
 ]
 
 [[package]]
@@ -1296,12 +1247,12 @@ dependencies = [
 
 [[package]]
 name = "throbber-widgets-tui"
-version = "0.3.0"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ca72c6051548fa6a579d7040d1d5476b8c12412ecac7cb4b10e105d74010f5b5"
+checksum = "9b2c457ba56303a9a3648a6baca52bacd1c65095fa6693b542f7d5df5ab052f6"
 dependencies = [
  "rand",
- "ratatui 0.24.0",
+ "ratatui",
 ]
 
 [[package]]
@@ -1439,8 +1390,8 @@ checksum = "b97b69c490b93c7ff8e41c877b326d3d178bf3cf6ea3a93f5e2628d008d3f45b"
 dependencies = [
  "derive_builder",
  "font8x8",
- "itertools 0.12.1",
- "ratatui 0.26.0",
+ "itertools",
+ "ratatui",
 ]
 
 [[package]]
@@ -1450,7 +1401,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a3e38ced1f941a9cfc923fbf2fe6858443c42cc5220bfd35bdd3648371e7bd8e"
 dependencies = [
  "crossterm",
- "ratatui 0.26.0",
+ "ratatui",
  "unicode-width",
 ]
 

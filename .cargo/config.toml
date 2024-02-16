@@ -1,0 +1,14 @@
+[profile.dev]
+opt-level = 0
+
+[profile.release]
+opt-level = 3
+
+# targets
+# x86_64-pc-windows-msvc
+# x86_64-unknown-linux-gnu
+# x86_64-apple-darwin
+
+[target.x86_64-apple-darwin]
+linker = "x86_64-apple-darwin14-clang"
+ar = "x86_64-apple-darwin14-ar"

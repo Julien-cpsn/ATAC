@@ -8,11 +8,11 @@ authors = ["julien-cpsn"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-crossterm = "0.27.0"
-ratatui = "0.26.0"
 reqwest = { version = "0.11.24", features = ["cookies"] }
-strum = "0.26.1"
-throbber-widgets-tui = "0.3.0"
 tokio = { version = "1.0.0", features = ["rt", "rt-multi-thread", "macros"] }
+strum = "0.26.1"
+ratatui = "0.26.0"
+crossterm = "0.27.0"
 tui-big-text = "0.4.0"
 tui-textarea = { version = "0.4.0", features = ["ratatui"] }
+throbber-widgets-tui = "0.4.0"
