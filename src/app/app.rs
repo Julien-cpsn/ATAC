@@ -67,6 +67,30 @@ impl App<'_> {
                 ..Default::default()
             },
             Request {
+                name: "Test Post",
+                url: "https://httpbin.org/post",
+                method: Method::POST,
+                ..Default::default()
+            },
+            Request {
+                name: "Test Put",
+                url: "https://httpbin.org/put",
+                method: Method::PUT,
+                ..Default::default()
+            },
+            Request {
+                name: "Test Delete",
+                url: "https://httpbin.org/delete",
+                method: Method::DELETE,
+                ..Default::default()
+            },
+            Request {
+                name: "Test Patch",
+                url: "https://httpbin.org/patch",
+                method: Method::PATCH,
+                ..Default::default()
+            },
+            Request {
                 name: "Rust Homepage",
                 url: "https://www.rust-lang.org",
                 method: Method::GET,

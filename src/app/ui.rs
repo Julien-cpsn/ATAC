@@ -4,6 +4,7 @@ use ratatui::layout::{Alignment, Constraint, Layout, Rect};
 use ratatui::layout::Direction::{Horizontal, Vertical};
 use ratatui::prelude::{Modifier, Style};
 use ratatui::style::{Color, Stylize};
+use ratatui::style::Color::White;
 use ratatui::widgets::{Block, Borders, List, ListItem, Padding, Paragraph};
 use ratatui::widgets::block::Title;
 use tui_big_text::{BigTextBuilder, PixelSize};
@@ -167,8 +168,8 @@ impl App<'_> {
         let request_header_layout = Layout::new(
             Horizontal,
             [
-                Constraint::Percentage(7),
-                Constraint::Percentage(93)
+                Constraint::Percentage(10),
+                Constraint::Percentage(90)
             ],
         )
             .split(request_layout[1]);
@@ -186,6 +187,7 @@ impl App<'_> {
 
         let method_paragraph = Paragraph::new(method.to_string())
             .bg(get_method_bg(&method))
+            .fg(White)
             .centered();
 
         frame.render_widget(method_block, request_header_layout[0]);
