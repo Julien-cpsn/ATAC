@@ -14,11 +14,14 @@ pub enum AppState {
     #[strum(to_string = "Request menu")]
     SelectedRequest,
 
+    #[strum(to_string = "Creating new request")]
+    CreatingNewRequest,
+
     #[strum(to_string = "Editing request URL")]
     EditingRequestUrl,
 
-    #[strum(to_string = "Creating new request")]
-    CreatingNewRequest,
+    #[strum(to_string = "Editing request param")]
+    EditingRequestParam,
 
     #[strum(to_string = "Editing request auth username")]
     EditingRequestAuthUsername,
@@ -33,6 +36,8 @@ pub enum AppState {
     EditingRequestBody
 }
 
+const TEXT_INPUT_KEYS: &str = "Esc Enter ← → copy paste";
+
 impl App<'_> {
     pub fn get_available_keys(&self) -> String {
         match self.state {
@@ -42,10 +47,10 @@ impl App<'_> {
                 let selected_request_index = self.collection.selected.unwrap();
                 let selected_request = &self.collection.items[selected_request_index];
 
-                let mut base_keys = String::from("Esc Space Tab (u)rl (m)ethod ^(a)uth ^(b)ody");
+                let mut base_keys = String::from("Esc Space ^TAB (u)rl (m)ethod ^(p)arams ^(a)uth ^(b)ody");
 
                 let additional_keys = match self.request_param_tab {
-                    RequestParamsTabs::Params => None,
+                    RequestParamsTabs::Params => Some("↑ ↓ ← → Enter"),
                     RequestParamsTabs::Auth => match selected_request.auth {
                         Auth::NoAuth => None,
                         Auth::BasicAuth(_, _) => Some("↑ ↓ Enter"),
@@ -66,11 +71,13 @@ impl App<'_> {
                 base_keys
             },
 
-            CreatingNewRequest => String::from("Esc Enter ← → copy paste"),
+            CreatingNewRequest => String::from(TEXT_INPUT_KEYS),
 
-            EditingRequestUrl => String::from("Esc Enter ← → copy paste"),
+            EditingRequestUrl => String::from(TEXT_INPUT_KEYS),
 
-            EditingRequestAuthUsername | EditingRequestAuthPassword | EditingRequestAuthBearerToken => String::from("Esc Enter ← → copy paste"),
+            EditingRequestParam => String::from(TEXT_INPUT_KEYS),
+
+            EditingRequestAuthUsername | EditingRequestAuthPassword | EditingRequestAuthBearerToken => String::from(TEXT_INPUT_KEYS),
 
             EditingRequestBody => String::from("Esc Enter Tab ^(s)ave ↑ ↓ ← → copy paste"),
         }

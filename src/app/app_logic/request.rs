@@ -1,4 +1,5 @@
-use reqwest::Client;
+use regex::Regex;
+use reqwest::{Client, Url};
 use reqwest::header::CONTENT_TYPE;
 use tui_textarea::TextArea;
 use crate::app::app::App;
@@ -6,6 +7,7 @@ use crate::request::auth::{next_auth};
 use crate::request::auth::Auth::*;
 use crate::request::body::{ContentType, next_content_type};
 use crate::request::method::next_method;
+use crate::utils::stateful_custom_table::CustomTableItem;
 
 impl App<'_> {
     /* URL */
@@ -13,7 +15,60 @@ impl App<'_> {
         let input_text = self.url_text_input.text.clone();
         let selected_request_index = self.collection.selected.unwrap();
 
-        self.collection.items[selected_request_index].url = input_text.leak();
+        let url_parts = input_text.split_once("?");
+
+        let final_url: String;
+        let query_params: &str;
+
+        if let Some((url, found_query_params)) = url_parts {
+            final_url = url.to_string();
+            query_params = found_query_params;
+        }
+        else {
+            final_url = input_text;
+            query_params = "";
+        }
+
+
+        let mut new_params_to_add: Vec<CustomTableItem> = vec![];
+        let mut existing_params_found_indexes: Vec<usize> = vec![];
+
+        let query_params_pattern = Regex::new(r"(&?([^=]+)=([^&]+))").unwrap();
+
+        for (_, [_, param_name, value]) in query_params_pattern.captures_iter(query_params).map(|c| c.extract()) {
+            let mut url_param_found = false;
+
+            for (index, existing_param) in self.collection.items[selected_request_index].params.iter_mut().enumerate() {
+                if param_name == existing_param.data.0 && existing_param.enabled {
+                    existing_param.data.1 = value.to_string();
+                    url_param_found = true;
+                    existing_params_found_indexes.push(index);
+                }
+            }
+
+            if !url_param_found {
+                let new_param = CustomTableItem {
+                    enabled: true,
+                    data: (param_name.to_string(), value.to_string()),
+                };
+
+                new_params_to_add.push(new_param);
+            }
+        }
+
+        let param_indexes = self.collection.items[selected_request_index].params.len();
+
+        for param_index in 0..param_indexes {
+            if !existing_params_found_indexes.contains(&param_index) {
+                self.collection.items[selected_request_index].params.remove(param_index);
+            }
+        }
+
+        for new_param in new_params_to_add {
+            self.collection.items[selected_request_index].params.push(new_param);
+        }
+
+        self.collection.items[selected_request_index].url = final_url.leak();
 
         self.update_inputs();
         self.select_request_state();
@@ -26,6 +81,39 @@ impl App<'_> {
         let next_method = next_method(&self.collection.items[selected_request_index].method);
 
         self.collection.items[selected_request_index].method = next_method;
+    }
+
+    /* PARAMS */
+
+    pub fn toggle_params_table_row(&mut self) {
+        if self.request_param_table.rows.is_empty() {
+            return;
+        }
+
+        let selected_request_index = self.collection.selected.unwrap();
+        let selected_request = &mut self.collection.items[selected_request_index];
+
+        let row = self.request_param_table.selection.unwrap().0;
+
+        selected_request.params[row].enabled = !selected_request.params[row].enabled;
+
+        self.update_inputs();
+    }
+
+    pub fn modify_request_param(&mut self) {
+        let selected_request_index = self.collection.selected.unwrap();
+
+        let selection = self.request_param_table.selection.unwrap();
+        let input_text = &self.request_param_table.param_selection_text_input.text;
+
+        match selection {
+            (_, 0) => self.collection.items[selected_request_index].params[selection.0].data.0 = input_text.clone(),
+            (_, 1) =>self.collection.items[selected_request_index].params[selection.0].data.1 = input_text.clone(),
+            (_, _) => {}
+        };
+
+        self.update_inputs();
+        self.select_request_state();
     }
 
     /* AUTH */
@@ -159,11 +247,25 @@ impl App<'_> {
         let selected_request_index = self.collection.selected.unwrap();
         let selected_request = &mut self.collection.items[selected_request_index];
 
+        let params: Vec<(String, String)> = selected_request.params
+            .iter()
+            .filter_map(|param| {
+                if param.enabled {
+                    Some(param.data.clone())
+                }
+                else {
+                    None
+                }
+            })
+            .collect();
+
         let client = Client::new();
+
+        let url = Url::parse_with_params(selected_request.url, params).unwrap();
 
         let mut request = client.request(
             selected_request.method.clone(),
-            selected_request.url
+            url
         );
 
         match &selected_request.auth {

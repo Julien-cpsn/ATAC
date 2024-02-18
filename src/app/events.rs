@@ -54,7 +54,17 @@ impl App<'_> {
                     AppState::SelectedRequest => {
                         // Param tabs
                         match self.request_param_tab {
-                            RequestParamsTabs::Params => {}
+                            RequestParamsTabs::Params => match key.code {
+                                KeyCode::Enter if self.request_param_table.is_selected() => self.edit_request_param_state(),
+
+                                KeyCode::Up => self.request_param_table.up(),
+                                KeyCode::Down => self.request_param_table.down(),
+                                KeyCode::Left | KeyCode::Right => self.request_param_table.change_y(),
+
+                                KeyCode::Char('p') if control_pressed => self.toggle_params_table_row(),
+
+                                _ => {}
+                            },
                             RequestParamsTabs::Auth if self.auth_text_input_selection.usable => match key.code {
                                 KeyCode::Enter => self.select_request_auth_input_text(),
 
@@ -74,6 +84,8 @@ impl App<'_> {
 
                         match key.code {
                             KeyCode::Esc => self.normal_state(),
+
+                            KeyCode::Char('p') if !control_pressed => self.load_request_params_tab(),
 
                             KeyCode::Char('a') if control_pressed => self.modify_request_auth(),
                             KeyCode::Char('a') => self.load_request_auth_param_tab(),
@@ -106,6 +118,19 @@ impl App<'_> {
                         KeyCode::Backspace => self.url_text_input.delete_char(),
                         KeyCode::Left => self.url_text_input.move_cursor_left(),
                         KeyCode::Right => self.url_text_input.move_cursor_right(),
+
+                        _ => miss_input = true
+                    },
+
+                    AppState::EditingRequestParam => match key.code {
+                        KeyCode::Char(char) => self.request_param_table.param_selection_text_input.enter_char(char),
+
+                        KeyCode::Esc => self.select_request_state(),
+                        KeyCode::Enter => self.modify_request_param(),
+
+                        KeyCode::Backspace => self.request_param_table.param_selection_text_input.delete_char(),
+                        KeyCode::Left => self.request_param_table.param_selection_text_input.move_cursor_left(),
+                        KeyCode::Right => self.request_param_table.param_selection_text_input.move_cursor_right(),
 
                         _ => miss_input = true
                     }

@@ -10,6 +10,7 @@ use crate::app::request_ui::views::RequestView;
 use crate::request::request::{Request};
 use crate::utils::stateful_list::StatefulList;
 use crate::utils::stateful_scrollbar::StatefulScrollbar;
+use crate::utils::stateful_custom_table::{CustomTableItem, StatefulCustomTable};
 use crate::utils::text_input::TextInput;
 use crate::utils::text_input_selection::TextInputSelection;
 
@@ -28,6 +29,8 @@ pub struct App<'a> {
     pub new_request_input: TextInput,
 
     pub url_text_input: TextInput,
+
+    pub request_param_table: StatefulCustomTable,
 
     pub auth_text_input_selection: TextInputSelection,
     pub auth_basic_username_text_input: TextInput,
@@ -52,6 +55,15 @@ impl App<'_> {
                 name: "Test Bearer",
                 url: "https://httpbin.org/bearer",
                 method: Method::GET,
+                ..Default::default()
+            },
+            Request {
+                name: "Test Query Params",
+                url: "https://httpbin.org/get",
+                method: Method::GET,
+                params: vec![
+                    CustomTableItem { enabled: true, data: ("test".to_string(), "3".to_string()) }
+                ],
                 ..Default::default()
             },
             Request {
@@ -94,6 +106,8 @@ impl App<'_> {
             new_request_input: TextInput::default(),
 
             url_text_input: TextInput::default(),
+
+            request_param_table: StatefulCustomTable::default(),
 
             auth_text_input_selection: TextInputSelection::default(),
             auth_basic_username_text_input: TextInput::default(),

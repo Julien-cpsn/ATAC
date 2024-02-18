@@ -16,3 +16,4 @@ crossterm = "0.27.0"
 tui-big-text = "0.4.0"
 tui-textarea = { version = "0.4.0", features = ["ratatui"] }
 throbber-widgets-tui = "0.4.0"
+regex = "1.10.3"

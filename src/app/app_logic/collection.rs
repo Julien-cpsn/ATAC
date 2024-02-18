@@ -6,6 +6,7 @@ use crate::request::request::{Request};
 impl<'a> App<'a> {
     pub fn reset_inputs(&mut self) {
         self.url_text_input.reset_input();
+        self.request_param_table.param_selection_text_input.reset_input();
         self.auth_basic_username_text_input.reset_input();
         self.auth_basic_password_text_input.reset_input();
         self.auth_bearer_token_text_input.reset_input();
@@ -17,7 +18,20 @@ impl<'a> App<'a> {
         let selected_request_index = self.collection.selected.unwrap();
         let selected_request = &self.collection.items[selected_request_index];
 
-        self.url_text_input.enter_str(selected_request.url);
+        self.url_text_input.enter_str(&selected_request.url_with_params_to_string());
+        self.request_param_table.rows = selected_request.params.clone();
+
+        if !selected_request.params.is_empty() {
+            let selection = self.request_param_table.selection.unwrap();
+
+            let param_text = match selection.1 {
+                0 => selected_request.params[selection.0].data.0.clone(),
+                1 => selected_request.params[selection.0].data.1.clone(),
+                _ => String::new()
+            };
+
+            self.request_param_table.param_selection_text_input.enter_str(&param_text);
+        }
 
         match &selected_request.auth {
             Auth::NoAuth => {
@@ -36,7 +50,6 @@ impl<'a> App<'a> {
                 self.auth_text_input_selection.usable = true;
 
                 self.auth_bearer_token_text_input.enter_str(bearer_token);
-
             }
         }
 
@@ -49,7 +62,7 @@ impl<'a> App<'a> {
         self.result_scrollbar.set_scroll(0);
 
         if self.collection.selected.is_some() {
-            self.update_inputs();
+            self.load_request_params_tab();
             self.state = AppState::SelectedRequest;
         }
     }
@@ -62,7 +75,7 @@ impl<'a> App<'a> {
     pub fn new_request(&mut self) {
         let new_request_name = &self.new_request_input.text;
 
-        if new_request_name.len() == 0 {
+        if new_request_name.is_empty() {
             return;
         }
 

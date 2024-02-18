@@ -1,9 +1,10 @@
 use ratatui::Frame;
 use ratatui::layout::{Constraint, Layout, Rect};
-use ratatui::layout::Direction::Vertical;
+use ratatui::layout::Direction::{Horizontal, Vertical};
 use ratatui::prelude::{Color, Style};
+use ratatui::style::Color::{LightYellow, Yellow};
 use ratatui::style::Stylize;
-use ratatui::widgets::{Block, Borders, Paragraph, Tabs};
+use ratatui::widgets::{Block, Borders, List, ListItem, Paragraph, Tabs};
 use strum::{Display, EnumIter, FromRepr, IntoEnumIterator};
 use crate::app::app::App;
 use crate::app::app_states::AppState::*;
@@ -36,19 +37,41 @@ impl App<'_> {
             RequestParamsTabs::Cookies => RequestParamsTabs::Params
         };
 
-        self.load_request_param_tab();
+        self.load_a_request_param_tab();
     }
 
-    pub fn load_request_param_tab(&mut self) {
+    pub fn load_a_request_param_tab(&mut self) {
         self.update_inputs();
 
         match self.request_param_tab {
-            RequestParamsTabs::Params => {}
+            RequestParamsTabs::Params => self.load_request_params_tab(),
             RequestParamsTabs::Auth => self.load_request_auth_param_tab(),
             RequestParamsTabs::Headers => {}
             RequestParamsTabs::Body => self.load_request_body_param_tab(),
             RequestParamsTabs::Cookies => {}
         }
+    }
+
+    pub fn load_request_params_tab(&mut self) {
+        let selected_request_index = self.collection.selected.unwrap();
+        let selected_request = &self.collection.items[selected_request_index];
+
+        match !selected_request.params.is_empty() {
+            true => {
+                self.request_param_table.selection = Some((0, 0));
+                self.request_param_table.left_state.select(Some(0));
+                self.request_param_table.right_state.select(Some(0));
+            },
+            false => {
+                self.request_param_table.selection = None;
+                self.request_param_table.left_state.select(None);
+                self.request_param_table.right_state.select(None);
+            }
+        }
+
+        self.request_param_tab = RequestParamsTabs::Params;
+
+        self.update_inputs();
     }
 
     pub fn load_request_auth_param_tab(&mut self) {
@@ -80,15 +103,18 @@ impl App<'_> {
         let param_tabs = RequestParamsTabs::iter()
             .map(|tab| {
                 match tab {
-                    RequestParamsTabs::Params => tab.to_string(),
-                    RequestParamsTabs::Auth => match &request.auth {
+                    RequestParamsTabs::Params => match request.params.is_empty() {
+                        true => tab.to_string(),
+                        false => format!("{} ({})", tab.to_string(), request.params.len())
+                    },
+                    RequestParamsTabs::Auth => match request.auth {
                         NoAuth => tab.to_string(),
-                        BasicAuth(_, _) | BearerToken(_) => format!("{} ({})", tab.to_string(), &request.auth.to_string())
+                        BasicAuth(_, _) | BearerToken(_) => format!("{} ({})", tab.to_string(), request.auth.to_string())
                     },
                     RequestParamsTabs::Headers => tab.to_string(),
-                    RequestParamsTabs::Body => match &request.body {
+                    RequestParamsTabs::Body => match request.body {
                         NoBody => tab.to_string(),
-                        Raw(_) | JSON(_) | XML(_) | HTML(_) => format!("{} ({})", tab.to_string(), &request.body.to_string())
+                        Raw(_) | JSON(_) | XML(_) | HTML(_) => format!("{} ({})", tab.to_string(), request.body.to_string())
                     }
                     RequestParamsTabs::Cookies => tab.to_string(),
                 }
@@ -108,7 +134,124 @@ impl App<'_> {
         // REQUEST PARAM TABS CONTENT
 
         match self.request_param_tab {
-            RequestParamsTabs::Params => {}
+            RequestParamsTabs::Params => {
+                match self.request_param_table.selection {
+                    None => {}
+                    Some(param_selection) => {
+                        let params_layout = Layout::new(
+                            Vertical,
+                            [
+                                Constraint::Length(2),
+                                Constraint::Fill(1)
+                            ]
+                        )
+                            .split(request_params_layout[1]);
+
+                        let header_layout = Layout::new(
+                            Horizontal,
+                            [
+                                Constraint::Percentage(50),
+                                Constraint::Percentage(50)
+                            ]
+                        )
+                            .split(params_layout[0]);
+
+                        let header_param = Paragraph::new("Param")
+                            .centered()
+                            .block(Block::new().borders(Borders::BOTTOM | Borders::RIGHT))
+                            .dark_gray();
+                        let header_value = Paragraph::new("Value")
+                            .centered()
+                            .block(Block::new().borders(Borders::BOTTOM))
+                            .dark_gray();
+
+                        frame.render_widget(header_param, header_layout[0]);
+                        frame.render_widget(header_value, header_layout[1]);
+
+                        let horizontal_margin = 2;
+
+                        let table_layout = Layout::new(
+                            Horizontal,
+                            [
+                                Constraint::Percentage(50),
+                                Constraint::Percentage(50)
+                            ]
+                        )
+                            .horizontal_margin(horizontal_margin)
+                            .split(params_layout[1]);
+
+                        let mut params: Vec<ListItem> = vec![];
+                        let mut values: Vec<ListItem> = vec![];
+
+                        for param in request.params.iter() {
+                            let mut key = ListItem::from(param.data.0.clone());
+                            let mut value = ListItem::from(param.data.1.clone());
+
+                            if !param.enabled {
+                                key = key.dark_gray().dim();
+                                value = value.dark_gray().dim();
+                            }
+
+                            params.push(key);
+                            values.push(value);
+                        }
+
+                        let mut left_list_style = Style::default().fg(LightYellow);
+                        let mut right_list_style = Style::default().fg(LightYellow);
+
+                        match param_selection.1 {
+                            0 => left_list_style = left_list_style.fg(Yellow).bold(),
+                            1 => right_list_style = right_list_style.fg(Yellow).bold(),
+                            _ => {}
+                        }
+
+                        let left_list = List::new(params)
+                            .highlight_style(left_list_style);
+
+                        let right_list = List::new(values)
+                            .highlight_style(right_list_style);
+
+                        frame.render_stateful_widget(left_list, table_layout[0], &mut self.request_param_table.left_state);
+                        frame.render_stateful_widget(right_list, table_layout[1], &mut self.request_param_table.right_state);
+
+                        // Param input & cursor
+
+                        if self.state == EditingRequestParam {
+                            let cell_with = params_layout[1].width / 2;
+
+                            let width_adjustment = match param_selection.1 {
+                                0 => 0,
+                                1 => {
+                                    let even_odd_adjustment = match params_layout[1].width % 2 {
+                                        1 => 1,
+                                        0 => 2,
+                                        _ => 0
+                                    };
+                                    cell_with - even_odd_adjustment
+                                },
+                                _ => 0
+                            };
+
+                            let height_adjustment = (param_selection.0 - self.request_param_table.left_state.offset()) as u16 % params_layout[1].height;
+
+                            let selection_position_x = params_layout[1].x + width_adjustment + horizontal_margin;
+                            let selection_position_y = params_layout[1].y + height_adjustment;
+
+                            let param_text = self.request_param_table.param_selection_text_input.text.clone();
+
+                            let text_input = Paragraph::new(format!("{:fill$}", param_text, fill = (cell_with - horizontal_margin) as usize));
+                            let text_rect = Rect::new(selection_position_x, selection_position_y, cell_with, 1);
+
+                            frame.render_widget(text_input, text_rect);
+
+                            frame.set_cursor(
+                                selection_position_x + param_text.len() as u16,
+                                selection_position_y
+                            );
+                        }
+                    }
+                }
+            }
             RequestParamsTabs::Auth => {
                 match &request.auth {
                     NoAuth => {

@@ -21,6 +21,11 @@ impl App<'_> {
         self.state = AppState::EditingRequestUrl;
     }
 
+    pub fn edit_request_param_state(&mut self) {
+        self.state = AppState::EditingRequestParam;
+        self.update_inputs();
+    }
+
     pub fn edit_request_auth_username_state(&mut self) {
         self.state = AppState::EditingRequestAuthUsername;
     }
