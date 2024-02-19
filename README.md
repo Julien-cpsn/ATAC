@@ -3,6 +3,7 @@ ATAC
 
 [![Rust](https://github.com/Julien-cpsn/ATAC/actions/workflows/rust.yml/badge.svg)](https://github.com/Julien-cpsn/ATAC/actions/workflows/rust.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![GitHub Release](https://img.shields.io/github/v/release/julien-cpsn/ATAC)
 
 ## Description
 
@@ -30,6 +31,7 @@ A documentation will soon be published in the wiki section
   - Postman & Insomnia import
   - Async request support
   - File based memory (for now the memory is blank at every program startup)
+  - Body & result syntax highlighting
   - keymap configuration (via a config file)
 
 - **To improve**
