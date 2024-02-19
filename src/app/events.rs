@@ -42,7 +42,7 @@ impl App<'_> {
                         KeyCode::Esc => self.normal_state(),
                         KeyCode::Enter => self.new_request(),
 
-                        KeyCode::Backspace => self.new_request_input.delete_char(),
+                        KeyCode::Backspace => self.new_request_input.delete_char_backward(),
                         KeyCode::Left => self.new_request_input.move_cursor_left(),
                         KeyCode::Right => self.new_request_input.move_cursor_right(),
 
@@ -115,7 +115,8 @@ impl App<'_> {
                         KeyCode::Esc => self.select_request_state(),
                         KeyCode::Enter => self.modify_request_url(),
 
-                        KeyCode::Backspace => self.url_text_input.delete_char(),
+                        KeyCode::Delete => self.url_text_input.delete_char_forward(),
+                        KeyCode::Backspace => self.url_text_input.delete_char_backward(),
                         KeyCode::Left => self.url_text_input.move_cursor_left(),
                         KeyCode::Right => self.url_text_input.move_cursor_right(),
 
@@ -128,7 +129,8 @@ impl App<'_> {
                         KeyCode::Esc => self.select_request_state(),
                         KeyCode::Enter => self.modify_request_param(),
 
-                        KeyCode::Backspace => self.request_param_table.param_selection_text_input.delete_char(),
+                        KeyCode::Delete => self.request_param_table.param_selection_text_input.delete_char_forward(),
+                        KeyCode::Backspace => self.request_param_table.param_selection_text_input.delete_char_backward(),
                         KeyCode::Left => self.request_param_table.param_selection_text_input.move_cursor_left(),
                         KeyCode::Right => self.request_param_table.param_selection_text_input.move_cursor_right(),
 
@@ -141,7 +143,8 @@ impl App<'_> {
                         KeyCode::Esc => self.select_request_state(),
                         KeyCode::Enter => self.modify_request_auth_basic_username(),
 
-                        KeyCode::Backspace => self.auth_basic_username_text_input.delete_char(),
+                        KeyCode::Delete => self.auth_basic_username_text_input.delete_char_forward(),
+                        KeyCode::Backspace => self.auth_basic_username_text_input.delete_char_backward(),
                         KeyCode::Left => self.auth_basic_username_text_input.move_cursor_left(),
                         KeyCode::Right => self.auth_basic_username_text_input.move_cursor_right(),
 
@@ -154,7 +157,8 @@ impl App<'_> {
                         KeyCode::Esc => self.select_request_state(),
                         KeyCode::Enter => self.modify_request_auth_basic_password(),
 
-                        KeyCode::Backspace => self.auth_basic_password_text_input.delete_char(),
+                        KeyCode::Delete => self.auth_basic_password_text_input.delete_char_forward(),
+                        KeyCode::Backspace => self.auth_basic_password_text_input.delete_char_backward(),
                         KeyCode::Left => self.auth_basic_password_text_input.move_cursor_left(),
                         KeyCode::Right => self.auth_basic_password_text_input.move_cursor_right(),
 
@@ -167,7 +171,8 @@ impl App<'_> {
                         KeyCode::Esc => self.select_request_state(),
                         KeyCode::Enter => self.modify_request_auth_bearer_token(),
 
-                        KeyCode::Backspace => self.auth_bearer_token_text_input.delete_char(),
+                        KeyCode::Delete => self.auth_bearer_token_text_input.delete_char_forward(),
+                        KeyCode::Backspace => self.auth_bearer_token_text_input.delete_char_backward(),
                         KeyCode::Left => self.auth_bearer_token_text_input.move_cursor_left(),
                         KeyCode::Right => self.auth_bearer_token_text_input.move_cursor_right(),
 
