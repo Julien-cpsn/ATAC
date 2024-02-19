@@ -55,7 +55,7 @@ impl App<'_> {
                         // Param tabs
                         match self.request_param_tab {
                             RequestParamsTabs::Params => match key.code {
-                                KeyCode::Enter if self.request_param_table.is_selected() => self.edit_request_param_state(),
+                                KeyCode::Enter if !control_pressed && self.request_param_table.is_selected()=> self.edit_request_param_state(),
 
                                 KeyCode::Up => self.request_param_table.up(),
                                 KeyCode::Down => self.request_param_table.down(),
@@ -66,7 +66,7 @@ impl App<'_> {
                                 _ => {}
                             },
                             RequestParamsTabs::Auth if self.auth_text_input_selection.usable => match key.code {
-                                KeyCode::Enter => self.select_request_auth_input_text(),
+                                KeyCode::Enter if !control_pressed => self.select_request_auth_input_text(),
 
                                 KeyCode::Up => self.auth_text_input_selection.previous(),
                                 KeyCode::Down => self.auth_text_input_selection.next(),
