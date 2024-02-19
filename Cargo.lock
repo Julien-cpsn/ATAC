@@ -904,9 +904,9 @@ dependencies = [
 
 [[package]]
 name = "ratatui"
-version = "0.26.0"
+version = "0.26.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "154b85ef15a5d1719bcaa193c3c81fe645cd120c156874cd660fe49fd21d1373"
+checksum = "bcb12f8fbf6c62614b0d56eb352af54f6a22410c3b079eb53ee93c7b97dd31d8"
 dependencies = [
  "bitflags 2.4.2",
  "cassowary",
@@ -1423,9 +1423,9 @@ checksum = "e421abadd41a4225275504ea4d6566923418b7f05506fbc9c0fe86ba7396114b"
 
 [[package]]
 name = "tui-big-text"
-version = "0.4.0"
+version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b97b69c490b93c7ff8e41c877b326d3d178bf3cf6ea3a93f5e2628d008d3f45b"
+checksum = "544f9de55b32fa36ba3c6716a10190d2cd79ec2b073c841deeaff327f8eeaefe"
 dependencies = [
  "derive_builder",
  "font8x8",
