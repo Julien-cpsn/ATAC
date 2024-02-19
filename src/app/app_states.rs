@@ -74,7 +74,7 @@ impl App<'_> {
                 let selected_request_index = self.collection.selected.unwrap();
                 let selected_request = &self.collection.items[selected_request_index];
 
-                let mut base_keys = String::from("Esc Space ^TAB (u)rl (m)ethod ^(p)arams ^(a)uth ^(b)ody");
+                let mut base_keys = String::from("Esc ^Enter ^TAB (u)rl (m)ethod ^(p)arams ^(a)uth ^(b)ody");
 
                 let additional_keys = match self.request_param_tab {
                     RequestParamsTabs::Params => match selected_request.params.is_empty() {

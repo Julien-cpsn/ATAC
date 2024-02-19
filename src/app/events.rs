@@ -75,7 +75,7 @@ impl App<'_> {
                             }
                             RequestParamsTabs::Headers => {}
                             RequestParamsTabs::Body => match key.code {
-                                KeyCode::Enter => self.edit_request_body_state(),
+                                KeyCode::Enter if !control_pressed => self.edit_request_body_state(),
                                 _ => {}
                             }
                             RequestParamsTabs::Cookies => {},
@@ -103,7 +103,7 @@ impl App<'_> {
                             KeyCode::Tab if control_pressed => self.next_request_result_tab(),
                             KeyCode::Tab => self.next_request_param_tab(),
 
-                            KeyCode::Char(' ') => self.send_request().await,
+                            KeyCode::Enter if control_pressed => self.send_request().await,
 
                             _ => miss_input = true
                         }
