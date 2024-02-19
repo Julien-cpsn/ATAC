@@ -3,7 +3,8 @@ use ratatui::layout::{Constraint, Layout, Rect};
 use ratatui::layout::Direction::{Horizontal, Vertical};
 use ratatui::prelude::{Color, Style};
 use ratatui::style::Color::{LightYellow, Yellow};
-use ratatui::style::Stylize;
+use ratatui::style::{Modifier, Stylize};
+use ratatui::text::{Line};
 use ratatui::widgets::{Block, Borders, List, ListItem, Paragraph, Tabs};
 use strum::{Display, EnumIter, FromRepr, IntoEnumIterator};
 use crate::app::app::App;
@@ -136,7 +137,17 @@ impl App<'_> {
         match self.request_param_tab {
             RequestParamsTabs::Params => {
                 match self.request_param_table.selection {
-                    None => {}
+                    None => {
+                        let params_lines = vec![
+                            Line::default(),
+                            Line::from("No params"),
+                            Line::from("(Add one via the URL)".dark_gray())
+                        ];
+
+                        let params_paragraph = Paragraph::new(params_lines).centered();
+
+                        frame.render_widget(params_paragraph, request_params_layout[1]);
+                    },
                     Some(param_selection) => {
                         let params_layout = Layout::new(
                             Vertical,
@@ -200,8 +211,8 @@ impl App<'_> {
                         let mut right_list_style = Style::default().fg(LightYellow);
 
                         match param_selection.1 {
-                            0 => left_list_style = left_list_style.fg(Yellow).bold(),
-                            1 => right_list_style = right_list_style.fg(Yellow).bold(),
+                            0 => left_list_style = left_list_style.fg(Yellow).add_modifier(Modifier::BOLD),
+                            1 => right_list_style = right_list_style.fg(Yellow).add_modifier(Modifier::BOLD),
                             _ => {}
                         }
 
@@ -255,8 +266,15 @@ impl App<'_> {
             RequestParamsTabs::Auth => {
                 match &request.auth {
                     NoAuth => {
-                        let body_paragraph = Paragraph::new("\nNo auth").centered();
-                        frame.render_widget(body_paragraph, request_params_layout[1]);
+                        let auth_lines = vec![
+                            Line::default(),
+                            Line::from("No auth"),
+                            Line::from("(Change auth method with ^a)".dark_gray())
+                        ];
+
+                        let auth_paragraph = Paragraph::new(auth_lines).centered();
+
+                        frame.render_widget(auth_paragraph, request_params_layout[1]);
                     }
                     BasicAuth(_, _) => {
                         let basic_auth_layout = Layout::new(
@@ -379,7 +397,14 @@ impl App<'_> {
             RequestParamsTabs::Body => {
                 match &request.body {
                     NoBody => {
-                        let body_paragraph = Paragraph::new("\nNo body").centered();
+                        let body_lines = vec![
+                            Line::default(),
+                            Line::from("No body"),
+                            Line::from("(Change body type with ^b)".dark_gray())
+                        ];
+
+                        let body_paragraph = Paragraph::new(body_lines).centered();
+
                         frame.render_widget(body_paragraph, request_params_layout[1]);
                     }
                     Raw(_) | JSON(_) | XML(_) | HTML(_) => {

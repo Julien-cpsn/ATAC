@@ -95,25 +95,11 @@ impl App<'_> {
 
         // FOOTER
 
-        let state_text = match self.state {
-            Normal | CreatingNewRequest => self.state.to_string(),
-            _ => {
-                let selected_request_index = self.collection.selected.unwrap();
-                let selected_request = &self.collection.items[selected_request_index];
-
-                if self.state == SelectedRequest {
-                    format!("Request > {}", selected_request.name)
-                }
-                else {
-                    format!("Request > {} > {}", selected_request.name, self.state.to_string())
-                }
-            }
-        };
-
+        let state_line = self.get_state_line();
         let available_keys = self.get_available_keys();
 
         let footer = Block::new()
-            .title(Title::from(state_text).alignment(Alignment::Left))
+            .title(Title::from(state_line).alignment(Alignment::Left))
             .title(Title::from(available_keys.dark_gray()).alignment(Alignment::Right));
 
         frame.render_widget(footer, main_layout[2]);
@@ -129,7 +115,7 @@ impl App<'_> {
 
         let list = List::new(items)
             .highlight_style(Style::default().add_modifier(Modifier::BOLD))
-            .highlight_symbol("> ")
+            .highlight_symbol(">")
             .block(
                 Block::default()
                     .title("Collection")

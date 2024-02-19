@@ -1,3 +1,6 @@
+use ratatui::prelude::Span;
+use ratatui::style::Stylize;
+use ratatui::text::Line;
 use strum::Display;
 use crate::app::app::App;
 use crate::app::app_states::AppState::*;
@@ -39,6 +42,30 @@ pub enum AppState {
 const TEXT_INPUT_KEYS: &str = "Esc Enter ← → copy paste";
 
 impl App<'_> {
+    pub fn get_state_line(&self) -> Line {
+        match self.state {
+            Normal | CreatingNewRequest => Line::from(self.state.to_string().white().on_dark_gray()),
+            _ => {
+                let selected_request_index = self.collection.selected.unwrap();
+                let selected_request = &self.collection.items[selected_request_index];
+
+                if self.state == SelectedRequest {
+                    Line::from(vec![
+                        Span::raw("Request > ").dark_gray(),
+                        Span::raw(selected_request.name).white().on_dark_gray()
+                    ])
+                }
+                else {
+                    Line::from(vec![
+                        Span::raw("Request > ").dark_gray(),
+                        Span::raw(format!("{} > ", selected_request.name)).dark_gray(),
+                        Span::raw(self.state.to_string()).white().on_dark_gray()
+                    ])
+                }
+            }
+        }
+    }
+
     pub fn get_available_keys(&self) -> String {
         match self.state {
             Normal => String::from("(q)uit or ^c ↑ ↓ ← → (n)ew (d)elete"),
@@ -50,7 +77,10 @@ impl App<'_> {
                 let mut base_keys = String::from("Esc Space ^TAB (u)rl (m)ethod ^(p)arams ^(a)uth ^(b)ody");
 
                 let additional_keys = match self.request_param_tab {
-                    RequestParamsTabs::Params => Some("↑ ↓ ← → Enter"),
+                    RequestParamsTabs::Params => match selected_request.params.is_empty() {
+                        true => None,
+                        false => Some("↑ ↓ ← → Enter")
+                    },
                     RequestParamsTabs::Auth => match selected_request.auth {
                         Auth::NoAuth => None,
                         Auth::BasicAuth(_, _) => Some("↑ ↓ Enter"),
