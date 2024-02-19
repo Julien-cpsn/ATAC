@@ -256,7 +256,7 @@ impl App<'_> {
                             frame.render_widget(text_input, text_rect);
 
                             frame.set_cursor(
-                                selection_position_x + param_text.len() as u16,
+                                selection_position_x + self.request_param_table.param_selection_text_input.cursor_position as u16,
                                 selection_position_y
                             );
                         }
