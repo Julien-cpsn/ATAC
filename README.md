@@ -1,4 +1,4 @@
-ATAC
+ATAC ⚔📩
 ===
 
 [![Rust](https://github.com/Julien-cpsn/ATAC/actions/workflows/rust.yml/badge.svg)](https://github.com/Julien-cpsn/ATAC/actions/workflows/rust.yml)
@@ -24,18 +24,29 @@ A documentation will soon be published in the wiki section
 
 ## TODO
 
+### v1.0.0
+
 - **To add**
   - Headers management
   - Cookies management
   - Proxy configuration
+  - Manage many collection
   - Postman & Insomnia import
   - Async request support
   - File based memory (for now the memory is blank at every program startup)
   - Body & result syntax highlighting
-  - keymap configuration (via a config file)
+  - Create a repo wiki
+  - Document whole code
 
 - **To improve**
-  - Keymap on bottom right
+  - Keymap help on bottom right
+
+### v2.0.0
+
+- **To add**
+  - Environments (maybe .env files?)
+  - keymap configuration (via a config file)
+  - Pre and post-request script
 
 ## Contributors
 
