@@ -27,8 +27,8 @@ impl App<'_> {
 
                         KeyCode::Up => self.collection.previous(),
                         KeyCode::Down => self.collection.next(),
-                        KeyCode::Right => self.select_request(),
                         KeyCode::Left => self.unselect_request(),
+                        KeyCode::Right | KeyCode::Enter => self.select_request(),
 
                         KeyCode::Char('n') => self.create_new_request_state(),
                         KeyCode::Char('d') => self.delete_request(),

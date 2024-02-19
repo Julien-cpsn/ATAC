@@ -68,7 +68,7 @@ impl App<'_> {
 
     pub fn get_available_keys(&self) -> String {
         match self.state {
-            Normal => String::from("(q)uit or ^c ↑ ↓ ← → (n)ew (d)elete"),
+            Normal => String::from("(q)uit or ^c ↑ ↓ ← → or Enter (n)ew (d)elete"),
 
             SelectedRequest => {
                 let selected_request_index = self.collection.selected.unwrap();
