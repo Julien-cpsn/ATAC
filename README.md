@@ -12,7 +12,7 @@ The philosophy of ATAC is to be free, account-less and offline for now and forev
 
 ## How to run
 
-Simply clone the repository and use :
+Make sur your rust version is updated first. Then, simply clone the repository and use :
 ```bash
 cargo run
 ```
@@ -20,6 +20,20 @@ cargo run
 ## Documentation
 
 A documentation will soon be published in the wiki section
+
+## TODO
+
+- **To add**
+  - Headers management
+  - Cookies management
+  - Proxy configuration
+  - Postman & Insomnia import
+  - Async request support
+  - File based memory (for now the memory is blank at every program startup)
+  - keymap configuration (via a config file)
+
+- **To improve**
+  - Keymap on bottom right
 
 ## Contributors
 
