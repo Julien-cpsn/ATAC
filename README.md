@@ -13,7 +13,10 @@ The philosophy of ATAC is to be free, account-less and offline for now and forev
 
 ## How to run
 
-Make sur your rust version is updated first. Then, simply clone the repository and use :
+> First, make sure your rust version is at least 1.76
+
+Simply clone the repository and use :
+
 ```bash
 cargo run
 ```
