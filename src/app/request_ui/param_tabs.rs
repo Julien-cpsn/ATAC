@@ -2,7 +2,7 @@ use ratatui::Frame;
 use ratatui::layout::{Constraint, Layout, Rect};
 use ratatui::layout::Direction::{Horizontal, Vertical};
 use ratatui::prelude::{Color, Style};
-use ratatui::style::Color::{LightYellow, Yellow};
+use ratatui::style::Color::{Yellow};
 use ratatui::style::{Modifier, Stylize};
 use ratatui::text::{Line};
 use ratatui::widgets::{Block, Borders, List, ListItem, Paragraph, Tabs};
@@ -207,8 +207,8 @@ impl App<'_> {
                             values.push(value);
                         }
 
-                        let mut left_list_style = Style::default().fg(LightYellow);
-                        let mut right_list_style = Style::default().fg(LightYellow);
+                        let mut left_list_style = Style::default();
+                        let mut right_list_style = Style::default();
 
                         match param_selection.1 {
                             0 => left_list_style = left_list_style.fg(Yellow).add_modifier(Modifier::BOLD),
