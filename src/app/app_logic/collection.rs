@@ -79,8 +79,8 @@ impl<'a> App<'a> {
             return;
         }
 
-        let new_request = Request::<'a> {
-            name: new_request_name.clone().leak(),
+        let new_request = Request {
+            name: new_request_name.clone(),
             ..Default::default()
         };
 

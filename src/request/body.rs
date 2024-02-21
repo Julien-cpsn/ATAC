@@ -1,7 +1,8 @@
+use serde::{Deserialize, Serialize};
 use strum::{Display};
 use crate::request::body::ContentType::{NoBody, HTML, JSON, Raw, XML};
 
-#[derive(Clone, Default, Display)]
+#[derive(Clone, Default, Display, Serialize, Deserialize)]
 pub enum ContentType {
     #[default]
     #[strum(to_string = "No Body")]

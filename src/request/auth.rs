@@ -1,7 +1,8 @@
+use serde::{Deserialize, Serialize};
 use strum::Display;
 use crate::request::auth::Auth::{BasicAuth, BearerToken, NoAuth};
 
-#[derive(Clone, Default, Debug, Display)]
+#[derive(Clone, Default, Debug, Display, Serialize, Deserialize)]
 pub enum Auth {
     #[default]
     #[strum(to_string = "No Auth")]

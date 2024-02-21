@@ -17,3 +17,5 @@ tui-big-text = "0.4.1"
 tui-textarea = { version = "0.4.0", features = ["ratatui"] }
 throbber-widgets-tui = "0.4.0"
 regex = "1.10.3"
+serde = { version = "1.0.197", features = ["derive"] }
+serde_json = "1.0.114"

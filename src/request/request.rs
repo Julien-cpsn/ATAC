@@ -1,24 +1,24 @@
 use ratatui::prelude::{Line, Modifier, Span};
 use ratatui::style::Stylize;
 use ratatui::widgets::ListItem;
-use reqwest::Method;
+use serde::{Deserialize, Serialize};
 use crate::request::auth::{Auth};
 use crate::request::body::ContentType;
-use crate::request::method::get_method_bg;
-use crate::utils::stateful_custom_table::CustomTableItem;
+use crate::request::method::Method;
+use crate::utils::stateful_custom_table::Param;
 
-#[derive(Default, Clone)]
-pub struct Request<'a> {
-    pub name: &'a str,
-    pub url: &'a str,
+#[derive(Default, Clone, Serialize, Deserialize)]
+pub struct Request {
+    pub name: String,
+    pub url: String,
     pub method: Method,
-    pub params: Vec<CustomTableItem>,
+    pub params: Vec<Param>,
     pub body: ContentType,
     pub auth: Auth,
     pub result: RequestResult
 }
 
-#[derive(Default, Clone)]
+#[derive(Default, Clone, Serialize, Deserialize)]
 pub struct RequestResult {
     pub status_code: Option<u16>,
     pub body: Option<String>,
@@ -26,13 +26,13 @@ pub struct RequestResult {
     pub headers: Option<String>
 }
 
-impl Request<'_> {
+impl Request {
     pub fn to_list_item(&self) -> ListItem {
         let prefix = Span::from(self.method.to_string())
             .style(Modifier::BOLD)
-            .bg(get_method_bg(&self.method));
+            .bg(self.method.get_color());
 
-        let text = Span::from(self.name);
+        let text = Span::from(&self.name);
 
         let line = Line::from(vec![
             prefix,

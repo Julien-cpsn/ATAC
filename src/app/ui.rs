@@ -11,7 +11,6 @@ use tui_big_text::{BigTextBuilder, PixelSize};
 use crate::app::app::{App};
 use crate::app::app_states::AppState::*;
 use crate::app::request_ui::views::RequestView;
-use crate::request::method::get_method_bg;
 use crate::request::request::Request;
 use crate::utils::centered_rect::centered_rect;
 
@@ -142,7 +141,7 @@ impl App<'_> {
 
         // REQUEST NAME
 
-        let request_name = request.name;
+        let request_name = request.name.clone();
 
         let request_name_paragraph = Paragraph::new(request_name)
             .centered();
@@ -162,7 +161,7 @@ impl App<'_> {
 
         // REQUEST METHOD
 
-        let method = &request.method;
+        let method = request.method.clone();
 
         let method_block = Block::new()
             .title("Method").title_alignment(Alignment::Center)
@@ -172,7 +171,7 @@ impl App<'_> {
         let method_area = method_block.inner(request_header_layout[0]);
 
         let method_paragraph = Paragraph::new(method.to_string())
-            .bg(get_method_bg(&method))
+            .bg(method.get_color())
             .fg(White)
             .centered();
 

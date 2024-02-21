@@ -7,7 +7,7 @@ use crate::request::auth::{next_auth};
 use crate::request::auth::Auth::*;
 use crate::request::body::{ContentType, next_content_type};
 use crate::request::method::next_method;
-use crate::utils::stateful_custom_table::CustomTableItem;
+use crate::utils::stateful_custom_table::Param;
 
 impl App<'_> {
     /* URL */
@@ -30,7 +30,7 @@ impl App<'_> {
         }
 
 
-        let mut new_params_to_add: Vec<CustomTableItem> = vec![];
+        let mut new_params_to_add: Vec<Param> = vec![];
         let mut existing_params_found_indexes: Vec<usize> = vec![];
 
         let query_params_pattern = Regex::new(r"(&?([^=]+)=([^&]+))").unwrap();
@@ -47,7 +47,7 @@ impl App<'_> {
             }
 
             if !url_param_found {
-                let new_param = CustomTableItem {
+                let new_param = Param {
                     enabled: true,
                     data: (param_name.to_string(), value.to_string()),
                 };
@@ -71,7 +71,7 @@ impl App<'_> {
         // In case new params were inputted or deleted
         self.update_params_selection();
 
-        self.collection.items[selected_request_index].url = final_url.leak();
+        self.collection.items[selected_request_index].url = final_url;
 
         self.select_request_state();
     }
@@ -279,10 +279,10 @@ impl App<'_> {
 
         let client = Client::new();
 
-        let url = Url::parse_with_params(selected_request.url, params).unwrap();
+        let url = Url::parse_with_params(&selected_request.url, params).unwrap();
 
         let mut request = client.request(
-            selected_request.method.clone(),
+            selected_request.method.as_reqwest(),
             url
         );
 

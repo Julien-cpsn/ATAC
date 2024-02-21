@@ -52,7 +52,7 @@ impl App<'_> {
                 if self.state == SelectedRequest {
                     Line::from(vec![
                         Span::raw("Request > ").dark_gray(),
-                        Span::raw(selected_request.name).white().on_dark_gray()
+                        Span::raw(&selected_request.name).white().on_dark_gray()
                     ])
                 }
                 else {

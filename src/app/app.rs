@@ -1,7 +1,6 @@
 use std::fs::{File, OpenOptions};
 use ratatui::backend::Backend;
 use ratatui::Terminal;
-use reqwest::Method;
 use tui_textarea::TextArea;
 use crate::app::app_states::AppState;
 use crate::app::request_ui::param_tabs::RequestParamsTabs;
@@ -10,7 +9,7 @@ use crate::app::request_ui::views::RequestView;
 use crate::request::request::{Request};
 use crate::utils::stateful_list::StatefulList;
 use crate::utils::stateful_scrollbar::StatefulScrollbar;
-use crate::utils::stateful_custom_table::{CustomTableItem, StatefulCustomTable};
+use crate::utils::stateful_custom_table::{StatefulCustomTable};
 use crate::utils::text_input::TextInput;
 use crate::utils::text_input_selection::TextInputSelection;
 
@@ -20,7 +19,7 @@ pub struct App<'a> {
 
     pub log_file: File,
 
-    pub collection: StatefulList<Request<'a>>,
+    pub collection: StatefulList<Request>,
 
     pub request_view: RequestView,
     pub request_param_tab: RequestParamsTabs,
@@ -43,67 +42,7 @@ pub struct App<'a> {
 }
 
 impl App<'_> {
-    pub fn new<'a>() -> App<'a> {
-        let items = vec![
-            Request {
-                name: "Check headers",
-                url: "https://httpbin.org/headers",
-                method: Method::GET,
-                ..Default::default()
-            },
-            Request {
-                name: "Test Bearer",
-                url: "https://httpbin.org/bearer",
-                method: Method::GET,
-                ..Default::default()
-            },
-            Request {
-                name: "Test Query Params",
-                url: "https://httpbin.org/get",
-                method: Method::GET,
-                params: vec![
-                    CustomTableItem { enabled: true, data: ("test".to_string(), "3".to_string()) }
-                ],
-                ..Default::default()
-            },
-            Request {
-                name: "Test Post",
-                url: "https://httpbin.org/post",
-                method: Method::POST,
-                ..Default::default()
-            },
-            Request {
-                name: "Test Put",
-                url: "https://httpbin.org/put",
-                method: Method::PUT,
-                ..Default::default()
-            },
-            Request {
-                name: "Test Delete",
-                url: "https://httpbin.org/delete",
-                method: Method::DELETE,
-                ..Default::default()
-            },
-            Request {
-                name: "Test Patch",
-                url: "https://httpbin.org/patch",
-                method: Method::PATCH,
-                ..Default::default()
-            },
-            Request {
-                name: "Rust Homepage",
-                url: "https://www.rust-lang.org",
-                method: Method::GET,
-                ..Default::default()
-            },
-            Request {
-                name: "Google fr",
-                url: "https://www.google.fr/",
-                method: Method::GET,
-                ..Default::default()
-            },
-        ];
-
+    pub fn new<'a>(requests: Vec<Request>) -> App<'a> {
         App {
             should_quit: false,
             state: AppState::Normal,
@@ -117,7 +56,7 @@ impl App<'_> {
 
             collection: StatefulList {
                 state: Default::default(),
-                items,
+                items: requests,
                 selected: None,
                 last_selected: None,
             },
