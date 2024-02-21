@@ -42,8 +42,6 @@ impl App<'_> {
     }
 
     pub fn load_a_request_param_tab(&mut self) {
-        self.update_inputs();
-
         match self.request_param_tab {
             RequestParamsTabs::Params => self.load_request_params_tab(),
             RequestParamsTabs::Auth => self.load_request_auth_param_tab(),
@@ -54,24 +52,9 @@ impl App<'_> {
     }
 
     pub fn load_request_params_tab(&mut self) {
-        let selected_request_index = self.collection.selected.unwrap();
-        let selected_request = &self.collection.items[selected_request_index];
-
-        match !selected_request.params.is_empty() {
-            true => {
-                self.request_param_table.selection = Some((0, 0));
-                self.request_param_table.left_state.select(Some(0));
-                self.request_param_table.right_state.select(Some(0));
-            },
-            false => {
-                self.request_param_table.selection = None;
-                self.request_param_table.left_state.select(None);
-                self.request_param_table.right_state.select(None);
-            }
-        }
+        self.update_params_selection();
 
         self.request_param_tab = RequestParamsTabs::Params;
-
         self.update_inputs();
     }
 
@@ -79,13 +62,11 @@ impl App<'_> {
         self.auth_text_input_selection.selected = 0;
 
         self.request_param_tab = RequestParamsTabs::Auth;
-
         self.update_inputs();
     }
 
     pub fn load_request_body_param_tab(&mut self) {
         self.request_param_tab = RequestParamsTabs::Body;
-
         self.update_inputs();
     }
 

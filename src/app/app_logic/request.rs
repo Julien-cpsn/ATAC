@@ -68,9 +68,11 @@ impl App<'_> {
             self.collection.items[selected_request_index].params.push(new_param);
         }
 
+        // In case new params were inputted or deleted
+        self.update_params_selection();
+
         self.collection.items[selected_request_index].url = final_url.leak();
 
-        self.update_inputs();
         self.select_request_state();
     }
 
@@ -84,6 +86,24 @@ impl App<'_> {
     }
 
     /* PARAMS */
+    /// Reset selection of if params are provided, either set it to none
+    pub fn update_params_selection(&mut self) {
+        let selected_request_index = self.collection.selected.unwrap();
+        let selected_request = &self.collection.items[selected_request_index];
+
+        match !selected_request.params.is_empty() {
+            true => {
+                self.request_param_table.selection = Some((0, 0));
+                self.request_param_table.left_state.select(Some(0));
+                self.request_param_table.right_state.select(Some(0));
+            },
+            false => {
+                self.request_param_table.selection = None;
+                self.request_param_table.left_state.select(None);
+                self.request_param_table.right_state.select(None);
+            }
+        }
+    }
 
     pub fn toggle_params_table_row(&mut self) {
         if self.request_param_table.rows.is_empty() {
@@ -112,7 +132,6 @@ impl App<'_> {
             (_, _) => {}
         };
 
-        self.update_inputs();
         self.select_request_state();
     }
 
@@ -158,7 +177,6 @@ impl App<'_> {
             _ => {}
         }
 
-        self.update_inputs();
         self.select_request_state();
     }
 
