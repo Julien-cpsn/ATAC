@@ -46,7 +46,7 @@ checksum = "0942ffc6dcaadf03badf6e6a2d0228460359d5e34b57ccdc720b7382dfbd5ec5"
 
 [[package]]
 name = "atac"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "crossterm",
  "ratatui",
