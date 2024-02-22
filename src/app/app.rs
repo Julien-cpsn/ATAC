@@ -85,6 +85,8 @@ impl App<'_> {
     }
 
     pub async fn run(&mut self, mut terminal: Terminal<impl Backend>) -> std::io::Result<()> {
+        terminal.clear()?;
+
         while !self.should_quit {
             self.draw(&mut terminal)?;
             self.should_quit = self.handle_events().await?;
