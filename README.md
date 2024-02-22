@@ -49,6 +49,7 @@ A documentation will soon be published in the wiki section
 - **To add**
   - Environments (maybe .env files?)
   - keymap configuration (via a config file)
+  - Export a request to other code formats (curl, PHP, JS, Rust, ...)
   - Pre and post-request script
 
 ## Contributors
