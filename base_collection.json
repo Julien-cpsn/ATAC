@@ -1,0 +1,116 @@
+[
+  {
+    "name": "Check headers",
+    "url": "https://httpbin.org/headers",
+    "method": "GET",
+    "params": [],
+    "body": "NoBody",
+    "auth": "NoAuth"
+  },
+  {
+    "name": "Test Bearer",
+    "url": "https://httpbin.org/bearer",
+    "method": "GET",
+    "params": [],
+    "body": "NoBody",
+    "auth": {
+      "BearerToken": "my_bearer="
+    }
+  },
+  {
+    "name": "Test Query Params",
+    "url": "https://httpbin.org/get",
+    "method": "GET",
+    "params": [
+      {
+        "enabled": true,
+        "data": [
+          "test",
+          "3"
+        ]
+      }
+    ],
+    "body": "NoBody",
+    "auth": "NoAuth"
+  },
+  {
+    "name": "Test Post",
+    "url": "https://httpbin.org/post",
+    "method": "POST",
+    "params": [],
+    "body": "NoBody",
+    "auth": "NoAuth"
+  },
+  {
+    "name": "Test Put",
+    "url": "https://httpbin.org/put",
+    "method": "PUT",
+    "params": [],
+    "body": "NoBody",
+    "auth": "NoAuth"
+  },
+  {
+    "name": "Test Delete",
+    "url": "https://httpbin.org/delete",
+    "method": "DELETE",
+    "params": [],
+    "body": "NoBody",
+    "auth": "NoAuth"
+  },
+  {
+    "name": "Test Patch",
+    "url": "https://httpbin.org/patch",
+    "method": "PATCH",
+    "params": [],
+    "body": "NoBody",
+    "auth": "NoAuth"
+  },
+  {
+    "name": "Test 200",
+    "url": "https://httpbin.org/status/200",
+    "method": "GET",
+    "params": [],
+    "body": "NoBody",
+    "auth": "NoAuth"
+  },
+  {
+    "name": "Test 401",
+    "url": "https://httpbin.org/status/401",
+    "method": "POST",
+    "params": [],
+    "body": "NoBody",
+    "auth": "NoAuth"
+  },
+  {
+    "name": "Test 500",
+    "url": "https://httpbin.org/status/500",
+    "method": "PUT",
+    "params": [],
+    "body": "NoBody",
+    "auth": "NoAuth"
+  },
+  {
+    "name": "Long request",
+    "url": "https://httpbin.org/delay/10",
+    "method": "GET",
+    "params": [],
+    "body": "NoBody",
+    "auth": "NoAuth"
+  },
+  {
+    "name": "Rust Homepage",
+    "url": "https://www.rust-lang.org",
+    "method": "GET",
+    "params": [],
+    "body": "NoBody",
+    "auth": "NoAuth"
+  },
+  {
+    "name": "Google fr",
+    "url": "https://www.google.fr/",
+    "method": "GET",
+    "params": [],
+    "body": "NoBody",
+    "auth": "NoAuth"
+  }
+]
