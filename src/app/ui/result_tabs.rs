@@ -59,7 +59,7 @@ impl App<'_> {
         self.result_scrollbar.set_scroll(lines_count);
     }
 
-    pub fn render_request_result(&mut self, frame: &mut Frame, rect: Rect, request: &Request) {
+    pub(super) fn render_request_result(&mut self, frame: &mut Frame, rect: Rect, request: &Request) {
         let request_result_layout = Layout::new(
             Vertical,
             [

@@ -1,10 +1,10 @@
 use crossterm::event;
 use crossterm::event::{Event, KeyCode, KeyEventKind, KeyModifiers};
-use std::io::{Result, Write};
+use std::io::{Result};
 use tui_textarea::CursorMove;
 use crate::app::app::{App};
 use crate::app::app_states::AppState;
-use crate::app::request_ui::param_tabs::RequestParamsTabs;
+use crate::app::ui::param_tabs::RequestParamsTabs;
 
 impl App<'_> {
     /// Handle events
@@ -221,14 +221,7 @@ impl App<'_> {
                 };
 
                 if !miss_input {
-                    self.log_file
-                        .write_fmt(format_args!(
-                            "{:25}{:25}{:40}\n",
-                            format!("{:?}", key.modifiers),
-                            format!("{:?}", key.code),
-                            previous_app_state.to_string(),
-                        ))
-                        .expect("Could not write to log file");
+                    self.write_to_log_file(format!("{:?}", key.modifiers), format!("{:?}", key.code), previous_app_state.to_string());
                 }
             }
         }

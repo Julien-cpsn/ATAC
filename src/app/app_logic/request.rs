@@ -73,6 +73,7 @@ impl App<'_> {
 
         self.collection.items[selected_request_index].url = final_url;
 
+        self.save_collection_to_file();
         self.select_request_state();
     }
 
@@ -83,6 +84,8 @@ impl App<'_> {
         let next_method = next_method(&self.collection.items[selected_request_index].method);
 
         self.collection.items[selected_request_index].method = next_method;
+
+        self.save_collection_to_file();
     }
 
     /* PARAMS */
@@ -117,6 +120,7 @@ impl App<'_> {
 
         selected_request.params[row].enabled = !selected_request.params[row].enabled;
 
+        self.save_collection_to_file();
         self.update_inputs();
     }
 
@@ -132,6 +136,7 @@ impl App<'_> {
             (_, _) => {}
         };
 
+        self.save_collection_to_file();
         self.select_request_state();
     }
 
@@ -143,6 +148,7 @@ impl App<'_> {
 
         self.collection.items[selected_request_index].auth = next_auth(&selected_request.auth);
 
+        self.save_collection_to_file();
         self.load_request_auth_param_tab();
     }
 
@@ -177,6 +183,7 @@ impl App<'_> {
             _ => {}
         }
 
+        self.save_collection_to_file();
         self.select_request_state();
     }
 
@@ -193,7 +200,7 @@ impl App<'_> {
             _ => {}
         }
 
-        self.update_inputs();
+        self.save_collection_to_file();
         self.select_request_state();
     }
 
@@ -210,7 +217,7 @@ impl App<'_> {
             _ => {}
         }
 
-        self.update_inputs();
+        self.save_collection_to_file();
         self.select_request_state();
     }
 
@@ -241,7 +248,7 @@ impl App<'_> {
 
         self.collection.items[selected_request_index].body = new_body;
 
-        self.update_inputs();
+        self.save_collection_to_file();
         self.select_request_state();
     }
 

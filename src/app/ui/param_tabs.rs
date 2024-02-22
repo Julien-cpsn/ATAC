@@ -70,7 +70,7 @@ impl App<'_> {
         self.update_inputs();
     }
 
-    pub fn render_request_params(&mut self, frame: &mut Frame, rect: Rect, request: &Request) {
+    pub(super) fn render_request_params(&mut self, frame: &mut Frame, rect: Rect, request: &Request) {
         let request_params_layout = Layout::new(
             Vertical,
             [

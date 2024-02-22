@@ -3,9 +3,10 @@ use ratatui::backend::Backend;
 use ratatui::Terminal;
 use tui_textarea::TextArea;
 use crate::app::app_states::AppState;
-use crate::app::request_ui::param_tabs::RequestParamsTabs;
-use crate::app::request_ui::result_tabs::RequestResultTabs;
-use crate::app::request_ui::views::RequestView;
+use crate::app::ui::param_tabs::RequestParamsTabs;
+use crate::app::ui::result_tabs::RequestResultTabs;
+use crate::app::ui::views::RequestView;
+use crate::app::startup::args::ARGS;
 use crate::request::request::{Request};
 use crate::utils::stateful_list::StatefulList;
 use crate::utils::stateful_scrollbar::StatefulScrollbar;
@@ -42,7 +43,7 @@ pub struct App<'a> {
 }
 
 impl App<'_> {
-    pub fn new<'a>(requests: Vec<Request>) -> App<'a> {
+    pub fn new<'a>() -> App<'a> {
         App {
             should_quit: false,
             state: AppState::Normal,
@@ -51,12 +52,12 @@ impl App<'_> {
                 .write(true)
                 .create(true)
                 .truncate(true)
-                .open("atac.log")
-                .expect("Could not open file"),
+                .open(&ARGS.log_file)
+                .expect(&format!("Could not open log file \"{}\"", ARGS.log_file)),
 
             collection: StatefulList {
                 state: Default::default(),
-                items: requests,
+                items: vec![],
                 selected: None,
                 last_selected: None,
             },

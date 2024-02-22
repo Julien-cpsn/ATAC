@@ -4,7 +4,7 @@ use ratatui::text::Line;
 use strum::Display;
 use crate::app::app::App;
 use crate::app::app_states::AppState::*;
-use crate::app::request_ui::param_tabs::RequestParamsTabs;
+use crate::app::ui::param_tabs::RequestParamsTabs;
 use crate::request::auth::Auth;
 use crate::request::body::ContentType;
 

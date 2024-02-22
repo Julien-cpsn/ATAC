@@ -1,6 +1,6 @@
 use crate::app::app::App;
 use crate::app::app_states::AppState;
-use crate::app::request_ui::param_tabs::RequestParamsTabs;
+use crate::app::ui::param_tabs::RequestParamsTabs;
 use crate::request::body::ContentType;
 
 impl App<'_> {

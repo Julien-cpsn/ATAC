@@ -15,6 +15,8 @@ pub struct Request {
     pub params: Vec<Param>,
     pub body: ContentType,
     pub auth: Auth,
+
+    #[serde(skip)]
     pub result: RequestResult
 }
 

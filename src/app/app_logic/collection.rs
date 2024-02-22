@@ -3,7 +3,7 @@ use crate::app::app_states::AppState;
 use crate::request::auth::Auth;
 use crate::request::request::{Request};
 
-impl<'a> App<'a> {
+impl App<'_> {
     pub fn reset_inputs(&mut self) {
         self.url_text_input.reset_input();
         self.request_param_table.param_selection_text_input.reset_input();
