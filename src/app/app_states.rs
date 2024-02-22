@@ -89,7 +89,7 @@ impl App<'_> {
                     RequestParamsTabs::Headers => None,
                     RequestParamsTabs::Body => match selected_request.body {
                         ContentType::NoBody => None,
-                        ContentType::Raw(_) | ContentType::JSON(_) | ContentType::XML(_) | ContentType::HTML(_) => Some("Enter"),
+                        ContentType::Raw(_) | ContentType::Json(_) | ContentType::Xml(_) | ContentType::Html(_) => Some("Enter"),
                     },
                     RequestParamsTabs::Cookies => None,
                 };

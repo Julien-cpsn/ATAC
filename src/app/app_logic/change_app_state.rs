@@ -46,7 +46,7 @@ impl App<'_> {
 
         match &selected_request.body {
             ContentType::NoBody => {},
-            ContentType::Raw(_) | ContentType::JSON(_) | ContentType::XML(_) | ContentType::HTML(_) => {
+            ContentType::Raw(_) | ContentType::Json(_) | ContentType::Xml(_) | ContentType::Html(_) => {
                 self.state = AppState::EditingRequestBody;
             }
         }

@@ -96,7 +96,7 @@ impl App<'_> {
                     RequestParamsTabs::Headers => tab.to_string(),
                     RequestParamsTabs::Body => match request.body {
                         NoBody => tab.to_string(),
-                        Raw(_) | JSON(_) | XML(_) | HTML(_) => format!("{} ({})", tab.to_string(), request.body.to_string())
+                        Raw(_) | Json(_) | Xml(_) | Html(_) => format!("{} ({})", tab.to_string(), request.body.to_string())
                     }
                     RequestParamsTabs::Cookies => tab.to_string(),
                 }
@@ -388,7 +388,7 @@ impl App<'_> {
 
                         frame.render_widget(body_paragraph, request_params_layout[1]);
                     }
-                    Raw(_) | JSON(_) | XML(_) | HTML(_) => {
+                    Raw(_) | Json(_) | Xml(_) | Html(_) => {
                         self.body_text_area.set_line_number_style(Style::new().fg(Color::DarkGray));
                         frame.render_widget(self.body_text_area.widget(), request_params_layout[1]);
                     }

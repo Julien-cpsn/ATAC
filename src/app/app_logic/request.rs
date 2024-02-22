@@ -242,9 +242,9 @@ impl App<'_> {
         let new_body = match selected_request.body {
             ContentType::NoBody => ContentType::NoBody,
             ContentType::Raw(_) => ContentType::Raw(body.clone()),
-            ContentType::JSON(_) => ContentType::JSON(body.clone()),
-            ContentType::XML(_) => ContentType::XML(body.clone()),
-            ContentType::HTML(_) => ContentType::HTML(body.clone())
+            ContentType::Json(_) => ContentType::Json(body.clone()),
+            ContentType::Xml(_) => ContentType::Xml(body.clone()),
+            ContentType::Html(_) => ContentType::Html(body.clone())
         };
 
         self.collection.items[selected_request_index].body = new_body;
@@ -306,7 +306,7 @@ impl App<'_> {
 
         match &selected_request.body {
             ContentType::NoBody => {},
-            ContentType::Raw(body) | ContentType::JSON(body) | ContentType::XML(body) | ContentType::HTML(body) => {
+            ContentType::Raw(body) | ContentType::Json(body) | ContentType::Xml(body) | ContentType::Html(body) => {
                 request = request
                     .header(CONTENT_TYPE, selected_request.body.to_content_type())
                     .body(body.to_string());
