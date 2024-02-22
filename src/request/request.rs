@@ -22,7 +22,8 @@ pub struct Request {
 
 #[derive(Default, Clone, Serialize, Deserialize)]
 pub struct RequestResult {
-    pub status_code: Option<u16>,
+    pub duration: Option<String>,
+    pub status_code: Option<String>,
     pub body: Option<String>,
     pub cookies: Option<String>,
     pub headers: Option<String>

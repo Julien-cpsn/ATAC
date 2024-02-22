@@ -1,3 +1,4 @@
+use std::time::{Duration, Instant};
 use regex::Regex;
 use reqwest::{Client, Url};
 use reqwest::header::CONTENT_TYPE;
@@ -312,9 +313,12 @@ impl App<'_> {
             }
         };
 
+        let request_start = Instant::now();
+        let elapsed_time: Duration;
+
         match request.send().await {
             Ok(response) => {
-                let status_code = response.status().as_u16();
+                let status_code = response.status().to_string();
 
                 let headers = response.headers().clone()
                     .iter()
@@ -342,12 +346,13 @@ impl App<'_> {
                 let response_status_code;
 
                 if let Some(status_code) = error.status() {
-                    response_status_code = Some(status_code.as_u16());
+                    response_status_code = Some(status_code.to_string());
                 }
                 else {
                     response_status_code = None;
                 }
                 let result_body = error.to_string();
+
 
                 selected_request.result.status_code = response_status_code;
                 selected_request.result.body = Some(result_body);
@@ -355,6 +360,10 @@ impl App<'_> {
                 selected_request.result.headers = None;
             }
         };
+
+        elapsed_time = request_start.elapsed();
+
+        selected_request.result.duration = Some(format!("{:?}", elapsed_time));
 
         self.refresh_result_scrollbar();
     }

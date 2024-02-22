@@ -64,6 +64,7 @@ impl App<'_> {
             Vertical,
             [
                 Constraint::Length(2),
+                Constraint::Length(1),
                 Constraint::Fill(1)
             ]
         )
@@ -76,8 +77,8 @@ impl App<'_> {
             .map(|tab| {
                 match tab {
                     RequestResultTabs::Body => {
-                        if let Some(status_code) = request.result.status_code {
-                            format!("{} ({})", tab.to_string(), status_code)
+                        if let Some(duration) = &request.result.duration {
+                            format!("{} ({})", tab.to_string(), duration)
                         }
                         else {
                             format!("{}", tab.to_string())
@@ -96,6 +97,17 @@ impl App<'_> {
             );
 
         frame.render_widget(result_tabs, request_result_layout[0]);
+
+        // REQUEST RESULT STATUS CODE
+
+        let status_code = match &request.result.status_code {
+            None => "",
+            Some(status_code) => status_code
+        };
+
+        let status_code_paragraph = Paragraph::new(status_code).centered().dark_gray();
+        frame.render_widget(status_code_paragraph, request_result_layout[1]);
+
 
         // REQUEST RESULT CONTENT
 
@@ -128,7 +140,7 @@ impl App<'_> {
 
         result_widget = result_widget.scroll((self.result_scrollbar.scroll, 0));
 
-        frame.render_widget(result_widget, request_result_layout[1]);
+        frame.render_widget(result_widget, request_result_layout[2]);
 
         let result_scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight);
 
