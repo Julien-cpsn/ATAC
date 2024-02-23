@@ -17,6 +17,10 @@ impl TextInput {
     }
 
     pub fn enter_char(&mut self, new_char: char) {
+        if !new_char.is_ascii() {
+            return;
+        }
+
         self.text.insert(self.cursor_position, new_char);
         self.move_cursor_right();
     }
