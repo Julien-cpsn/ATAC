@@ -41,8 +41,8 @@ impl App<'_> {
         let inner_layout = Layout::new(
             Horizontal,
             [
-                Constraint::Percentage(18),
-                Constraint::Percentage(82)
+                Constraint::Percentage(20),
+                Constraint::Percentage(80)
             ],
         )
             .split(main_layout[1]);
@@ -53,13 +53,13 @@ impl App<'_> {
 
         // REQUEST
 
-        match self.collection.selected {
+        match self.collections_tree.selected {
             None => self.render_homepage(frame, inner_layout[1]),
-            Some(selected_request_index) => {
-                let selected_request = self.collection.items[selected_request_index].clone();
+            Some(selection) => {
+                let selected_request = self.collections[selection.0].requests[selection.1].clone();
 
                 self.render_request(frame, inner_layout[1], selected_request);
-            },
+            }
         }
 
         // NEW REQUEST DIALOG
@@ -67,22 +67,44 @@ impl App<'_> {
         match self.state {
             CreatingNewRequest => {
                 let popup_block = Block::default()
-                    .title("Enter the new request name")
                     .borders(Borders::ALL)
                     .style(Style::default().bg(Color::DarkGray));
 
 
-                let area = centered_rect(40, 20, 3, 50, frame.size());
-                let new_request_area = popup_block.inner(area);
+                let area = centered_rect(40, 20, 6, 50, frame.size());
 
-                let new_request_paragraph = Paragraph::new(self.new_request_input.text.as_str());
+                let new_request_layout = Layout::new(
+                    Vertical,
+                    vec![
+                        Constraint::Length(3),
+                        Constraint::Length(3),
+                    ]
+                )
+                    .split(area);
+
+
+                let selected_collection_name = self.collections[self.new_request_popup.selected_collection].name.clone();
+                let selected_collection_paragraph = Paragraph::new(selected_collection_name)
+                    .block(
+                        Block::new()
+                            .title("Collection ↑ ↓")
+                            .borders(Borders::ALL)
+                    );
+
+                let new_request_name_paragraph = Paragraph::new(self.new_request_popup.text_input.text.as_str())
+                    .block(
+                        Block::new()
+                            .title("Request name")
+                            .borders(Borders::ALL)
+                    );
 
                 frame.render_widget(popup_block, area);
-                frame.render_widget(new_request_paragraph, new_request_area);
+                frame.render_widget(selected_collection_paragraph, new_request_layout[0]);
+                frame.render_widget(new_request_name_paragraph, new_request_layout[1]);
 
                 frame.set_cursor(
-                    new_request_area.x + self.new_request_input.cursor_position as u16,
-                    new_request_area.y
+                    new_request_layout[1].x + self.new_request_popup.text_input.cursor_position as u16 + 1,
+                    new_request_layout[1].y + 1
                 )
             }
             _ => {}

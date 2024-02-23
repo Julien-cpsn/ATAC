@@ -1,5 +1,4 @@
 use crate::app::app::App;
-use crate::app::app_states::AppState;
 use crate::request::auth::Auth;
 use crate::request::request::{Request};
 
@@ -15,8 +14,8 @@ impl App<'_> {
     pub fn update_inputs(&mut self) {
         self.reset_inputs();
 
-        let selected_request_index = self.collection.selected.unwrap();
-        let selected_request = &self.collection.items[selected_request_index];
+        let selected_request_index = self.collections_tree.selected.unwrap();
+        let selected_request = &self.collections[selected_request_index.0].requests[selected_request_index.1];
 
         self.url_text_input.enter_str(&selected_request.url_with_params_to_string());
         self.request_param_table.rows = selected_request.params.clone();
@@ -58,22 +57,22 @@ impl App<'_> {
     }
 
     pub fn select_request(&mut self) {
-        self.collection.select();
-        self.result_scrollbar.set_scroll(0);
+        if self.collections_tree.state.selected().len() == 2 {
+            self.collections_tree.set_selected();
+            self.update_params_selection();
 
-        if self.collection.selected.is_some() {
-            self.load_request_params_tab();
-            self.state = AppState::SelectedRequest;
+            self.select_request_state();
         }
     }
 
     pub fn unselect_request(&mut self) {
-        self.reset_inputs();
-        self.collection.unselect();
+        self.collections_tree.state.select(Vec::new());
+        self.collections_tree.set_unselected();
+        self.normal_state()
     }
 
     pub fn new_request(&mut self) {
-        let new_request_name = &self.new_request_input.text;
+        let new_request_name = &self.new_request_popup.text_input.text;
 
         if new_request_name.is_empty() {
             return;
@@ -84,15 +83,19 @@ impl App<'_> {
             ..Default::default()
         };
 
-        self.collection.items.push(new_request);
+        let selected_collection = self.new_request_popup.selected_collection;
 
-        self.state = AppState::Normal;
+        self.collections[selected_collection].requests.push(new_request);
+
+        self.save_collections_to_file();
+        self.normal_state();
     }
 
     pub fn delete_request(&mut self) {
-        if let Some(selected_request_index) = self.collection.state.selected() {
-            self.collection.unselect();
-            self.collection.items.remove(selected_request_index);
+        if let Some(selected_request_index) = &self.collections_tree.selected {
+            self.collections[selected_request_index.0].requests.remove(selected_request_index.1);
+            self.collections_tree.state.select(Vec::new());
+            self.collections_tree.selected = None;
         }
     }
 }

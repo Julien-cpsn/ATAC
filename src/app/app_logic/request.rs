@@ -14,7 +14,8 @@ impl App<'_> {
     /* URL */
     pub fn modify_request_url(&mut self) {
         let input_text = self.url_text_input.text.clone();
-        let selected_request_index = self.collection.selected.unwrap();
+        let selected_request_index = &self.collections_tree.selected.unwrap();
+        let selected_request = &mut self.collections[selected_request_index.0].requests[selected_request_index.1];
 
         let url_parts = input_text.split_once("?");
 
@@ -39,7 +40,7 @@ impl App<'_> {
         for (_, [_, param_name, value]) in query_params_pattern.captures_iter(query_params).map(|c| c.extract()) {
             let mut url_param_found = false;
 
-            for (index, existing_param) in self.collection.items[selected_request_index].params.iter_mut().enumerate() {
+            for (index, existing_param) in selected_request.params.iter_mut().enumerate() {
                 if param_name == existing_param.data.0 && existing_param.enabled {
                     existing_param.data.1 = value.to_string();
                     url_param_found = true;
@@ -57,43 +58,45 @@ impl App<'_> {
             }
         }
 
-        let param_indexes = self.collection.items[selected_request_index].params.len();
+        let param_indexes = selected_request.params.len();
 
         for param_index in 0..param_indexes {
             if !existing_params_found_indexes.contains(&param_index) {
-                self.collection.items[selected_request_index].params.remove(param_index);
+                selected_request.params.remove(param_index);
             }
         }
 
         for new_param in new_params_to_add {
-            self.collection.items[selected_request_index].params.push(new_param);
+            selected_request.params.push(new_param);
         }
+
+        selected_request.url = final_url;
 
         // In case new params were inputted or deleted
         self.update_params_selection();
 
-        self.collection.items[selected_request_index].url = final_url;
-
-        self.save_collection_to_file();
+        self.save_collections_to_file();
         self.select_request_state();
     }
 
     /* METHOD */
 
     pub fn modify_request_method(&mut self) {
-        let selected_request_index = self.collection.selected.unwrap();
-        let next_method = next_method(&self.collection.items[selected_request_index].method);
+        let selected_request_index = &self.collections_tree.selected.unwrap();
+        let selected_request = &mut self.collections[selected_request_index.0].requests[selected_request_index.1];
 
-        self.collection.items[selected_request_index].method = next_method;
+        let next_method = next_method(&selected_request.method);
 
-        self.save_collection_to_file();
+        selected_request.method = next_method;
+
+        self.save_collections_to_file();
     }
 
     /* PARAMS */
     /// Reset selection of if params are provided, either set it to none
     pub fn update_params_selection(&mut self) {
-        let selected_request_index = self.collection.selected.unwrap();
-        let selected_request = &self.collection.items[selected_request_index];
+        let selected_request_index = &self.collections_tree.selected.unwrap();
+        let selected_request = &self.collections[selected_request_index.0].requests[selected_request_index.1];
 
         match !selected_request.params.is_empty() {
             true => {
@@ -114,48 +117,49 @@ impl App<'_> {
             return;
         }
 
-        let selected_request_index = self.collection.selected.unwrap();
-        let selected_request = &mut self.collection.items[selected_request_index];
+        let selected_request_index = &self.collections_tree.selected.unwrap();
+        let selected_request = &mut self.collections[selected_request_index.0].requests[selected_request_index.1];
 
         let row = self.request_param_table.selection.unwrap().0;
 
         selected_request.params[row].enabled = !selected_request.params[row].enabled;
 
-        self.save_collection_to_file();
+        self.save_collections_to_file();
         self.update_inputs();
     }
 
     pub fn modify_request_param(&mut self) {
-        let selected_request_index = self.collection.selected.unwrap();
+        let selected_request_index = &self.collections_tree.selected.unwrap();
+        let selected_request = &mut self.collections[selected_request_index.0].requests[selected_request_index.1];
 
         let selection = self.request_param_table.selection.unwrap();
         let input_text = &self.request_param_table.param_selection_text_input.text;
 
         match selection {
-            (_, 0) => self.collection.items[selected_request_index].params[selection.0].data.0 = input_text.clone(),
-            (_, 1) =>self.collection.items[selected_request_index].params[selection.0].data.1 = input_text.clone(),
+            (_, 0) => selected_request.params[selection.0].data.0 = input_text.clone(),
+            (_, 1) => selected_request.params[selection.0].data.1 = input_text.clone(),
             (_, _) => {}
         };
 
-        self.save_collection_to_file();
+        self.save_collections_to_file();
         self.select_request_state();
     }
 
     /* AUTH */
 
     pub fn modify_request_auth(&mut self) {
-        let selected_request_index = self.collection.selected.unwrap();
-        let selected_request = &self.collection.items[selected_request_index];
+        let selected_request_index = &self.collections_tree.selected.unwrap();
+        let selected_request = &mut self.collections[selected_request_index.0].requests[selected_request_index.1];
 
-        self.collection.items[selected_request_index].auth = next_auth(&selected_request.auth);
+        selected_request.auth = next_auth(&selected_request.auth);
 
-        self.save_collection_to_file();
+        self.save_collections_to_file();
         self.load_request_auth_param_tab();
     }
 
     pub fn select_request_auth_input_text(&mut self) {
-        let selected_request_index = self.collection.selected.unwrap();
-        let selected_request = &self.collection.items[selected_request_index];
+        let selected_request_index = &self.collections_tree.selected.unwrap();
+        let selected_request = &mut self.collections[selected_request_index.0].requests[selected_request_index.1];
 
         match selected_request.auth {
             NoAuth => {}
@@ -174,51 +178,51 @@ impl App<'_> {
     pub fn modify_request_auth_basic_username(&mut self) {
         let input_text = self.auth_basic_username_text_input.text.clone();
 
-        let selected_request_index = self.collection.selected.unwrap();
-        let selected_request = &self.collection.items[selected_request_index];
+        let selected_request_index = &self.collections_tree.selected.unwrap();
+        let selected_request = &mut self.collections[selected_request_index.0].requests[selected_request_index.1];
 
         match &selected_request.auth {
             BasicAuth(_, password) => {
-                self.collection.items[selected_request_index].auth = BasicAuth(input_text, password.to_string());
+                selected_request.auth = BasicAuth(input_text, password.to_string());
             }
             _ => {}
         }
 
-        self.save_collection_to_file();
+        self.save_collections_to_file();
         self.select_request_state();
     }
 
     pub fn modify_request_auth_basic_password(&mut self) {
         let input_text = self.auth_basic_password_text_input.text.clone();
 
-        let selected_request_index = self.collection.selected.unwrap();
-        let selected_request = &self.collection.items[selected_request_index];
+        let selected_request_index = &self.collections_tree.selected.unwrap();
+        let selected_request = &mut self.collections[selected_request_index.0].requests[selected_request_index.1];
 
         match &selected_request.auth {
             BasicAuth(username, _) => {
-                self.collection.items[selected_request_index].auth = BasicAuth(username.to_string(), input_text);
+                selected_request.auth = BasicAuth(username.to_string(), input_text);
             }
             _ => {}
         }
 
-        self.save_collection_to_file();
+        self.save_collections_to_file();
         self.select_request_state();
     }
 
     pub fn modify_request_auth_bearer_token(&mut self) {
         let input_text = self.auth_bearer_token_text_input.text.clone();
 
-        let selected_request_index = self.collection.selected.unwrap();
-        let selected_request = &self.collection.items[selected_request_index];
+        let selected_request_index = &self.collections_tree.selected.unwrap();
+        let selected_request = &mut self.collections[selected_request_index.0].requests[selected_request_index.1];
 
         match &selected_request.auth {
             BearerToken(_) => {
-                self.collection.items[selected_request_index].auth = BearerToken(input_text);
+                selected_request.auth = BearerToken(input_text);
             }
             _ => {}
         }
 
-        self.save_collection_to_file();
+        self.save_collections_to_file();
         self.select_request_state();
     }
 
@@ -234,8 +238,8 @@ impl App<'_> {
     }
 
     pub fn modify_request_body(&mut self) {
-        let selected_request_index = self.collection.selected.unwrap();
-        let selected_request = &self.collection.items[selected_request_index];
+        let selected_request_index = &self.collections_tree.selected.unwrap();
+        let selected_request = &mut self.collections[selected_request_index.0].requests[selected_request_index.1];
 
         let body = self.body_text_area.lines().join("\n");
 
@@ -247,17 +251,17 @@ impl App<'_> {
             ContentType::Html(_) => ContentType::Html(body.clone())
         };
 
-        self.collection.items[selected_request_index].body = new_body;
+        selected_request.body = new_body;
 
-        self.save_collection_to_file();
+        self.save_collections_to_file();
         self.select_request_state();
     }
 
     pub fn modify_request_content_type(&mut self) {
-        let selected_request_index = self.collection.selected.unwrap();
-        let selected_request = &self.collection.items[selected_request_index];
+        let selected_request_index = &self.collections_tree.selected.unwrap();
+        let selected_request = &mut self.collections[selected_request_index.0].requests[selected_request_index.1];
 
-        self.collection.items[selected_request_index].body = next_content_type(&selected_request.body);
+        selected_request.body = next_content_type(&selected_request.body);
 
         self.load_request_body_param_tab();
     }
@@ -270,8 +274,8 @@ impl App<'_> {
     /* REQUEST */
 
     pub async fn send_request(&mut self) {
-        let selected_request_index = self.collection.selected.unwrap();
-        let selected_request = &mut self.collection.items[selected_request_index];
+        let selected_request_index = &self.collections_tree.selected.unwrap();
+        let selected_request = &mut self.collections[selected_request_index.0].requests[selected_request_index.1];
 
         let params: Vec<(String, String)> = selected_request.params
             .iter()

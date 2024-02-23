@@ -25,10 +25,11 @@ impl App<'_> {
                         KeyCode::Char('c') if control_pressed => return Ok(true),
                         KeyCode::Char('q') => return Ok(true),
 
-                        KeyCode::Up => self.collection.previous(),
-                        KeyCode::Down => self.collection.next(),
+                        KeyCode::Up => self.collections_tree.up(),
+                        KeyCode::Down => self.collections_tree.down(),
                         KeyCode::Left => self.unselect_request(),
-                        KeyCode::Right | KeyCode::Enter => self.select_request(),
+                        KeyCode::Right => self.collections_tree.state.toggle_selected(),
+                        KeyCode::Enter => self.select_request(),
 
                         KeyCode::Char('n') => self.create_new_request_state(),
                         KeyCode::Char('d') => self.delete_request(),
@@ -37,14 +38,17 @@ impl App<'_> {
                     },
 
                     AppState::CreatingNewRequest => match key.code {
-                        KeyCode::Char(char) => self.new_request_input.enter_char(char),
+                        KeyCode::Char(char) => self.new_request_popup.text_input.enter_char(char),
 
                         KeyCode::Esc => self.normal_state(),
                         KeyCode::Enter => self.new_request(),
 
-                        KeyCode::Backspace => self.new_request_input.delete_char_backward(),
-                        KeyCode::Left => self.new_request_input.move_cursor_left(),
-                        KeyCode::Right => self.new_request_input.move_cursor_right(),
+                        KeyCode::Backspace => self.new_request_popup.text_input.delete_char_backward(),
+                        KeyCode::Left => self.new_request_popup.text_input.move_cursor_left(),
+                        KeyCode::Right => self.new_request_popup.text_input.move_cursor_right(),
+
+                        KeyCode::Up => self.new_request_popup.previous_collection(),
+                        KeyCode::Down => self.new_request_popup.next_collection(),
 
                         _ => miss_input = true
                     },

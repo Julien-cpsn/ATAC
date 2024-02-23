@@ -109,6 +109,7 @@ dependencies = [
  "tokio",
  "tui-big-text",
  "tui-textarea",
+ "tui-tree-widget",
 ]
 
 [[package]]
@@ -1544,6 +1545,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a3e38ced1f941a9cfc923fbf2fe6858443c42cc5220bfd35bdd3648371e7bd8e"
 dependencies = [
  "crossterm",
+ "ratatui",
+ "unicode-width",
+]
+
+[[package]]
+name = "tui-tree-widget"
+version = "0.17.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5c317bb061f42d943a2eb118b5de0ee98fc2443f0631e54b24a19de014a28810"
+dependencies = [
  "ratatui",
  "unicode-width",
 ]

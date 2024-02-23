@@ -2,7 +2,7 @@ use ratatui::prelude::Color;
 use serde::{Deserialize, Serialize};
 use strum::Display;
 
-#[derive(Default, Copy, Clone, Display, Serialize, Deserialize)]
+#[derive(Default, Debug, Copy, Clone, Display, Serialize, Deserialize)]
 pub enum Method {
     #[default]
     #[strum(to_string = "GET")]

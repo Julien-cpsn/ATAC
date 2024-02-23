@@ -9,6 +9,7 @@ impl App<'_> {
     }
 
     pub fn create_new_request_state(&mut self) {
+        self.new_request_popup.max_selection = self.collections.len();
         self.state = AppState::CreatingNewRequest;
     }
 
@@ -41,8 +42,8 @@ impl App<'_> {
     pub fn edit_request_body_state(&mut self) {
         self.request_param_tab = RequestParamsTabs::Body;
 
-        let selected_request_index = self.collection.selected.unwrap();
-        let selected_request = &self.collection.items[selected_request_index];
+        let selected_request_index = &self.collections_tree.selected.unwrap();
+        let selected_request = &self.collections[selected_request_index.0].requests[selected_request_index.1];
 
         match &selected_request.body {
             ContentType::NoBody => {},

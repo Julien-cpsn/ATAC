@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use strum::{Display};
 use crate::request::body::ContentType::{NoBody, Html, Json, Raw, Xml};
 
-#[derive(Clone, Default, Display, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, Display, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum ContentType {
     #[default]

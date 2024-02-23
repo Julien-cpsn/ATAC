@@ -1,0 +1,180 @@
+[
+  {
+    "name": "Request Types",
+    "requests": [
+      {
+        "name": "Check headers",
+        "url": "https://httpbin.org/headersddd",
+        "method": "GET",
+        "params": [],
+        "body": "no_body",
+        "auth": "no_auth"
+      },
+      {
+        "name": "Test Query Params",
+        "url": "https://httpbin.org/get",
+        "method": "GET",
+        "params": [
+          {
+            "enabled": true,
+            "data": [
+              "test",
+              "3"
+            ]
+          }
+        ],
+        "body": "no_body",
+        "auth": "no_auth"
+      }
+    ]
+  },
+  {
+    "name": "HTTP Methods",
+    "requests": [
+      {
+        "name": "Test Get",
+        "url": "https://httpbin.org/get",
+        "method": "GET",
+        "params": [],
+        "body": "no_body",
+        "auth": "no_auth"
+      },
+      {
+        "name": "Test Post",
+        "url": "https://httpbin.org/post",
+        "method": "POST",
+        "params": [],
+        "body": {
+          "json": "{\n\t\"my_json\": 32\n}"
+        },
+        "auth": "no_auth"
+      },
+      {
+        "name": "Test Put",
+        "url": "https://httpbin.org/put",
+        "method": "PUT",
+        "params": [],
+        "body": "no_body",
+        "auth": "no_auth"
+      },
+      {
+        "name": "Test Delete",
+        "url": "https://httpbin.org/delete",
+        "method": "DELETE",
+        "params": [],
+        "body": "no_body",
+        "auth": "no_auth"
+      },
+      {
+        "name": "Test Patch",
+        "url": "https://httpbin.org/patch",
+        "method": "PATCH",
+        "params": [],
+        "body": "no_body",
+        "auth": "no_auth"
+      }
+    ]
+  },
+  {
+    "name": "Auth",
+    "requests": [
+      {
+        "name": "Test Basic Auth",
+        "url": "https://httpbin.org/basic-auth/username/pws",
+        "method": "GET",
+        "params": [],
+        "body": "no_body",
+        "auth": {
+          "basic_auth": [
+            "username",
+            "password"
+          ]
+        }
+      },
+      {
+        "name": "Test Bearer Auth",
+        "url": "https://httpbin.org/bearer",
+        "method": "GET",
+        "params": [],
+        "body": "no_body",
+        "auth": {
+          "bearer_token": "my_bearer="
+        }
+      }
+    ]
+  },
+  {
+    "name": "Status code",
+    "requests": [
+      {
+        "name": "Test 200",
+        "url": "https://httpbin.org/status/200",
+        "method": "GET",
+        "params": [],
+        "body": "no_body",
+        "auth": "no_auth"
+      },
+      {
+        "name": "Test 401",
+        "url": "https://httpbin.org/status/401",
+        "method": "POST",
+        "params": [],
+        "body": "no_body",
+        "auth": "no_auth"
+      },
+      {
+        "name": "Test 500",
+        "url": "https://httpbin.org/status/500",
+        "method": "PUT",
+        "params": [],
+        "body": "no_body",
+        "auth": "no_auth"
+      }
+    ]
+  },
+  {
+    "name": "Others",
+    "requests": [
+      {
+        "name": "Long request",
+        "url": "https://httpbin.org/delay/10",
+        "method": "GET",
+        "params": [],
+        "body": "no_body",
+        "auth": "no_auth"
+      },
+      {
+        "name": "PNG Image",
+        "url": "https://httpbin.org/image/png",
+        "method": "GET",
+        "params": [],
+        "body": "no_body",
+        "auth": "no_auth"
+      },
+      {
+        "name": "Rust Homepage",
+        "url": "https://www.rust-lang.org",
+        "method": "GET",
+        "params": [],
+        "body": "no_body",
+        "auth": "no_auth"
+      },
+      {
+        "name": "Google fr",
+        "url": "https://www.google.fr/",
+        "method": "GET",
+        "params": [],
+        "body": "no_body",
+        "auth": "no_auth"
+      },
+      {
+        "name": "TEST DE DINGUE",
+        "url": "",
+        "method": "GET",
+        "params": [],
+        "body": "no_body",
+        "auth": "no_auth"
+      }
+    ]
+  }
+]

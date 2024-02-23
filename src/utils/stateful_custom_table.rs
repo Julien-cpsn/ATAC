@@ -12,7 +12,7 @@ pub struct StatefulCustomTable {
     pub param_selection_text_input: TextInput,
 }
 
-#[derive(Default, Clone, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
 pub struct Param {
     pub enabled: bool,
     pub data: (String, String)

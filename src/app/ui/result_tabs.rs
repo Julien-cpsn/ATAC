@@ -32,8 +32,8 @@ impl App<'_> {
 
     pub fn refresh_result_scrollbar(&mut self) {
         let lines_count: usize;
-        let selected_request_index = self.collection.selected.unwrap();
-        let selected_request = &mut self.collection.items[selected_request_index];
+        let selected_request_index = &self.collections_tree.selected.unwrap();
+        let selected_request = &self.collections[selected_request_index.0].requests[selected_request_index.1];
 
         match self.request_result_tab {
             RequestResultTabs::Body => {

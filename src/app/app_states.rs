@@ -46,8 +46,8 @@ impl App<'_> {
         match self.state {
             Normal | CreatingNewRequest => Line::from(self.state.to_string().white().on_dark_gray()),
             _ => {
-                let selected_request_index = self.collection.selected.unwrap();
-                let selected_request = &self.collection.items[selected_request_index];
+                let selected_request_index = &self.collections_tree.state.selected();
+                let selected_request = &self.collections[selected_request_index[0]].requests[selected_request_index[1]];
 
                 if self.state == SelectedRequest {
                     Line::from(vec![
@@ -71,8 +71,8 @@ impl App<'_> {
             Normal => String::from("(q)uit or ^c ↑ ↓ ← → or Enter (n)ew (d)elete"),
 
             SelectedRequest => {
-                let selected_request_index = self.collection.selected.unwrap();
-                let selected_request = &self.collection.items[selected_request_index];
+                let selected_request_index = &self.collections_tree.state.selected();
+                let selected_request = &self.collections[selected_request_index[0]].requests[selected_request_index[1]];
 
                 let mut base_keys = String::from("Esc ^Enter ^TAB (u)rl (m)ethod ^(p)arams ^(a)uth ^(b)ody");
 
@@ -101,7 +101,7 @@ impl App<'_> {
                 base_keys
             },
 
-            CreatingNewRequest => String::from(TEXT_INPUT_KEYS),
+            CreatingNewRequest => format!("{TEXT_INPUT_KEYS} ↑ ↓"),
 
             EditingRequestUrl => String::from(TEXT_INPUT_KEYS),
 

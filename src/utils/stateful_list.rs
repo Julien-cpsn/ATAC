@@ -1,5 +1,6 @@
 use ratatui::widgets::ListState;
 
+#[allow(dead_code)]
 pub struct StatefulList<T> {
     pub state: ListState,
     pub items: Vec<T>,
@@ -7,6 +8,7 @@ pub struct StatefulList<T> {
     pub last_selected: Option<usize>,
 }
 
+#[allow(dead_code)]
 impl<T> StatefulList<T> {
     pub fn next(&mut self) {
         if self.items.is_empty() {

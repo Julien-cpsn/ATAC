@@ -1,13 +1,13 @@
 use ratatui::prelude::{Line, Modifier, Span};
 use ratatui::style::Stylize;
-use ratatui::widgets::ListItem;
 use serde::{Deserialize, Serialize};
+use tui_tree_widget::TreeItem;
 use crate::request::auth::{Auth};
 use crate::request::body::ContentType;
 use crate::request::method::Method;
 use crate::utils::stateful_custom_table::Param;
 
-#[derive(Default, Clone, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
 pub struct Request {
     pub name: String,
     pub url: String,
@@ -20,7 +20,7 @@ pub struct Request {
     pub result: RequestResult
 }
 
-#[derive(Default, Clone, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
 pub struct RequestResult {
     pub duration: Option<String>,
     pub status_code: Option<String>,
@@ -30,12 +30,12 @@ pub struct RequestResult {
 }
 
 impl Request {
-    pub fn to_list_item(&self) -> ListItem {
+    pub fn to_tree_item<'a>(&self, identifier: usize) -> TreeItem<'a, usize> {
         let prefix = Span::from(self.method.to_string())
             .style(Modifier::BOLD)
             .bg(self.method.get_color());
 
-        let text = Span::from(&self.name);
+        let text = Span::from(self.name.clone());
 
         let line = Line::from(vec![
             prefix,
@@ -43,7 +43,7 @@ impl Request {
             text,
         ]);
 
-        ListItem::new(line)
+        TreeItem::new_leaf(identifier, line)
     }
 
     pub fn url_with_params_to_string(&self) -> String {
