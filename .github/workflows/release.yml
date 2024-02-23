@@ -65,8 +65,8 @@ jobs:
         if: endsWith(matrix.target, 'windows-msvc')
       - uses: taiki-e/upload-rust-binary-action@v1
         with:
-          bin: my-bin
+          bin: atac
           target: ${{ matrix.target }}
           tar: all
           zip: windows
-          token: ${{ secrets.RELEASE_PLZ_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
