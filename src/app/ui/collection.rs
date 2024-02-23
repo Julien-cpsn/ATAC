@@ -20,6 +20,7 @@ impl<'a> App<'a> {
             .highlight_style(Style::default().add_modifier(Modifier::BOLD))
             .highlight_symbol(">")
             .node_closed_symbol("")
+            .node_no_children_symbol("")
             .block(
                 Block::default()
                     .title("Collections")
@@ -33,27 +34,5 @@ impl<'a> App<'a> {
             rect,
             &mut self.collections_tree.state
         );
-        /*
-        let items: Vec<ListItem> = self.collection.items
-            .iter()
-            .map(|request| {
-                request.to_list_item()
-            })
-            .collect();
-
-        let list = List::new(items)
-            .highlight_style(Style::default().add_modifier(Modifier::BOLD))
-            .highlight_symbol(">")
-            .block(
-                Block::default()
-                    .title("Collection")
-                    .borders(Borders::ALL)
-            );
-
-        frame.render_stateful_widget(
-            list,
-            rect,
-            &mut self.collection.state
-        );*/
     }
 }
