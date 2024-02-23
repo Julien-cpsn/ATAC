@@ -14,11 +14,20 @@ pub enum AppState {
     #[strum(to_string = "Main menu")]
     Normal,
 
-    #[strum(to_string = "Request menu")]
-    SelectedRequest,
+    #[strum(to_string = "Creating new collection")]
+    CreatingNewCollection,
 
     #[strum(to_string = "Creating new request")]
     CreatingNewRequest,
+
+    #[strum(to_string = "Deleting collection")]
+    DeletingCollection,
+
+    #[strum(to_string = "Deleting request")]
+    DeletingRequest,
+
+    #[strum(to_string = "Request menu")]
+    SelectedRequest,
 
     #[strum(to_string = "Editing request URL")]
     EditingRequestUrl,
@@ -40,14 +49,35 @@ pub enum AppState {
 }
 
 const TEXT_INPUT_KEYS: &str = "Esc Enter ← → copy paste";
+const VALIDATION_KEYS: &str = "Esc Enter ← →";
 
 impl App<'_> {
     pub fn get_state_line(&self) -> Line {
         match self.state {
-            Normal | CreatingNewRequest => Line::from(self.state.to_string().white().on_dark_gray()),
-            _ => {
+            Normal | CreatingNewCollection | CreatingNewRequest => Line::from(self.state.to_string().white().on_dark_gray()),
+            DeletingCollection => {
+                let collection_index = self.collections_tree.state.selected()[0];
+                let collection_name = &self.collections[collection_index].name;
+
+                Line::from(vec![
+                    Span::raw("Collection > ").dark_gray(),
+                    Span::raw(format!("{} > ", collection_name)).dark_gray(),
+                    Span::raw(self.state.to_string()).white().on_dark_gray()
+                ])
+            },
+            DeletingRequest => {
                 let selected_request_index = &self.collections_tree.state.selected();
                 let selected_request = &self.collections[selected_request_index[0]].requests[selected_request_index[1]];
+
+                Line::from(vec![
+                    Span::raw("Collection > ").dark_gray(),
+                    Span::raw(format!("{} > ", selected_request.name)).dark_gray(),
+                    Span::raw(self.state.to_string()).white().on_dark_gray()
+                ])
+            },
+            _ => {
+                let selected_request_index = &self.collections_tree.selected.unwrap();
+                let selected_request = &self.collections[selected_request_index.0].requests[selected_request_index.1];
 
                 if self.state == SelectedRequest {
                     Line::from(vec![
@@ -68,7 +98,7 @@ impl App<'_> {
 
     pub fn get_available_keys(&self) -> String {
         match self.state {
-            Normal => String::from("(q)uit or ^c ↑ ↓ ← → or Enter (n)ew (d)elete"),
+            Normal => String::from("(q)uit or ^c ↑ ↓ ← → Enter (c)ollection (r)equest (d)elete"),
 
             SelectedRequest => {
                 let selected_request_index = &self.collections_tree.state.selected();
@@ -101,7 +131,13 @@ impl App<'_> {
                 base_keys
             },
 
+            CreatingNewCollection => String::from(TEXT_INPUT_KEYS),
+
             CreatingNewRequest => format!("{TEXT_INPUT_KEYS} ↑ ↓"),
+
+            DeletingCollection => String::from(VALIDATION_KEYS),
+
+            DeletingRequest => String::from(VALIDATION_KEYS),
 
             EditingRequestUrl => String::from(TEXT_INPUT_KEYS),
 

@@ -14,6 +14,7 @@ use crate::utils::stateful_custom_table::{StatefulCustomTable};
 use crate::utils::stateful_tree::StatefulTree;
 use crate::utils::text_input::TextInput;
 use crate::utils::text_input_selection::TextInputSelection;
+use crate::utils::validation_popup::ValidationPopup;
 
 pub struct App<'a> {
     pub should_quit: bool,
@@ -28,7 +29,11 @@ pub struct App<'a> {
     pub request_param_tab: RequestParamsTabs,
     pub request_result_tab: RequestResultTabs,
 
+    pub new_collection_input: TextInput,
     pub new_request_popup: NewRequestPopup,
+
+    pub delete_collection_popup: ValidationPopup,
+    pub delete_request_popup: ValidationPopup,
 
     pub url_text_input: TextInput,
 
@@ -65,12 +70,16 @@ impl App<'_> {
             request_param_tab: RequestParamsTabs::Params,
             request_result_tab: RequestResultTabs::Body,
 
+            new_collection_input: TextInput::default(),
             new_request_popup: NewRequestPopup {
                 selected_collection: 0,
                 max_selection: 0,
                 text_input: TextInput::default(),
             },
 
+            delete_collection_popup: ValidationPopup::default(),
+            delete_request_popup: ValidationPopup::default(),
+            
             url_text_input: TextInput::default(),
 
             request_param_table: StatefulCustomTable::default(),

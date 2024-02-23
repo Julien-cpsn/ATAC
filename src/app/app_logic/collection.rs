@@ -1,5 +1,6 @@
 use crate::app::app::App;
 use crate::request::auth::Auth;
+use crate::request::collection::Collection;
 use crate::request::request::{Request};
 
 impl App<'_> {
@@ -71,6 +72,24 @@ impl App<'_> {
         self.normal_state()
     }
 
+    pub fn new_collection(&mut self) {
+        let new_collection_name = &self.new_collection_input.text;
+
+        if new_collection_name.is_empty() {
+            return;
+        }
+
+        let new_collection = Collection {
+            name: new_collection_name.clone(),
+            requests: vec![]
+        };
+
+        self.collections.push(new_collection);
+
+        self.save_collections_to_file();
+        self.normal_state();
+    }
+
     pub fn new_request(&mut self) {
         let new_request_name = &self.new_request_popup.text_input.text;
 
@@ -91,11 +110,35 @@ impl App<'_> {
         self.normal_state();
     }
 
-    pub fn delete_request(&mut self) {
-        if let Some(selected_request_index) = &self.collections_tree.selected {
-            self.collections[selected_request_index.0].requests.remove(selected_request_index.1);
-            self.collections_tree.state.select(Vec::new());
-            self.collections_tree.selected = None;
+    pub fn delete_element(&mut self) {
+        match self.collections_tree.state.selected().len() {
+            // Selection on a collection
+            1 => self.delete_collection_state(),
+            // Selection on a request
+            2 => self.delete_request_state(),
+            _ => {}
         }
+    }
+
+    pub fn delete_collection(&mut self) {
+        let selected_request_index = self.collections_tree.state.selected();
+        self.collections.remove(selected_request_index[0]);
+
+        self.collections_tree.state.select(Vec::new());
+        self.collections_tree.selected = None;
+
+        self.save_collections_to_file();
+        self.normal_state();
+    }
+
+    pub fn delete_request(&mut self) {
+        let selected_request_index = self.collections_tree.state.selected();
+        self.collections[selected_request_index[0]].requests.remove(selected_request_index[1]);
+
+        self.collections_tree.state.select(Vec::new());
+        self.collections_tree.selected = None;
+
+        self.save_collections_to_file();
+        self.normal_state();
     }
 }

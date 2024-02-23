@@ -31,8 +31,22 @@ impl App<'_> {
                         KeyCode::Right => self.collections_tree.state.toggle_selected(),
                         KeyCode::Enter => self.select_request(),
 
-                        KeyCode::Char('n') => self.create_new_request_state(),
-                        KeyCode::Char('d') => self.delete_request(),
+                        KeyCode::Char('c') => self.create_new_collection_state(),
+                        KeyCode::Char('r') => self.create_new_request_state(),
+                        KeyCode::Char('d') => self.delete_element(),
+
+                        _ => miss_input = true
+                    },
+
+                    AppState::CreatingNewCollection => match key.code {
+                        KeyCode::Char(char) => self.new_collection_input.enter_char(char),
+
+                        KeyCode::Esc => self.normal_state(),
+                        KeyCode::Enter => self.new_collection(),
+
+                        KeyCode::Backspace => self.new_collection_input.delete_char_backward(),
+                        KeyCode::Left => self.new_collection_input.move_cursor_left(),
+                        KeyCode::Right => self.new_collection_input.move_cursor_right(),
 
                         _ => miss_input = true
                     },
@@ -49,6 +63,30 @@ impl App<'_> {
 
                         KeyCode::Up => self.new_request_popup.previous_collection(),
                         KeyCode::Down => self.new_request_popup.next_collection(),
+
+                        _ => miss_input = true
+                    },
+
+                    AppState::DeletingCollection => match key.code {
+                        KeyCode::Esc => self.normal_state(),
+
+                        KeyCode::Enter if self.delete_collection_popup.state => self.delete_collection(),
+                        KeyCode::Enter if !self.delete_collection_popup.state => self.normal_state(),
+
+                        KeyCode::Left => self.delete_collection_popup.change_state(),
+                        KeyCode::Right => self.delete_collection_popup.change_state(),
+
+                        _ => miss_input = true
+                    },
+
+                    AppState::DeletingRequest => match key.code {
+                        KeyCode::Esc => self.normal_state(),
+
+                        KeyCode::Enter if self.delete_request_popup.state => self.delete_request(),
+                        KeyCode::Enter if !self.delete_request_popup.state => self.normal_state(),
+
+                        KeyCode::Left => self.delete_request_popup.change_state(),
+                        KeyCode::Right => self.delete_request_popup.change_state(),
 
                         _ => miss_input = true
                     },

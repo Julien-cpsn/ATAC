@@ -8,9 +8,23 @@ impl App<'_> {
         self.state = AppState::Normal;
     }
 
+    pub fn create_new_collection_state(&mut self) {
+        self.state = AppState::CreatingNewCollection;
+    }
+
     pub fn create_new_request_state(&mut self) {
         self.new_request_popup.max_selection = self.collections.len();
         self.state = AppState::CreatingNewRequest;
+    }
+
+    pub fn delete_collection_state(&mut self) {
+        self.delete_collection_popup.state = false;
+        self.state = AppState::DeletingCollection;
+    }
+
+    pub fn delete_request_state(&mut self) {
+        self.delete_request_popup.state = false;
+        self.state = AppState::DeletingRequest;
     }
 
     pub fn select_request_state(&mut self) {
