@@ -80,7 +80,7 @@
     "requests": [
       {
         "name": "Test Basic Auth",
-        "url": "https://httpbin.org/basic-auth/username/pws",
+        "url": "https://httpbin.org/basic-auth/username/pwd",
         "method": "GET",
         "params": [],
         "body": "no_body",
