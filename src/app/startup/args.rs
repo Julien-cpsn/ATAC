@@ -11,6 +11,10 @@ pub struct Args {
     /// Collection file path
     #[arg(short, long)]
     pub collection_file: String,
+
+    /// Avoid saving data to the collection file
+    #[arg(long, default_value_t = false)]
+    pub dry_run: bool,
 }
 
 lazy_static! {

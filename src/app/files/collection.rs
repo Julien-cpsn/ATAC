@@ -38,6 +38,10 @@ impl App<'_> {
 
     /// Save app collection in the collection file through a temporary file
     pub fn save_collections_to_file(&mut self) {
+        if ARGS.dry_run {
+            return;
+        }
+
         let temps_file_path = format!("{}_", ARGS.collection_file);
 
         let mut temp_file = OpenOptions::new()
