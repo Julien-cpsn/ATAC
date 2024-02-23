@@ -33,7 +33,6 @@ A documentation will soon be published in the wiki section
   - Headers management
   - Cookies management
   - Proxy configuration
-  - Manage many collection
   - Postman & Insomnia import
   - Async request support
   - File based memory (for now the memory is blank at every program startup)
@@ -42,6 +41,8 @@ A documentation will soon be published in the wiki section
   - Document whole code
 
 - **To improve**
+  - Create collection
+  - Rename request
   - Keymap help on bottom right
 
 ### v2.0.0
