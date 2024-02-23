@@ -70,4 +70,4 @@ jobs:
           target: ${{ matrix.target }}
           tar: all
           zip: windows
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.RELEASE_PLZ_TOKEN }}
