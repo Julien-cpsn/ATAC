@@ -1,3 +1,4 @@
+use std::sync::{Arc, RwLock};
 use crate::app::app::App;
 use crate::request::auth::Auth;
 use crate::request::collection::Collection;
@@ -15,8 +16,8 @@ impl App<'_> {
     pub fn update_inputs(&mut self) {
         self.reset_inputs();
 
-        let selected_request_index = self.collections_tree.selected.unwrap();
-        let selected_request = &self.collections[selected_request_index.0].requests[selected_request_index.1];
+        let local_selected_request = self.get_selected_request_as_local();
+        let selected_request = local_selected_request.read().unwrap();
 
         self.url_text_input.enter_str(&selected_request.url_with_params_to_string());
         self.request_param_table.rows = selected_request.params.clone();
@@ -104,7 +105,7 @@ impl App<'_> {
 
         let selected_collection = self.new_request_popup.selected_collection;
 
-        self.collections[selected_collection].requests.push(new_request);
+        self.collections[selected_collection].requests.push(Arc::new(RwLock::new(new_request)));
 
         self.save_collections_to_file();
         self.normal_state();

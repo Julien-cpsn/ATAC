@@ -1,6 +1,8 @@
 use std::fs::{File, OpenOptions};
+use std::time::Duration;
 use ratatui::backend::Backend;
 use ratatui::Terminal;
+use throbber_widgets_tui::ThrobberState;
 use tui_textarea::TextArea;
 use crate::app::app_logic::new_request_popup::NewRequestPopup;
 use crate::app::app_states::AppState;
@@ -17,7 +19,9 @@ use crate::utils::text_input_selection::TextInputSelection;
 use crate::utils::validation_popup::ValidationPopup;
 
 pub struct App<'a> {
+    pub tick_rate: Duration,
     pub should_quit: bool,
+
     pub state: AppState,
 
     pub log_file: File,
@@ -46,12 +50,14 @@ pub struct App<'a> {
 
     pub body_text_area: TextArea<'a>,
 
+    pub result_throbber_state: ThrobberState,
     pub result_scrollbar: StatefulScrollbar
 }
 
 impl App<'_> {
     pub fn new<'a>() -> App<'a> {
         App {
+            tick_rate: Duration::from_millis(250),
             should_quit: false,
             state: AppState::Normal,
 
@@ -91,6 +97,7 @@ impl App<'_> {
 
             body_text_area: TextArea::default(),
 
+            result_throbber_state: ThrobberState::default(),
             result_scrollbar: StatefulScrollbar::default(),
         }
     }
@@ -100,7 +107,7 @@ impl App<'_> {
 
         while !self.should_quit {
             self.draw(&mut terminal)?;
-            self.should_quit = self.handle_events().await?;
+            self.handle_events().await;
         }
 
         Ok(())

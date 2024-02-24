@@ -1,3 +1,4 @@
+use std::sync::{Arc, RwLock};
 use ratatui::text::{Line, Span};
 use serde::{Deserialize, Serialize};
 use tui_tree_widget::TreeItem;
@@ -6,7 +7,7 @@ use crate::request::request::Request;
 #[derive(Default, Clone, Serialize, Deserialize)]
 pub struct Collection {
     pub name: String,
-    pub requests: Vec<Request>
+    pub requests: Vec<Arc<RwLock<Request>>>
 }
 
 impl Collection {
@@ -21,7 +22,9 @@ impl Collection {
         let items: Vec<TreeItem<usize>> = self.requests
             .iter()
             .enumerate()
-            .map(|(index, request)| request.to_tree_item(index))
+            .map(|(request_index, request)| {
+                request.read().unwrap().to_tree_item(request_index)
+            })
             .collect();
 
         TreeItem::new(identifier, line, items).unwrap()

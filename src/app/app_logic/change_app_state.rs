@@ -56,8 +56,8 @@ impl App<'_> {
     pub fn edit_request_body_state(&mut self) {
         self.request_param_tab = RequestParamsTabs::Body;
 
-        let selected_request_index = &self.collections_tree.selected.unwrap();
-        let selected_request = &self.collections[selected_request_index.0].requests[selected_request_index.1];
+        let local_selected_request = self.get_selected_request_as_local();
+        let selected_request = local_selected_request.read().unwrap();
 
         match &selected_request.body {
             ContentType::NoBody => {},

@@ -166,14 +166,6 @@
         "params": [],
         "body": "no_body",
         "auth": "no_auth"
-      },
-      {
-        "name": "TEST DE DINGUE",
-        "url": "",
-        "method": "GET",
-        "params": [],
-        "body": "no_body",
-        "auth": "no_auth"
       }
     ]
   }

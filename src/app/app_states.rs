@@ -67,7 +67,7 @@ impl App<'_> {
             },
             DeletingRequest => {
                 let selected_request_index = &self.collections_tree.state.selected();
-                let selected_request = &self.collections[selected_request_index[0]].requests[selected_request_index[1]];
+                let selected_request = &self.collections[selected_request_index[0]].requests[selected_request_index[1]].read().unwrap();
 
                 Line::from(vec![
                     Span::raw("Collection > ").dark_gray(),
@@ -76,13 +76,13 @@ impl App<'_> {
                 ])
             },
             _ => {
-                let selected_request_index = &self.collections_tree.selected.unwrap();
-                let selected_request = &self.collections[selected_request_index.0].requests[selected_request_index.1];
+                let local_selected_request = self.get_selected_request_as_local();
+                let selected_request = local_selected_request.read().unwrap();
 
                 if self.state == SelectedRequest {
                     Line::from(vec![
                         Span::raw("Request > ").dark_gray(),
-                        Span::raw(&selected_request.name).white().on_dark_gray()
+                        Span::raw(selected_request.name.clone()).white().on_dark_gray()
                     ])
                 }
                 else {
@@ -101,8 +101,8 @@ impl App<'_> {
             Normal => String::from("(q)uit or ^c ↑ ↓ ← → Enter (c)ollection (r)equest (d)elete"),
 
             SelectedRequest => {
-                let selected_request_index = &self.collections_tree.state.selected();
-                let selected_request = &self.collections[selected_request_index[0]].requests[selected_request_index[1]];
+                let local_selected_request = self.get_selected_request_as_local();
+                let selected_request = local_selected_request.read().unwrap();
 
                 let mut base_keys = String::from("Esc ^Enter ^TAB (u)rl (m)ethod ^(p)arams ^(a)uth ^(b)ody");
 

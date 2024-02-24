@@ -5,8 +5,10 @@ use ratatui::prelude::Style;
 use ratatui::style::Stylize;
 use ratatui::widgets::{Block, Borders, Paragraph, Scrollbar, ScrollbarOrientation, Tabs};
 use strum::{Display, EnumIter, FromRepr, IntoEnumIterator};
+use throbber_widgets_tui::{BRAILLE_DOUBLE, Throbber, WhichUse};
 use crate::app::app::App;
 use crate::request::request::Request;
+use crate::utils::centered_rect::centered_rect;
 
 #[derive(Default, Clone, Copy, Display, FromRepr, EnumIter)]
 pub enum RequestResultTabs {
@@ -32,8 +34,9 @@ impl App<'_> {
 
     pub fn refresh_result_scrollbar(&mut self) {
         let lines_count: usize;
-        let selected_request_index = &self.collections_tree.selected.unwrap();
-        let selected_request = &self.collections[selected_request_index.0].requests[selected_request_index.1];
+
+        let local_selected_request = self.get_selected_request_as_local();
+        let selected_request = local_selected_request.read().unwrap();
 
         match self.request_result_tab {
             RequestResultTabs::Body => {
@@ -98,49 +101,64 @@ impl App<'_> {
 
         frame.render_widget(result_tabs, request_result_layout[0]);
 
-        // REQUEST RESULT STATUS CODE
+        // If the selected request is currently pending
+        if request.is_pending {
+            let area = centered_rect(20, 50, 1, 9, request_result_layout[2]);
 
-        let status_code = match &request.result.status_code {
-            None => "",
-            Some(status_code) => status_code
-        };
+            let throbber = Throbber::default()
+                .label("Pending")
+                .style(Style::new().dark_gray())
+                .throbber_set(BRAILLE_DOUBLE)
+                .use_type(WhichUse::Spin);
 
-        let status_code_paragraph = Paragraph::new(status_code).centered().dark_gray();
-        frame.render_widget(status_code_paragraph, request_result_layout[1]);
+            frame.render_stateful_widget(throbber, area, &mut self.result_throbber_state);
+        }
+        // If the selected request is not pending
+        else {
+            // REQUEST RESULT STATUS CODE
+
+            let status_code = match &request.result.status_code {
+                None => "",
+                Some(status_code) => status_code
+            };
+
+            let status_code_paragraph = Paragraph::new(status_code).centered().dark_gray();
+            frame.render_widget(status_code_paragraph, request_result_layout[1]);
 
 
-        // REQUEST RESULT CONTENT
+            // REQUEST RESULT CONTENT
 
-        let mut result_widget: Paragraph = match self.request_result_tab {
-            RequestResultTabs::Body => {
-                let result_body = match &request.result.body {
-                    None => "",
-                    Some(result) => result
-                };
+            let mut result_widget: Paragraph = match self.request_result_tab {
+                RequestResultTabs::Body => {
+                    let result_body = match &request.result.body {
+                        None => "",
+                        Some(result) => result
+                    };
 
-                Paragraph::new(result_body)
-            }
-            RequestResultTabs::Cookies => {
-                let result_cookies = match &request.result.cookies {
-                    None => "",
-                    Some(cookies) => cookies
-                };
+                    Paragraph::new(result_body)
+                }
+                RequestResultTabs::Cookies => {
+                    let result_cookies = match &request.result.cookies {
+                        None => "",
+                        Some(cookies) => cookies
+                    };
 
-                Paragraph::new(result_cookies)
-            }
-            RequestResultTabs::Headers => {
-                let result_headers = match &request.result.headers {
-                    None => "",
-                    Some(headers) => headers
-                };
+                    Paragraph::new(result_cookies)
+                }
+                RequestResultTabs::Headers => {
+                    let result_headers = match &request.result.headers {
+                        None => "",
+                        Some(headers) => headers
+                    };
 
-                Paragraph::new(result_headers)
-            }
-        };
+                    Paragraph::new(result_headers)
+                }
+            };
 
-        result_widget = result_widget.scroll((self.result_scrollbar.scroll, 0));
+            result_widget = result_widget.scroll((self.result_scrollbar.scroll, 0));
 
-        frame.render_widget(result_widget, request_result_layout[2]);
+            frame.render_widget(result_widget, request_result_layout[2]);
+        }
 
         let result_scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight);
 

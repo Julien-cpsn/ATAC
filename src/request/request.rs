@@ -17,7 +17,10 @@ pub struct Request {
     pub auth: Auth,
 
     #[serde(skip)]
-    pub result: RequestResult
+    pub result: RequestResult,
+
+    #[serde(skip)]
+    pub is_pending: bool
 }
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
@@ -31,17 +34,26 @@ pub struct RequestResult {
 
 impl Request {
     pub fn to_tree_item<'a>(&self, identifier: usize) -> TreeItem<'a, usize> {
+        let mut line_elements: Vec<Span> = vec![];
+
         let prefix = Span::from(self.method.to_string())
             .style(Modifier::BOLD)
             .bg(self.method.get_color());
 
+        line_elements.push(prefix);
+
+        if self.is_pending {
+            line_elements.push(Span::raw(" ⏰"));
+        }
+        else {
+            line_elements.push(Span::raw(" "));
+        }
+
         let text = Span::from(self.name.clone());
 
-        let line = Line::from(vec![
-            prefix,
-            Span::from(" "),
-            text,
-        ]);
+        line_elements.push(text);
+
+        let line = Line::from(line_elements);
 
         TreeItem::new_leaf(identifier, line)
     }

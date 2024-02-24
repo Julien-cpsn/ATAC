@@ -28,7 +28,7 @@ impl Method {
         }
     }
 
-    pub fn as_reqwest(&self) -> reqwest::Method {
+    pub fn to_reqwest(&self) -> reqwest::Method {
         match self {
             Method::GET => reqwest::Method::GET,
             Method::POST => reqwest::Method::POST,

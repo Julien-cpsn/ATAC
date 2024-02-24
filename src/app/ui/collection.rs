@@ -10,8 +10,8 @@ impl<'a> App<'a> {
         let items: Vec<TreeItem<'a, usize>> = self.collections
             .iter()
             .enumerate()
-            .map(|(index, request)| {
-                request.to_tree_item(index)
+            .map(|(collection_index, request)| {
+                request.to_tree_item(collection_index)
             })
             .collect();
 

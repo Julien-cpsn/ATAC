@@ -54,8 +54,8 @@ impl App<'_> {
 
         match self.collections_tree.selected {
             None => self.render_homepage(frame, inner_layout[1]),
-            Some(selection) => {
-                let selected_request = self.collections[selection.0].requests[selection.1].clone();
+            Some(_) => {
+                let selected_request = self.get_selected_request_as_local().read().unwrap().clone();
 
                 self.render_request(frame, inner_layout[1], selected_request);
             }
