@@ -7,6 +7,24 @@ ATAC ⚔📩
 
 ![Demo Animation](./demo.gif)
 
+## TOC
+
+- [Description](#description)
+- [How to use](#how-to-use)
+   * [Binary](#binary)
+   * [Compile by yourself](#compile-by-yourself)
+- [Features](#features)
+   * [Current](#current)
+   * [TODO v1.0.0](#todo-v100)
+   * [TODO v2.0.0](#todo-v200)
+- [Documentation](#documentation)
+- [Technical precisions](#technical-precisions)
+   * [Support](#support)
+   * [Dependencies](#dependencies)
+   * [Binary size](#binary-size)
+- [Contributors](#contributors)
+- [License](#license)
+
 ## Description
 
 ATAC is **A**rguably a **T**erminal **A**PI **C**lient. It is based on well known clients such as Postman, Insomnia or even Bruno, but inside your terminal without any specific graphical environment needed.
@@ -15,7 +33,7 @@ The philosophy of ATAC is to be free, account-less and offline for now and forev
 
 ## How to use
 
-### With binary
+### Binary
 
 The binaries from the latest release can be found [here](https://github.com/Julien-cpsn/ATAC/releases/latest)
 
@@ -73,7 +91,7 @@ cargo run
   - 100% response
   - 100% params
 
-### v1.0.0
+### TODO v1.0.0
 
 - **To add**
   - Headers management
@@ -87,7 +105,7 @@ cargo run
   - Rename request and collection
   - Better keymap help on bottom right
 
-### v2.0.0
+### TODO v2.0.0
 
 - **To add**
   - Environments (maybe .env files?, with autocompletion)
