@@ -337,19 +337,24 @@ impl App<'_> {
 
             /* PROXY */
 
-            match &self.config.http_proxy {
+            match &self.config.proxy {
                 None => {}
-                Some(http_proxy_str) => {
-                    let proxy = Proxy::http(http_proxy_str).expect("Could not parse HTTP proxy");
-                    client_builder = client_builder.proxy(proxy);
-                }
-            }
+                Some(proxy) => {
+                    match &proxy.http_proxy {
+                        None => {}
+                        Some(http_proxy_str) => {
+                            let proxy = Proxy::http(http_proxy_str).expect("Could not parse HTTP proxy");
+                            client_builder = client_builder.proxy(proxy);
+                        }
+                    }
 
-            match &self.config.https_proxy {
-                None => {}
-                Some(https_proxy_str) => {
-                    let proxy = Proxy::https(https_proxy_str).expect("Could not parse HTTPS proxy");
-                    client_builder = client_builder.proxy(proxy);
+                    match &proxy.https_proxy {
+                        None => {}
+                        Some(https_proxy_str) => {
+                            let proxy = Proxy::https(https_proxy_str).expect("Could not parse HTTPS proxy");
+                            client_builder = client_builder.proxy(proxy);
+                        }
+                    }
                 }
             }
 

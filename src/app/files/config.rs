@@ -6,6 +6,11 @@ use crate::app::app::App;
 
 #[derive(Default, Serialize, Deserialize)]
 pub struct Config {
+    pub proxy: Option<Proxy>
+}
+
+#[derive(Default, Serialize, Deserialize)]
+pub struct Proxy {
     pub http_proxy: Option<String>,
     pub https_proxy: Option<String>,
 }
