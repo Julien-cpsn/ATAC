@@ -35,21 +35,19 @@ A documentation will soon be published in the wiki section
   - Proxy configuration
   - Postman & Insomnia import
   - Async request support
-  - File based memory (for now the memory is blank at every program startup)
-  - Body & result syntax highlighting
   - Create a repo wiki
   - Document whole code
 
 - **To improve**
-  - Create collection
-  - Rename request
+  - Rename request and collection
   - Keymap help on bottom right
 
 ### v2.0.0
 
 - **To add**
-  - Environments (maybe .env files?)
+  - Environments (maybe .env files?, with autocompletion)
   - keymap configuration (via a config file)
+  - Body & result syntax highlighting
   - Export a request to other code formats (curl, PHP, JS, Rust, ...)
   - Pre and post-request script
 
