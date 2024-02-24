@@ -7,7 +7,7 @@ ATAC ⚔📩
 
 ![Demo Animation](./demo.gif)
 
-## TOC
+## Table Of Contents
 
 - [Description](#description)
 - [How to use](#how-to-use)
@@ -19,7 +19,7 @@ ATAC ⚔📩
    * [TODO v2.0.0](#todo-v200)
 - [Documentation](#documentation)
 - [Technical precisions](#technical-precisions)
-   * [Support](#support)
+   * [Tested on](#tested-on)
    * [Dependencies](#dependencies)
    * [Binary size](#binary-size)
 - [Contributors](#contributors)
@@ -52,8 +52,13 @@ atac -h
 Simply clone the repository and use:
 
 ```bash
-cargo run
+cargo run -- -h
 ```
+
+> Build latest release 
+> ```bash
+> cargo build --release
+> ```
 
 ## Features
 
@@ -68,6 +73,7 @@ cargo run
     - PUT
     - DELETE
     - PATCH
+  - **Query params**, synchronous between the URL and the query params tab
   - **Authentication**
     - No Auth
     - Basic Auth
@@ -120,16 +126,14 @@ A documentation will soon be published in the wiki section
 
 ## Technical precisions
 
-### Support
-
-Tested on:
+### Tested on
 
 - Console Host
   - Windows 10 (Pro)
   - Windows 8.1 (N)
 - Ubuntu Desktop Terminal
   - Ubuntu 17.10
-  - Pop!_OS ( Ubuntu ) 20.04
+  - Pop!_OS 20.04
 - (Arch, Manjaro) KDE Konsole
 - (Arch, NixOS) Kitty
 - Linux Mint
