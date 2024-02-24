@@ -13,7 +13,14 @@ impl App<'_> {
     }
 
     pub fn create_new_request_state(&mut self) {
-        self.new_request_popup.max_selection = self.collections.len();
+        let collections_length = self.collections.len();
+
+        // Cannot create a request if there is no collection
+        if collections_length == 0 {
+            return;
+        }
+
+        self.new_request_popup.max_selection = collections_length;
         self.state = AppState::CreatingNewRequest;
     }
 
