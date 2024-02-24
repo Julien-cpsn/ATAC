@@ -18,6 +18,7 @@ async fn main() -> Result<()> {
     terminal.clear()?;
 
     App::new()
+        .chain_hook()
         .startup()
         .run(terminal).await?;
 

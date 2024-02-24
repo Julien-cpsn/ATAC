@@ -1,5 +1,6 @@
 use std::fs::{File, OpenOptions};
 use std::time::Duration;
+use crossterm::terminal::{disable_raw_mode};
 use ratatui::backend::Backend;
 use ratatui::Terminal;
 use throbber_widgets_tui::ThrobberState;
@@ -111,5 +112,16 @@ impl App<'_> {
         }
 
         Ok(())
+    }
+
+    pub fn chain_hook(&mut self) -> &mut Self {
+        let original_hook = std::panic::take_hook();
+
+        std::panic::set_hook(Box::new(move |panic| {
+            disable_raw_mode().unwrap();
+            original_hook(panic);
+        }));
+
+        self
     }
 }
