@@ -15,7 +15,7 @@ ratatui = "0.26.1"
 crossterm = "0.27.0"
 tui-big-text = "0.4.1"
 tui-textarea = { version = "0.4.0", features = ["ratatui"] }
-tui-tree-widget = "0.17.0"
+tui-tree-widget = "0.18.0"
 throbber-widgets-tui = { version = "0.4.0", features = ["ratatui"] }
 regex = "1.10.3"
 serde = { version = "1.0.197", features = ["derive", "rc"] }
