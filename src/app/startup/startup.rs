@@ -1,6 +1,5 @@
 use std::fs;
 use std::path::PathBuf;
-use std::process::exit;
 use crate::app::app::App;
 use crate::app::startup::args::ARGS;
 
@@ -51,7 +50,5 @@ impl App<'_> {
 
             println!();
         }
-
-        exit(1);
     }
 }
