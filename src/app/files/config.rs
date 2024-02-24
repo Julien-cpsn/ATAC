@@ -32,5 +32,7 @@ impl App<'_> {
 
             self.config = config
         }
+
+        println!("Config file parsed!");
     }
 }
