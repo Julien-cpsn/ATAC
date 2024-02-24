@@ -5,6 +5,8 @@ ATAC ⚔📩
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![GitHub Release](https://img.shields.io/github/v/release/julien-cpsn/ATAC?link=https%3A%2F%2Fgithub.com%2FJulien-cpsn%2FATAC%2Freleases%2Flatest)
 
+![Demo Animation](./demo.gif)
+
 ## Description
 
 ATAC is **A**rguably a **T**erminal **A**PI **C**lient. It is based on well known clients such as Postman, Insomnia or even Bruno, but inside your terminal without any specific graphical environment needed.
