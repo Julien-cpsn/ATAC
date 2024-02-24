@@ -34,7 +34,6 @@ A documentation will soon be published in the wiki section
   - Cookies management
   - Proxy configuration
   - Postman & Insomnia import
-  - Async request support
   - Create a repo wiki
   - Document whole code
 
