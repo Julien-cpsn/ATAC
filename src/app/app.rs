@@ -7,6 +7,7 @@ use throbber_widgets_tui::ThrobberState;
 use tui_textarea::TextArea;
 use crate::app::app_logic::new_request_popup::NewRequestPopup;
 use crate::app::app_states::AppState;
+use crate::app::files::config::Config;
 use crate::app::ui::param_tabs::RequestParamsTabs;
 use crate::app::ui::result_tabs::RequestResultTabs;
 use crate::app::ui::views::RequestView;
@@ -24,6 +25,8 @@ pub struct App<'a> {
     pub should_quit: bool,
 
     pub state: AppState,
+
+    pub config: Config,
 
     pub log_file: File,
 
@@ -61,6 +64,8 @@ impl App<'_> {
             tick_rate: Duration::from_millis(250),
             should_quit: false,
             state: AppState::Normal,
+
+            config: Config::default(),
 
             log_file: OpenOptions::new()
                 .write(true)

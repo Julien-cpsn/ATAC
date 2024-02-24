@@ -1,7 +1,7 @@
 use std::sync::{Arc, RwLock};
 use std::time::{Duration, Instant};
 use regex::Regex;
-use reqwest::{Client, Url};
+use reqwest::{ClientBuilder, Proxy, Url};
 use reqwest::header::CONTENT_TYPE;
 use tokio::task;
 use tui_textarea::TextArea;
@@ -333,6 +333,32 @@ impl App<'_> {
                 return;
             }
 
+            let mut client_builder = ClientBuilder::new();
+
+            /* PROXY */
+
+            match &self.config.http_proxy {
+                None => {}
+                Some(http_proxy_str) => {
+                    let proxy = Proxy::http(http_proxy_str).expect("Could not parse HTTP proxy");
+                    client_builder = client_builder.proxy(proxy);
+                }
+            }
+
+            match &self.config.https_proxy {
+                None => {}
+                Some(https_proxy_str) => {
+                    let proxy = Proxy::https(https_proxy_str).expect("Could not parse HTTPS proxy");
+                    client_builder = client_builder.proxy(proxy);
+                }
+            }
+
+            /* CLIENT */
+
+            let client = client_builder.build().expect("Could not build HTTP client");
+
+            /* PARAMS */
+
             let params: Vec<(String, String)> = selected_request.params
                 .iter()
                 .filter_map(|param| {
@@ -344,7 +370,7 @@ impl App<'_> {
                 })
                 .collect();
 
-            let client = Client::new();
+            /* URL */
 
             let url = match Url::parse_with_params(&selected_request.url, params) {
                 Ok(url) => url,
@@ -354,10 +380,14 @@ impl App<'_> {
                 }
             };
 
+            /* REQUEST */
+
             let mut request = client.request(
                 selected_request.method.to_reqwest(),
                 url
             );
+
+            /* AUTH */
 
             match &selected_request.auth {
                 NoAuth => {}
@@ -369,6 +399,8 @@ impl App<'_> {
                 }
             }
 
+            /* BODY */
+
             match &selected_request.body {
                 ContentType::NoBody => {},
                 ContentType::Raw(body) | ContentType::Json(body) | ContentType::Xml(body) | ContentType::Html(body) => {
@@ -379,6 +411,8 @@ impl App<'_> {
             };
 
             let local_selected_request = self.get_selected_request_as_local();
+
+            /* SEND REQUEST */
 
             task::spawn(async move {
                 local_selected_request.write().unwrap().is_pending = true;

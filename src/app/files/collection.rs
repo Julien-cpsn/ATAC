@@ -7,36 +7,8 @@ use crate::app::startup::args::ARGS;
 use crate::request::collection::Collection;
 
 impl App<'_> {
-    pub fn parse_app_directory(&mut self) {
-        let paths = fs::read_dir(&ARGS.directory).expect(&format!("Directory \"{}\" not found", ARGS.directory));
-
-        for path in paths {
-            let path = path.unwrap().path();
-
-            if path.is_dir() {
-                continue;
-            }
-
-            let path_str = path.file_name().unwrap().to_str().unwrap();
-
-            println!("Parsing: {}", path.display());
-
-            if path_str.ends_with(".json") {
-                self.set_collections_from_file(path);
-            }
-            else if path_str.starts_with(".env.") {
-                println!("env file are not supported yet");
-            }
-            else {
-                panic!("unhandled file type");
-            }
-
-            println!();
-        }
-    }
-
     /// Set the app request to the requests found in the collection file
-    fn set_collections_from_file(&mut self, path_buf: PathBuf) {
+    pub fn set_collections_from_file(&mut self, path_buf: PathBuf) {
         let mut file_content = String::new();
 
         let mut collection_file = OpenOptions::new()
