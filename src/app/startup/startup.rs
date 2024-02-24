@@ -1,5 +1,6 @@
 use std::fs;
 use std::path::PathBuf;
+use std::process::exit;
 use crate::app::app::App;
 use crate::app::startup::args::ARGS;
 
@@ -31,11 +32,14 @@ impl App<'_> {
                 self.set_collections_from_file(path);
             }
             else if path_str.starts_with(".env.") {
-                println!("env file are not supported yet");
+                println!("\tenv file are not supported yet");
             }
             else if path_str == "atac.toml" {
                 self.parse_config_file(path);
                 was_config_file_parsed = true;
+            }
+            else if path_str == "atac.log" {
+                println!("Log file")
             }
             else {
                 panic!("unhandled file type");
@@ -47,5 +51,7 @@ impl App<'_> {
 
             println!();
         }
+
+        exit(1);
     }
 }

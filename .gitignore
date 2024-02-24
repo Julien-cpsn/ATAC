@@ -1,4 +1,5 @@
 .idea
 /target
 
-atac.log
+base_collections/atac.log
+base_collections/atac.toml
