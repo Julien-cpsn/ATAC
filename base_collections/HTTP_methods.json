@@ -1,0 +1,47 @@
+{
+  "name": "HTTP Methods",
+  "requests": [
+    {
+      "name": "Test Get",
+      "url": "https://httpbin.org/get",
+      "method": "GET",
+      "params": [],
+      "body": "no_body",
+      "auth": "no_auth"
+    },
+    {
+      "name": "Test Post",
+      "url": "https://httpbin.org/post",
+      "method": "POST",
+      "params": [],
+      "body": {
+        "json": "{\n\t\"my_json\": 42\n}"
+      },
+      "auth": "no_auth"
+    },
+    {
+      "name": "Test Put",
+      "url": "https://httpbin.org/put",
+      "method": "PUT",
+      "params": [],
+      "body": "no_body",
+      "auth": "no_auth"
+    },
+    {
+      "name": "Test Delete",
+      "url": "https://httpbin.org/delete",
+      "method": "DELETE",
+      "params": [],
+      "body": "no_body",
+      "auth": "no_auth"
+    },
+    {
+      "name": "Test Patch",
+      "url": "https://httpbin.org/patch",
+      "method": "PATCH",
+      "params": [],
+      "body": "no_body",
+      "auth": "no_auth"
+    }
+  ]
+}

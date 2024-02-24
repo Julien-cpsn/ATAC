@@ -1,5 +1,7 @@
+use std::path::PathBuf;
 use std::sync::{Arc, RwLock};
 use crate::app::app::App;
+use crate::app::startup::args::ARGS;
 use crate::request::auth::Auth;
 use crate::request::collection::Collection;
 use crate::request::request::{Request};
@@ -80,14 +82,24 @@ impl App<'_> {
             return;
         }
 
+        // Check that collection names are unique (like files)
+        for collection in &self.collections {
+            if new_collection_name == &collection.name {
+                return;
+            }
+        }
+
         let new_collection = Collection {
             name: new_collection_name.clone(),
-            requests: vec![]
+            requests: vec![],
+            path: PathBuf::from(&ARGS.directory).join(format!("{}.json", new_collection_name.clone()))
         };
 
         self.collections.push(new_collection);
 
-        self.save_collections_to_file();
+        let collection_index= self.collections.len() - 1;
+
+        self.save_collection_to_file(collection_index);
         self.normal_state();
     }
 
@@ -107,7 +119,7 @@ impl App<'_> {
 
         self.collections[selected_collection].requests.push(Arc::new(RwLock::new(new_request)));
 
-        self.save_collections_to_file();
+        self.save_collection_to_file(selected_collection);
         self.normal_state();
     }
 
@@ -123,12 +135,13 @@ impl App<'_> {
 
     pub fn delete_collection(&mut self) {
         let selected_request_index = self.collections_tree.state.selected();
-        self.collections.remove(selected_request_index[0]);
+
+        let collection = self.collections.remove(selected_request_index[0]);
 
         self.collections_tree.state.select(Vec::new());
         self.collections_tree.selected = None;
 
-        self.save_collections_to_file();
+        self.delete_collection_file(collection);
         self.normal_state();
     }
 
@@ -139,7 +152,7 @@ impl App<'_> {
         self.collections_tree.state.select(Vec::new());
         self.collections_tree.selected = None;
 
-        self.save_collections_to_file();
+        self.save_collection_to_file(selected_request_index[0]);
         self.normal_state();
     }
 }

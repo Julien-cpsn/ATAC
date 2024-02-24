@@ -1,0 +1,29 @@
+{
+  "name": "Status code",
+  "requests": [
+    {
+      "name": "Test 200",
+      "url": "https://httpbin.org/status/200",
+      "method": "GET",
+      "params": [],
+      "body": "no_body",
+      "auth": "no_auth"
+    },
+    {
+      "name": "Test 401",
+      "url": "https://httpbin.org/status/401",
+      "method": "POST",
+      "params": [],
+      "body": "no_body",
+      "auth": "no_auth"
+    },
+    {
+      "name": "Test 500",
+      "url": "https://httpbin.org/status/500",
+      "method": "PUT",
+      "params": [],
+      "body": "no_body",
+      "auth": "no_auth"
+    }
+  ]
+}

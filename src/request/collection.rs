@@ -1,13 +1,17 @@
+use std::path::PathBuf;
 use std::sync::{Arc, RwLock};
 use ratatui::text::{Line, Span};
 use serde::{Deserialize, Serialize};
 use tui_tree_widget::TreeItem;
 use crate::request::request::Request;
 
-#[derive(Default, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct Collection {
     pub name: String,
-    pub requests: Vec<Arc<RwLock<Request>>>
+    pub requests: Vec<Arc<RwLock<Request>>>,
+
+    #[serde(skip)]
+    pub path: PathBuf
 }
 
 impl Collection {

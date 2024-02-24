@@ -1,0 +1,29 @@
+{
+  "name": "Request Types",
+  "requests": [
+    {
+      "name": "Check headers",
+      "url": "https://httpbin.org/headersddd",
+      "method": "GET",
+      "params": [],
+      "body": "no_body",
+      "auth": "no_auth"
+    },
+    {
+      "name": "Test Query Params",
+      "url": "https://httpbin.org/get",
+      "method": "GET",
+      "params": [
+        {
+          "enabled": true,
+          "data": [
+            "test",
+            "3"
+          ]
+        }
+      ],
+      "body": "no_body",
+      "auth": "no_auth"
+    }
+  ]
+}

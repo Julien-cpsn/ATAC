@@ -1,0 +1,37 @@
+{
+  "name": "Others",
+  "requests": [
+    {
+      "name": "Long request",
+      "url": "https://httpbin.org/delay/5",
+      "method": "GET",
+      "params": [],
+      "body": "no_body",
+      "auth": "no_auth"
+    },
+    {
+      "name": "PNG Image",
+      "url": "https://httpbin.org/image/png",
+      "method": "GET",
+      "params": [],
+      "body": "no_body",
+      "auth": "no_auth"
+    },
+    {
+      "name": "Rust Homepage",
+      "url": "https://www.rust-lang.org",
+      "method": "GET",
+      "params": [],
+      "body": "no_body",
+      "auth": "no_auth"
+    },
+    {
+      "name": "Google fr",
+      "url": "https://www.google.fr/",
+      "method": "GET",
+      "params": [],
+      "body": "no_body",
+      "auth": "no_auth"
+    }
+  ]
+}

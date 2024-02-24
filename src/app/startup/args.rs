@@ -8,9 +8,9 @@ pub struct Args {
     #[arg(short, long, default_value = "atac.log")]
     pub log_file: String,
 
-    /// Collection file path
+    /// Main application directory, containing collections
     #[arg(short, long)]
-    pub collection_file: String,
+    pub directory: String,
 
     /// Avoid saving data to the collection file
     #[arg(long, default_value_t = false)]
