@@ -3,7 +3,7 @@
   "requests": [
     {
       "name": "Check headers",
-      "url": "https://httpbin.org/headersddd",
+      "url": "https://httpbin.org/headers",
       "method": "GET",
       "params": [],
       "body": "no_body",
