@@ -108,6 +108,8 @@ impl App<'_> {
                                     KeyCode::Left | KeyCode::Right => self.request_param_table.change_y(),
 
                                     KeyCode::Char('p') if control_pressed => self.toggle_params_table_row(),
+                                    KeyCode::Char('n') => self.create_new_query_param(),
+                                    KeyCode::Char('d') => self.delete_query_param(),
 
                                     _ => {}
                                 },

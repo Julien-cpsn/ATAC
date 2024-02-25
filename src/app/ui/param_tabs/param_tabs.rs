@@ -79,7 +79,7 @@ impl App<'_> {
                         let params_lines = vec![
                             Line::default(),
                             Line::from("No params"),
-                            Line::from("(Add one via the URL)".dark_gray())
+                            Line::from("(Add one with n or via the URL)".dark_gray())
                         ];
 
                         let params_paragraph = Paragraph::new(params_lines).centered();

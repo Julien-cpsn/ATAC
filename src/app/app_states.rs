@@ -108,8 +108,8 @@ impl App<'_> {
 
                 let additional_keys = match self.request_param_tab {
                     RequestParamsTabs::QueryParams => match selected_request.params.is_empty() {
-                        true => None,
-                        false => Some("↑ ↓ ← → Enter")
+                        true => Some("(n)ew param"),
+                        false => Some("↑ ↓ ← → Enter (n)ew (d)elete")
                     },
                     RequestParamsTabs::Auth => match selected_request.auth {
                         Auth::NoAuth => None,
