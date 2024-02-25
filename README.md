@@ -94,6 +94,7 @@ cargo run -- -h
 - **Readable, commitable and versionable JSON files** containing application data
 - Configuration file
   - **HTTP and HTTPS proxy**
+- **Postman collection v2.1.0 import**
 - Permanent keymap help & application state
 - **3 request views**
   - 50% params / 50% response
@@ -105,7 +106,7 @@ cargo run -- -h
 - **To add**
   - Headers management
   - Cookies management
-  - Postman & Insomnia import
+  - Insomnia import
   - Create a repo wiki
   - Document whole code
 
