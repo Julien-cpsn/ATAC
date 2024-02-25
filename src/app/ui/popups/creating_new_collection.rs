@@ -5,7 +5,7 @@ use crate::app::app::App;
 use crate::utils::centered_rect::centered_rect;
 
 impl App<'_> {
-    pub(super) fn render_creating_new_collection_popup(&mut self, frame: &mut Frame) {
+    pub fn render_creating_new_collection_popup(&mut self, frame: &mut Frame) {
         let popup_block = Block::default()
             .title("Enter the new collection name")
             .borders(Borders::ALL)

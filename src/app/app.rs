@@ -9,7 +9,7 @@ use tui_textarea::TextArea;
 use crate::app::app_logic::new_request_popup::NewRequestPopup;
 use crate::app::app_states::AppState;
 use crate::app::files::config::Config;
-use crate::app::ui::param_tabs::RequestParamsTabs;
+use crate::app::ui::param_tabs::param_tabs::RequestParamsTabs;
 use crate::app::ui::result_tabs::RequestResultTabs;
 use crate::app::ui::views::RequestView;
 use crate::app::startup::args::ARGS;
@@ -80,7 +80,7 @@ impl App<'_> {
 
             request_view: RequestView::Normal,
 
-            request_param_tab: RequestParamsTabs::Params,
+            request_param_tab: RequestParamsTabs::QueryParams,
             request_result_tab: RequestResultTabs::Body,
 
             new_collection_input: TextInput::default(),

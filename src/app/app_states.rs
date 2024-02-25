@@ -4,7 +4,7 @@ use ratatui::text::Line;
 use strum::Display;
 use crate::app::app::App;
 use crate::app::app_states::AppState::*;
-use crate::app::ui::param_tabs::RequestParamsTabs;
+use crate::app::ui::param_tabs::param_tabs::RequestParamsTabs;
 use crate::request::auth::Auth;
 use crate::request::body::ContentType;
 
@@ -107,7 +107,7 @@ impl App<'_> {
                 let mut base_keys = String::from("Esc ^Enter ^TAB (u)rl (m)ethod ^(p)arams ^(a)uth ^(b)ody");
 
                 let additional_keys = match self.request_param_tab {
-                    RequestParamsTabs::Params => match selected_request.params.is_empty() {
+                    RequestParamsTabs::QueryParams => match selected_request.params.is_empty() {
                         true => None,
                         false => Some("↑ ↓ ← → Enter")
                     },

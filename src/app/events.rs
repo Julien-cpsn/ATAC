@@ -3,7 +3,7 @@ use crossterm::event::{Event, KeyCode, KeyEventKind, KeyModifiers};
 use tui_textarea::CursorMove;
 use crate::app::app::{App};
 use crate::app::app_states::AppState;
-use crate::app::ui::param_tabs::RequestParamsTabs;
+use crate::app::ui::param_tabs::param_tabs::RequestParamsTabs;
 
 impl App<'_> {
     /// Handle events
@@ -100,7 +100,7 @@ impl App<'_> {
                         AppState::SelectedRequest => {
                             // Param tabs
                             match self.request_param_tab {
-                                RequestParamsTabs::Params => match key.code {
+                                RequestParamsTabs::QueryParams => match key.code {
                                     KeyCode::Enter if !control_pressed && self.request_param_table.is_selected() => self.edit_request_param_state(),
 
                                     KeyCode::Up => self.request_param_table.up(),
@@ -131,7 +131,7 @@ impl App<'_> {
                             match key.code {
                                 KeyCode::Esc => self.normal_state(),
 
-                                KeyCode::Char('p') if !control_pressed => self.load_request_params_tab(),
+                                KeyCode::Char('p') if !control_pressed => self.load_request_query_params_tab(),
 
                                 KeyCode::Char('a') if control_pressed => self.modify_request_auth(),
                                 KeyCode::Char('a') => self.load_request_auth_param_tab(),

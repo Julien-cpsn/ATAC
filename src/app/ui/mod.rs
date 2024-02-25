@@ -5,7 +5,4 @@ pub mod views;
 pub mod collection;
 pub mod request;
 pub mod homepage;
-mod creating_new_collection;
-mod creating_new_request;
-mod deleting_collection;
-mod deleting_request;
+pub mod popups;

@@ -9,13 +9,13 @@ use crate::app::app::App;
 use crate::utils::centered_rect::centered_rect;
 
 impl App<'_> {
-    pub(super) fn render_deleting_collection_popup(&mut self, frame: &mut Frame) {
+    pub fn render_deleting_request_popup(&mut self, frame: &mut Frame) {
         let popup_block = Block::default()
-            .title("Confirm delete collection")
+            .title("Confirm delete request")
             .borders(Borders::ALL)
             .style(Style::default().bg(Color::DarkGray));
 
-        let area = centered_rect(25, 20, 3, 30, frame.size());
+        let area = centered_rect(30, 20, 3, 30, frame.size());
 
         let deleting_request_layout = Layout::new(
             Horizontal,
@@ -31,7 +31,7 @@ impl App<'_> {
         let mut no_paragraph = Paragraph::new("no").centered();
         let mut yes_paragraph = Paragraph::new("yes").centered();
 
-        match self.delete_collection_popup.state {
+        match self.delete_request_popup.state {
             false => no_paragraph = no_paragraph.fg(Yellow).bold(),
             true => yes_paragraph = yes_paragraph.fg(Yellow).bold(),
         }

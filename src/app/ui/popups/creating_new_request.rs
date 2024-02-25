@@ -7,7 +7,7 @@ use crate::app::app::App;
 use crate::utils::centered_rect::centered_rect;
 
 impl App<'_> {
-    pub(super) fn render_creating_new_request_popup(&mut self, frame: &mut Frame) {
+    pub fn render_creating_new_request_popup(&mut self, frame: &mut Frame) {
         let popup_block = Block::default()
             .borders(Borders::ALL)
             .style(Style::default().bg(Color::DarkGray));
