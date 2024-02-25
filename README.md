@@ -73,6 +73,7 @@ cargo run -- -h
     - PUT
     - DELETE
     - PATCH
+    - OPTIONS
   - **Query params**, synchronous between the URL and the query params tab
   - **Authentication**
     - No Auth

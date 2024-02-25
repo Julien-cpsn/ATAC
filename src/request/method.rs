@@ -14,7 +14,9 @@ pub enum Method {
     #[strum(to_string = "DELETE")]
     DELETE,
     #[strum(to_string = "PATCH")]
-    PATCH
+    PATCH,
+    #[strum(to_string = "OPTIONS")]
+    OPTIONS
 }
 
 impl Method {
@@ -25,6 +27,7 @@ impl Method {
             Method::PUT => Color::LightBlue,
             Method::DELETE => Color::LightRed,
             Method::PATCH => Color::LightCyan,
+            Method::OPTIONS => Color::Magenta,
         }
     }
 
@@ -35,6 +38,7 @@ impl Method {
             Method::PUT => reqwest::Method::PUT,
             Method::DELETE => reqwest::Method::DELETE,
             Method::PATCH => reqwest::Method::PATCH,
+            Method::OPTIONS => reqwest::Method::OPTIONS
         }
     }
 }
@@ -45,6 +49,7 @@ pub fn next_method(method: &Method) -> Method {
         &Method::POST => Method::PUT,
         &Method::PUT => Method::DELETE,
         &Method::DELETE => Method::PATCH,
-        &Method::PATCH => Method::GET,
+        &Method::PATCH => Method::OPTIONS,
+        &Method::OPTIONS => Method::GET
     }
 }
