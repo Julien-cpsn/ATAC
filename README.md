@@ -130,7 +130,8 @@ A documentation will soon be published in the wiki section
 ### Tested on
 
 - Console Host
-  - Windows 11 (Pro)  
+  - Windows 11 (Pro)
+  - WSL2 Debian
   - Windows 10 (Pro)
   - Windows 8.1 (N)
 - Ubuntu Desktop Terminal
