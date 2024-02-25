@@ -150,23 +150,23 @@ A documentation will soon be published in the wiki section
 
 ### Dependencies
 
-| Library                                                                                     | Version           | Reason                                                                                 |
-|---------------------------------------------------------------------------------------------|-------------------|----------------------------------------------------------------------------------------|
-| [request](https://github.com/seanmonstar/reqwest)                                           | 0.11.24           | Send requests                                                                          |
-| [ratatui](https://github.com/ratatui-org/ratatui)                                           | 0.26.1            | Terminal UI framework                                                                  |
-| [crossterm](https://github.com/crossterm-rs/crossterm)                                      | 0.27.0            | Terminal Backend                                                                       |
-| [tui-big-text](https://github.com/joshka/tui-big-text)                                      | 0.4.1             | Display big texts. Only used for displaying ATAC in the homepage.                      |
-| [tui-tree-widget](https://github.com/EdJoPaTo/tui-rs-tree-widget)                           | 0.18.0            | Display tree-like lists. Used for displaying the collections.                          |
-| [tui-textarea](https://github.com/rhysd/tui-textarea)                                       | 0.4.0             | Text area that handle a lot of features. Used for editing request body.                |
-| [throbber-widgets-tui](https://github.com/arkbig/throbber-widgets-tui)                      | 0.4.0             | Display loading UI elements. Used when request is pending.                             |
-| [serde](https://github.com/serde-rs/serde) & [serde_json](https://github.com/serde-rs/json) | 1.0.197 & 1.0.144 | Serialize & Deserialize application data into JSON files                               |
-| [toml](https://github.com/toml-rs/toml)                                                     | 0.8.10            | Serialize & Deserialize application config files                                       |
-| [postman_collection](https://github.com/mandrean/postman-collection-rs)                     | 0.2.0             | Deserialize Postman collection files                                                   |
-| [clap](https://github.com/clap-rs/clap)                                                     | 4.5.0             | Command Line Argument Parser                                                           |
-| [tokio](https://github.com/tokio-rs/tokio)                                                  | 1.0.0             | Handle asynchronous requests                                                           |
-| [strum](https://github.com/Peternator7/strum)                                               | 0.26.1            | Enum facilities                                                                        |
-| [lazy_static](https://github.com/rust-lang-nursery/lazy-static.rs)                          | 1.4.0             | Allows for more flexible constants. Mainly used for accessing CLI arguments everywhere |
-| [regex](https://github.com/rust-lang/regex)                                                 | 1.10.3            | Regex. Using for parsing requests URL                                                  |
+| Library                                                                                                                                    | Version           | Reason                                                                                 |
+|--------------------------------------------------------------------------------------------------------------------------------------------|-------------------|----------------------------------------------------------------------------------------|
+| [request](https://github.com/seanmonstar/reqwest)                                                                                          | 0.11.24           | Send requests                                                                          |
+| [ratatui](https://github.com/ratatui-org/ratatui)                                                                                          | 0.26.1            | Terminal UI framework                                                                  |
+| [crossterm](https://github.com/crossterm-rs/crossterm)                                                                                     | 0.27.0            | Terminal Backend                                                                       |
+| [tui-big-text](https://github.com/joshka/tui-big-text)                                                                                     | 0.4.1             | Display big texts. Only used for displaying ATAC in the homepage.                      |
+| [tui-tree-widget](https://github.com/EdJoPaTo/tui-rs-tree-widget)                                                                          | 0.18.0            | Display tree-like lists. Used for displaying the collections.                          |
+| [tui-textarea](https://github.com/rhysd/tui-textarea)                                                                                      | 0.4.0             | Text area that handle a lot of features. Used for editing request body.                |
+| [throbber-widgets-tui](https://github.com/arkbig/throbber-widgets-tui)                                                                     | 0.4.0             | Display loading UI elements. Used when request is pending.                             |
+| [serde](https://github.com/serde-rs/serde) & [serde_json](https://github.com/serde-rs/json)                                                | 1.0.197 & 1.0.144 | Serialize & Deserialize application data into JSON files                               |
+| [toml](https://github.com/toml-rs/toml)                                                                                                    | 0.8.10            | Serialize & Deserialize application config files                                       |
+| [My fork](https://github.com/Julien-cpsn/postman-collection-rs) of [postman_collection](https://github.com/mandrean/postman-collection-rs) | 0.2.1             | Deserialize Postman collection files                                                   |
+| [clap](https://github.com/clap-rs/clap)                                                                                                    | 4.5.0             | Command Line Argument Parser                                                           |
+| [tokio](https://github.com/tokio-rs/tokio)                                                                                                 | 1.0.0             | Handle asynchronous requests                                                           |
+| [strum](https://github.com/Peternator7/strum)                                                                                              | 0.26.1            | Enum facilities                                                                        |
+| [lazy_static](https://github.com/rust-lang-nursery/lazy-static.rs)                                                                         | 1.4.0             | Allows for more flexible constants. Mainly used for accessing CLI arguments everywhere |
+| [regex](https://github.com/rust-lang/regex)                                                                                                | 1.10.3            | Regex. Using for parsing requests URL                                                  |
 
 ### Binary size
 
