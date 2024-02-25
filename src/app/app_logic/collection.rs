@@ -1,4 +1,3 @@
-use std::path::PathBuf;
 use std::sync::{Arc, RwLock};
 use crate::app::app::App;
 use crate::app::startup::args::ARGS;
@@ -92,7 +91,7 @@ impl App<'_> {
         let new_collection = Collection {
             name: new_collection_name.clone(),
             requests: vec![],
-            path: PathBuf::from(&ARGS.directory).join(format!("{}.json", new_collection_name.clone()))
+            path: ARGS.directory.join(format!("{}.json", new_collection_name.clone()))
         };
 
         self.collections.push(new_collection);

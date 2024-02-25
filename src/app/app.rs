@@ -1,5 +1,4 @@
 use std::fs::{File, OpenOptions};
-use std::path::PathBuf;
 use std::time::Duration;
 use crossterm::terminal::{disable_raw_mode};
 use ratatui::backend::Backend;
@@ -72,7 +71,7 @@ impl App<'_> {
                 .write(true)
                 .create(true)
                 .truncate(true)
-                .open(PathBuf::from(&ARGS.directory).join("atac.log"))
+                .open(ARGS.directory.join("atac.log"))
                 .expect("Could not open log file"),
 
             collections: vec![],

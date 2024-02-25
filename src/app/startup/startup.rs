@@ -1,5 +1,3 @@
-use std::fs;
-use std::path::PathBuf;
 use crate::app::app::App;
 use crate::app::startup::args::ARGS;
 
@@ -8,11 +6,15 @@ impl App<'_> {
     pub fn startup(&mut self) -> &mut Self {
         self.parse_app_directory();
 
+        if let Some(postman_file_path) = &ARGS.import {
+            self.import_postman_collection(postman_file_path);
+        }
+        
         self
     }
 
     pub fn parse_app_directory(&mut self) {
-        let paths = fs::read_dir(&ARGS.directory).expect(&format!("Directory \"{}\" not found", ARGS.directory));
+        let paths = ARGS.directory.read_dir().expect(&format!("Directory \"{}\" not found", ARGS.directory.display()));
 
         let mut was_config_file_parsed = false;
 
@@ -45,7 +47,7 @@ impl App<'_> {
             }
 
             if !was_config_file_parsed {
-                self.parse_config_file(PathBuf::from(&ARGS.directory).join("atac.toml"));
+                self.parse_config_file(ARGS.directory.join("atac.toml"));
             }
 
             println!();

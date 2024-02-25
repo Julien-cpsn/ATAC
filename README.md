@@ -160,6 +160,7 @@ A documentation will soon be published in the wiki section
 | [throbber-widgets-tui](https://github.com/arkbig/throbber-widgets-tui)                      | 0.4.0             | Display loading UI elements. Used when request is pending.                             |
 | [serde](https://github.com/serde-rs/serde) & [serde_json](https://github.com/serde-rs/json) | 1.0.197 & 1.0.144 | Serialize & Deserialize application data into JSON files                               |
 | [toml](https://github.com/toml-rs/toml)                                                     | 0.8.10            | Serialize & Deserialize application config files                                       |
+| [postman_collection](https://github.com/mandrean/postman-collection-rs)                     | 0.2.0             | Deserialize Postman collection files                                                   |
 | [clap](https://github.com/clap-rs/clap)                                                     | 4.5.0             | Command Line Argument Parser                                                           |
 | [tokio](https://github.com/tokio-rs/tokio)                                                  | 1.0.0             | Handle asynchronous requests                                                           |
 | [strum](https://github.com/Peternator7/strum)                                               | 0.26.1            | Enum facilities                                                                        |
