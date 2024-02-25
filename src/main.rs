@@ -14,8 +14,7 @@ use crate::app::app::App;
 async fn main() -> Result<()> {
     enable_raw_mode()?;
     stdout().execute(EnterAlternateScreen)?;
-    let mut terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
-    terminal.clear()?;
+    let terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
 
     App::new()
         .chain_hook()
