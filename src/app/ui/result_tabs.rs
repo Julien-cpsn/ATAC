@@ -65,6 +65,8 @@ impl App<'_> {
         if request.is_pending {
             let area = centered_rect(20, 50, 1, 9, request_result_layout[2]);
 
+            self.result_throbber_state.calc_next();
+            
             let throbber = Throbber::default()
                 .label("Pending")
                 .style(Style::new().dark_gray())

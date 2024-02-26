@@ -8,8 +8,6 @@ use crate::app::ui::param_tabs::param_tabs::RequestParamsTabs;
 impl App<'_> {
     /// Handle events
     pub async fn handle_events(&mut self) {
-        self.result_throbber_state.calc_next();
-
         // Refreshes the app every tick_rate
         if event::poll(self.tick_rate).unwrap() {
             // Block while a key is pressed

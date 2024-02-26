@@ -43,7 +43,7 @@ impl Request {
         line_elements.push(prefix);
 
         if self.is_pending {
-            line_elements.push(Span::raw(" ⏰"));
+            line_elements.push(Span::raw(" 🕛"));
         }
         else {
             line_elements.push(Span::raw(" "));
