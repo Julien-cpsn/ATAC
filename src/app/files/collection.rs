@@ -54,8 +54,6 @@ impl App<'_> {
         let temp_file_name = format!("{}_", collection.path.file_name().unwrap().to_str().unwrap());
 
         let temp_file_path = collection.path.with_file_name(temp_file_name);
-
-        dbg!(&temp_file_path);
         
         let mut temp_file = OpenOptions::new()
             .write(true)
