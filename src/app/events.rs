@@ -30,7 +30,9 @@ impl App<'_> {
                             KeyCode::Up => self.collections_tree.up(),
                             KeyCode::Down => self.collections_tree.down(),
                             KeyCode::Left => self.unselect_request(),
-                            KeyCode::Right => self.collections_tree.state.toggle_selected(),
+                            KeyCode::Right => {
+                                self.collections_tree.state.toggle_selected();
+                            },
                             KeyCode::Enter => self.select_request(),
 
                             KeyCode::Char('c') => self.create_new_collection_state(),

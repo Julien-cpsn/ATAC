@@ -15,12 +15,12 @@ ratatui = "0.26.1"
 crossterm = "0.27.0"
 tui-big-text = "0.4.1"
 tui-textarea = { version = "0.4.0", features = ["ratatui"] }
-tui-tree-widget = "0.18.0"
+tui-tree-widget = "0.19.0"
 throbber-widgets-tui = { version = "0.4.1", features = ["ratatui"] }
 regex = "1.10.3"
 serde = { version = "1.0.197", features = ["derive", "rc"] }
 serde_json = "1.0.114"
 toml = "0.8.10"
-postman_collection = { git = "https://github.com/Julien-cpsn/postman-collection-rs.git", rev = "8c7641fa" }
+postman_collection = { git = "https://github.com/Julien-cpsn/postman-collection-rs.git", rev = "6bf3ec87" }
 clap = { version = "4.5.0", features = ["derive", "color"] }
 lazy_static = "1.4.0"
