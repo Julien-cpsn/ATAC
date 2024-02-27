@@ -4,7 +4,7 @@ mod utils;
 
 use std::io::{stdout, Result};
 use crossterm::{ExecutableCommand};
-use crossterm::terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen};
+use crossterm::terminal::{disable_raw_mode, LeaveAlternateScreen};
 pub use ratatui::backend::{Backend};
 use ratatui::backend::CrosstermBackend;
 use ratatui::{Terminal};
@@ -12,13 +12,12 @@ use crate::app::app::App;
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    enable_raw_mode()?;
-    stdout().execute(EnterAlternateScreen)?;
     let terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
 
     App::new()
-        .chain_hook()
         .startup()
+        .prepare_terminal()
+        .chain_hook()
         .run(terminal).await?;
 
     stdout().execute(LeaveAlternateScreen)?;
