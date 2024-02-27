@@ -107,6 +107,7 @@ cargo run -- -h
   - Headers management
   - Cookies management
   - Insomnia import
+  - Environments (maybe .env files?, with autocompletion)
   - Create a repo wiki
   - Document whole code
 
@@ -117,7 +118,7 @@ cargo run -- -h
 ### TODO v2.0.0
 
 - **To add**
-  - Environments (maybe .env files?, with autocompletion)
+  - Command line usage (send requests, add new requests)
   - keymap configuration (via a config file)
   - Body & result syntax highlighting
   - Export a request to other code formats (curl, PHP, JS, Rust, ...)
