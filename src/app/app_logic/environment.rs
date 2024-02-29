@@ -1,4 +1,3 @@
-use std::ops::Range;
 use ratatui::style::Stylize;
 use ratatui::text::{Line, Span};
 use regex::Regex;
