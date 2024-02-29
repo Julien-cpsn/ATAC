@@ -65,8 +65,11 @@ impl App<'_> {
             );
         }
 
-        let username_paragraph = Paragraph::new(self.auth_basic_username_text_input.text.as_str()).block(username_block);
-        let password_paragraph = Paragraph::new(self.auth_basic_password_text_input.text.as_str()).block(password_block);
+        let username_line = self.add_color_to_env_keys(&self.auth_basic_username_text_input.text);
+        let password_line = self.add_color_to_env_keys(&self.auth_basic_password_text_input.text);
+
+        let username_paragraph = Paragraph::new(username_line).block(username_block);
+        let password_paragraph = Paragraph::new(password_line).block(password_block);
 
         frame.render_widget(username_paragraph, basic_auth_layout[0]);
         frame.render_widget(password_paragraph, basic_auth_layout[1]);

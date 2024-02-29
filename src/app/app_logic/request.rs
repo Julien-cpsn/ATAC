@@ -377,7 +377,9 @@ impl App<'_> {
 
             /* URL */
 
-            let url = match Url::parse_with_params(&selected_request.url, params) {
+            let url = self.replace_env_keys_by_value(&selected_request.url);
+            
+            let url = match Url::parse_with_params(&url, params) {
                 Ok(url) => url,
                 Err(_) => {
                     selected_request.result.status_code = Some(String::from("INVALID URL"));
@@ -397,6 +399,9 @@ impl App<'_> {
             match &selected_request.auth {
                 NoAuth => {}
                 BasicAuth(username, password) => {
+                    let username = self.replace_env_keys_by_value(username);
+                    let password = self.replace_env_keys_by_value(password);
+                    
                     request = request.basic_auth(username, Some(password));
                 }
                 BearerToken(bearer_token) => {

@@ -109,11 +109,9 @@ impl App<'_> {
                                     KeyCode::Down => self.request_param_table.down(),
                                     KeyCode::Left | KeyCode::Right => self.request_param_table.change_y(),
 
-                                    KeyCode::Char('p') if control_pressed => self.toggle_params_table_row(),
                                     KeyCode::Char('n') => self.create_new_query_param(),
                                     KeyCode::Char('d') => self.delete_query_param(),
-
-                                    KeyCode::Char('e') => self.next_environment(),
+                                    KeyCode::Char('t') => self.toggle_params_table_row(),
 
                                     _ => {}
                                 },
@@ -136,6 +134,8 @@ impl App<'_> {
 
                             match key.code {
                                 KeyCode::Esc => self.normal_state(),
+
+                                KeyCode::Char('e') => self.next_environment(),
 
                                 KeyCode::Char('p') if !control_pressed => self.load_request_query_params_tab(),
 

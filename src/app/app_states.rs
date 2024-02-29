@@ -98,18 +98,18 @@ impl App<'_> {
 
     pub fn get_available_keys(&self) -> String {
         match self.state {
-            Normal => String::from("(q)uit or ^c ↑ ↓ ← → Enter (c)ollection (r)equest (d)elete"),
+            Normal => String::from("(q)uit or ^c ↑ ↓ ← → Enter (c)ollection (r)equest (d)elete (e)nv"),
 
             SelectedRequest => {
                 let local_selected_request = self.get_selected_request_as_local();
                 let selected_request = local_selected_request.read().unwrap();
 
-                let mut base_keys = String::from("Esc ^Enter ^TAB (u)rl (m)ethod ^(p)arams ^(a)uth ^(b)ody");
+                let mut base_keys = String::from("Esc ^Enter ^TAB (u)rl (m)ethod (p)arams ^(a)uth ^(b)ody (e)nv");
 
                 let additional_keys = match self.request_param_tab {
                     RequestParamsTabs::QueryParams => match selected_request.params.is_empty() {
                         true => Some("(n)ew param"),
-                        false => Some("↑ ↓ ← → Enter (n)ew (d)elete")
+                        false => Some("↑ ↓ ← → Enter (n)ew (d)elete (t)oggle")
                     },
                     RequestParamsTabs::Auth => match selected_request.auth {
                         Auth::NoAuth => None,

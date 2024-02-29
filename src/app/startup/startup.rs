@@ -29,32 +29,32 @@ impl App<'_> {
                 continue;
             }
 
-            let path_str = path.file_name().unwrap().to_str().unwrap();
+            let file_name = path.file_name().unwrap().to_str().unwrap();
 
             println!("Parsing: {}", path.display());
 
-            if path_str.ends_with(".json") {
+            if file_name.ends_with(".json") {
                 self.set_collections_from_file(path);
             }
-            else if path_str.starts_with(".env.") {
+            else if file_name.starts_with(".env.") {
                 self.add_environment_from_file(path)
             }
-            else if path_str == "atac.toml" {
+            else if file_name == "atac.toml" {
                 self.parse_config_file(path);
                 was_config_file_parsed = true;
             }
-            else if path_str == "atac.log" {
-                println!("Log file")
+            else if file_name == "atac.log" {
+                println!("Nothing to parse here")
             }
             else {
                 panic!("unhandled file type");
             }
 
-            if !was_config_file_parsed {
-                self.parse_config_file(ARGS.directory.join("atac.toml"));
-            }
-
             println!();
+        }
+
+        if !was_config_file_parsed {
+            self.parse_config_file(ARGS.directory.join("atac.toml"));
         }
     }
 }

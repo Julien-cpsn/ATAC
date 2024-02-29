@@ -67,7 +67,9 @@ impl App<'_> {
             .borders(Borders::ALL)
             .padding(Padding::horizontal(1));
 
-        let url_paragraph = Paragraph::new(self.url_text_input.text.as_str()).block(url_block);
+        let url_line = self.add_color_to_env_keys(&self.url_text_input.text);
+        
+        let url_paragraph = Paragraph::new(url_line).block(url_block);
 
         frame.render_widget(url_paragraph, request_header_layout[1]);
 

@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::fs::{File, OpenOptions};
 use std::time::Duration;
 use crossterm::terminal::{disable_raw_mode};
@@ -79,21 +78,7 @@ impl App<'_> {
                 .open(ARGS.directory.join("atac.log"))
                 .expect("Could not open log file"),
 
-            environments: vec![
-                Environment {
-                    name: "My test env".to_string(),
-                    values: HashMap::from([
-                        (String::from("Clé"), String::from("Valeur"))
-                    ]),
-                },
-                Environment {
-                    name: "Some other env".to_string(),
-                    values: HashMap::from([
-                        (String::from("aaaa"), String::from("bbbb")),
-                        (String::from("cccc"), String::from("dddd")),
-                    ]),
-                }
-            ],
+            environments: vec![],
             selected_environment: 0,
 
             collections: vec![],
