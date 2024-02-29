@@ -37,7 +37,7 @@ impl App<'_> {
                 self.set_collections_from_file(path);
             }
             else if path_str.starts_with(".env.") {
-                println!("\tenv file are not supported yet");
+                self.add_environment_from_file(path)
             }
             else if path_str == "atac.toml" {
                 self.parse_config_file(path);

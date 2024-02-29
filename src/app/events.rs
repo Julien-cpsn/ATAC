@@ -39,6 +39,8 @@ impl App<'_> {
                             KeyCode::Char('r') => self.create_new_request_state(),
                             KeyCode::Char('d') => self.delete_element(),
 
+                            KeyCode::Char('e') => self.next_environment(),
+
                             _ => miss_input = true
                         },
 
@@ -110,6 +112,8 @@ impl App<'_> {
                                     KeyCode::Char('p') if control_pressed => self.toggle_params_table_row(),
                                     KeyCode::Char('n') => self.create_new_query_param(),
                                     KeyCode::Char('d') => self.delete_query_param(),
+
+                                    KeyCode::Char('e') => self.next_environment(),
 
                                     _ => {}
                                 },

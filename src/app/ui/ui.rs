@@ -46,9 +46,24 @@ impl App<'_> {
         )
             .split(main_layout[1]);
 
+        // LEFT LAYOUT
+
+        let env_and_collections_layout = Layout::new(
+            Vertical,
+            [
+                Constraint::Length(3),
+                Constraint::Fill(1)
+            ]
+        )
+            .split(inner_layout[0]);
+
+        // ENVIRONMENTS
+
+        self.render_environments(frame, env_and_collections_layout[0]);
+
         // COLLECTION
 
-        self.render_collection(frame, inner_layout[0]);
+        self.render_collections(frame, env_and_collections_layout[1]);
 
         // REQUEST
 

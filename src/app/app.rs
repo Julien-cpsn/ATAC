@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::fs::{File, OpenOptions};
 use std::time::Duration;
 use crossterm::terminal::{disable_raw_mode};
@@ -13,6 +14,7 @@ use crate::app::ui::result_tabs::RequestResultTabs;
 use crate::app::ui::views::RequestView;
 use crate::app::startup::args::ARGS;
 use crate::request::collection::Collection;
+use crate::request::environment::Environment;
 use crate::utils::stateful_scrollbar::StatefulScrollbar;
 use crate::utils::stateful_custom_table::{StatefulCustomTable};
 use crate::utils::stateful_tree::StatefulTree;
@@ -29,6 +31,9 @@ pub struct App<'a> {
     pub config: Config,
 
     pub log_file: File,
+
+    pub environments: Vec<Environment>,
+    pub selected_environment: usize,
 
     pub collections: Vec<Collection>,
     pub collections_tree: StatefulTree<'a>,
@@ -73,6 +78,23 @@ impl App<'_> {
                 .truncate(true)
                 .open(ARGS.directory.join("atac.log"))
                 .expect("Could not open log file"),
+
+            environments: vec![
+                Environment {
+                    name: "My test env".to_string(),
+                    values: HashMap::from([
+                        (String::from("Clé"), String::from("Valeur"))
+                    ]),
+                },
+                Environment {
+                    name: "Some other env".to_string(),
+                    values: HashMap::from([
+                        (String::from("aaaa"), String::from("bbbb")),
+                        (String::from("cccc"), String::from("dddd")),
+                    ]),
+                }
+            ],
+            selected_environment: 0,
 
             collections: vec![],
             collections_tree: StatefulTree::default(),

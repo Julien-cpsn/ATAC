@@ -24,3 +24,4 @@ toml = "0.8.10"
 postman_collection = { git = "https://github.com/Julien-cpsn/postman-collection-rs.git", rev = "6bf3ec87" }
 clap = { version = "4.5.0", features = ["derive", "color"] }
 lazy_static = "1.4.0"
+envfile = "0.2.1"

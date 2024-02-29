@@ -6,7 +6,7 @@ use tui_tree_widget::{Tree, TreeItem};
 use crate::app::app::App;
 
 impl<'a> App<'a> {
-    pub(super) fn render_collection(&mut self, frame: &mut Frame, rect: Rect) {
+    pub(super) fn render_collections(&mut self, frame: &mut Frame, rect: Rect) {
         let items: Vec<TreeItem<'a, usize>> = self.collections
             .iter()
             .enumerate()
