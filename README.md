@@ -37,7 +37,8 @@ The philosophy of ATAC is to be free, account-less and offline for now and forev
 
 The binaries from the latest release can be found [here](https://github.com/Julien-cpsn/ATAC/releases/latest)
 
-Don't forget to run it from a terminal. For example, you can add the binary into your PATH. You won't be able to run it like other graphical applications since it needs CLI arguments.
+> [!IMPORTANT]
+> Don't forget to run it from a terminal. For example, you can add the binary into your PATH. You won't be able to run it like other graphical applications since it needs CLI arguments.
 
 For more:
 
@@ -47,6 +48,7 @@ atac -h
 
 ### Compile by yourself
 
+> [!IMPORTANT]
 > First, make sure your rust version is at least 1.76
 
 Simply clone the repository and use:
@@ -126,7 +128,8 @@ cargo run -- -h
 
 ## Documentation
 
-A documentation will soon be published in the wiki section
+> [!NOTE]
+> A documentation will soon be published in the wiki section
 
 ## Technical precisions
 
@@ -147,7 +150,6 @@ A documentation will soon be published in the wiki section
 - (Chrome OS) Crostini
 
 (List from [here](https://github.com/crossterm-rs/crossterm#tested-terminals))
-
 
 ### Dependencies
 
