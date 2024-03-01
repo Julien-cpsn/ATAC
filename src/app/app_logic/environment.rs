@@ -29,23 +29,22 @@ impl App<'_> {
 
     pub fn add_color_to_env_keys(&self, input: &String) -> Line {
         if self.environments.is_empty() {
-            return Line::raw(input.to_string());
+            return Line::raw(input.to_string().to_owned());
         }
 
-        let tmp_string = input;
         let mut spans: Vec<Span> = vec![];
 
         let regex = Regex::new(r"\{\{(\w+)}}").unwrap();
         let mut tmp_index: usize = 0;
 
-        for match_ in regex.captures_iter(tmp_string) {
+        for match_ in regex.captures_iter(input) {
             for sub_match in match_.iter() {
                 if let Some(sub_match) = sub_match {
                     for (key, _) in &self.environments[self.selected_environment].values {
                         if sub_match.as_str() == &format!("{{{{{}}}}}", key) {
                             let range = sub_match.range();
 
-                            spans.push(Span::raw(String::from(&tmp_string[tmp_index..range.start])));
+                            spans.push(Span::raw(String::from(&input[tmp_index..range.start])));
                             spans.push(Span::raw(String::from(sub_match.as_str())).cyan());
 
                             tmp_index = range.end;
@@ -55,7 +54,7 @@ impl App<'_> {
             }
         }
 
-        spans.push(Span::raw(String::from(&tmp_string[tmp_index..tmp_string.len()])));
+        spans.push(Span::raw(String::from(&input[tmp_index..input.len()])));
 
         return Line::from(spans);
     }

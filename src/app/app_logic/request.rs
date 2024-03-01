@@ -368,7 +368,10 @@ impl App<'_> {
                 .iter()
                 .filter_map(|param| {
                     if param.enabled {
-                        Some(param.data.clone())
+                        let key = self.replace_env_keys_by_value(&param.data.0);
+                        let value = self.replace_env_keys_by_value(&param.data.1);
+
+                        Some((key, value))
                     } else {
                         None
                     }
@@ -405,6 +408,8 @@ impl App<'_> {
                     request = request.basic_auth(username, Some(password));
                 }
                 BearerToken(bearer_token) => {
+                    let bearer_token = self.replace_env_keys_by_value(bearer_token);
+
                     request = request.bearer_auth(bearer_token);
                 }
             }

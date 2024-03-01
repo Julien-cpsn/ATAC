@@ -54,8 +54,10 @@ impl App<'_> {
             );
         }
 
-        let username_paragraph = Paragraph::new(self.auth_bearer_token_text_input.text.as_str()).block(bearer_token_block);
+        let bearer_token_line = self.add_color_to_env_keys(&self.auth_bearer_token_text_input.text);
 
-        frame.render_widget(username_paragraph, bearer_token_auth_layout[0]);
+        let bearer_token_paragraph = Paragraph::new(bearer_token_line).block(bearer_token_block);
+
+        frame.render_widget(bearer_token_paragraph, bearer_token_auth_layout[0]);
     }
 }

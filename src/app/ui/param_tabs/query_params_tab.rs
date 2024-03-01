@@ -57,8 +57,11 @@ impl App<'_> {
         let mut values: Vec<ListItem> = vec![];
 
         for param in request.params.iter() {
-            let mut key = ListItem::from(param.data.0.clone());
-            let mut value = ListItem::from(param.data.1.clone());
+            let key = self.add_color_to_env_keys(&param.data.0);
+            let value = self.add_color_to_env_keys(&param.data.1);
+
+            let mut key = ListItem::from(key);
+            let mut value = ListItem::from(value);
 
             if !param.enabled {
                 key = key.dark_gray().dim();
@@ -84,8 +87,8 @@ impl App<'_> {
         let right_list = List::new(values)
             .highlight_style(right_list_style);
 
-        frame.render_stateful_widget(left_list, table_layout[0], &mut self.request_param_table.left_state);
-        frame.render_stateful_widget(right_list, table_layout[1], &mut self.request_param_table.right_state);
+        frame.render_stateful_widget(left_list, table_layout[0], &mut self.request_param_table.left_state.clone());
+        frame.render_stateful_widget(right_list, table_layout[1], &mut self.request_param_table.right_state.clone());
 
         // Param input & cursor
 

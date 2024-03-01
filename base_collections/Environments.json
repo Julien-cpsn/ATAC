@@ -8,6 +8,16 @@
       "params": [],
       "body": "no_body",
       "auth": "no_auth"
+    },
+    {
+      "name": "In Bearer",
+      "url": "{{BASE_URL}}/bearer",
+      "method": "GET",
+      "params": [],
+      "body": "no_body",
+      "auth": {
+        "bearer_token": "bearer_{{ID}}="
+      }
     }
   ]
 }
