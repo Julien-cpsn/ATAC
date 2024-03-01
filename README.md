@@ -81,7 +81,8 @@ cargo run -- -h
     - No Auth
     - Basic Auth
     - Bearer Token
-  - **Content-Types**
+  - **Headers**
+  - **Body**
     - No Body
     - Plain Text
     - JSON
@@ -107,8 +108,8 @@ cargo run -- -h
 ### TODO v1.0.0
 
 - **To add**
-  - Headers management
   - Cookies management
+  - Request settings (toggle proxy, TLS, timeout, ...)
   - Insomnia import
   - Create a repo wiki
   - Document whole code
