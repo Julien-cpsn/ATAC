@@ -28,8 +28,8 @@ impl App<'_> {
     }
 
     pub fn add_color_to_env_keys(&self, input: &String) -> Line {
-        if self.environments.is_empty() {
-            return Line::raw(input.to_string().to_owned());
+        if self.environments.is_empty() || !input.contains('{') {
+            return Line::raw(input.to_string());
         }
 
         let mut spans: Vec<Span> = vec![];
@@ -44,8 +44,8 @@ impl App<'_> {
                         if sub_match.as_str() == &format!("{{{{{}}}}}", key) {
                             let range = sub_match.range();
 
-                            spans.push(Span::raw(String::from(&input[tmp_index..range.start])));
-                            spans.push(Span::raw(String::from(sub_match.as_str())).cyan());
+                            spans.push(Span::raw(input[tmp_index..range.start].to_string()));
+                            spans.push(Span::raw(sub_match.as_str().to_owned()).cyan());
 
                             tmp_index = range.end;
                         }
