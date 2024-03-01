@@ -1,3 +1,4 @@
+use lazy_static::lazy_static;
 use ratatui::prelude::{Line, Modifier, Span};
 use ratatui::style::Stylize;
 use serde::{Deserialize, Serialize};
@@ -5,14 +6,14 @@ use tui_tree_widget::TreeItem;
 use crate::request::auth::{Auth};
 use crate::request::body::ContentType;
 use crate::request::method::Method;
-use crate::utils::stateful_custom_table::Param;
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
 pub struct Request {
     pub name: String,
     pub url: String,
     pub method: Method,
-    pub params: Vec<Param>,
+    pub params: Vec<KeyValue>,
+    pub headers: Vec<KeyValue>,
     pub body: ContentType,
     pub auth: Auth,
 
@@ -21,6 +22,37 @@ pub struct Request {
 
     #[serde(skip)]
     pub is_pending: bool
+}
+
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
+pub struct KeyValue {
+    pub enabled: bool,
+    pub data: (String, String)
+}
+
+lazy_static! {
+    pub static ref DEFAULT_HEADERS: Vec<KeyValue> = vec![
+        KeyValue {
+            enabled: true,
+            data: (String::from("cache-control"), String::from("no-cache")),
+        },
+        KeyValue {
+            enabled: true,
+            data: (String::from("user-agent"), format!("ATAC/v{}", env!("CARGO_PKG_VERSION"))),
+        },
+        KeyValue {
+            enabled: true,
+            data: (String::from("accept"), String::from("*/*")),
+        },
+        KeyValue {
+            enabled: true,
+            data: (String::from("accept-encoding"), String::from("gzip, deflate, br")),
+        },
+        KeyValue {
+            enabled: true,
+            data: (String::from("connection"), String::from("keep-alive")),
+        },
+    ];
 }
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
@@ -88,5 +120,34 @@ impl Request {
         }
 
         return base_url;
+    }
+
+    pub fn find_and_delete_header(&mut self, input_header: &str) {
+        let index = self.headers.iter().position(|header| header.data.0 == input_header);
+
+        match index {
+            None => {}
+            Some(index) => {
+                self.headers.remove(index);
+            }
+        }
+    }
+
+    pub fn modify_or_create_header(&mut self, input_header: &str, value: &str) {
+        let mut header_was_found = false;
+
+        for header in &mut self.headers {
+            if &header.data.0 == input_header {
+                header.data.1 = value.to_string();
+                header_was_found = true;
+            }
+        }
+
+        if !header_was_found {
+            self.headers.push(KeyValue {
+                enabled: true,
+                data: (input_header.to_string(), value.to_string()),
+            })
+        }
     }
 }

@@ -49,12 +49,14 @@ pub struct App<'a> {
 
     pub url_text_input: TextInput,
 
-    pub request_param_table: StatefulCustomTable,
+    pub query_params_table: StatefulCustomTable,
 
     pub auth_text_input_selection: TextInputSelection,
     pub auth_basic_username_text_input: TextInput,
     pub auth_basic_password_text_input: TextInput,
     pub auth_bearer_token_text_input: TextInput,
+
+    pub headers_table: StatefulCustomTable,
 
     pub body_text_area: TextArea<'a>,
 
@@ -101,12 +103,14 @@ impl App<'_> {
             
             url_text_input: TextInput::default(),
 
-            request_param_table: StatefulCustomTable::default(),
+            query_params_table: StatefulCustomTable::default(),
 
             auth_text_input_selection: TextInputSelection::default(),
             auth_basic_username_text_input: TextInput::default(),
             auth_basic_password_text_input: TextInput::default(),
             auth_bearer_token_text_input: TextInput::default(),
+
+            headers_table: StatefulCustomTable::default(),
 
             body_text_area: TextArea::default(),
 

@@ -10,8 +10,7 @@ use crate::request::auth::{next_auth};
 use crate::request::auth::Auth::*;
 use crate::request::body::{ContentType, next_content_type};
 use crate::request::method::next_method;
-use crate::request::request::Request;
-use crate::utils::stateful_custom_table::Param;
+use crate::request::request::{KeyValue, Request};
 
 impl App<'_> {
     pub fn get_selected_request_as_local(&self) -> Arc<RwLock<Request>> {
@@ -47,7 +46,7 @@ impl App<'_> {
             }
 
 
-            let mut new_params_to_add: Vec<Param> = vec![];
+            let mut new_params_to_add: Vec<KeyValue> = vec![];
             let mut existing_params_found_indexes: Vec<usize> = vec![];
 
             let query_params_pattern = Regex::new(r"(&?([^=]+)=([^&]+))").unwrap();
@@ -64,7 +63,7 @@ impl App<'_> {
                 }
 
                 if !url_param_found {
-                    let new_param = Param {
+                    let new_param = KeyValue {
                         enabled: true,
                         data: (param_name.to_string(), value.to_string()),
                     };
@@ -89,7 +88,7 @@ impl App<'_> {
         }
 
         // In case new params were inputted or deleted
-        self.update_params_selection();
+        self.update_query_params_selection();
 
         self.save_collection_to_file(selected_request_index.0);
         self.select_request_state();
@@ -112,27 +111,28 @@ impl App<'_> {
     }
 
     /* PARAMS */
+
     /// Reset selection of if params are provided, either set it to none
-    pub fn update_params_selection(&mut self) {
+    pub fn update_query_params_selection(&mut self) {
         let local_selected_request = self.get_selected_request_as_local();
         let selected_request = local_selected_request.read().unwrap();
 
         match !selected_request.params.is_empty() {
             true => {
-                self.request_param_table.selection = Some((0, 0));
-                self.request_param_table.left_state.select(Some(0));
-                self.request_param_table.right_state.select(Some(0));
+                self.query_params_table.selection = Some((0, 0));
+                self.query_params_table.left_state.select(Some(0));
+                self.query_params_table.right_state.select(Some(0));
             },
             false => {
-                self.request_param_table.selection = None;
-                self.request_param_table.left_state.select(None);
-                self.request_param_table.right_state.select(None);
+                self.query_params_table.selection = None;
+                self.query_params_table.left_state.select(None);
+                self.query_params_table.right_state.select(None);
             }
         }
     }
 
-    pub fn toggle_params_table_row(&mut self) {
-        if self.request_param_table.rows.is_empty() {
+    pub fn toggle_query_param(&mut self) {
+        if self.query_params_table.rows.is_empty() {
             return;
         }
 
@@ -142,7 +142,7 @@ impl App<'_> {
         {
             let mut selected_request = local_selected_request.write().unwrap();
 
-            let row = self.request_param_table.selection.unwrap().0;
+            let row = self.query_params_table.selection.unwrap().0;
             selected_request.params[row].enabled = !selected_request.params[row].enabled;
         }
 
@@ -150,15 +150,15 @@ impl App<'_> {
         self.update_inputs();
     }
 
-    pub fn modify_request_param(&mut self) {
+    pub fn modify_request_query_param(&mut self) {
         let selected_request_index = &self.collections_tree.selected.unwrap();
         let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
 
         {
             let mut selected_request = local_selected_request.write().unwrap();
 
-            let selection = self.request_param_table.selection.unwrap();
-            let input_text = &self.request_param_table.param_selection_text_input.text;
+            let selection = self.query_params_table.selection.unwrap();
+            let input_text = &self.query_params_table.selection_text_input.text;
 
             match selection {
                 (_, 0) => selected_request.params[selection.0].data.0 = input_text.clone(),
@@ -169,6 +169,41 @@ impl App<'_> {
 
         self.save_collection_to_file(selected_request_index.0);
         self.select_request_state();
+    }
+
+
+    pub fn create_new_query_param(&mut self) {
+        let local_selected_request = self.get_selected_request_as_local();
+
+        {
+            let mut selected_request = local_selected_request.write().unwrap();
+
+            selected_request.params.push(KeyValue {
+                enabled: true,
+                data: (String::from("param"), String::from("value"))
+            });
+        }
+
+        self.update_query_params_selection();
+        self.update_inputs();
+    }
+
+    pub fn delete_query_param(&mut self) {
+        if self.query_params_table.selection.is_none() {
+            return;
+        }
+
+        let local_selected_request = self.get_selected_request_as_local();
+
+        {
+            let mut selected_request = local_selected_request.write().unwrap();
+
+            let selection = self.query_params_table.selection.unwrap();
+            selected_request.params.remove(selection.0);
+        }
+
+        self.update_query_params_selection();
+        self.update_inputs();
     }
 
     /* AUTH */
@@ -268,6 +303,101 @@ impl App<'_> {
         self.select_request_state();
     }
 
+    /* HEADERS */
+
+    /// Reset selection of if headers are provided, either set it to none
+    pub fn update_headers_selection(&mut self) {
+        let local_selected_request = self.get_selected_request_as_local();
+        let selected_request = local_selected_request.read().unwrap();
+
+        match !selected_request.headers.is_empty() {
+            true => {
+                self.headers_table.selection = Some((0, 0));
+                self.headers_table.left_state.select(Some(0));
+                self.headers_table.right_state.select(Some(0));
+            },
+            false => {
+                self.headers_table.selection = None;
+                self.headers_table.left_state.select(None);
+                self.headers_table.right_state.select(None);
+            }
+        }
+    }
+
+    pub fn toggle_header(&mut self) {
+        if self.headers_table.rows.is_empty() {
+            return;
+        }
+
+        let selected_request_index = &self.collections_tree.selected.unwrap();
+        let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
+
+        {
+            let mut selected_request = local_selected_request.write().unwrap();
+
+            let row = self.headers_table.selection.unwrap().0;
+            selected_request.headers[row].enabled = !selected_request.headers[row].enabled;
+        }
+
+        self.save_collection_to_file(selected_request_index.0);
+        self.update_inputs();
+    }
+
+    pub fn modify_request_header(&mut self) {
+        let selected_request_index = &self.collections_tree.selected.unwrap();
+        let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
+
+        {
+            let mut selected_request = local_selected_request.write().unwrap();
+
+            let selection = self.headers_table.selection.unwrap();
+            let input_text = &self.headers_table.selection_text_input.text;
+
+            match selection {
+                (_, 0) => selected_request.headers[selection.0].data.0 = input_text.clone(),
+                (_, 1) => selected_request.headers[selection.0].data.1 = input_text.clone(),
+                (_, _) => {}
+            };
+        }
+
+        self.save_collection_to_file(selected_request_index.0);
+        self.select_request_state();
+    }
+
+    pub fn create_new_header(&mut self) {
+        let local_selected_request = self.get_selected_request_as_local();
+
+        {
+            let mut selected_request = local_selected_request.write().unwrap();
+
+            selected_request.headers.push(KeyValue {
+                enabled: true,
+                data: (String::from("header"), String::from("value"))
+            });
+        }
+
+        self.update_headers_selection();
+        self.update_inputs();
+    }
+
+    pub fn delete_header(&mut self) {
+        if self.headers_table.selection.is_none() {
+            return;
+        }
+
+        let local_selected_request = self.get_selected_request_as_local();
+
+        {
+            let mut selected_request = local_selected_request.write().unwrap();
+
+            let selection = self.headers_table.selection.unwrap();
+            selected_request.headers.remove(selection.0);
+        }
+
+        self.update_headers_selection();
+        self.update_inputs();
+    }
+
     /* BODY */
 
     pub fn refresh_body_textarea(&mut self, text: String) {
@@ -310,6 +440,18 @@ impl App<'_> {
             let mut selected_request = local_selected_request.write().unwrap();
 
             selected_request.body = next_content_type(&selected_request.body);
+
+            match &selected_request.body {
+                // Removes Content-Type header if there is no more body
+                ContentType::NoBody => {
+                    selected_request.find_and_delete_header(CONTENT_TYPE.as_str())
+                }
+                // Create or replace Content-Type header with new body content type
+                ContentType::Raw(_) | ContentType::Json(_) | ContentType::Xml(_) | ContentType::Html(_) => {
+                    let content_type = &selected_request.body.to_content_type();
+                    selected_request.modify_or_create_header(CONTENT_TYPE.as_str(), content_type)
+                }
+            }
         }
 
         self.load_request_body_param_tab();
@@ -419,11 +561,22 @@ impl App<'_> {
             match &selected_request.body {
                 ContentType::NoBody => {},
                 ContentType::Raw(body) | ContentType::Json(body) | ContentType::Xml(body) | ContentType::Html(body) => {
-                    request = request
-                        .header(CONTENT_TYPE, selected_request.body.to_content_type())
-                        .body(body.to_string());
+                    request = request.body(body.to_string());
                 }
             };
+
+            /* HEADERS */
+
+            for header in &selected_request.headers {
+                if !header.enabled {
+                    continue;
+                }
+
+                let header_name = self.replace_env_keys_by_value(&header.data.0);
+                let header_value = self.replace_env_keys_by_value(&header.data.1);
+
+                request = request.header(header_name, header_value);
+            }
 
             let local_selected_request = self.get_selected_request_as_local();
 

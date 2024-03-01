@@ -50,7 +50,10 @@ impl App<'_> {
                         NoAuth => tab.to_string(),
                         BasicAuth(_, _) | BearerToken(_) => format!("{} ({})", tab.to_string(), request.auth.to_string())
                     },
-                    RequestParamsTabs::Headers => tab.to_string(),
+                    RequestParamsTabs::Headers => match request.headers.is_empty() {
+                        true => tab.to_string(),
+                        false => format!("{} ({})", tab.to_string(), request.headers.len())
+                    },
                     RequestParamsTabs::Body => match request.body {
                         NoBody => tab.to_string(),
                         Raw(_) | Json(_) | Xml(_) | Html(_) => format!("{} ({})", tab.to_string(), request.body.to_string())
@@ -74,7 +77,7 @@ impl App<'_> {
 
         match self.request_param_tab {
             RequestParamsTabs::QueryParams => {
-                match self.request_param_table.selection {
+                match self.query_params_table.selection {
                     None => {
                         let params_lines = vec![
                             Line::default(),
@@ -112,7 +115,24 @@ impl App<'_> {
                     }
                 }
             }
-            RequestParamsTabs::Headers => {}
+            RequestParamsTabs::Headers => {
+                match self.headers_table.selection {
+                    None => {
+                        let headers_lines = vec![
+                            Line::default(),
+                            Line::from("Default headers"),
+                            Line::from("(Add one with n)".dark_gray())
+                        ];
+
+                        let headers_paragraph = Paragraph::new(headers_lines).centered();
+
+                        frame.render_widget(headers_paragraph, request_params_layout[1]);
+                    },
+                    Some(header_selection) => {
+                        self.render_headers_tab(frame, request_params_layout[1], request, header_selection);
+                    }
+                }
+            }
             RequestParamsTabs::Body => {
                 match &request.body {
                     NoBody => {

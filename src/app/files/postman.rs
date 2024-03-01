@@ -1,15 +1,14 @@
 use std::path::PathBuf;
 use std::str::FromStr;
 use std::sync::{Arc, RwLock};
-use postman_collection::v2_1_0::{AuthType, Body, Items, Language, Mode, RequestClass, RequestUnion, Url};
+use postman_collection::v2_1_0::{AuthType, Body, HeaderUnion, Items, Language, Mode, RequestClass, RequestUnion, Url};
 use crate::app::app::App;
 use crate::app::startup::args::ARGS;
 use crate::request::auth::Auth;
 use crate::request::body::ContentType;
 use crate::request::collection::Collection;
 use crate::request::method::Method;
-use crate::request::request::Request;
-use crate::utils::stateful_custom_table::Param;
+use crate::request::request::{DEFAULT_HEADERS, KeyValue, Request};
 
 
 impl App<'_> {
@@ -196,6 +195,13 @@ fn parse_request(item: Items) -> Request {
                 None => {}
                 Some(content_type) => request.body = content_type
             }
+
+            /* HEADERS */
+
+            match retrieve_headers(&request_class) {
+                None => {}
+                Some(headers) => request.headers = headers
+            }
         }
         RequestUnion::String(_) => {}
     }
@@ -203,16 +209,16 @@ fn parse_request(item: Items) -> Request {
     return request;
 }
 
-fn retrieve_query_params(request_class: &RequestClass) -> Option<Vec<Param>> {
+fn retrieve_query_params(request_class: &RequestClass) -> Option<Vec<KeyValue>> {
     let url = request_class.url.clone()?;
 
     match url {
         Url::String(_) => None,
         Url::UrlClass(url_class) => {
-            let mut query_params: Vec<Param> = vec![];
+            let mut query_params: Vec<KeyValue> = vec![];
 
             for query_param in url_class.query? {
-                query_params.push(Param {
+                query_params.push(KeyValue {
                     enabled: !query_param.disabled.unwrap_or(false), // Set default to enabled
                     data: (query_param.key?, query_param.value?),
                 })
@@ -299,5 +305,25 @@ fn retrieve_auth(request_class: &RequestClass) -> Option<Auth> {
         AuthType::Ntlm => None,
         AuthType::Oauth1 => None,
         AuthType::Oauth2 => None,
+    }
+}
+
+fn retrieve_headers(request_class: &RequestClass) -> Option<Vec<KeyValue>> {
+    let headers = request_class.header.clone()?;
+
+    let mut headers_to_return: Vec<KeyValue> = DEFAULT_HEADERS.clone();
+
+    match headers {
+        HeaderUnion::HeaderArray(headers) => {
+            for header in headers {
+                headers_to_return.push(KeyValue {
+                    enabled: !header.disabled.unwrap_or(false),
+                    data: (header.key, header.value),
+                })
+            }
+
+            Some(headers_to_return)
+        }
+        HeaderUnion::String(_) => None
     }
 }

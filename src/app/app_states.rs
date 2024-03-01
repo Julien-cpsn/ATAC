@@ -44,6 +44,9 @@ pub enum AppState {
     #[strum(to_string = "Editing request auth bearer token")]
     EditingRequestAuthBearerToken,
 
+    #[strum(to_string = "Editing request header")]
+    EditingRequestHeader,
+
     #[strum(to_string = "Editing request body")]
     EditingRequestBody
 }
@@ -144,6 +147,8 @@ impl App<'_> {
             EditingRequestParam => String::from(TEXT_INPUT_KEYS),
 
             EditingRequestAuthUsername | EditingRequestAuthPassword | EditingRequestAuthBearerToken => String::from(TEXT_INPUT_KEYS),
+
+            EditingRequestHeader => String::from(TEXT_INPUT_KEYS),
 
             EditingRequestBody => String::from("Esc Enter Tab ^(s)ave ↑ ↓ ← → copy paste"),
         }

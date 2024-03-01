@@ -60,6 +60,11 @@ impl App<'_> {
         self.state = AppState::EditingRequestAuthBearerToken;
     }
 
+    pub fn edit_request_header_state(&mut self) {
+        self.state = AppState::EditingRequestHeader;
+        self.update_inputs();
+    }
+
     pub fn edit_request_body_state(&mut self) {
         self.request_param_tab = RequestParamsTabs::Body;
 

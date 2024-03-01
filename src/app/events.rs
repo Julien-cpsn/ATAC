@@ -103,15 +103,15 @@ impl App<'_> {
                             // Param tabs
                             match self.request_param_tab {
                                 RequestParamsTabs::QueryParams => match key.code {
-                                    KeyCode::Enter if !control_pressed && self.request_param_table.is_selected() => self.edit_request_param_state(),
+                                    KeyCode::Enter if !control_pressed && self.query_params_table.is_selected() => self.edit_request_param_state(),
 
-                                    KeyCode::Up => self.request_param_table.up(),
-                                    KeyCode::Down => self.request_param_table.down(),
-                                    KeyCode::Left | KeyCode::Right => self.request_param_table.change_y(),
+                                    KeyCode::Up => self.query_params_table.up(),
+                                    KeyCode::Down => self.query_params_table.down(),
+                                    KeyCode::Left | KeyCode::Right => self.query_params_table.change_y(),
 
                                     KeyCode::Char('n') => self.create_new_query_param(),
                                     KeyCode::Char('d') => self.delete_query_param(),
-                                    KeyCode::Char('t') => self.toggle_params_table_row(),
+                                    KeyCode::Char('t') => self.toggle_query_param(),
 
                                     _ => {}
                                 },
@@ -123,7 +123,19 @@ impl App<'_> {
 
                                     _ => {}
                                 }
-                                RequestParamsTabs::Headers => {}
+                                RequestParamsTabs::Headers => match key.code {
+                                    KeyCode::Enter if !control_pressed && self.headers_table.is_selected() => self.edit_request_header_state(),
+
+                                    KeyCode::Up => self.headers_table.up(),
+                                    KeyCode::Down => self.headers_table.down(),
+                                    KeyCode::Left | KeyCode::Right => self.headers_table.change_y(),
+
+                                    KeyCode::Char('n') => self.create_new_header(),
+                                    KeyCode::Char('d') => self.delete_header(),
+                                    KeyCode::Char('t') => self.toggle_header(),
+
+                                    _ => {}
+                                },
                                 RequestParamsTabs::Body => match key.code {
                                     KeyCode::Enter if !control_pressed => self.edit_request_body_state(),
                                     _ => {}
@@ -137,10 +149,12 @@ impl App<'_> {
 
                                 KeyCode::Char('e') => self.next_environment(),
 
-                                KeyCode::Char('p') if !control_pressed => self.load_request_query_params_tab(),
+                                KeyCode::Char('p') => self.load_request_query_params_tab(),
 
                                 KeyCode::Char('a') if control_pressed => self.modify_request_auth(),
                                 KeyCode::Char('a') => self.load_request_auth_param_tab(),
+
+                                KeyCode::Char('h') => self.load_request_headers_tab(),
 
                                 KeyCode::Char('b') if control_pressed => self.modify_request_content_type(),
                                 KeyCode::Char('b') => self.load_request_body_param_tab(),
@@ -176,15 +190,15 @@ impl App<'_> {
                         },
 
                         AppState::EditingRequestParam => match key.code {
-                            KeyCode::Char(char) => self.request_param_table.param_selection_text_input.enter_char(char),
+                            KeyCode::Char(char) => self.query_params_table.selection_text_input.enter_char(char),
 
                             KeyCode::Esc => self.select_request_state(),
-                            KeyCode::Enter => self.modify_request_param(),
+                            KeyCode::Enter => self.modify_request_query_param(),
 
-                            KeyCode::Delete => self.request_param_table.param_selection_text_input.delete_char_forward(),
-                            KeyCode::Backspace => self.request_param_table.param_selection_text_input.delete_char_backward(),
-                            KeyCode::Left => self.request_param_table.param_selection_text_input.move_cursor_left(),
-                            KeyCode::Right => self.request_param_table.param_selection_text_input.move_cursor_right(),
+                            KeyCode::Delete => self.query_params_table.selection_text_input.delete_char_forward(),
+                            KeyCode::Backspace => self.query_params_table.selection_text_input.delete_char_backward(),
+                            KeyCode::Left => self.query_params_table.selection_text_input.move_cursor_left(),
+                            KeyCode::Right => self.query_params_table.selection_text_input.move_cursor_right(),
 
                             _ => miss_input = true
                         }
@@ -227,6 +241,20 @@ impl App<'_> {
                             KeyCode::Backspace => self.auth_bearer_token_text_input.delete_char_backward(),
                             KeyCode::Left => self.auth_bearer_token_text_input.move_cursor_left(),
                             KeyCode::Right => self.auth_bearer_token_text_input.move_cursor_right(),
+
+                            _ => miss_input = true
+                        }
+
+                        AppState::EditingRequestHeader => match key.code {
+                            KeyCode::Char(char) => self.headers_table.selection_text_input.enter_char(char),
+
+                            KeyCode::Esc => self.select_request_state(),
+                            KeyCode::Enter => self.modify_request_header(),
+
+                            KeyCode::Delete => self.headers_table.selection_text_input.delete_char_forward(),
+                            KeyCode::Backspace => self.headers_table.selection_text_input.delete_char_backward(),
+                            KeyCode::Left => self.headers_table.selection_text_input.move_cursor_left(),
+                            KeyCode::Right => self.headers_table.selection_text_input.move_cursor_right(),
 
                             _ => miss_input = true
                         }

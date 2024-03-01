@@ -1,5 +1,5 @@
 use ratatui::widgets::{ListState};
-use serde::{Deserialize, Serialize};
+use crate::request::request::KeyValue;
 use crate::utils::text_input::TextInput;
 
 #[derive(Default)]
@@ -8,14 +8,8 @@ pub struct StatefulCustomTable {
     pub right_state: ListState,
     /// (x, y)
     pub selection: Option<(usize, usize)>,
-    pub rows: Vec<Param>,
-    pub param_selection_text_input: TextInput,
-}
-
-#[derive(Default, Debug, Clone, Serialize, Deserialize)]
-pub struct Param {
-    pub enabled: bool,
-    pub data: (String, String)
+    pub rows: Vec<KeyValue>,
+    pub selection_text_input: TextInput,
 }
 
 impl StatefulCustomTable {
