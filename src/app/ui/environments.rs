@@ -6,10 +6,7 @@ use crate::app::app::App;
 
 impl<'a> App<'a> {
     pub(super) fn render_environments(&mut self, frame: &mut Frame, rect: Rect) {
-        let current_environment = match self.environments.get(self.selected_environment) {
-            None => "None",
-            Some(env) => &env.name
-        };
+        let current_environment = self.environments.get(self.selected_environment).unwrap().name.as_str();
 
         let current_environment_paragraph = Paragraph::new(current_environment)
             .block(

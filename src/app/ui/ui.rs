@@ -48,22 +48,41 @@ impl App<'_> {
 
         // LEFT LAYOUT
 
-        let env_and_collections_layout = Layout::new(
-            Vertical,
-            [
-                Constraint::Length(3),
-                Constraint::Fill(1)
-            ]
-        )
-            .split(inner_layout[0]);
+        match self.environments.is_empty() {
+            // No environments
+            true => {
+                let env_and_collections_layout = Layout::new(
+                    Vertical,
+                    [
+                        Constraint::Fill(1)
+                    ]
+                )
+                    .split(inner_layout[0]);
 
-        // ENVIRONMENTS
+                // COLLECTION
 
-        self.render_environments(frame, env_and_collections_layout[0]);
+                self.render_collections(frame, env_and_collections_layout[0]);
+            }
+            // At least one environment
+            false => {
+                let env_and_collections_layout = Layout::new(
+                    Vertical,
+                    [
+                        Constraint::Length(3),
+                        Constraint::Fill(1)
+                    ]
+                )
+                    .split(inner_layout[0]);
 
-        // COLLECTION
+                // ENVIRONMENTS
 
-        self.render_collections(frame, env_and_collections_layout[1]);
+                self.render_environments(frame, env_and_collections_layout[0]);
+
+                // COLLECTION
+
+                self.render_collections(frame, env_and_collections_layout[1]);
+            }
+        }
 
         // REQUEST
 
