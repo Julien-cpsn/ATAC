@@ -97,6 +97,7 @@ cargo run -- -h
 - Configuration file
   - **HTTP and HTTPS proxy**
 - **Postman collection v2.1.0 import**
+- **Environment variables** along .env file support
 - Permanent keymap help & application state
 - **3 request views**
   - 50% params / 50% response
@@ -109,7 +110,6 @@ cargo run -- -h
   - Headers management
   - Cookies management
   - Insomnia import
-  - Environments (maybe .env files?, with autocompletion)
   - Create a repo wiki
   - Document whole code
 
@@ -125,6 +125,9 @@ cargo run -- -h
   - Body & result syntax highlighting
   - Export a request to other code formats (curl, PHP, JS, Rust, ...)
   - Pre and post-request script
+
+- **To improve**
+  - Auto-completion on env file variables
 
 ## Documentation
 
