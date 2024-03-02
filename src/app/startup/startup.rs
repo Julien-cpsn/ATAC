@@ -1,3 +1,5 @@
+use std::fs;
+use std::fs::OpenOptions;
 use crate::app::app::App;
 use crate::app::startup::args::{ARGS, Command};
 
@@ -18,6 +20,9 @@ impl App<'_> {
     }
 
     pub fn parse_app_directory(&mut self) {
+        // Create the app directory if it does not exist
+        fs::create_dir_all(&ARGS.directory).expect(&format!("Could not create directory \"{}\"", ARGS.directory.display()));
+        
         let paths = ARGS.directory.read_dir().expect(&format!("Directory \"{}\" not found", ARGS.directory.display()));
 
         let mut was_config_file_parsed = false;
@@ -53,6 +58,15 @@ impl App<'_> {
             println!();
         }
 
+        self.log_file = Some(
+            OpenOptions::new()
+                .write(true)
+                .create(true)
+                .truncate(true)
+                .open(ARGS.directory.join("atac.log"))
+                .expect("Could not open log file")
+        );
+        
         if !was_config_file_parsed {
             self.parse_config_file(ARGS.directory.join("atac.toml"));
         }

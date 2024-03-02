@@ -29,7 +29,7 @@ pub struct App<'a> {
 
     pub config: Config,
 
-    pub log_file: File,
+    pub log_file: Option<File>,
 
     pub environments: Vec<Environment>,
     pub selected_environment: usize,
@@ -73,12 +73,7 @@ impl App<'_> {
 
             config: Config::default(),
 
-            log_file: OpenOptions::new()
-                .write(true)
-                .create(true)
-                .truncate(true)
-                .open(ARGS.directory.join("atac.log"))
-                .expect("Could not open log file"),
+            log_file: None,
 
             environments: vec![],
             selected_environment: 0,
