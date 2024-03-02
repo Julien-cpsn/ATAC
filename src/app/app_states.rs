@@ -101,13 +101,25 @@ impl App<'_> {
 
     pub fn get_available_keys(&self) -> String {
         match self.state {
-            Normal => String::from("(q)uit or ^c ↑ ↓ ← → Enter (c)ollection (r)equest (d)elete (e)nv"),
+            Normal => {
+                let mut base_keys = String::from("(q)uit or ^c ↑ ↓ ← → Enter (c)ollection (r)equest (d)elete");
+
+                if !self.environments.is_empty() {
+                    base_keys += " (e)nv";
+                }
+
+                base_keys
+            },
 
             SelectedRequest => {
                 let local_selected_request = self.get_selected_request_as_local();
                 let selected_request = local_selected_request.read().unwrap();
 
-                let mut base_keys = String::from("Esc ^Enter ^TAB (u)rl (m)ethod (p)arams ^(a)uth (h)eaders ^(b)ody (e)nv");
+                let mut base_keys = String::from("Esc ^Enter or (s)end ^TAB (u)rl (m)ethod (p)arams ^(a)uth (h)eaders ^(b)ody");
+
+                if !self.environments.is_empty() {
+                    base_keys += " (e)nv";
+                }
 
                 let additional_keys = match self.request_param_tab {
                     RequestParamsTabs::QueryParams => match selected_request.params.is_empty() {
