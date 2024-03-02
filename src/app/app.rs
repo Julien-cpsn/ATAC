@@ -1,4 +1,4 @@
-use std::fs::{File, OpenOptions};
+use std::fs::{File};
 use std::time::Duration;
 use crossterm::terminal::{disable_raw_mode};
 use ratatui::backend::Backend;
@@ -11,7 +11,6 @@ use crate::app::files::config::Config;
 use crate::app::ui::param_tabs::param_tabs::RequestParamsTabs;
 use crate::app::ui::result_tabs::RequestResultTabs;
 use crate::app::ui::views::RequestView;
-use crate::app::startup::args::ARGS;
 use crate::request::collection::Collection;
 use crate::request::environment::Environment;
 use crate::utils::stateful_scrollbar::StatefulScrollbar;
