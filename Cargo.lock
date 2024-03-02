@@ -94,7 +94,7 @@ dependencies = [
 
 [[package]]
 name = "atac"
-version = "0.8.0"
+version = "0.8.1"
 dependencies = [
  "clap",
  "crossterm",
