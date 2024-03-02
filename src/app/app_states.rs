@@ -107,7 +107,7 @@ impl App<'_> {
                 let local_selected_request = self.get_selected_request_as_local();
                 let selected_request = local_selected_request.read().unwrap();
 
-                let mut base_keys = String::from("Esc ^Enter ^TAB (u)rl (m)ethod (p)arams ^(a)uth ^(b)ody (e)nv");
+                let mut base_keys = String::from("Esc ^Enter ^TAB (u)rl (m)ethod (p)arams ^(a)uth (h)eaders ^(b)ody (e)nv");
 
                 let additional_keys = match self.request_param_tab {
                     RequestParamsTabs::QueryParams => match selected_request.params.is_empty() {
@@ -119,7 +119,10 @@ impl App<'_> {
                         Auth::BasicAuth(_, _) => Some("↑ ↓ Enter"),
                         Auth::BearerToken(_) => Some("Enter"),
                     },
-                    RequestParamsTabs::Headers => None,
+                    RequestParamsTabs::Headers => match selected_request.headers.is_empty() {
+                        true => Some("(n)ew header"),
+                        false => Some("↑ ↓ ← → Enter (n)ew (d)elete (t)oggle")
+                    },
                     RequestParamsTabs::Body => match selected_request.body {
                         ContentType::NoBody => None,
                         ContentType::Raw(_) | ContentType::Json(_) | ContentType::Xml(_) | ContentType::Html(_) => Some("Enter"),
