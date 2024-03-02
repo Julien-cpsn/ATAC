@@ -130,6 +130,10 @@ cargo run -- -h
 - **To improve**
   - Auto-completion on env file variables
 
+### Ideas (will think about it later)
+
+- Base URL on collection
+
 ## Documentation
 
 > [!NOTE]
