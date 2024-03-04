@@ -4,6 +4,7 @@ use crate::app::startup::args::ARGS;
 use crate::request::auth::Auth;
 use crate::request::collection::Collection;
 use crate::request::request::{DEFAULT_HEADERS, Request};
+use crate::request::settings::RequestSettings;
 
 impl App<'_> {
     pub fn reset_inputs(&mut self) {
@@ -127,6 +128,11 @@ impl App<'_> {
         let new_request = Request {
             name: new_request_name.clone(),
             headers: DEFAULT_HEADERS.clone(),
+            settings: RequestSettings {
+                use_config_proxy: true,
+                allow_redirects: true,
+                store_received_cookies: true,
+            },
             ..Default::default()
         };
 

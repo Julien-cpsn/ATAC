@@ -6,6 +6,7 @@ use tui_tree_widget::TreeItem;
 use crate::request::auth::{Auth};
 use crate::request::body::ContentType;
 use crate::request::method::Method;
+use crate::request::settings::RequestSettings;
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
 pub struct Request {
@@ -16,6 +17,7 @@ pub struct Request {
     pub headers: Vec<KeyValue>,
     pub body: ContentType,
     pub auth: Auth,
+    pub settings: RequestSettings,
 
     #[serde(skip)]
     pub result: RequestResult,

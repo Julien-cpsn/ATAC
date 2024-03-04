@@ -162,6 +162,8 @@ impl App<'_> {
                                 KeyCode::Char('u') => self.edit_request_url_state(),
                                 KeyCode::Char('m') => self.modify_request_method(),
 
+                                KeyCode::Char('s') => self.edit_request_settings_state(),
+
                                 KeyCode::PageUp => self.result_scrollbar.page_up(),
                                 KeyCode::PageDown => self.result_scrollbar.page_down(),
 
@@ -295,6 +297,19 @@ impl App<'_> {
                             KeyCode::Down => self.body_text_area.move_cursor(CursorMove::Bottom),
                             KeyCode::Right => self.body_text_area.move_cursor(CursorMove::Forward),
                             KeyCode::Left => self.body_text_area.move_cursor(CursorMove::Back),
+
+                            _ => miss_input = true
+                        },
+
+                        AppState::EditingRequestSettings => match key.code {
+                            KeyCode::Esc => self.select_request_state(),
+
+                            KeyCode::Enter => self.modify_request_settings(),
+
+                            KeyCode::Up => self.request_settings_popup.previous(),
+                            KeyCode::Down => self.request_settings_popup.next(),
+                            KeyCode::Left => self.request_settings_popup.toggle_setting(),
+                            KeyCode::Right => self.request_settings_popup.toggle_setting(),
 
                             _ => miss_input = true
                         },

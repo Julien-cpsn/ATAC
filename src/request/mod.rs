@@ -4,3 +4,4 @@ pub mod body;
 pub mod auth;
 pub mod collection;
 pub mod environment;
+pub mod settings;

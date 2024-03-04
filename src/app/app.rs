@@ -13,6 +13,7 @@ use crate::app::ui::result_tabs::RequestResultTabs;
 use crate::app::ui::views::RequestView;
 use crate::request::collection::Collection;
 use crate::request::environment::Environment;
+use crate::utils::settings_popup::SettingsPopup;
 use crate::utils::stateful_scrollbar::StatefulScrollbar;
 use crate::utils::stateful_custom_table::{StatefulCustomTable};
 use crate::utils::stateful_tree::StatefulTree;
@@ -58,6 +59,8 @@ pub struct App<'a> {
     pub headers_table: StatefulCustomTable,
 
     pub body_text_area: TextArea<'a>,
+
+    pub request_settings_popup: SettingsPopup,
 
     pub result_throbber_state: ThrobberState,
     pub result_scrollbar: StatefulScrollbar
@@ -108,6 +111,8 @@ impl App<'_> {
 
             body_text_area: TextArea::default(),
 
+            request_settings_popup: SettingsPopup::default(),
+            
             result_throbber_state: ThrobberState::default(),
             result_scrollbar: StatefulScrollbar::default(),
         }

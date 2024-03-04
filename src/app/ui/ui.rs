@@ -95,16 +95,6 @@ impl App<'_> {
             }
         }
 
-        // POPUPS
-
-        match self.state {
-            CreatingNewCollection => self.render_creating_new_collection_popup(frame),
-            CreatingNewRequest => self.render_creating_new_request_popup(frame),
-            DeletingCollection => self.render_deleting_collection_popup(frame),
-            DeletingRequest => self.render_deleting_request_popup(frame),
-            _ => {}
-        }
-
         // FOOTER
 
         let state_line = self.get_state_line();
@@ -115,6 +105,17 @@ impl App<'_> {
             .title(Title::from(available_keys.dark_gray()).alignment(Alignment::Right));
 
         frame.render_widget(footer, main_layout[2]);
+
+        // POPUPS
+
+        match self.state {
+            CreatingNewCollection => self.render_creating_new_collection_popup(frame),
+            CreatingNewRequest => self.render_creating_new_request_popup(frame),
+            DeletingCollection => self.render_deleting_collection_popup(frame),
+            DeletingRequest => self.render_deleting_request_popup(frame),
+            EditingRequestSettings => self.render_request_settings_popup(frame),
+            _ => {}
+        }
     }
 
     pub fn draw(&mut self, terminal: &mut Terminal<impl Backend>) -> std::io::Result<()> {

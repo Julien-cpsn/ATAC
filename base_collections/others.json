@@ -44,7 +44,70 @@
         }
       ],
       "body": "no_body",
-      "auth": "no_auth"
+      "auth": "no_auth",
+      "settings": {
+        "use_config_proxy": true,
+        "allow_redirects": true,
+        "store_received_cookies": true
+      }
+    },
+    {
+      "name": "Redirect to",
+      "url": "https://httpbin.org/redirect-to",
+      "method": "GET",
+      "params": [
+        {
+          "enabled": true,
+          "data": [
+            "url",
+            "https://google.com"
+          ]
+        }
+      ],
+      "headers": [
+        {
+          "enabled": true,
+          "data": [
+            "cache-control",
+            "no-cache"
+          ]
+        },
+        {
+          "enabled": true,
+          "data": [
+            "user-agent",
+            "ATAC/v0.8.1"
+          ]
+        },
+        {
+          "enabled": true,
+          "data": [
+            "accept",
+            "*/*"
+          ]
+        },
+        {
+          "enabled": true,
+          "data": [
+            "accept-encoding",
+            "gzip, deflate, br"
+          ]
+        },
+        {
+          "enabled": true,
+          "data": [
+            "connection",
+            "keep-alive"
+          ]
+        }
+      ],
+      "body": "no_body",
+      "auth": "no_auth",
+      "settings": {
+        "use_config_proxy": true,
+        "allow_redirects": true,
+        "store_received_cookies": true
+      }
     },
     {
       "name": "PNG Image",
@@ -89,7 +152,12 @@
         }
       ],
       "body": "no_body",
-      "auth": "no_auth"
+      "auth": "no_auth",
+      "settings": {
+        "use_config_proxy": true,
+        "allow_redirects": true,
+        "store_received_cookies": true
+      }
     },
     {
       "name": "Rust Homepage",
@@ -134,7 +202,12 @@
         }
       ],
       "body": "no_body",
-      "auth": "no_auth"
+      "auth": "no_auth",
+      "settings": {
+        "use_config_proxy": true,
+        "allow_redirects": true,
+        "store_received_cookies": true
+      }
     },
     {
       "name": "Google fr",
@@ -179,7 +252,12 @@
         }
       ],
       "body": "no_body",
-      "auth": "no_auth"
+      "auth": "no_auth",
+      "settings": {
+        "use_config_proxy": true,
+        "allow_redirects": true,
+        "store_received_cookies": true
+      }
     }
   ]
 }

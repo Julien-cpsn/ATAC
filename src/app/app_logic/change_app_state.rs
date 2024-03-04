@@ -78,4 +78,15 @@ impl App<'_> {
             }
         }
     }
+
+    pub fn edit_request_settings_state(&mut self) {
+        self.request_settings_popup.selection = 0;
+
+        let local_selected_request = self.get_selected_request_as_local();
+        let selected_request = local_selected_request.read().unwrap();
+
+        self.request_settings_popup.settings = selected_request.settings.to_vec();
+
+        self.state = AppState::EditingRequestSettings;
+    }
 }

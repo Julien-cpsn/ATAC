@@ -44,7 +44,12 @@
         }
       ],
       "body": "no_body",
-      "auth": "no_auth"
+      "auth": "no_auth",
+      "settings": {
+        "use_config_proxy": true,
+        "allow_redirects": true,
+        "store_received_cookies": true
+      }
     },
     {
       "name": "Test Post",
@@ -98,7 +103,12 @@
       "body": {
         "json": "{\n\t\"my_json\": 42\n}"
       },
-      "auth": "no_auth"
+      "auth": "no_auth",
+      "settings": {
+        "use_config_proxy": true,
+        "allow_redirects": true,
+        "store_received_cookies": true
+      }
     },
     {
       "name": "Test Put",
@@ -143,7 +153,12 @@
         }
       ],
       "body": "no_body",
-      "auth": "no_auth"
+      "auth": "no_auth",
+      "settings": {
+        "use_config_proxy": true,
+        "allow_redirects": true,
+        "store_received_cookies": true
+      }
     },
     {
       "name": "Test Delete",
@@ -188,7 +203,12 @@
         }
       ],
       "body": "no_body",
-      "auth": "no_auth"
+      "auth": "no_auth",
+      "settings": {
+        "use_config_proxy": true,
+        "allow_redirects": true,
+        "store_received_cookies": true
+      }
     },
     {
       "name": "Test Patch",
@@ -233,7 +253,12 @@
         }
       ],
       "body": "no_body",
-      "auth": "no_auth"
+      "auth": "no_auth",
+      "settings": {
+        "use_config_proxy": true,
+        "allow_redirects": true,
+        "store_received_cookies": true
+      }
     }
   ]
 }

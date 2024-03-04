@@ -94,6 +94,10 @@ cargo run -- -h
     - Cookies
     - Request duration
   - **Simultaneously send asynchronous requests**
+  - Settings
+    - Use config proxy
+    - Allow redirects
+    - Store received cookies
 - **Readable, commitable and versionable JSON files** containing application data
 - Configuration file
   - **HTTP and HTTPS proxy**
@@ -109,7 +113,6 @@ cargo run -- -h
 
 - **To add**
   - Cookies management
-  - Request settings (toggle proxy, TLS, timeout, ...)
   - Insomnia import
   - Create a repo wiki
   - Document whole code

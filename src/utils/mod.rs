@@ -6,3 +6,4 @@ pub mod text_input_selection;
 pub mod stateful_custom_table;
 pub mod stateful_tree;
 pub mod validation_popup;
+pub mod settings_popup;

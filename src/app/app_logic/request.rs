@@ -3,6 +3,7 @@ use std::time::{Duration, Instant};
 use regex::Regex;
 use reqwest::{ClientBuilder, Proxy, Url};
 use reqwest::header::CONTENT_TYPE;
+use reqwest::redirect::Policy;
 use tokio::task;
 use tui_textarea::TextArea;
 use crate::app::app::App;
@@ -173,7 +174,8 @@ impl App<'_> {
 
 
     pub fn create_new_query_param(&mut self) {
-        let local_selected_request = self.get_selected_request_as_local();
+        let selected_request_index = &self.collections_tree.selected.unwrap();
+        let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
 
         {
             let mut selected_request = local_selected_request.write().unwrap();
@@ -184,6 +186,7 @@ impl App<'_> {
             });
         }
 
+        self.save_collection_to_file(selected_request_index.0);
         self.update_query_params_selection();
         self.update_inputs();
     }
@@ -193,7 +196,8 @@ impl App<'_> {
             return;
         }
 
-        let local_selected_request = self.get_selected_request_as_local();
+        let selected_request_index = &self.collections_tree.selected.unwrap();
+        let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
 
         {
             let mut selected_request = local_selected_request.write().unwrap();
@@ -202,6 +206,7 @@ impl App<'_> {
             selected_request.params.remove(selection.0);
         }
 
+        self.save_collection_to_file(selected_request_index.0);
         self.update_query_params_selection();
         self.update_inputs();
     }
@@ -365,7 +370,8 @@ impl App<'_> {
     }
 
     pub fn create_new_header(&mut self) {
-        let local_selected_request = self.get_selected_request_as_local();
+        let selected_request_index = &self.collections_tree.selected.unwrap();
+        let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
 
         {
             let mut selected_request = local_selected_request.write().unwrap();
@@ -376,6 +382,7 @@ impl App<'_> {
             });
         }
 
+        self.save_collection_to_file(selected_request_index.0);
         self.update_headers_selection();
         self.update_inputs();
     }
@@ -385,7 +392,8 @@ impl App<'_> {
             return;
         }
 
-        let local_selected_request = self.get_selected_request_as_local();
+        let selected_request_index = &self.collections_tree.selected.unwrap();
+        let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
 
         {
             let mut selected_request = local_selected_request.write().unwrap();
@@ -394,6 +402,7 @@ impl App<'_> {
             selected_request.headers.remove(selection.0);
         }
 
+        self.save_collection_to_file(selected_request_index.0);
         self.update_headers_selection();
         self.update_inputs();
     }
@@ -434,7 +443,8 @@ impl App<'_> {
     }
 
     pub fn modify_request_content_type(&mut self) {
-        let local_selected_request = self.get_selected_request_as_local();
+        let selected_request_index = &self.collections_tree.selected.unwrap();
+        let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
 
         {
             let mut selected_request = local_selected_request.write().unwrap();
@@ -454,11 +464,28 @@ impl App<'_> {
             }
         }
 
+        self.save_collection_to_file(selected_request_index.0);
         self.load_request_body_param_tab();
     }
 
     pub fn quit_request_body(&mut self) {
         self.update_inputs();
+        self.select_request_state();
+    }
+
+    /* SETTINGS */
+
+    pub fn modify_request_settings(&mut self) {
+        let selected_request_index = &self.collections_tree.selected.unwrap();
+        let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
+
+        {
+            let mut selected_request = local_selected_request.write().unwrap();
+
+            selected_request.settings.update_from_vec(&self.request_settings_popup.settings)
+        }
+
+        self.save_collection_to_file(selected_request_index.0);
         self.select_request_state();
     }
 
@@ -477,24 +504,38 @@ impl App<'_> {
 
             let mut client_builder = ClientBuilder::new();
 
+            /* REDIRECTS */
+
+            if !selected_request.settings.allow_redirects {
+                client_builder = client_builder.redirect(Policy::none());
+            }
+
+            /* STORE COOKIES */
+
+            let should_store_cookies = selected_request.settings.store_received_cookies;
+
+            client_builder = client_builder.cookie_store(should_store_cookies);
+
             /* PROXY */
 
-            match &self.config.proxy {
-                None => {}
-                Some(proxy) => {
-                    match &proxy.http_proxy {
-                        None => {}
-                        Some(http_proxy_str) => {
-                            let proxy = Proxy::http(http_proxy_str).expect("Could not parse HTTP proxy");
-                            client_builder = client_builder.proxy(proxy);
+            if selected_request.settings.use_config_proxy {
+                match &self.config.proxy {
+                    None => {}
+                    Some(proxy) => {
+                        match &proxy.http_proxy {
+                            None => {}
+                            Some(http_proxy_str) => {
+                                let proxy = Proxy::http(http_proxy_str).expect("Could not parse HTTP proxy");
+                                client_builder = client_builder.proxy(proxy);
+                            }
                         }
-                    }
 
-                    match &proxy.https_proxy {
-                        None => {}
-                        Some(https_proxy_str) => {
-                            let proxy = Proxy::https(https_proxy_str).expect("Could not parse HTTPS proxy");
-                            client_builder = client_builder.proxy(proxy);
+                        match &proxy.https_proxy {
+                            None => {}
+                            Some(https_proxy_str) => {
+                                let proxy = Proxy::https(https_proxy_str).expect("Could not parse HTTPS proxy");
+                                client_builder = client_builder.proxy(proxy);
+                            }
                         }
                     }
                 }

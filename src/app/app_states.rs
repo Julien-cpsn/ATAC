@@ -48,7 +48,10 @@ pub enum AppState {
     EditingRequestHeader,
 
     #[strum(to_string = "Editing request body")]
-    EditingRequestBody
+    EditingRequestBody,
+
+    #[strum(to_string = "Editing request settings")]
+    EditingRequestSettings
 }
 
 const TEXT_INPUT_KEYS: &str = "Esc Enter ← → copy paste";
@@ -115,7 +118,7 @@ impl App<'_> {
                 let local_selected_request = self.get_selected_request_as_local();
                 let selected_request = local_selected_request.read().unwrap();
 
-                let mut base_keys = String::from("Esc ^Enter or (s)end ^TAB (u)rl (m)ethod (p)arams ^(a)uth (h)eaders ^(b)ody");
+                let mut base_keys = String::from("Esc ^Enter ^TAB (u)rl (m)ethod (p)arams ^(a)uth (h)eaders ^(b)ody (s)ettings");
 
                 if !self.environments.is_empty() {
                     base_keys += " (e)nv";
@@ -166,6 +169,8 @@ impl App<'_> {
             EditingRequestHeader => String::from(TEXT_INPUT_KEYS),
 
             EditingRequestBody => String::from("Esc Enter Tab ^(s)ave ↑ ↓ ← → copy paste"),
+
+            EditingRequestSettings => String::from("Esc Enter ↑ ↓ ← →"),
         }
     }
 }

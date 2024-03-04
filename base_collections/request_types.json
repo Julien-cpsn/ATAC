@@ -44,7 +44,12 @@
         }
       ],
       "body": "no_body",
-      "auth": "no_auth"
+      "auth": "no_auth",
+      "settings": {
+        "use_config_proxy": true,
+        "allow_redirects": true,
+        "store_received_cookies": true
+      }
     },
     {
       "name": "Test Query Params",
@@ -97,7 +102,12 @@
         }
       ],
       "body": "no_body",
-      "auth": "no_auth"
+      "auth": "no_auth",
+      "settings": {
+        "use_config_proxy": true,
+        "allow_redirects": true,
+        "store_received_cookies": true
+      }
     }
   ]
 }
