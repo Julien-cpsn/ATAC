@@ -6,6 +6,8 @@ use crate::app::app::App;
 
 #[derive(Default, Serialize, Deserialize)]
 pub struct Config {
+    #[serde(default)]
+    pub disable_syntax_highlighting: Option<bool>,
     pub proxy: Option<Proxy>
 }
 

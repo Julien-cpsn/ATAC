@@ -99,22 +99,24 @@ impl App<'_> {
             let mut result_widget: Paragraph = match self.request_result_tab {
                 RequestResultTabs::Body => match &request.result.body {
                     None => Paragraph::new(""),
-                    Some(body) => {
-                        let lines: Vec<Line> = match content_type {
-                            None => body.lines().map(|line| Line::raw(line)).collect(),
-                            Some((_, content_type)) => {
-                                let regex = Regex::new(r"\w+/(?<language>\w+)").unwrap();
+                    Some(body) if content_type.is_some() && !self.config.disable_syntax_highlighting.unwrap_or(false) => {
+                        let (_, content_type) = content_type.unwrap();
 
-                                if let Some(capture) = regex.captures(content_type) {
-                                    self.syntax_highlighting.highlight(body, &capture["language"])
-                                }
-                                else {
-                                    body.lines().map(|line| Line::raw(line)).collect()
-                                }
-                            }
-                        };
+                        let regex = Regex::new(r"\w+/(?<language>\w+)").unwrap();
+
+                        let lines: Vec<Line>;
+
+                        if let Some(capture) = regex.captures(content_type) {
+                            lines = self.syntax_highlighting.highlight(body, &capture["language"]);
+                        }
+                        else {
+                            lines = body.lines().map(|line| Line::raw(line)).collect();
+                        }
 
                         Paragraph::new(lines)
+                    },
+                    Some(body) => {
+                        Paragraph::new(body.lines().map(|line| Line::raw(line)).collect::<Vec<Line>>())
                     }
                 }
                 RequestResultTabs::Cookies => {
