@@ -89,7 +89,7 @@ cargo run -- -h
     - HTML
     - XML
   - **Full response**
-    - Body 
+    - Body (with automatic syntax highlighting)
     - Status code
     - Cookies
     - Request duration
@@ -127,9 +127,9 @@ cargo run -- -h
 - **To add**
   - Command line usage (send requests, add new requests)
   - keymap configuration (via a config file)
-  - Body & result syntax highlighting
+  - Request body syntax highlighting
   - Export a request to other code formats (curl, PHP, JS, Rust, ...)
-  - Pre and post-request script
+  - Pre and post-request script (javascript v8 engine)
 
 - **To improve**
   - Auto-completion on env file variables

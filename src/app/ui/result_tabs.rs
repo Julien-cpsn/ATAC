@@ -5,6 +5,7 @@ use ratatui::prelude::Style;
 use ratatui::style::{Stylize};
 use ratatui::text::{Line};
 use ratatui::widgets::{Block, Borders, Paragraph, Scrollbar, ScrollbarOrientation, Tabs};
+use regex::Regex;
 use strum::{Display, EnumIter, FromRepr, IntoEnumIterator};
 use throbber_widgets_tui::{BRAILLE_DOUBLE, Throbber, WhichUse};
 use crate::app::app::App;
@@ -102,9 +103,14 @@ impl App<'_> {
                         let lines: Vec<Line> = match content_type {
                             None => body.lines().map(|line| Line::raw(line)).collect(),
                             Some((_, content_type)) => {
-                                let supposed_extension = content_type.split('\\');
+                                let regex = Regex::new(r"\w+/(?<language>\w+)").unwrap();
 
-                                self.syntax_highlighting.highlight(body, "json")
+                                if let Some(capture) = regex.captures(content_type) {
+                                    self.syntax_highlighting.highlight(body, &capture["language"])
+                                }
+                                else {
+                                    body.lines().map(|line| Line::raw(line)).collect()
+                                }
                             }
                         };
 

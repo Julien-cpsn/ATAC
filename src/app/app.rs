@@ -4,7 +4,6 @@ use std::time::Duration;
 use crossterm::terminal::{disable_raw_mode};
 use ratatui::backend::Backend;
 use ratatui::Terminal;
-use syntect::easy::HighlightLines;
 use syntect::highlighting::ThemeSet;
 use syntect::parsing::SyntaxSet;
 use throbber_widgets_tui::ThrobberState;

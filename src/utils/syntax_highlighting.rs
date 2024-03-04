@@ -3,7 +3,7 @@ use ratatui::prelude::{Color, Span, Style};
 use ratatui::text::Line;
 use syntect::easy::HighlightLines;
 use syntect::highlighting::ThemeSet;
-use syntect::parsing::SyntaxSet;
+use syntect::parsing::{SyntaxSet};
 
 pub struct SyntaxHighlighting<'a> {
     pub syntax_set: SyntaxSet,
@@ -13,7 +13,13 @@ pub struct SyntaxHighlighting<'a> {
 
 impl<'a> SyntaxHighlighting<'a> {
     pub fn highlight(&self, string: &'a str, extension: &str) -> Vec<Line> {
-        let syntax = self.syntax_set.find_syntax_by_extension(extension).unwrap();
+        let syntax = match self.syntax_set.find_syntax_by_extension(extension) {
+            None => {
+                return string.lines().map(|line| Line::raw(line)).collect();
+            }
+            Some(syntax) => syntax
+        };
+        
         let mut highlight = HighlightLines::new(syntax, &self.theme_set.themes["base16-ocean.dark"]);
 
         let mut highlighted_lines: Vec<Line> = vec![];
