@@ -32,10 +32,7 @@ impl App<'_> {
                 }
             }
             RequestResultTabs::Headers => {
-                lines_count = match &selected_request.result.headers {
-                    None => 0,
-                    Some(headers) => headers.lines().count()
-                }
+                lines_count = selected_request.result.headers.len();
             }
         }
 

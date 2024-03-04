@@ -1,8 +1,12 @@
 use std::fs::{File};
+use std::marker::PhantomData;
 use std::time::Duration;
 use crossterm::terminal::{disable_raw_mode};
 use ratatui::backend::Backend;
 use ratatui::Terminal;
+use syntect::easy::HighlightLines;
+use syntect::highlighting::ThemeSet;
+use syntect::parsing::SyntaxSet;
 use throbber_widgets_tui::ThrobberState;
 use tui_textarea::TextArea;
 use crate::app::app_logic::new_request_popup::NewRequestPopup;
@@ -17,6 +21,7 @@ use crate::utils::settings_popup::SettingsPopup;
 use crate::utils::stateful_scrollbar::StatefulScrollbar;
 use crate::utils::stateful_custom_table::{StatefulCustomTable};
 use crate::utils::stateful_tree::StatefulTree;
+use crate::utils::syntax_highlighting::SyntaxHighlighting;
 use crate::utils::text_input::TextInput;
 use crate::utils::text_input_selection::TextInputSelection;
 use crate::utils::validation_popup::ValidationPopup;
@@ -63,7 +68,9 @@ pub struct App<'a> {
     pub request_settings_popup: SettingsPopup,
 
     pub result_throbber_state: ThrobberState,
-    pub result_scrollbar: StatefulScrollbar
+    pub result_scrollbar: StatefulScrollbar,
+
+    pub syntax_highlighting: SyntaxHighlighting<'a>
 }
 
 impl App<'_> {
@@ -115,6 +122,12 @@ impl App<'_> {
             
             result_throbber_state: ThrobberState::default(),
             result_scrollbar: StatefulScrollbar::default(),
+
+            syntax_highlighting: SyntaxHighlighting {
+                syntax_set: SyntaxSet::load_defaults_newlines(),
+                theme_set: ThemeSet::load_defaults(),
+                phantom_data: PhantomData::default(),
+            },
         }
     }
 

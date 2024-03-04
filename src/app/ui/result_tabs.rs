@@ -2,7 +2,8 @@ use ratatui::Frame;
 use ratatui::layout::{Constraint, Layout, Margin, Rect};
 use ratatui::layout::Direction::Vertical;
 use ratatui::prelude::Style;
-use ratatui::style::Stylize;
+use ratatui::style::{Stylize};
+use ratatui::text::{Line};
 use ratatui::widgets::{Block, Borders, Paragraph, Scrollbar, ScrollbarOrientation, Tabs};
 use strum::{Display, EnumIter, FromRepr, IntoEnumIterator};
 use throbber_widgets_tui::{BRAILLE_DOUBLE, Throbber, WhichUse};
@@ -90,14 +91,25 @@ impl App<'_> {
 
             // REQUEST RESULT CONTENT
 
-            let mut result_widget: Paragraph = match self.request_result_tab {
-                RequestResultTabs::Body => {
-                    let result_body = match &request.result.body {
-                        None => "",
-                        Some(result) => result
-                    };
+            let content_type = request.result.headers.iter().find(|(header, _)| *header == "content-type");
 
-                    Paragraph::new(result_body)
+            //dbg!(&content_type);
+
+            let mut result_widget: Paragraph = match self.request_result_tab {
+                RequestResultTabs::Body => match &request.result.body {
+                    None => Paragraph::new(""),
+                    Some(body) => {
+                        let lines: Vec<Line> = match content_type {
+                            None => body.lines().map(|line| Line::raw(line)).collect(),
+                            Some((_, content_type)) => {
+                                let supposed_extension = content_type.split('\\');
+
+                                self.syntax_highlighting.highlight(body, "json")
+                            }
+                        };
+
+                        Paragraph::new(lines)
+                    }
                 }
                 RequestResultTabs::Cookies => {
                     let result_cookies = match &request.result.cookies {
@@ -108,10 +120,10 @@ impl App<'_> {
                     Paragraph::new(result_cookies)
                 }
                 RequestResultTabs::Headers => {
-                    let result_headers = match &request.result.headers {
-                        None => "",
-                        Some(headers) => headers
-                    };
+                    let result_headers: Vec<Line> = request.result.headers
+                        .iter()
+                        .map(|(header, value)| Line::from(format!("{header}: {value}")))
+                        .collect();
 
                     Paragraph::new(result_headers)
                 }

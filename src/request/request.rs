@@ -63,7 +63,7 @@ pub struct RequestResult {
     pub status_code: Option<String>,
     pub body: Option<String>,
     pub cookies: Option<String>,
-    pub headers: Option<String>
+    pub headers: Vec<(String, String)>
 }
 
 impl Request {

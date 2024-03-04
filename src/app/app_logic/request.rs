@@ -633,13 +633,14 @@ impl App<'_> {
                     Ok(response) => {
                         let status_code = response.status().to_string();
 
-                        let headers = response.headers().clone()
+                        let headers: Vec<(String, String)> = response.headers().clone()
                             .iter()
                             .map(|(header_name, header_value)| {
-                                format!("{}: {:?}", header_name.to_string(), header_value)
+                                let value = header_value.to_str().unwrap_or("").to_string();
+
+                                (header_name.to_string(), value)
                             })
-                            .collect::<Vec<String>>()
-                            .join("\n");
+                            .collect();
 
                         let cookies = response.cookies()
                             .map(|cookie| {
@@ -653,7 +654,7 @@ impl App<'_> {
                         local_selected_request.write().unwrap().result.status_code = Some(status_code);
                         local_selected_request.write().unwrap().result.body = Some(result_body);
                         local_selected_request.write().unwrap().result.cookies = Some(cookies);
-                        local_selected_request.write().unwrap().result.headers = Some(headers);
+                        local_selected_request.write().unwrap().result.headers = headers;
                     },
                     Err(error) => {
                         let response_status_code;
@@ -669,7 +670,7 @@ impl App<'_> {
                         local_selected_request.write().unwrap().result.status_code = response_status_code;
                         local_selected_request.write().unwrap().result.body = Some(result_body);
                         local_selected_request.write().unwrap().result.cookies = None;
-                        local_selected_request.write().unwrap().result.headers = None;
+                        local_selected_request.write().unwrap().result.headers = vec![];
                     }
                 };
 
