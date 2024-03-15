@@ -113,6 +113,7 @@ cargo run -- -h
 
 - **To add**
   - Cookies management
+  - Multipart form & Urlencoded body types
   - Insomnia import
   - Create a repo wiki
   - Document whole code

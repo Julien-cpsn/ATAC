@@ -2,6 +2,7 @@ use std::sync::{Arc, RwLock};
 use crate::app::app::App;
 use crate::app::startup::args::ARGS;
 use crate::request::auth::Auth;
+use crate::request::body::ContentType;
 use crate::request::collection::Collection;
 use crate::request::request::{DEFAULT_HEADERS, Request};
 use crate::request::settings::RequestSettings;
@@ -14,6 +15,7 @@ impl App<'_> {
         self.auth_basic_password_text_input.reset_input();
         self.auth_bearer_token_text_input.reset_input();
         self.headers_table.selection_text_input.reset_input();
+        self.body_form_table.selection_text_input.reset_input();
     }
 
     pub fn update_inputs(&mut self) {
@@ -70,8 +72,33 @@ impl App<'_> {
             self.headers_table.selection_text_input.enter_str(&header_text);
         }
 
-        let body = selected_request.body.get_body_as_string();
-        self.refresh_body_textarea(body);
+        match &selected_request.body {
+            ContentType::NoBody => {
+                self.body_form_table.rows = Vec::new();
+                self.refresh_body_textarea(&String::new());
+            }
+            ContentType::Multipart(form) | ContentType::Form(form) => {
+                self.body_form_table.rows = form.clone();
+
+                if !form.is_empty() {
+                    let selection = self.body_form_table.selection.unwrap();
+
+                    let form_text = match selection.1 {
+                        0 => form[selection.0].data.0.clone(),
+                        1 => form[selection.0].data.1.clone(),
+                        _ => String::new()
+                    };
+
+                    self.body_form_table.selection_text_input.enter_str(&form_text);
+                }
+
+                self.refresh_body_textarea(&String::new());
+            }
+            ContentType::Raw(body) | ContentType::Json(body) | ContentType::Xml(body) | ContentType::Html(body) => {
+                self.body_form_table.rows = Vec::new();
+                self.refresh_body_textarea(body);
+            }
+        }
     }
 
     pub fn select_request(&mut self) {

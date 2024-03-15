@@ -48,7 +48,10 @@ pub enum AppState {
     EditingRequestHeader,
 
     #[strum(to_string = "Editing request body")]
-    EditingRequestBody,
+    EditingRequestBodyTable,
+
+    #[strum(to_string = "Editing request body")]
+    EditingRequestBodyString,
 
     #[strum(to_string = "Editing request settings")]
     EditingRequestSettings
@@ -56,6 +59,7 @@ pub enum AppState {
 
 const TEXT_INPUT_KEYS: &str = "Esc Enter ← → copy paste";
 const VALIDATION_KEYS: &str = "Esc Enter ← →";
+const TABLE_KEYS: &str = "↑ ↓ ← → Enter (n)ew (d)elete (t)oggle";
 
 impl App<'_> {
     pub fn get_state_line(&self) -> Line {
@@ -127,7 +131,7 @@ impl App<'_> {
                 let additional_keys = match self.request_param_tab {
                     RequestParamsTabs::QueryParams => match selected_request.params.is_empty() {
                         true => Some("(n)ew param"),
-                        false => Some("↑ ↓ ← → Enter (n)ew (d)elete (t)oggle")
+                        false => Some(TABLE_KEYS),
                     },
                     RequestParamsTabs::Auth => match selected_request.auth {
                         Auth::NoAuth => None,
@@ -136,10 +140,11 @@ impl App<'_> {
                     },
                     RequestParamsTabs::Headers => match selected_request.headers.is_empty() {
                         true => Some("(n)ew header"),
-                        false => Some("↑ ↓ ← → Enter (n)ew (d)elete (t)oggle")
+                        false => Some(TABLE_KEYS)
                     },
                     RequestParamsTabs::Body => match selected_request.body {
                         ContentType::NoBody => None,
+                        ContentType::Multipart(_) | ContentType::Form(_) => Some(TABLE_KEYS),
                         ContentType::Raw(_) | ContentType::Json(_) | ContentType::Xml(_) | ContentType::Html(_) => Some("Enter"),
                     },
                     RequestParamsTabs::Cookies => None,
@@ -168,7 +173,9 @@ impl App<'_> {
 
             EditingRequestHeader => String::from(TEXT_INPUT_KEYS),
 
-            EditingRequestBody => String::from("Esc Enter Tab ^(s)ave ↑ ↓ ← → copy paste"),
+            EditingRequestBodyTable => String::from(TEXT_INPUT_KEYS),
+            
+            EditingRequestBodyString => String::from("Esc Enter Tab ^(s)ave ↑ ↓ ← → copy paste"),
 
             EditingRequestSettings => String::from("Esc Enter ↑ ↓ ← →"),
         }

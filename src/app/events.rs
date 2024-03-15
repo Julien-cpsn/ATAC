@@ -137,9 +137,19 @@ impl App<'_> {
                                     _ => {}
                                 },
                                 RequestParamsTabs::Body => match key.code {
-                                    KeyCode::Enter if !control_pressed => self.edit_request_body_state(),
+                                    KeyCode::Enter if !control_pressed && self.body_form_table.is_selected() => self.edit_request_body_table_state(),
+                                    KeyCode::Enter if !control_pressed => self.edit_request_body_string_state(),
+
+                                    KeyCode::Up => self.body_form_table.up(),
+                                    KeyCode::Down => self.body_form_table.down(),
+                                    KeyCode::Left | KeyCode::Right => self.body_form_table.change_y(),
+
+                                    KeyCode::Char('n') => self.create_new_form_data(),
+                                    KeyCode::Char('d') => self.delete_form_data(),
+                                    KeyCode::Char('t') => self.toggle_form_data(),
+
                                     _ => {}
-                                }
+                                },
                                 RequestParamsTabs::Cookies => {},
                                 _ => {}
                             }
@@ -261,7 +271,21 @@ impl App<'_> {
                             _ => miss_input = true
                         }
 
-                        AppState::EditingRequestBody => match key.code {
+                        AppState::EditingRequestBodyTable => match key.code {
+                            KeyCode::Char(char) => self.body_form_table.selection_text_input.enter_char(char),
+
+                            KeyCode::Esc => self.select_request_state(),
+                            KeyCode::Enter => self.modify_request_form_data(),
+
+                            KeyCode::Delete => self.body_form_table.selection_text_input.delete_char_forward(),
+                            KeyCode::Backspace => self.body_form_table.selection_text_input.delete_char_backward(),
+                            KeyCode::Left => self.body_form_table.selection_text_input.move_cursor_left(),
+                            KeyCode::Right => self.body_form_table.selection_text_input.move_cursor_right(),
+
+                            _ => miss_input = true
+                        }
+
+                        AppState::EditingRequestBodyString => match key.code {
                             KeyCode::Char('c') if control_pressed => self.body_text_area.copy(),
                             KeyCode::Char('v') if control_pressed => {
                                 self.body_text_area.paste();

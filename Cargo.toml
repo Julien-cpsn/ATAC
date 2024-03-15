@@ -8,7 +8,7 @@ authors = ["julien-cpsn"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-reqwest = { version = "0.11.24", default-features = false, features = ["cookies", "rustls-tls-native-roots"] }
+reqwest = { version = "0.11.24", default-features = false, features = ["cookies", "rustls-tls-native-roots", "multipart"] }
 tokio = { version = "1.0.0", features = ["rt", "rt-multi-thread", "macros"] }
 strum = "0.26.1"
 ratatui = "0.26.1"
