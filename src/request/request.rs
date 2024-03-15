@@ -3,6 +3,7 @@ use ratatui::prelude::{Line, Modifier, Span};
 use ratatui::style::Stylize;
 use serde::{Deserialize, Serialize};
 use tui_tree_widget::TreeItem;
+use crate::app::app::App;
 use crate::request::auth::{Auth};
 use crate::request::body::ContentType;
 use crate::request::method::Method;
@@ -30,6 +31,24 @@ pub struct Request {
 pub struct KeyValue {
     pub enabled: bool,
     pub data: (String, String)
+}
+
+impl App<'_> {
+    pub fn key_value_vec_to_tuple_vec(&self, key_value: &Vec<KeyValue>) -> Vec<(String, String)> {
+        key_value
+            .iter()
+            .filter_map(|param| {
+                if param.enabled {
+                    let key = self.replace_env_keys_by_value(&param.data.0);
+                    let value = self.replace_env_keys_by_value(&param.data.1);
+
+                    Some((key, value))
+                } else {
+                    None
+                }
+            })
+            .collect()
+    }
 }
 
 lazy_static! {

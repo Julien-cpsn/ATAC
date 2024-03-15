@@ -6,12 +6,12 @@ use ratatui::prelude::{Modifier, Style};
 use ratatui::style::Stylize;
 use ratatui::widgets::{Block, Borders, List, ListItem, Paragraph};
 use crate::app::app::App;
-use crate::app::app_states::AppState::{EditingRequestHeader};
-use crate::request::request::Request;
+use crate::app::app_states::AppState::{EditingRequestBodyTable};
+use crate::request::request::{KeyValue};
 
 impl App<'_> {
-    pub(super) fn render_headers_tab(&mut self, frame: &mut Frame, area: Rect, request: &Request, header_selection: (usize, usize)) {
-        let headers_layout = Layout::new(
+    pub(super) fn render_form_body_tab(&mut self, frame: &mut Frame, area: Rect, form: &Vec<KeyValue>, form_selection: (usize, usize)) {
+        let form_layout = Layout::new(
             Vertical,
             [
                 Constraint::Length(2),
@@ -20,27 +20,27 @@ impl App<'_> {
         )
             .split(area);
 
-        let inner_header_layout = Layout::new(
+        let inner_form_layout = Layout::new(
             Horizontal,
             [
                 Constraint::Percentage(50),
                 Constraint::Percentage(50)
             ]
         )
-            .split(headers_layout[0]);
+            .split(form_layout[0]);
 
-        let header_title = Paragraph::new("Header")
+        let form_title = Paragraph::new("Key")
             .centered()
             .block(Block::new().borders(Borders::BOTTOM | Borders::RIGHT))
             .dark_gray();
 
-        let header_value = Paragraph::new("Value")
+        let form_value = Paragraph::new("Value")
             .centered()
             .block(Block::new().borders(Borders::BOTTOM))
             .dark_gray();
 
-        frame.render_widget(header_title, inner_header_layout[0]);
-        frame.render_widget(header_value, inner_header_layout[1]);
+        frame.render_widget(form_title, inner_form_layout[0]);
+        frame.render_widget(form_value, inner_form_layout[1]);
 
         let horizontal_margin = 2;
 
@@ -52,52 +52,52 @@ impl App<'_> {
             ]
         )
             .horizontal_margin(horizontal_margin)
-            .split(headers_layout[1]);
+            .split(form_layout[1]);
 
-        let mut headers: Vec<ListItem> = vec![];
+        let mut keys: Vec<ListItem> = vec![];
         let mut values: Vec<ListItem> = vec![];
 
-        for header in request.headers.iter() {
-            let key = self.add_color_to_env_keys(&header.data.0);
-            let value = self.add_color_to_env_keys(&header.data.1);
+        for form_data in form.iter() {
+            let key = self.add_color_to_env_keys(&form_data.data.0);
+            let value = self.add_color_to_env_keys(&form_data.data.1);
 
             let mut key = ListItem::from(key);
             let mut value = ListItem::from(value);
 
-            if !header.enabled {
+            if !form_data.enabled {
                 key = key.dark_gray().dim();
                 value = value.dark_gray().dim();
             }
 
-            headers.push(key);
+            keys.push(key);
             values.push(value);
         }
 
         let mut left_list_style = Style::default();
         let mut right_list_style = Style::default();
 
-        match header_selection.1 {
+        match form_selection.1 {
             0 => left_list_style = left_list_style.fg(Yellow).add_modifier(Modifier::BOLD),
             1 => right_list_style = right_list_style.fg(Yellow).add_modifier(Modifier::BOLD),
             _ => {}
         }
 
-        let left_list = List::new(headers).highlight_style(left_list_style);
+        let left_list = List::new(keys).highlight_style(left_list_style);
 
         let right_list = List::new(values).highlight_style(right_list_style);
 
-        frame.render_stateful_widget(left_list, table_layout[0], &mut self.headers_table.left_state.clone());
-        frame.render_stateful_widget(right_list, table_layout[1], &mut self.headers_table.right_state.clone());
+        frame.render_stateful_widget(left_list, table_layout[0], &mut self.body_form_table.left_state.clone());
+        frame.render_stateful_widget(right_list, table_layout[1], &mut self.body_form_table.right_state.clone());
 
-        // Header input & cursor
+        // Form input & cursor
 
-        if self.state == EditingRequestHeader {
-            let cell_with = headers_layout[1].width / 2;
+        if self.state == EditingRequestBodyTable {
+            let cell_with = form_layout[1].width / 2;
 
-            let width_adjustment = match header_selection.1 {
+            let width_adjustment = match form_selection.1 {
                 0 => 0,
                 1 => {
-                    let even_odd_adjustment = match headers_layout[1].width % 2 {
+                    let even_odd_adjustment = match form_layout[1].width % 2 {
                         1 => 1,
                         0 => 2,
                         _ => 0
@@ -107,20 +107,20 @@ impl App<'_> {
                 _ => 0
             };
 
-            let height_adjustment = (header_selection.0 - self.headers_table.left_state.offset()) as u16 % headers_layout[1].height;
+            let height_adjustment = (form_selection.0 - self.body_form_table.left_state.offset()) as u16 % form_layout[1].height;
 
-            let selection_position_x = headers_layout[1].x + width_adjustment + horizontal_margin;
-            let selection_position_y = headers_layout[1].y + height_adjustment;
+            let selection_position_x = form_layout[1].x + width_adjustment + horizontal_margin;
+            let selection_position_y = form_layout[1].y + height_adjustment;
 
-            let header_text = self.headers_table.selection_text_input.text.clone();
+            let form_data_text = self.body_form_table.selection_text_input.text.clone();
 
-            let text_input = Paragraph::new(format!("{:fill$}", header_text, fill = (cell_with - horizontal_margin) as usize));
+            let text_input = Paragraph::new(format!("{:fill$}", form_data_text, fill = (cell_with - horizontal_margin) as usize));
             let text_rect = Rect::new(selection_position_x, selection_position_y, cell_with, 1);
 
             frame.render_widget(text_input, text_rect);
 
             frame.set_cursor(
-                selection_position_x + self.headers_table.selection_text_input.cursor_position as u16,
+                selection_position_x + self.body_form_table.selection_text_input.cursor_position as u16,
                 selection_position_y
             );
         }

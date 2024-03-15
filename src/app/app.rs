@@ -62,6 +62,7 @@ pub struct App<'a> {
 
     pub headers_table: StatefulCustomTable,
 
+    pub body_form_table: StatefulCustomTable,
     pub body_text_area: TextArea<'a>,
 
     pub request_settings_popup: SettingsPopup,
@@ -115,6 +116,7 @@ impl App<'_> {
 
             headers_table: StatefulCustomTable::default(),
 
+            body_form_table: StatefulCustomTable::default(),
             body_text_area: TextArea::default(),
 
             request_settings_popup: SettingsPopup::default(),
