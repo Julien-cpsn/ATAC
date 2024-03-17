@@ -175,6 +175,73 @@
         "allow_redirects": true,
         "store_received_cookies": true
       }
+    },
+    {
+      "name": "Multipart",
+      "url": "https://httpbin.org/post",
+      "method": "POST",
+      "params": [],
+      "headers": [
+        {
+          "enabled": true,
+          "data": [
+            "cache-control",
+            "no-cache"
+          ]
+        },
+        {
+          "enabled": true,
+          "data": [
+            "user-agent",
+            "ATAC/v0.9.0"
+          ]
+        },
+        {
+          "enabled": true,
+          "data": [
+            "accept",
+            "*/*"
+          ]
+        },
+        {
+          "enabled": true,
+          "data": [
+            "accept-encoding",
+            "gzip, deflate, br"
+          ]
+        },
+        {
+          "enabled": true,
+          "data": [
+            "connection",
+            "keep-alive"
+          ]
+        }
+      ],
+      "body": {
+        "multipart": [
+          {
+            "enabled": true,
+            "data": [
+              "key",
+              "value"
+            ]
+          },
+          {
+            "enabled": true,
+            "data": [
+              "file",
+              "!!Cargo.toml"
+            ]
+          }
+        ]
+      },
+      "auth": "no_auth",
+      "settings": {
+        "use_config_proxy": true,
+        "allow_redirects": true,
+        "store_received_cookies": true
+      }
     }
   ]
 }

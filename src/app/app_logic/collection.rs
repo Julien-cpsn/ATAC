@@ -106,6 +106,7 @@ impl App<'_> {
             self.collections_tree.set_selected();
             self.update_query_params_selection();
             self.update_headers_selection();
+            self.update_body_table_selection();
 
             self.select_request_state();
         }

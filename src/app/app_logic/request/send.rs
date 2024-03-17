@@ -1,10 +1,16 @@
+use std::fs::File;
+use std::io::Read;
+use std::path::PathBuf;
 use std::time::{Duration, Instant};
-use reqwest::multipart::Form;
+
 use reqwest::{ClientBuilder, Proxy, Url};
+use reqwest::header::HeaderMap;
+use reqwest::multipart::{Form, Part};
 use reqwest::redirect::Policy;
 use tokio::task;
+
 use crate::app::app::App;
-use crate::request::auth::Auth::{NoAuth, BasicAuth, BearerToken};
+use crate::request::auth::Auth::{BasicAuth, BearerToken, NoAuth};
 use crate::request::body::ContentType;
 
 impl App<'_> {
@@ -19,7 +25,9 @@ impl App<'_> {
                 return;
             }
 
-            let mut client_builder = ClientBuilder::new();
+            let mut client_builder = ClientBuilder::new()
+                .default_headers(HeaderMap::new())
+                .referer(false);
 
             /* REDIRECTS */
 
@@ -113,7 +121,24 @@ impl App<'_> {
                         let key = self.replace_env_keys_by_value(&form_data.data.0);
                         let value = self.replace_env_keys_by_value(&form_data.data.1);
 
-                        multipart = multipart.text(key, value);
+                        // If the value starts with !!, then it is supposed to be a file
+                        if value.starts_with("!!") {
+                            let path = PathBuf::from(&value[2..]);
+                            
+                            match get_file_content_with_name(path) {
+                                Ok((file_content, file_name)) => {
+                                    let part = Part::bytes(file_content).file_name(file_name);
+                                    multipart = multipart.part(key, part);
+                                }
+                                Err(_) => {
+                                    selected_request.result.status_code = Some(String::from("COULD NOT OPEN FILE"));
+                                    return;
+                                }
+                            }
+                        }
+                        else {
+                            multipart = multipart.text(key, value);
+                        }
                     }
 
                     request = request.multipart(multipart);
@@ -205,4 +230,15 @@ impl App<'_> {
 
         self.refresh_result_scrollbar();
     }
+}
+
+fn get_file_content_with_name(path: PathBuf) -> std::io::Result<(Vec<u8>, String)> {
+    let mut buffer: Vec<u8> = vec![];
+    let mut file = File::open(path.clone())?;
+
+    file.read_to_end(&mut buffer)?;
+    
+    let file_name = path.file_name().unwrap().to_str().unwrap();
+    
+    return Ok((buffer, file_name.to_string()));
 }

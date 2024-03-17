@@ -155,16 +155,16 @@ impl Request {
     }
 
     pub fn modify_or_create_header(&mut self, input_header: &str, value: &str) {
-        let mut header_was_found = false;
+        let mut was_header_found = false;
 
         for header in &mut self.headers {
             if &header.data.0 == input_header {
                 header.data.1 = value.to_string();
-                header_was_found = true;
+                was_header_found = true;
             }
         }
 
-        if !header_was_found {
+        if !was_header_found {
             self.headers.push(KeyValue {
                 enabled: true,
                 data: (input_header.to_string(), value.to_string()),

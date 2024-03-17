@@ -84,6 +84,8 @@ cargo run -- -h
   - **Headers**
   - **Body**
     - No Body
+    - Multipart form
+    - URL encoded form
     - Plain Text
     - JSON
     - HTML
@@ -113,14 +115,15 @@ cargo run -- -h
 
 - **To add**
   - Cookies management
-  - Multipart form & Urlencoded body types
   - Insomnia import
   - Create a repo wiki
   - Document whole code
 
 - **To improve**
   - Rename request and collection
+  - Move requests and collections
   - Import request settings in Postman import
+  - Disable CORS in the app config
   - Better keymap help on bottom right
 
 ### TODO v2.0.0

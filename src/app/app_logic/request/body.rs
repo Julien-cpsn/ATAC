@@ -28,7 +28,6 @@ impl App<'_> {
         }
     }
 
-
     pub fn modify_request_form_data(&mut self) {
         let selected_request_index = &self.collections_tree.selected.unwrap();
         let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
@@ -164,9 +163,11 @@ impl App<'_> {
                 // Removes Content-Type header if there is no more body
                 ContentType::NoBody => {
                     selected_request.find_and_delete_header(CONTENT_TYPE.as_str())
-                }
+                },
+                // Impossible to set the header for multipart yet, because of boundary and content-length that are computed on reqwest's side
+                ContentType::Multipart(_) => {},
                 // Create or replace Content-Type header with new body content type
-                ContentType::Multipart(_) | ContentType::Form(_) | ContentType::Raw(_) | ContentType::Json(_) | ContentType::Xml(_) | ContentType::Html(_) => {
+                ContentType::Form(_) | ContentType::Raw(_) | ContentType::Json(_) | ContentType::Xml(_) | ContentType::Html(_) => {
                     let content_type = &selected_request.body.to_content_type();
                     selected_request.modify_or_create_header(CONTENT_TYPE.as_str(), content_type)
                 }

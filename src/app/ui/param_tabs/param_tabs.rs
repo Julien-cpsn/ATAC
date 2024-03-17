@@ -1,11 +1,12 @@
 use ratatui::Frame;
 use ratatui::layout::{Constraint, Layout, Rect};
-use ratatui::layout::Direction::{Vertical};
+use ratatui::layout::Direction::Vertical;
 use ratatui::prelude::{Color, Style};
-use ratatui::style::{Stylize};
-use ratatui::text::{Line};
+use ratatui::style::Stylize;
+use ratatui::text::Line;
 use ratatui::widgets::{Block, Borders, Paragraph, Tabs};
 use strum::{Display, EnumIter, FromRepr, IntoEnumIterator};
+
 use crate::app::app::App;
 use crate::request::auth::Auth::*;
 use crate::request::body::ContentType::*;
