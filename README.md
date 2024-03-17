@@ -73,8 +73,9 @@ cargo run -- -h
     - GET
     - POST
     - PUT
-    - DELETE
     - PATCH
+    - DELETE
+    - HEAD
     - OPTIONS
   - **Query params**, synchronous between the URL and the query params tab
   - **Authentication**
