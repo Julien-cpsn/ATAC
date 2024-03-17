@@ -8,6 +8,8 @@ use crate::app::app::App;
 pub struct Config {
     #[serde(default)]
     pub disable_syntax_highlighting: Option<bool>,
+    #[serde(default)]
+    pub disable_cors: Option<bool>,
     pub proxy: Option<Proxy>
 }
 

@@ -104,6 +104,8 @@ cargo run -- -h
 - **Readable, commitable and versionable JSON files** containing application data
 - Configuration file
   - **HTTP and HTTPS proxy**
+  - Disable CORS
+  - Disable syntax highlighting
 - **Postman collection v2.1.0 import**
 - **Environment variables** along .env file support
 - Permanent keymap help & application state
@@ -124,7 +126,6 @@ cargo run -- -h
   - Rename request and collection
   - Move requests and collections
   - Import request settings in Postman import
-  - Disable CORS in the app config
   - Better keymap help on bottom right
 
 ### TODO v2.0.0

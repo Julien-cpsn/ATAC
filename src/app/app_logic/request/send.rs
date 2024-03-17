@@ -93,6 +93,12 @@ impl App<'_> {
                 url
             );
 
+            /* CORS */
+            
+            if self.config.disable_cors.unwrap_or(false) {
+                request = request.fetch_mode_no_cors();
+            }
+            
             /* AUTH */
 
             match &selected_request.auth {
@@ -124,7 +130,7 @@ impl App<'_> {
                         // If the value starts with !!, then it is supposed to be a file
                         if value.starts_with("!!") {
                             let path = PathBuf::from(&value[2..]);
-                            
+
                             match get_file_content_with_name(path) {
                                 Ok((file_content, file_name)) => {
                                     let part = Part::bytes(file_content).file_name(file_name);
@@ -237,8 +243,8 @@ fn get_file_content_with_name(path: PathBuf) -> std::io::Result<(Vec<u8>, String
     let mut file = File::open(path.clone())?;
 
     file.read_to_end(&mut buffer)?;
-    
+
     let file_name = path.file_name().unwrap().to_str().unwrap();
-    
+
     return Ok((buffer, file_name.to_string()));
 }
