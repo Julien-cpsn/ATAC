@@ -28,7 +28,8 @@ use crate::utils::validation_popup::ValidationPopup;
 pub struct App<'a> {
     pub tick_rate: Duration,
     pub should_quit: bool,
-
+    pub display_full_help: bool,
+    
     pub state: AppState,
 
     pub config: Config,
@@ -78,6 +79,8 @@ impl App<'_> {
         App {
             tick_rate: Duration::from_millis(250),
             should_quit: false,
+            display_full_help: false,
+            
             state: AppState::Normal,
 
             config: Config::default(),

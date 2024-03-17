@@ -126,7 +126,6 @@ cargo run -- -h
   - Rename request and collection
   - Move requests and collections
   - Import request settings in Postman import
-  - Better keymap help on bottom right
 
 ### TODO v2.0.0
 

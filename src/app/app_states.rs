@@ -59,7 +59,8 @@ pub enum AppState {
 
 const TEXT_INPUT_KEYS: &str = "Esc Enter ← → copy paste";
 const VALIDATION_KEYS: &str = "Esc Enter ← →";
-const TABLE_KEYS: &str = "↑ ↓ ← → Enter (n)ew (d)elete (t)oggle";
+const TABLE_KEYS: &str = "↑ ↓ ← → Enter (n) (d) (t)";
+const FULL_TABLE_KEYS: &str = "↑ ↓ ← → Enter (n)ew (d)elete (t)oggle";
 
 impl App<'_> {
     pub fn get_state_line(&self) -> Line {
@@ -109,6 +110,83 @@ impl App<'_> {
     pub fn get_available_keys(&self) -> String {
         match self.state {
             Normal => {
+                let mut base_keys = String::from("q or ^c ↑ ↓ ← → Enter (h)elp (c) (r) (d)");
+
+                if !self.environments.is_empty() {
+                    base_keys += " (e)";
+                }
+
+                base_keys
+            },
+
+            SelectedRequest => {
+                let local_selected_request = self.get_selected_request_as_local();
+                let selected_request = local_selected_request.read().unwrap();
+
+                let mut base_keys = String::from("Esc ^Enter ^TAB (h)elp (u) (m) ^(a) ^(b) (s)");
+
+                if !self.environments.is_empty() {
+                    base_keys += " (e)";
+                }
+
+                let additional_keys = match self.request_param_tab {
+                    RequestParamsTabs::QueryParams => match selected_request.params.is_empty() {
+                        true => Some("(n)"),
+                        false => Some(TABLE_KEYS),
+                    },
+                    RequestParamsTabs::Auth => match selected_request.auth {
+                        Auth::NoAuth => None,
+                        Auth::BasicAuth(_, _) => Some("↑ ↓ Enter"),
+                        Auth::BearerToken(_) => Some("Enter"),
+                    },
+                    RequestParamsTabs::Headers => match selected_request.headers.is_empty() {
+                        true => Some("(n)"),
+                        false => Some(TABLE_KEYS)
+                    },
+                    RequestParamsTabs::Body => match selected_request.body {
+                        ContentType::NoBody => None,
+                        ContentType::Multipart(_) | ContentType::Form(_) => match selected_request.body.get_form().unwrap().is_empty() {
+                            true => Some("(n)"),
+                            false => Some(TABLE_KEYS)
+                        },
+                        ContentType::Raw(_) | ContentType::Json(_) | ContentType::Xml(_) | ContentType::Html(_) => Some("Enter"),
+                    },
+                };
+
+                if let Some(additional_keys_str) = additional_keys {
+                    base_keys += &format!(" | {additional_keys_str}");
+                }
+
+                base_keys
+            },
+
+            CreatingNewCollection => String::from(TEXT_INPUT_KEYS),
+
+            CreatingNewRequest => format!("{TEXT_INPUT_KEYS} ↑ ↓"),
+
+            DeletingCollection => String::from(VALIDATION_KEYS),
+
+            DeletingRequest => String::from(VALIDATION_KEYS),
+
+            EditingRequestUrl => String::from(TEXT_INPUT_KEYS),
+
+            EditingRequestParam => String::from(TEXT_INPUT_KEYS),
+
+            EditingRequestAuthUsername | EditingRequestAuthPassword | EditingRequestAuthBearerToken => String::from(TEXT_INPUT_KEYS),
+
+            EditingRequestHeader => String::from(TEXT_INPUT_KEYS),
+
+            EditingRequestBodyTable => String::from(TEXT_INPUT_KEYS),
+
+            EditingRequestBodyString => String::from("Esc Enter Tab ^(s)ave ↑ ↓ ← → copy paste"),
+
+            EditingRequestSettings => String::from("Esc Enter ↑ ↓ ← →"),
+        }
+    }
+
+    pub fn get_full_available_keys(&self) -> String {
+        match self.state {
+            Normal => {
                 let mut base_keys = String::from("(q)uit or ^c ↑ ↓ ← → Enter (c)ollection (r)equest (d)elete");
 
                 if !self.environments.is_empty() {
@@ -122,7 +200,7 @@ impl App<'_> {
                 let local_selected_request = self.get_selected_request_as_local();
                 let selected_request = local_selected_request.read().unwrap();
 
-                let mut base_keys = String::from("Esc ^Enter ^TAB (u)rl (m)ethod (p)arams ^(a)uth (h)eaders ^(b)ody (s)ettings");
+                let mut base_keys = String::from("Esc ^Enter ^TAB (u)rl (m)ethod ^(a)uth ^(b)ody (s)ettings");
 
                 if !self.environments.is_empty() {
                     base_keys += " (e)nv";
@@ -131,7 +209,7 @@ impl App<'_> {
                 let additional_keys = match self.request_param_tab {
                     RequestParamsTabs::QueryParams => match selected_request.params.is_empty() {
                         true => Some("(n)ew param"),
-                        false => Some(TABLE_KEYS),
+                        false => Some(FULL_TABLE_KEYS),
                     },
                     RequestParamsTabs::Auth => match selected_request.auth {
                         Auth::NoAuth => None,
@@ -140,11 +218,14 @@ impl App<'_> {
                     },
                     RequestParamsTabs::Headers => match selected_request.headers.is_empty() {
                         true => Some("(n)ew header"),
-                        false => Some(TABLE_KEYS)
+                        false => Some(FULL_TABLE_KEYS)
                     },
                     RequestParamsTabs::Body => match selected_request.body {
                         ContentType::NoBody => None,
-                        ContentType::Multipart(_) | ContentType::Form(_) => Some(TABLE_KEYS),
+                        ContentType::Multipart(_) | ContentType::Form(_) => match selected_request.body.get_form().unwrap().is_empty() {
+                            true => Some("(n)"),
+                            false => Some(FULL_TABLE_KEYS)
+                        }
                         ContentType::Raw(_) | ContentType::Json(_) | ContentType::Xml(_) | ContentType::Html(_) => Some("Enter"),
                     },
                 };

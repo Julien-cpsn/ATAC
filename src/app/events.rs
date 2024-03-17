@@ -10,6 +10,9 @@ impl App<'_> {
     pub async fn handle_events(&mut self) {
         // Refreshes the app every tick_rate
         if event::poll(self.tick_rate).unwrap() {
+            // Default state
+            self.display_full_help = false;
+            
             // Block while a key is pressed
             if let Event::Key(key) = event::read().unwrap() {
                 let mut miss_input = false;
@@ -40,6 +43,8 @@ impl App<'_> {
                             KeyCode::Char('d') => self.delete_element(),
 
                             KeyCode::Char('e') => self.next_environment(),
+                            
+                            KeyCode::Char('h') => self.display_full_help = true,
 
                             _ => miss_input = true
                         },
@@ -158,15 +163,17 @@ impl App<'_> {
 
                                 KeyCode::Char('e') => self.next_environment(),
 
-                                KeyCode::Char('p') => self.load_request_query_params_tab(),
+                                KeyCode::Char('h') => self.display_full_help = true,
+
+                                //KeyCode::Char('p') => self.load_request_query_params_tab(),
 
                                 KeyCode::Char('a') if control_pressed => self.modify_request_auth(),
-                                KeyCode::Char('a') => self.load_request_auth_param_tab(),
+                                //KeyCode::Char('a') => self.load_request_auth_param_tab(),
 
-                                KeyCode::Char('h') => self.load_request_headers_tab(),
+                                //KeyCode::Char('h') => self.load_request_headers_tab(),
 
                                 KeyCode::Char('b') if control_pressed => self.modify_request_content_type(),
-                                KeyCode::Char('b') => self.load_request_body_param_tab(),
+                                //KeyCode::Char('b') => self.load_request_body_param_tab(),
 
                                 KeyCode::Char('u') => self.edit_request_url_state(),
                                 KeyCode::Char('m') => self.modify_request_method(),
