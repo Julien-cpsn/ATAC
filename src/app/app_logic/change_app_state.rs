@@ -34,6 +34,28 @@ impl App<'_> {
         self.state = AppState::DeletingRequest;
     }
 
+    pub fn rename_collection_state(&mut self) {
+        let selected_request_index = self.collections_tree.state.selected();
+
+        let collection_name = &self.collections[selected_request_index[0]].name;
+        self.rename_collection_input.text = collection_name.clone();
+        self.rename_collection_input.cursor_position = collection_name.len();
+        
+        self.state = AppState::RenamingCollection;
+    }
+
+    pub fn rename_request_state(&mut self) {
+        let selected_request_index = self.collections_tree.state.selected();
+
+        {
+            let selected_request = self.collections[selected_request_index[0]].requests[selected_request_index[1]].read().unwrap();
+            self.rename_request_input.text = selected_request.name.clone();
+            self.rename_request_input.cursor_position = selected_request.name.len();
+        }
+
+        self.state = AppState::RenamingRequest;
+    }
+    
     pub fn select_request_state(&mut self) {
         self.state = AppState::SelectedRequest;
         self.update_inputs();

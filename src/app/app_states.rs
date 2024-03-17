@@ -26,6 +26,12 @@ pub enum AppState {
     #[strum(to_string = "Deleting request")]
     DeletingRequest,
 
+    #[strum(to_string = "Renaming collection")]
+    RenamingCollection,
+
+    #[strum(to_string = "Renaming request")]
+    RenamingRequest,
+
     #[strum(to_string = "Request menu")]
     SelectedRequest,
 
@@ -66,7 +72,7 @@ impl App<'_> {
     pub fn get_state_line(&self) -> Line {
         match self.state {
             Normal | CreatingNewCollection | CreatingNewRequest => Line::from(self.state.to_string().white().on_dark_gray()),
-            DeletingCollection => {
+            DeletingCollection | RenamingCollection => {
                 let collection_index = self.collections_tree.state.selected()[0];
                 let collection_name = &self.collections[collection_index].name;
 
@@ -76,12 +82,12 @@ impl App<'_> {
                     Span::raw(self.state.to_string()).white().on_dark_gray()
                 ])
             },
-            DeletingRequest => {
+            DeletingRequest | RenamingRequest => {
                 let selected_request_index = &self.collections_tree.state.selected();
                 let selected_request = &self.collections[selected_request_index[0]].requests[selected_request_index[1]].read().unwrap();
 
                 Line::from(vec![
-                    Span::raw("Collection > ").dark_gray(),
+                    Span::raw("Request > ").dark_gray(),
                     Span::raw(format!("{} > ", selected_request.name)).dark_gray(),
                     Span::raw(self.state.to_string()).white().on_dark_gray()
                 ])
@@ -110,7 +116,7 @@ impl App<'_> {
     pub fn get_available_keys(&self) -> String {
         match self.state {
             Normal => {
-                let mut base_keys = String::from("q or ^c ↑ ↓ ← → Enter (h)elp (c) (r) (d)");
+                let mut base_keys = String::from("q or ^c ↑ ↓ ← → Enter (h)elp (c) (r) (d) (n)");
 
                 if !self.environments.is_empty() {
                     base_keys += " (e)";
@@ -168,6 +174,10 @@ impl App<'_> {
 
             DeletingRequest => String::from(VALIDATION_KEYS),
 
+            RenamingCollection => String::from(TEXT_INPUT_KEYS),
+
+            RenamingRequest => String::from(TEXT_INPUT_KEYS),
+
             EditingRequestUrl => String::from(TEXT_INPUT_KEYS),
 
             EditingRequestParam => String::from(TEXT_INPUT_KEYS),
@@ -187,7 +197,7 @@ impl App<'_> {
     pub fn get_full_available_keys(&self) -> String {
         match self.state {
             Normal => {
-                let mut base_keys = String::from("(q)uit or ^c ↑ ↓ ← → Enter (c)ollection (r)equest (d)elete");
+                let mut base_keys = String::from("(q)uit or ^c ↑ ↓ ← → Enter (c)ollection (r)equest (d)elete re(n)ame");
 
                 if !self.environments.is_empty() {
                     base_keys += " (e)nv";
@@ -244,6 +254,10 @@ impl App<'_> {
             DeletingCollection => String::from(VALIDATION_KEYS),
 
             DeletingRequest => String::from(VALIDATION_KEYS),
+
+            RenamingCollection => String::from(TEXT_INPUT_KEYS),
+
+            RenamingRequest => String::from(TEXT_INPUT_KEYS),
 
             EditingRequestUrl => String::from(TEXT_INPUT_KEYS),
 

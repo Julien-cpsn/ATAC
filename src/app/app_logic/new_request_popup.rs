@@ -1,5 +1,6 @@
 use crate::utils::text_input::TextInput;
 
+#[derive(Default)]
 pub struct NewRequestPopup {
     pub selected_collection: usize,
     pub max_selection: usize,

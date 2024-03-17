@@ -121,7 +121,7 @@ impl App<'_> {
     pub fn new_collection(&mut self) {
         let new_collection_name = &self.new_collection_input.text;
 
-        if new_collection_name.is_empty() {
+        if new_collection_name.trim().is_empty() {
             return;
         }
 
@@ -149,7 +149,7 @@ impl App<'_> {
     pub fn new_request(&mut self) {
         let new_request_name = &self.new_request_popup.text_input.text;
 
-        if new_request_name.is_empty() {
+        if new_request_name.trim().is_empty() {
             return;
         }
 
@@ -201,6 +201,51 @@ impl App<'_> {
         self.collections_tree.state.select(Vec::new());
         self.collections_tree.selected = None;
 
+        self.save_collection_to_file(selected_request_index[0]);
+        self.normal_state();
+    }
+
+    pub fn rename_element(&mut self) {
+        match self.collections_tree.state.selected().len() {
+            // Selection on a collection
+            1 => self.rename_collection_state(),
+            // Selection on a request
+            2 => self.rename_request_state(),
+            _ => {}
+        }
+    }
+
+    pub fn rename_collection(&mut self) {
+        let new_collection_name = &self.rename_collection_input.text;
+
+        if new_collection_name.trim().is_empty() {
+            return;
+        }
+
+        let selected_request_index = self.collections_tree.state.selected();
+
+        self.collections[selected_request_index[0]].name = new_collection_name.to_string();
+
+        self.save_collection_to_file(selected_request_index[0]);
+        self.normal_state();
+    }
+
+    pub fn rename_request(&mut self) {
+        let new_request_name = &self.rename_request_input.text;
+
+        if new_request_name.trim().is_empty() {
+            return;
+        }
+
+        let selected_request_index = self.collections_tree.state.selected();
+        let local_selected_request = self.get_request_as_local_from_indexes(&(selected_request_index[0], selected_request_index[1]));
+
+        {
+            let mut selected_request = local_selected_request.write().unwrap();
+            
+            selected_request.name = new_request_name.to_string();
+        }
+        
         self.save_collection_to_file(selected_request_index[0]);
         self.normal_state();
     }

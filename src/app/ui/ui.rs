@@ -117,6 +117,8 @@ impl App<'_> {
             DeletingCollection => self.render_deleting_collection_popup(frame),
             DeletingRequest => self.render_deleting_request_popup(frame),
             EditingRequestSettings => self.render_request_settings_popup(frame),
+            RenamingCollection => self.render_renaming_collection_popup(frame),
+            RenamingRequest => self.render_renaming_request_popup(frame),
             _ => {}
         }
     }

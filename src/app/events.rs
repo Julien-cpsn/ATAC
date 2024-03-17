@@ -41,6 +41,7 @@ impl App<'_> {
                             KeyCode::Char('c') => self.create_new_collection_state(),
                             KeyCode::Char('r') => self.create_new_request_state(),
                             KeyCode::Char('d') => self.delete_element(),
+                            KeyCode::Char('n') => self.rename_element(),
 
                             KeyCode::Char('e') => self.next_environment(),
                             
@@ -98,6 +99,32 @@ impl App<'_> {
 
                             KeyCode::Left => self.delete_request_popup.change_state(),
                             KeyCode::Right => self.delete_request_popup.change_state(),
+
+                            _ => miss_input = true
+                        },
+
+                        AppState::RenamingCollection => match key.code {
+                            KeyCode::Char(char) => self.rename_collection_input.enter_char(char),
+
+                            KeyCode::Esc => self.normal_state(),
+                            KeyCode::Enter => self.rename_collection(),
+
+                            KeyCode::Backspace => self.rename_collection_input.delete_char_backward(),
+                            KeyCode::Left => self.rename_collection_input.move_cursor_left(),
+                            KeyCode::Right => self.rename_collection_input.move_cursor_right(),
+
+                            _ => miss_input = true
+                        },
+                        
+                        AppState::RenamingRequest => match key.code {
+                            KeyCode::Char(char) => self.rename_request_input.enter_char(char),
+
+                            KeyCode::Esc => self.normal_state(),
+                            KeyCode::Enter => self.rename_request(),
+
+                            KeyCode::Backspace => self.rename_request_input.delete_char_backward(),
+                            KeyCode::Left => self.rename_request_input.move_cursor_left(),
+                            KeyCode::Right => self.rename_request_input.move_cursor_right(),
 
                             _ => miss_input = true
                         },

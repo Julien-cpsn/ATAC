@@ -123,7 +123,6 @@ cargo run -- -h
   - Document whole code
 
 - **To improve**
-  - Rename request and collection
   - Move requests and collections
   - Add Multipart form, URL encoded form and request settings from Postman import
 

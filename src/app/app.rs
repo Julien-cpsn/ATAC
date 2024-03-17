@@ -47,7 +47,9 @@ pub struct App<'a> {
     pub request_result_tab: RequestResultTabs,
 
     pub new_collection_input: TextInput,
+    pub rename_collection_input: TextInput,
     pub new_request_popup: NewRequestPopup,
+    pub rename_request_input: TextInput,
 
     pub delete_collection_popup: ValidationPopup,
     pub delete_request_popup: ValidationPopup,
@@ -99,11 +101,9 @@ impl App<'_> {
             request_result_tab: RequestResultTabs::Body,
 
             new_collection_input: TextInput::default(),
-            new_request_popup: NewRequestPopup {
-                selected_collection: 0,
-                max_selection: 0,
-                text_input: TextInput::default(),
-            },
+            rename_collection_input: TextInput::default(),
+            new_request_popup: NewRequestPopup::default(),
+            rename_request_input: TextInput::default(),
 
             delete_collection_popup: ValidationPopup::default(),
             delete_request_popup: ValidationPopup::default(),
