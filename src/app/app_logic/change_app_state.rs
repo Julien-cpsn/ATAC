@@ -7,6 +7,10 @@ impl App<'_> {
     pub fn normal_state(&mut self) {
         self.state = AppState::Normal;
     }
+    
+    pub fn edit_cookies_state(&mut self) {
+        self.state = AppState::DisplayingCookies;
+    }
 
     pub fn create_new_collection_state(&mut self) {
         self.state = AppState::CreatingNewCollection;

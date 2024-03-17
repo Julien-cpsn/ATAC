@@ -112,6 +112,7 @@ impl App<'_> {
         // POPUPS
 
         match self.state {
+            DisplayingCookies => self.render_cookies_popup(frame),
             CreatingNewCollection => self.render_creating_new_collection_popup(frame),
             CreatingNewRequest => self.render_creating_new_request_popup(frame),
             DeletingCollection => self.render_deleting_collection_popup(frame),

@@ -7,4 +7,5 @@ pub mod stateful_custom_table;
 pub mod stateful_tree;
 pub mod validation_popup;
 pub mod settings_popup;
+pub mod cookies_popup;
 pub mod syntax_highlighting;

@@ -15,7 +15,7 @@ impl App<'_> {
             .borders(Borders::ALL)
             .style(Style::default().bg(Color::DarkGray));
 
-        let area = centered_rect(30, 20, 3, 30, frame.size());
+        let area = centered_rect(25, 100, frame.size()); //TODO centered_rect(30, 20, 3, 30, frame.size());
 
         let deleting_request_layout = Layout::new(
             Horizontal,

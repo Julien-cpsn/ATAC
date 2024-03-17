@@ -14,6 +14,13 @@ pub enum AppState {
     #[strum(to_string = "Main menu")]
     Normal,
 
+    /* Cookies */
+    
+    #[strum(to_string = "Editing cookies")]
+    DisplayingCookies,
+    
+    /* Collections */
+    
     #[strum(to_string = "Creating new collection")]
     CreatingNewCollection,
 
@@ -32,9 +39,11 @@ pub enum AppState {
     #[strum(to_string = "Renaming request")]
     RenamingRequest,
 
+    /* Request */
+
     #[strum(to_string = "Request menu")]
     SelectedRequest,
-
+    
     #[strum(to_string = "Editing request URL")]
     EditingRequestUrl,
 
@@ -64,6 +73,7 @@ pub enum AppState {
 }
 
 const TEXT_INPUT_KEYS: &str = "Esc Enter ← → copy paste";
+const TEXT_AREA_INPUT_KEYS: &str = "Esc Enter Tab ^(s)ave ↑ ↓ ← → copy paste";
 const VALIDATION_KEYS: &str = "Esc Enter ← →";
 const TABLE_KEYS: &str = "↑ ↓ ← → Enter (n) (d) (t)";
 const FULL_TABLE_KEYS: &str = "↑ ↓ ← → Enter (n)ew (d)elete (t)oggle";
@@ -72,6 +82,7 @@ impl App<'_> {
     pub fn get_state_line(&self) -> Line {
         match self.state {
             Normal | CreatingNewCollection | CreatingNewRequest => Line::from(self.state.to_string().white().on_dark_gray()),
+            DisplayingCookies => Line::from(self.state.to_string().white().on_dark_gray()),
             DeletingCollection | RenamingCollection => {
                 let collection_index = self.collections_tree.state.selected()[0];
                 let collection_name = &self.collections[collection_index].name;
@@ -92,7 +103,14 @@ impl App<'_> {
                     Span::raw(self.state.to_string()).white().on_dark_gray()
                 ])
             },
-            _ => {
+            SelectedRequest |
+            EditingRequestUrl |
+            EditingRequestParam |
+            EditingRequestAuthUsername | EditingRequestAuthPassword | EditingRequestAuthBearerToken  |
+            EditingRequestHeader |
+            EditingRequestBodyTable | EditingRequestBodyString |
+            EditingRequestSettings 
+            => {
                 let local_selected_request = self.get_selected_request_as_local();
                 let selected_request = local_selected_request.read().unwrap();
 
@@ -124,6 +142,26 @@ impl App<'_> {
 
                 base_keys
             },
+
+            /* Cookies */
+            
+            DisplayingCookies => String::from(TABLE_KEYS),
+
+            /* Collections */
+            
+            CreatingNewCollection => String::from(TEXT_INPUT_KEYS),
+
+            CreatingNewRequest => format!("{TEXT_INPUT_KEYS} ↑ ↓"),
+
+            DeletingCollection => String::from(VALIDATION_KEYS),
+
+            DeletingRequest => String::from(VALIDATION_KEYS),
+
+            RenamingCollection => String::from(TEXT_INPUT_KEYS),
+
+            RenamingRequest => String::from(TEXT_INPUT_KEYS),
+
+            /* Request */
 
             SelectedRequest => {
                 let local_selected_request = self.get_selected_request_as_local();
@@ -165,19 +203,7 @@ impl App<'_> {
 
                 base_keys
             },
-
-            CreatingNewCollection => String::from(TEXT_INPUT_KEYS),
-
-            CreatingNewRequest => format!("{TEXT_INPUT_KEYS} ↑ ↓"),
-
-            DeletingCollection => String::from(VALIDATION_KEYS),
-
-            DeletingRequest => String::from(VALIDATION_KEYS),
-
-            RenamingCollection => String::from(TEXT_INPUT_KEYS),
-
-            RenamingRequest => String::from(TEXT_INPUT_KEYS),
-
+            
             EditingRequestUrl => String::from(TEXT_INPUT_KEYS),
 
             EditingRequestParam => String::from(TEXT_INPUT_KEYS),
@@ -188,7 +214,7 @@ impl App<'_> {
 
             EditingRequestBodyTable => String::from(TEXT_INPUT_KEYS),
 
-            EditingRequestBodyString => String::from("Esc Enter Tab ^(s)ave ↑ ↓ ← → copy paste"),
+            EditingRequestBodyString => String::from(TEXT_AREA_INPUT_KEYS),
 
             EditingRequestSettings => String::from("Esc Enter ↑ ↓ ← →"),
         }
@@ -205,6 +231,26 @@ impl App<'_> {
 
                 base_keys
             },
+
+            /* Cookies */
+            
+            DisplayingCookies => String::from(FULL_TABLE_KEYS),
+            
+            /* Collections */
+            
+            CreatingNewCollection => String::from(TEXT_INPUT_KEYS),
+
+            CreatingNewRequest => format!("{TEXT_INPUT_KEYS} ↑ ↓"),
+
+            DeletingCollection => String::from(VALIDATION_KEYS),
+
+            DeletingRequest => String::from(VALIDATION_KEYS),
+
+            RenamingCollection => String::from(TEXT_INPUT_KEYS),
+
+            RenamingRequest => String::from(TEXT_INPUT_KEYS),
+
+            /* Request */
 
             SelectedRequest => {
                 let local_selected_request = self.get_selected_request_as_local();
@@ -246,19 +292,7 @@ impl App<'_> {
 
                 base_keys
             },
-
-            CreatingNewCollection => String::from(TEXT_INPUT_KEYS),
-
-            CreatingNewRequest => format!("{TEXT_INPUT_KEYS} ↑ ↓"),
-
-            DeletingCollection => String::from(VALIDATION_KEYS),
-
-            DeletingRequest => String::from(VALIDATION_KEYS),
-
-            RenamingCollection => String::from(TEXT_INPUT_KEYS),
-
-            RenamingRequest => String::from(TEXT_INPUT_KEYS),
-
+            
             EditingRequestUrl => String::from(TEXT_INPUT_KEYS),
 
             EditingRequestParam => String::from(TEXT_INPUT_KEYS),
@@ -269,7 +303,7 @@ impl App<'_> {
 
             EditingRequestBodyTable => String::from(TEXT_INPUT_KEYS),
             
-            EditingRequestBodyString => String::from("Esc Enter Tab ^(s)ave ↑ ↓ ← → copy paste"),
+            EditingRequestBodyString => String::from(TEXT_AREA_INPUT_KEYS),
 
             EditingRequestSettings => String::from("Esc Enter ↑ ↓ ← →"),
         }

@@ -38,24 +38,46 @@ impl App<'_> {
                             },
                             KeyCode::Enter => self.select_request(),
 
-                            KeyCode::Char('c') => self.create_new_collection_state(),
-                            KeyCode::Char('r') => self.create_new_request_state(),
-                            KeyCode::Char('d') => self.delete_element(),
-                            KeyCode::Char('n') => self.rename_element(),
-
                             KeyCode::Char('e') => self.next_environment(),
+
+                            KeyCode::Char('c') => self.edit_cookies_state(),
+                            
+                            //KeyCode::Char('c') => self.create_new_collection_state(), // TODO
+                            //KeyCode::Char('r') => self.create_new_request_state(), // TODO
+                            KeyCode::Char('d') => self.delete_element(),
+                            KeyCode::Char('r') => self.rename_element(),
                             
                             KeyCode::Char('h') => self.display_full_help = true,
 
                             _ => miss_input = true
                         },
+                        
+                        /* Cookies */
+                        
+                        AppState::DisplayingCookies => match key.code {
+                            KeyCode::Esc => self.normal_state(),
+                            KeyCode::Enter if !control_pressed && self.cookies_popup.cookies_table.is_selected() => self.edit_request_header_state(), // TODO
 
+                            KeyCode::Up => self.cookies_popup.cookies_table.up(),
+                            KeyCode::Down => self.cookies_popup.cookies_table.down(),
+                            KeyCode::Left | KeyCode::Right => self.cookies_popup.cookies_table.change_y(),
+
+                            KeyCode::Char('n') => self.create_new_header(), // TODO
+                            KeyCode::Char('d') => self.delete_header(), // TODO
+                            KeyCode::Char('t') => self.toggle_header(), // TODO
+
+                            _ => {}
+                        },
+
+                        /* Collections */
+                        
                         AppState::CreatingNewCollection => match key.code {
                             KeyCode::Char(char) => self.new_collection_input.enter_char(char),
 
                             KeyCode::Esc => self.normal_state(),
                             KeyCode::Enter => self.new_collection(),
 
+                            KeyCode::Delete => self.new_collection_input.delete_char_forward(),
                             KeyCode::Backspace => self.new_collection_input.delete_char_backward(),
                             KeyCode::Left => self.new_collection_input.move_cursor_left(),
                             KeyCode::Right => self.new_collection_input.move_cursor_right(),
@@ -69,6 +91,7 @@ impl App<'_> {
                             KeyCode::Esc => self.normal_state(),
                             KeyCode::Enter => self.new_request(),
 
+                            KeyCode::Delete => self.new_request_popup.text_input.delete_char_forward(),
                             KeyCode::Backspace => self.new_request_popup.text_input.delete_char_backward(),
                             KeyCode::Left => self.new_request_popup.text_input.move_cursor_left(),
                             KeyCode::Right => self.new_request_popup.text_input.move_cursor_right(),
@@ -109,6 +132,7 @@ impl App<'_> {
                             KeyCode::Esc => self.normal_state(),
                             KeyCode::Enter => self.rename_collection(),
 
+                            KeyCode::Delete => self.rename_collection_input.delete_char_forward(),
                             KeyCode::Backspace => self.rename_collection_input.delete_char_backward(),
                             KeyCode::Left => self.rename_collection_input.move_cursor_left(),
                             KeyCode::Right => self.rename_collection_input.move_cursor_right(),
@@ -122,6 +146,7 @@ impl App<'_> {
                             KeyCode::Esc => self.normal_state(),
                             KeyCode::Enter => self.rename_request(),
 
+                            KeyCode::Delete => self.rename_request_input.delete_char_forward(),
                             KeyCode::Backspace => self.rename_request_input.delete_char_backward(),
                             KeyCode::Left => self.rename_request_input.move_cursor_left(),
                             KeyCode::Right => self.rename_request_input.move_cursor_right(),
@@ -129,6 +154,7 @@ impl App<'_> {
                             _ => miss_input = true
                         },
 
+                        /* Request */
                         /* /!\ Below, consider that a request has been selected /!\ */
 
                         AppState::SelectedRequest => {

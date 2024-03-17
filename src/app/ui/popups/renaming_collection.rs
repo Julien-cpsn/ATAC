@@ -12,7 +12,7 @@ impl App<'_> {
             .style(Style::default().bg(Color::DarkGray));
 
 
-        let area = centered_rect(40, 20, 3, 50, frame.size());
+        let area = centered_rect(25, 100, frame.size()); //TODO centered_rect(40, 20, 3, 50, frame.size());
         let new_request_area = popup_block.inner(area);
 
         let new_request_paragraph = Paragraph::new(self.rename_collection_input.text.as_str());

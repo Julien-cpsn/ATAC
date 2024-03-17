@@ -16,6 +16,8 @@ use crate::app::ui::result_tabs::RequestResultTabs;
 use crate::app::ui::views::RequestView;
 use crate::request::collection::Collection;
 use crate::request::environment::Environment;
+use crate::request::request::KeyValue;
+use crate::utils::cookies_popup::CookiesPopup;
 use crate::utils::settings_popup::SettingsPopup;
 use crate::utils::stateful_scrollbar::StatefulScrollbar;
 use crate::utils::stateful_custom_table::{StatefulCustomTable};
@@ -36,9 +38,17 @@ pub struct App<'a> {
 
     pub log_file: Option<File>,
 
+    /* Environments */
+    
     pub environments: Vec<Environment>,
     pub selected_environment: usize,
 
+    /* Cookies */
+    
+    pub cookies_popup: CookiesPopup,
+    
+    /* Collections */
+    
     pub collections: Vec<Collection>,
     pub collections_tree: StatefulTree<'a>,
 
@@ -53,6 +63,8 @@ pub struct App<'a> {
 
     pub delete_collection_popup: ValidationPopup,
     pub delete_request_popup: ValidationPopup,
+
+    /* Request */
 
     pub url_text_input: TextInput,
 
@@ -73,6 +85,8 @@ pub struct App<'a> {
     pub result_throbber_state: ThrobberState,
     pub result_scrollbar: StatefulScrollbar,
 
+    /* Others */
+    
     pub syntax_highlighting: SyntaxHighlighting<'a>
 }
 
@@ -89,9 +103,17 @@ impl App<'_> {
 
             log_file: None,
 
+            /* Environments */
+
             environments: vec![],
             selected_environment: 0,
 
+            /* Cookies */
+
+            cookies_popup: CookiesPopup::default(),
+            
+            /* Collections */
+            
             collections: vec![],
             collections_tree: StatefulTree::default(),
 
@@ -107,6 +129,8 @@ impl App<'_> {
 
             delete_collection_popup: ValidationPopup::default(),
             delete_request_popup: ValidationPopup::default(),
+            
+            /* Request */
             
             url_text_input: TextInput::default(),
 
@@ -127,6 +151,8 @@ impl App<'_> {
             result_throbber_state: ThrobberState::default(),
             result_scrollbar: StatefulScrollbar::default(),
 
+            /* Others */
+            
             syntax_highlighting: SyntaxHighlighting {
                 syntax_set: SyntaxSet::load_defaults_newlines(),
                 theme_set: ThemeSet::load_defaults(),

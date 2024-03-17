@@ -13,7 +13,7 @@ impl App<'_> {
             .style(Style::default().bg(Color::DarkGray));
 
 
-        let area = centered_rect(40, 20, 6, 50, frame.size());
+        let area = centered_rect(25, 100, frame.size()); //TODO centered_rect(40, 20, 6, 50, frame.size());
 
         let new_request_layout = Layout::new(
             Vertical,
