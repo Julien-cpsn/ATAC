@@ -7,8 +7,7 @@ impl App<'_> {
             RequestParamsTabs::QueryParams => RequestParamsTabs::Auth,
             RequestParamsTabs::Auth => RequestParamsTabs::Headers,
             RequestParamsTabs::Headers => RequestParamsTabs::Body,
-            RequestParamsTabs::Body => RequestParamsTabs::Cookies,
-            RequestParamsTabs::Cookies => RequestParamsTabs::QueryParams
+            RequestParamsTabs::Body => RequestParamsTabs::QueryParams
         };
 
         self.load_a_request_param_tab();
@@ -20,7 +19,6 @@ impl App<'_> {
             RequestParamsTabs::Auth => self.load_request_auth_param_tab(),
             RequestParamsTabs::Headers => self.load_request_headers_tab(),
             RequestParamsTabs::Body => self.load_request_body_param_tab(),
-            RequestParamsTabs::Cookies => {}
         }
     }
 

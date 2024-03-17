@@ -147,7 +147,6 @@ impl App<'_> {
                         ContentType::Multipart(_) | ContentType::Form(_) => Some(TABLE_KEYS),
                         ContentType::Raw(_) | ContentType::Json(_) | ContentType::Xml(_) | ContentType::Html(_) => Some("Enter"),
                     },
-                    RequestParamsTabs::Cookies => None,
                 };
 
                 if let Some(additional_keys_str) = additional_keys {

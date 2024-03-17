@@ -150,7 +150,6 @@ impl App<'_> {
 
                                     _ => {}
                                 },
-                                RequestParamsTabs::Cookies => {},
                                 _ => {}
                             }
 

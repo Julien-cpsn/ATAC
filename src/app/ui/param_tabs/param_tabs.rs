@@ -22,9 +22,7 @@ pub enum RequestParamsTabs {
     #[strum(to_string = "Headers")]
     Headers,
     #[strum(to_string = "Body")]
-    Body,
-    #[strum(to_string = "Cookies")]
-    Cookies
+    Body
 }
 
 impl App<'_> {
@@ -59,7 +57,6 @@ impl App<'_> {
                         NoBody => tab.to_string(),
                         Multipart(_) | Form(_) | Raw(_) | Json(_) | Xml(_) | Html(_) => format!("{} ({})", tab.to_string(), request.body.to_string())
                     }
-                    RequestParamsTabs::Cookies => tab.to_string(),
                 }
             });
 
@@ -171,7 +168,6 @@ impl App<'_> {
                     }
                 }
             }
-            RequestParamsTabs::Cookies => {}
         }
     }
 }
