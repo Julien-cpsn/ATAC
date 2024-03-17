@@ -125,7 +125,7 @@ cargo run -- -h
 - **To improve**
   - Rename request and collection
   - Move requests and collections
-  - Import request settings in Postman import
+  - Add Multipart form, URL encoded form and request settings from Postman import
 
 ### TODO v2.0.0
 
