@@ -16,8 +16,11 @@ pub enum AppState {
 
     /* Cookies */
     
-    #[strum(to_string = "Editing cookies")]
+    #[strum(to_string = "Displaying cookies")]
     DisplayingCookies,
+
+    #[strum(to_string = "Editing cookies")]
+    EditingCookies,
     
     /* Collections */
     
@@ -82,7 +85,7 @@ impl App<'_> {
     pub fn get_state_line(&self) -> Line {
         match self.state {
             Normal | CreatingNewCollection | CreatingNewRequest => Line::from(self.state.to_string().white().on_dark_gray()),
-            DisplayingCookies => Line::from(self.state.to_string().white().on_dark_gray()),
+            DisplayingCookies | EditingCookies => Line::from(self.state.to_string().white().on_dark_gray()),
             DeletingCollection | RenamingCollection => {
                 let collection_index = self.collections_tree.state.selected()[0];
                 let collection_name = &self.collections[collection_index].name;
@@ -145,7 +148,9 @@ impl App<'_> {
 
             /* Cookies */
             
-            DisplayingCookies => String::from(TABLE_KEYS),
+            DisplayingCookies => format!("Esc {FULL_TABLE_KEYS}"),
+
+            EditingCookies => String::from(TEXT_INPUT_KEYS),
 
             /* Collections */
             
@@ -234,8 +239,10 @@ impl App<'_> {
 
             /* Cookies */
             
-            DisplayingCookies => String::from(FULL_TABLE_KEYS),
-            
+            DisplayingCookies => format!("Esc {FULL_TABLE_KEYS}"),
+
+            EditingCookies => String::from(TEXT_INPUT_KEYS),
+
             /* Collections */
             
             CreatingNewCollection => String::from(TEXT_INPUT_KEYS),

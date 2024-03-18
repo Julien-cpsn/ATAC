@@ -65,7 +65,7 @@ impl App<'_> {
 
         // If the selected request is currently pending
         if request.is_pending {
-            let area = centered_rect(25, 100, frame.size()); //TODO centered_rect(20, 50, 1, 9, request_result_layout[2]);
+            let area = centered_rect(9, 1, request_result_layout[2]); //TODO centered_rect(20, 50, 1, 9, request_result_layout[2]);
 
             self.result_throbber_state.calc_next();
             

@@ -1,12 +1,15 @@
 use std::fs::File;
 use std::io::Read;
 use std::path::PathBuf;
+use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 use reqwest::{ClientBuilder, Proxy, Url};
+use reqwest::cookie::{Cookie, Jar};
 use reqwest::header::HeaderMap;
 use reqwest::multipart::{Form, Part};
 use reqwest::redirect::Policy;
+use reqwest_cookie_store::{CookieStoreRwLock, RawCookie};
 use tokio::task;
 
 use crate::app::app::App;
@@ -65,6 +68,11 @@ impl App<'_> {
                     }
                 }
             }
+
+            /* COOKIES */
+
+            let local_cookie_store = Arc::clone(&self.cookies_popup.cookie_store);
+            client_builder = client_builder.cookie_provider(local_cookie_store);
 
             /* CLIENT */
 

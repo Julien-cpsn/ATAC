@@ -4,7 +4,7 @@ use ratatui::layout::{Constraint, Layout};
 use ratatui::prelude::{Color, Style};
 use ratatui::style::Color::Yellow;
 use ratatui::style::Stylize;
-use ratatui::widgets::{Block, Borders, Paragraph};
+use ratatui::widgets::{Block, Borders, Clear, Paragraph};
 use crate::app::app::App;
 use crate::utils::centered_rect::centered_rect;
 
@@ -36,6 +36,7 @@ impl App<'_> {
             true => yes_paragraph = yes_paragraph.fg(Yellow).bold(),
         }
 
+        frame.render_widget(Clear, area);
         frame.render_widget(popup_block, area);
         frame.render_widget(no_paragraph, deleting_request_layout[0]);
         frame.render_widget(yes_paragraph, deleting_request_layout[1]);

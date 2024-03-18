@@ -2,7 +2,7 @@ use ratatui::Frame;
 use ratatui::layout::{Constraint, Layout};
 use ratatui::layout::Direction::Vertical;
 use ratatui::prelude::{Color, Style};
-use ratatui::widgets::{Block, Borders, Paragraph};
+use ratatui::widgets::{Block, Borders, Clear, Paragraph};
 use crate::app::app::App;
 use crate::utils::centered_rect::centered_rect;
 
@@ -40,6 +40,7 @@ impl App<'_> {
                     .borders(Borders::ALL)
             );
 
+        frame.render_widget(Clear, area);
         frame.render_widget(popup_block, area);
         frame.render_widget(selected_collection_paragraph, new_request_layout[0]);
         frame.render_widget(new_request_name_paragraph, new_request_layout[1]);

@@ -7,3 +7,4 @@ pub mod send;
 pub mod settings;
 pub mod url;
 pub(super) mod utils;
+mod cookies;

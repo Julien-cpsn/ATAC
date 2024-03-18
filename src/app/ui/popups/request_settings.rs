@@ -2,7 +2,7 @@ use ratatui::Frame;
 use ratatui::layout::Direction::{Horizontal, Vertical};
 use ratatui::layout::{Constraint, Layout};
 use ratatui::style::Stylize;
-use ratatui::widgets::{Block, Borders, Paragraph};
+use ratatui::widgets::{Block, Borders, Clear, Paragraph};
 use crate::app::app::App;
 use crate::utils::centered_rect::centered_rect;
 
@@ -18,6 +18,7 @@ impl App<'_> {
 
         let area = centered_rect(25, 100, frame.size()); //TODO centered_rect(25, 20, 2 + 1 + 2 * settings_number, 45, frame.size());
 
+        frame.render_widget(Clear, area);
         frame.render_widget(popup_block, area);
 
         let request_settings_layout = Layout::new(

@@ -126,6 +126,7 @@ name = "atac"
 version = "0.10.1"
 dependencies = [
  "clap",
+ "cookie_store",
  "crossterm",
  "envfile",
  "lazy_static",
@@ -133,6 +134,7 @@ dependencies = [
  "ratatui",
  "regex",
  "reqwest",
+ "reqwest_cookie_store",
  "serde",
  "serde_json",
  "strum",
@@ -1232,6 +1234,18 @@ dependencies = [
  "wasm-bindgen-futures",
  "web-sys",
  "winreg",
+]
+
+[[package]]
+name = "reqwest_cookie_store"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ba529055ea150e42e4eb9c11dcd380a41025ad4d594b0cb4904ef28b037e1061"
+dependencies = [
+ "bytes",
+ "cookie_store",
+ "reqwest",
+ "url 2.5.0",
 ]
 
 [[package]]

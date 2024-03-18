@@ -31,10 +31,10 @@ impl App<'_> {
         if !selected_request.params.is_empty() {
             let selection = self.query_params_table.selection.unwrap();
 
-            let param_text = match selection.1 {
-                0 => selected_request.params[selection.0].data.0.clone(),
-                1 => selected_request.params[selection.0].data.1.clone(),
-                _ => String::new()
+            let param_text = match selection {
+                (x, 0) => selected_request.params[x].data.0.clone(),
+                (x, 1) => selected_request.params[x].data.1.clone(),
+                _ => String::new() // Should not happen
             };
 
             self.query_params_table.selection_text_input.enter_str(&param_text);
@@ -63,10 +63,10 @@ impl App<'_> {
         if !selected_request.headers.is_empty() {
             let selection = self.headers_table.selection.unwrap();
 
-            let header_text = match selection.1 {
-                0 => selected_request.headers[selection.0].data.0.clone(),
-                1 => selected_request.headers[selection.0].data.1.clone(),
-                _ => String::new()
+            let header_text = match selection {
+                (x, 0) => selected_request.headers[x].data.0.clone(),
+                (x, 1) => selected_request.headers[x].data.1.clone(),
+                _ => String::new() // Should not happen
             };
 
             self.headers_table.selection_text_input.enter_str(&header_text);
@@ -83,10 +83,10 @@ impl App<'_> {
                 if !form.is_empty() {
                     let selection = self.body_form_table.selection.unwrap();
 
-                    let form_text = match selection.1 {
-                        0 => form[selection.0].data.0.clone(),
-                        1 => form[selection.0].data.1.clone(),
-                        _ => String::new()
+                    let form_text = match selection {
+                        (x, 0) => form[x].data.0.clone(),
+                        (x, 1) => form[x].data.1.clone(),
+                        _ => String::new() // Should not happen
                     };
 
                     self.body_form_table.selection_text_input.enter_str(&form_text);

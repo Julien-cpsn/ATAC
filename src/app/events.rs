@@ -40,7 +40,7 @@ impl App<'_> {
 
                             KeyCode::Char('e') => self.next_environment(),
 
-                            KeyCode::Char('c') => self.edit_cookies_state(),
+                            KeyCode::Char('c') => self.display_cookies_state(),
                             
                             //KeyCode::Char('c') => self.create_new_collection_state(), // TODO
                             //KeyCode::Char('r') => self.create_new_request_state(), // TODO
@@ -56,17 +56,31 @@ impl App<'_> {
                         
                         AppState::DisplayingCookies => match key.code {
                             KeyCode::Esc => self.normal_state(),
-                            KeyCode::Enter if !control_pressed && self.cookies_popup.cookies_table.is_selected() => self.edit_request_header_state(), // TODO
+                            KeyCode::Enter if !control_pressed && self.cookies_popup.cookies_table.is_selected() => self.edit_cookie_state(),
 
                             KeyCode::Up => self.cookies_popup.cookies_table.up(),
                             KeyCode::Down => self.cookies_popup.cookies_table.down(),
                             KeyCode::Left | KeyCode::Right => self.cookies_popup.cookies_table.change_y(),
 
-                            KeyCode::Char('n') => self.create_new_header(), // TODO
-                            KeyCode::Char('d') => self.delete_header(), // TODO
-                            KeyCode::Char('t') => self.toggle_header(), // TODO
+                            //KeyCode::Char('n') => self.create_new_cookie(), // TODO
+                            //KeyCode::Char('d') => self.delete_cookie(), // TODO
+                            //KeyCode::Char('t') => self.toggle_cookie(), // TODO
 
                             _ => {}
+                        },
+
+                        AppState::EditingCookies => match key.code {
+                            KeyCode::Char(char) => self.cookies_popup.cookies_table.selection_text_input.enter_char(char),
+
+                            KeyCode::Esc => self.display_cookies_state(),
+                            KeyCode::Enter => self.modify_cookie(),
+
+                            KeyCode::Delete => self.cookies_popup.cookies_table.selection_text_input.delete_char_forward(),
+                            KeyCode::Backspace => self.cookies_popup.cookies_table.selection_text_input.delete_char_backward(),
+                            KeyCode::Left => self.cookies_popup.cookies_table.selection_text_input.move_cursor_left(),
+                            KeyCode::Right => self.cookies_popup.cookies_table.selection_text_input.move_cursor_right(),
+
+                            _ => miss_input = true
                         },
 
                         /* Collections */

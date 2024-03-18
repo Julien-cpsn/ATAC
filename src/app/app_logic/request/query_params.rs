@@ -7,37 +7,18 @@ impl App<'_> {
         let local_selected_request = self.get_selected_request_as_local();
         let selected_request = local_selected_request.read().unwrap();
 
-        match !selected_request.params.is_empty() {
-            true => {
+        match selected_request.params.is_empty() {
+            false => {
                 self.query_params_table.selection = Some((0, 0));
                 self.query_params_table.left_state.select(Some(0));
                 self.query_params_table.right_state.select(Some(0));
             },
-            false => {
+            true => {
                 self.query_params_table.selection = None;
                 self.query_params_table.left_state.select(None);
                 self.query_params_table.right_state.select(None);
             }
         }
-    }
-
-    pub fn toggle_query_param(&mut self) {
-        if self.query_params_table.rows.is_empty() {
-            return;
-        }
-
-        let selected_request_index = &self.collections_tree.selected.unwrap();
-        let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
-
-        {
-            let mut selected_request = local_selected_request.write().unwrap();
-
-            let row = self.query_params_table.selection.unwrap().0;
-            selected_request.params[row].enabled = !selected_request.params[row].enabled;
-        }
-
-        self.save_collection_to_file(selected_request_index.0);
-        self.update_inputs();
     }
 
     pub fn modify_request_query_param(&mut self) {
@@ -81,7 +62,7 @@ impl App<'_> {
     }
 
     pub fn delete_query_param(&mut self) {
-        if self.query_params_table.selection.is_none() {
+        if self.query_params_table.rows.is_empty() || self.query_params_table.selection.is_none() {
             return;
         }
 
@@ -97,6 +78,25 @@ impl App<'_> {
 
         self.save_collection_to_file(selected_request_index.0);
         self.update_query_params_selection();
+        self.update_inputs();
+    }
+
+    pub fn toggle_query_param(&mut self) {
+        if self.query_params_table.rows.is_empty() || self.query_params_table.selection.is_none() {
+            return;
+        }
+
+        let selected_request_index = &self.collections_tree.selected.unwrap();
+        let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
+
+        {
+            let mut selected_request = local_selected_request.write().unwrap();
+
+            let row = self.query_params_table.selection.unwrap().0;
+            selected_request.params[row].enabled = !selected_request.params[row].enabled;
+        }
+
+        self.save_collection_to_file(selected_request_index.0);
         self.update_inputs();
     }
 }

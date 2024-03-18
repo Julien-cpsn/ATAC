@@ -12,13 +12,13 @@ impl App<'_> {
 
         {
             if let Some(form) = selected_request.body.get_form() {
-                match !form.is_empty() {
-                    true => {
+                match form.is_empty() {
+                    false => {
                         self.body_form_table.selection = Some((0, 0));
                         self.body_form_table.left_state.select(Some(0));
                         self.body_form_table.right_state.select(Some(0));
                     },
-                    false => {
+                    true => {
                         self.body_form_table.selection = None;
                         self.body_form_table.left_state.select(None);
                         self.body_form_table.right_state.select(None);
@@ -40,8 +40,8 @@ impl App<'_> {
 
             if let Some(form) = selected_request.body.get_form_mut() {
                 match selection {
-                    (_, 0) => form[selection.0].data.0 = input_text.clone(),
-                    (_, 1) => form[selection.0].data.1 = input_text.clone(),
+                    (x, 0) => form[x].data.0 = input_text.clone(),
+                    (x, 1) => form[x].data.1 = input_text.clone(),
                     (_, _) => {}
                 };
             }

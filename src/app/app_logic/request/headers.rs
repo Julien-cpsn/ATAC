@@ -7,13 +7,13 @@ impl App<'_> {
         let local_selected_request = self.get_selected_request_as_local();
         let selected_request = local_selected_request.read().unwrap();
 
-        match !selected_request.headers.is_empty() {
-            true => {
+        match selected_request.headers.is_empty() {
+            false => {
                 self.headers_table.selection = Some((0, 0));
                 self.headers_table.left_state.select(Some(0));
                 self.headers_table.right_state.select(Some(0));
             },
-            false => {
+            true => {
                 self.headers_table.selection = None;
                 self.headers_table.left_state.select(None);
                 self.headers_table.right_state.select(None);
@@ -32,8 +32,8 @@ impl App<'_> {
             let input_text = &self.headers_table.selection_text_input.text;
 
             match selection {
-                (_, 0) => selected_request.headers[selection.0].data.0 = input_text.clone(),
-                (_, 1) => selected_request.headers[selection.0].data.1 = input_text.clone(),
+                (x, 0) => selected_request.headers[x].data.0 = input_text.clone(),
+                (x, 1) => selected_request.headers[x].data.1 = input_text.clone(),
                 (_, _) => {}
             };
         }
@@ -61,7 +61,7 @@ impl App<'_> {
     }
 
     pub fn delete_header(&mut self) {
-        if self.headers_table.selection.is_none() {
+        if self.headers_table.rows.is_empty() || self.headers_table.selection.is_none() {
             return;
         }
 
@@ -81,7 +81,7 @@ impl App<'_> {
     }
 
     pub fn toggle_header(&mut self) {
-        if self.headers_table.rows.is_empty() {
+        if self.headers_table.rows.is_empty() || self.headers_table.selection.is_none() {
             return;
         }
 

@@ -1,15 +1,47 @@
+use std::sync::Arc;
 use crate::app::app::App;
 use crate::app::app_states::AppState;
 use crate::app::ui::param_tabs::param_tabs::RequestParamsTabs;
 use crate::request::body::ContentType;
+use crate::request::request::KeyValue;
 
 impl App<'_> {
     pub fn normal_state(&mut self) {
         self.state = AppState::Normal;
     }
     
-    pub fn edit_cookies_state(&mut self) {
+    pub fn display_cookies_state(&mut self) {
+        let local_cookie_store = Arc::clone(&self.cookies_popup.cookie_store);
+
+        self.cookies_popup.cookies_table.rows = vec![];
+
+        for cookie in local_cookie_store.read().unwrap().iter_any() {
+            let (name, value) = cookie.name_value();
+
+            self.cookies_popup.cookies_table.rows.push(KeyValue {
+                enabled: true,
+                data: (name.to_string(), value.to_string()),
+            })
+        }
+
+        self.update_cookies_table_selection();
         self.state = AppState::DisplayingCookies;
+    }
+
+    pub fn edit_cookie_state(&mut self) {
+        let selection = self.cookies_popup.cookies_table.selection.unwrap();
+
+        let input_text = match selection {
+            (x, 0) => self.cookies_popup.cookies_table.rows[x].data.0.clone(),
+            (x, 1) => self.cookies_popup.cookies_table.rows[x].data.1.clone(),
+            _ => String::new() // Should not happen
+        };
+
+        self.cookies_popup.cookies_table.selection_text_input.reset_input();
+        self.cookies_popup.cookies_table.selection_text_input.enter_str(&input_text);
+        self.cookies_popup.cookies_table.selection_text_input.cursor_position = input_text.len();
+
+        self.state = AppState::EditingCookies;
     }
 
     pub fn create_new_collection_state(&mut self) {
