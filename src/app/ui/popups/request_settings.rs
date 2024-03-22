@@ -16,7 +16,7 @@ impl App<'_> {
 
         let settings_number = self.request_settings_popup.settings.len() as u16;
 
-        let area = centered_rect(25, 100, frame.size()); //TODO centered_rect(25, 20, 2 + 1 + 2 * settings_number, 45, frame.size());
+        let area = centered_rect(45, 2 + 1 + 2 * settings_number, frame.size());
 
         frame.render_widget(Clear, area);
         frame.render_widget(popup_block, area);
