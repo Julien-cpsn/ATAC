@@ -239,6 +239,7 @@ impl App<'_> {
                             match key.code {
                                 KeyCode::Esc => self.normal_state(),
 
+                                KeyCode::Char('c') => self.display_cookies_state(),
                                 KeyCode::Char('e') => self.next_environment(),
 
                                 KeyCode::Char('h') => self.display_full_help = true,

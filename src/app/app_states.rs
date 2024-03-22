@@ -143,7 +143,7 @@ impl App<'_> {
     pub fn get_available_keys(&self) -> String {
         match self.state {
             Normal => {
-                let mut base_keys = String::from("q or ^c ↑ ↓ ← → Enter (h)elp (c) (r) (d) (n)");
+                let mut base_keys = String::from("q or ^c ↑ ↓ ← → Enter (h)elp (n) (d) (r) (c)");
 
                 if !self.environments.is_empty() {
                     base_keys += " (e)";
@@ -156,7 +156,7 @@ impl App<'_> {
 
             ChoosingElementToCreate => String::from(VALIDATION_KEYS),
 
-            DisplayingCookies => format!("Esc {FULL_TABLE_KEYS}"),
+            DisplayingCookies => String::from("Esc (d)"),
 
             EditingCookies => String::from(TEXT_INPUT_KEYS),
 
@@ -180,7 +180,7 @@ impl App<'_> {
                 let local_selected_request = self.get_selected_request_as_local();
                 let selected_request = local_selected_request.read().unwrap();
 
-                let mut base_keys = String::from("Esc ^Enter ^TAB (h)elp (u) (m) ^(a) ^(b) (s)");
+                let mut base_keys = String::from("Esc ^Enter ^TAB (h)elp (u) (m) ^(a) ^(b) (s) (c)");
 
                 if !self.environments.is_empty() {
                     base_keys += " (e)";
@@ -236,7 +236,7 @@ impl App<'_> {
     pub fn get_full_available_keys(&self) -> String {
         match self.state {
             Normal => {
-                let mut base_keys = String::from("(q)uit or ^c ↑ ↓ ← → Enter (c)ollection (r)equest (d)elete re(n)ame");
+                let mut base_keys = String::from("(q)uit or ^c ↑ ↓ ← → Enter (n)ew (d)elete (r)ename (c)ookies");
 
                 if !self.environments.is_empty() {
                     base_keys += " (e)nv";
@@ -247,7 +247,7 @@ impl App<'_> {
 
             /* Cookies */
             
-            DisplayingCookies => format!("Esc {FULL_TABLE_KEYS}"),
+            DisplayingCookies => String::from("Esc (d)elete"),
 
             EditingCookies => String::from(TEXT_INPUT_KEYS),
 
@@ -273,7 +273,7 @@ impl App<'_> {
                 let local_selected_request = self.get_selected_request_as_local();
                 let selected_request = local_selected_request.read().unwrap();
 
-                let mut base_keys = String::from("Esc ^Enter ^TAB (u)rl (m)ethod ^(a)uth ^(b)ody (s)ettings");
+                let mut base_keys = String::from("Esc ^Enter ^TAB (u)rl (m)ethod ^(a)uth ^(b)ody (s)ettings (c)ookies");
 
                 if !self.environments.is_empty() {
                     base_keys += " (e)nv";
