@@ -5,11 +5,9 @@ use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 use reqwest::{ClientBuilder, Proxy, Url};
-use reqwest::cookie::{Cookie, Jar};
 use reqwest::header::HeaderMap;
 use reqwest::multipart::{Form, Part};
 use reqwest::redirect::Policy;
-use reqwest_cookie_store::{CookieStoreRwLock, RawCookie};
 use tokio::task;
 
 use crate::app::app::App;

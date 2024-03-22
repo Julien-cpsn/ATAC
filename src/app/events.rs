@@ -42,8 +42,7 @@ impl App<'_> {
 
                             KeyCode::Char('c') => self.display_cookies_state(),
                             
-                            //KeyCode::Char('c') => self.create_new_collection_state(), // TODO
-                            //KeyCode::Char('r') => self.create_new_request_state(), // TODO
+                            KeyCode::Char('n') => self.create_new_element_state(),
                             KeyCode::Char('d') => self.delete_element(),
                             KeyCode::Char('r') => self.rename_element(),
                             
@@ -56,15 +55,15 @@ impl App<'_> {
                         
                         AppState::DisplayingCookies => match key.code {
                             KeyCode::Esc => self.normal_state(),
-                            KeyCode::Enter if !control_pressed && self.cookies_popup.cookies_table.is_selected() => self.edit_cookie_state(),
+                            //KeyCode::Enter if !control_pressed && self.cookies_popup.cookies_table.is_selected() => self.edit_cookie_state(),
 
                             KeyCode::Up => self.cookies_popup.cookies_table.up(),
                             KeyCode::Down => self.cookies_popup.cookies_table.down(),
-                            KeyCode::Left | KeyCode::Right => self.cookies_popup.cookies_table.change_y(),
+                            KeyCode::Left => self.cookies_popup.cookies_table.left(),
+                            KeyCode::Right => self.cookies_popup.cookies_table.right(),
 
-                            //KeyCode::Char('n') => self.create_new_cookie(), // TODO
-                            //KeyCode::Char('d') => self.delete_cookie(), // TODO
-                            //KeyCode::Char('t') => self.toggle_cookie(), // TODO
+                            //KeyCode::Char('n') => self.create_new_cookie(),
+                            KeyCode::Char('d') => self.delete_cookie(),
 
                             _ => {}
                         },
@@ -84,7 +83,19 @@ impl App<'_> {
                         },
 
                         /* Collections */
-                        
+
+                        AppState::ChoosingElementToCreate => match key.code {
+                            KeyCode::Esc => self.normal_state(),
+
+                            KeyCode::Enter if !self.creation_popup.state => self.create_new_collection_state(),
+                            KeyCode::Enter if self.creation_popup.state => self.create_new_request_state(),
+
+                            KeyCode::Left => self.creation_popup.change_state(),
+                            KeyCode::Right => self.creation_popup.change_state(),
+
+                            _ => miss_input = true
+                        },
+
                         AppState::CreatingNewCollection => match key.code {
                             KeyCode::Char(char) => self.new_collection_input.enter_char(char),
 

@@ -1,9 +1,10 @@
 use std::sync::Arc;
+
 use crate::app::app::App;
 use crate::app::app_states::AppState;
 use crate::app::ui::param_tabs::param_tabs::RequestParamsTabs;
 use crate::request::body::ContentType;
-use crate::request::request::KeyValue;
+use crate::utils::cookie_table::cookie_to_row;
 
 impl App<'_> {
     pub fn normal_state(&mut self) {
@@ -16,26 +17,18 @@ impl App<'_> {
         self.cookies_popup.cookies_table.rows = vec![];
 
         for cookie in local_cookie_store.read().unwrap().iter_any() {
-            let (name, value) = cookie.name_value();
-
-            self.cookies_popup.cookies_table.rows.push(KeyValue {
-                enabled: true,
-                data: (name.to_string(), value.to_string()),
-            })
+            self.cookies_popup.cookies_table.rows.push(cookie_to_row(cookie))
         }
 
         self.update_cookies_table_selection();
         self.state = AppState::DisplayingCookies;
     }
 
+    #[allow(dead_code)]
     pub fn edit_cookie_state(&mut self) {
         let selection = self.cookies_popup.cookies_table.selection.unwrap();
 
-        let input_text = match selection {
-            (x, 0) => self.cookies_popup.cookies_table.rows[x].data.0.clone(),
-            (x, 1) => self.cookies_popup.cookies_table.rows[x].data.1.clone(),
-            _ => String::new() // Should not happen
-        };
+        let input_text = self.cookies_popup.cookies_table.rows[selection.0][selection.1].clone();
 
         self.cookies_popup.cookies_table.selection_text_input.reset_input();
         self.cookies_popup.cookies_table.selection_text_input.enter_str(&input_text);
@@ -44,6 +37,10 @@ impl App<'_> {
         self.state = AppState::EditingCookies;
     }
 
+    pub fn create_new_element_state(&mut self) {
+        self.state = AppState::ChoosingElementToCreate;    
+    }
+    
     pub fn create_new_collection_state(&mut self) {
         self.state = AppState::CreatingNewCollection;
     }

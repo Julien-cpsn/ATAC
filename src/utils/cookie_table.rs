@@ -1,19 +1,56 @@
-use ratatui::widgets::{ListState};
-use crate::request::request::KeyValue;
+use cookie_store::Cookie;
+use ratatui::layout::Constraint;
+use ratatui::widgets::ListState;
+use strum::{Display, FromRepr};
+
 use crate::utils::text_input::TextInput;
 
-#[derive(Default)]
-pub struct StatefulCustomTable {
-    pub lists_states: &[ListState; 8],
-    pub left_state: ListState,
-    pub right_state: ListState,
+#[derive(Display, FromRepr)]
+pub enum CookieColumns {
+    #[strum(to_string = "URL")]
+    URL,
+    #[strum(to_string = "Name")]
+    Name,
+    #[strum(to_string = "Value")]
+    Value,
+    #[strum(to_string = "Path")]
+    Path,
+    #[strum(to_string = "Expires")]
+    Expires,
+    #[strum(to_string = "Http\nonly")]
+    HttpOnly,
+    #[strum(to_string = "Secure")]
+    Secure,
+    #[strum(to_string = "Same\nsite")]
+    SameSite
+}
+
+impl CookieColumns {
+    pub fn constraints() -> [Constraint; 8]{
+        [
+            Constraint::Percentage(10),
+            Constraint::Percentage(15),
+            Constraint::Percentage(37),
+            Constraint::Percentage(10),
+            Constraint::Percentage(10),
+            Constraint::Percentage(6),
+            Constraint::Percentage(6),
+            Constraint::Percentage(6)
+        ]
+    }
+}
+
+pub const COOKIES_COLUMNS_NUMBER: usize = 8;
+
+pub struct StatefulCookieTable {
+    pub lists_states: [ListState; COOKIES_COLUMNS_NUMBER],
     /// (x, y)
     pub selection: Option<(usize, usize)>,
-    pub rows: Vec<KeyValue>,
+    pub rows: Vec<[String; COOKIES_COLUMNS_NUMBER]>,
     pub selection_text_input: TextInput,
 }
 
-impl StatefulCustomTable {
+impl StatefulCookieTable {
     fn decrement_x(&self, i: usize) -> usize {
         if i == 0 {
             self.rows.len() - 1
@@ -30,21 +67,20 @@ impl StatefulCustomTable {
         }
     }
 
-    pub fn change_y(&mut self) {
-        if self.rows.is_empty() || self.selection.is_none() {
-            return;
+    fn decrement_y(&self, i: usize) -> usize {
+        if i == 0 {
+            COOKIES_COLUMNS_NUMBER - 1
+        } else {
+            i - 1
         }
+    }
 
-        match self.selection.unwrap() {
-            (x, 0) => self.selection = Some((x, 1)),
-            (x, 1) => self.selection = Some((x, 0)),
-            (x, _) => self.selection = Some((x, 0))
+    pub fn increment_y(&mut self, i: usize) -> usize {
+        if i >= COOKIES_COLUMNS_NUMBER - 1 {
+            0
+        } else {
+            i + 1
         }
-
-        let x = self.selection.unwrap().0;
-
-        self.right_state.select(Some(x));
-        self.left_state.select(Some(x));
     }
 
     pub fn up(&mut self) {
@@ -52,20 +88,16 @@ impl StatefulCustomTable {
             return;
         }
 
-        let x = match self.selection.unwrap() {
-            (_, 0) => match self.left_state.selected() {
-                None => 0,
-                Some(i) => self.decrement_x(i)
-            },
-            (_, 1) => match self.right_state.selected() {
-                None => 0,
-                Some(i) => self.decrement_x(i)
-            },
-            (_, _) => 0
+        let selection = self.selection.unwrap();
+
+        let x = match self.lists_states[selection.1].selected() {
+            None => 0,
+            Some(i) => self.decrement_x(i)
         };
 
-        self.left_state.select(Some(x));
-        self.right_state.select(Some(x));
+        for list_state in self.lists_states.iter_mut() {
+            list_state.select(Some(x));
+        }
 
         match self.selection.unwrap() {
             (_, y) => self.selection = Some((x, y))
@@ -77,27 +109,101 @@ impl StatefulCustomTable {
             return;
         }
 
-        let x = match self.selection.unwrap() {
-            (_, 0) => match self.left_state.selected() {
-                None => 0,
-                Some(i) => self.increment_x(i)
-            },
-            (_, 1) => match self.right_state.selected() {
-                None => 0,
-                Some(i) => self.increment_x(i)
-            },
-            (_, _) => 0
+        let selection = self.selection.unwrap();
+
+        let x = match self.lists_states[selection.1].selected() {
+            None => 0,
+            Some(i) => self.increment_x(i)
         };
 
-        self.left_state.select(Some(x));
-        self.right_state.select(Some(x));
+        for list_state in self.lists_states.iter_mut() {
+            list_state.select(Some(x));
+        }
 
         match self.selection.unwrap() {
             (_, y) => self.selection = Some((x, y))
         }
     }
 
-    pub fn is_selected(&self) -> bool {
-        return self.selection.is_some();
+    pub fn left(&mut self) {
+        if self.rows.is_empty() || self.selection.is_none() {
+            return;
+        }
+
+        let selection = self.selection.unwrap();
+
+        let y = self.decrement_y(selection.1);
+
+        match self.selection.unwrap() {
+            (x, _) => self.selection = Some((x, y))
+        }
     }
+
+    pub fn right(&mut self) {
+        if self.rows.is_empty() || self.selection.is_none() {
+            return;
+        }
+
+        let selection = self.selection.unwrap();
+
+        let y = self.increment_y(selection.1);
+
+        match self.selection.unwrap() {
+            (x, _) => self.selection = Some((x, y))
+        }
+    }
+}
+
+impl Default for StatefulCookieTable {
+    fn default() -> Self {
+        StatefulCookieTable {
+            lists_states: [
+                ListState::default(),
+                ListState::default(),
+                ListState::default(),
+                ListState::default(),
+                ListState::default(),
+                ListState::default(),
+                ListState::default(),
+                ListState::default()
+            ],
+            selection: None,
+            rows: vec![],
+            selection_text_input: TextInput::default(),
+        }
+    }
+}
+
+pub fn cookie_to_row(cookie: &Cookie) -> [String; COOKIES_COLUMNS_NUMBER]{
+    [
+        match cookie.domain() {
+            None => String::new(),
+            Some(domain) => domain.to_string()
+        },
+        cookie.name().to_string(),
+        cookie.value().to_string(),
+        match cookie.path() {
+            None => String::new(),
+            Some(path) => path.to_string()
+        },
+        match cookie.expires() {
+            None => String::new(),
+            Some(expiration) => match expiration.is_datetime() {
+                true => expiration.datetime().unwrap().to_string(),
+                false => String::from("session")
+            }
+        },
+        match cookie.http_only() {
+            None => String::new(),
+            Some(http_only) => http_only.to_string()
+        },
+        match cookie.secure() {
+            None => String::new(),
+            Some(secure) => secure.to_string()
+        },
+        match cookie.same_site() {
+            None => String::new(),
+            Some(same_site) => same_site.to_string()
+        }
+    ]
 }

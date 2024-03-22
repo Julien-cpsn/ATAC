@@ -1,13 +1,15 @@
-use std::fs::{File};
+use std::fs::File;
 use std::marker::PhantomData;
 use std::time::Duration;
-use crossterm::terminal::{disable_raw_mode};
+
+use crossterm::terminal::disable_raw_mode;
 use ratatui::backend::Backend;
 use ratatui::Terminal;
 use syntect::highlighting::ThemeSet;
 use syntect::parsing::SyntaxSet;
 use throbber_widgets_tui::ThrobberState;
 use tui_textarea::TextArea;
+
 use crate::app::app_logic::new_request_popup::NewRequestPopup;
 use crate::app::app_states::AppState;
 use crate::app::files::config::Config;
@@ -16,11 +18,10 @@ use crate::app::ui::result_tabs::RequestResultTabs;
 use crate::app::ui::views::RequestView;
 use crate::request::collection::Collection;
 use crate::request::environment::Environment;
-use crate::request::request::KeyValue;
 use crate::utils::cookies_popup::CookiesPopup;
 use crate::utils::settings_popup::SettingsPopup;
+use crate::utils::stateful_custom_table::StatefulCustomTable;
 use crate::utils::stateful_scrollbar::StatefulScrollbar;
-use crate::utils::stateful_custom_table::{StatefulCustomTable};
 use crate::utils::stateful_tree::StatefulTree;
 use crate::utils::syntax_highlighting::SyntaxHighlighting;
 use crate::utils::text_input::TextInput;
@@ -55,6 +56,8 @@ pub struct App<'a> {
     pub request_view: RequestView,
     pub request_param_tab: RequestParamsTabs,
     pub request_result_tab: RequestResultTabs,
+
+    pub creation_popup: ValidationPopup,
 
     pub new_collection_input: TextInput,
     pub rename_collection_input: TextInput,
@@ -122,6 +125,8 @@ impl App<'_> {
             request_param_tab: RequestParamsTabs::QueryParams,
             request_result_tab: RequestResultTabs::Body,
 
+            creation_popup: ValidationPopup::default(),
+            
             new_collection_input: TextInput::default(),
             rename_collection_input: TextInput::default(),
             new_request_popup: NewRequestPopup::default(),

@@ -20,10 +20,14 @@ pub enum AppState {
     DisplayingCookies,
 
     #[strum(to_string = "Editing cookies")]
+    #[allow(dead_code)]
     EditingCookies,
     
     /* Collections */
-    
+
+    #[strum(to_string = "Choosing an element to create")]
+    ChoosingElementToCreate,
+
     #[strum(to_string = "Creating new collection")]
     CreatingNewCollection,
 
@@ -84,7 +88,9 @@ const FULL_TABLE_KEYS: &str = "↑ ↓ ← → Enter (n)ew (d)elete (t)oggle";
 impl App<'_> {
     pub fn get_state_line(&self) -> Line {
         match self.state {
-            Normal | CreatingNewCollection | CreatingNewRequest => Line::from(self.state.to_string().white().on_dark_gray()),
+            Normal => Line::from(self.state.to_string().white().on_dark_gray()),
+            ChoosingElementToCreate => Line::from(self.state.to_string().white().on_dark_gray()),
+            CreatingNewCollection | CreatingNewRequest => Line::from(self.state.to_string().white().on_dark_gray()),
             DisplayingCookies | EditingCookies => Line::from(self.state.to_string().white().on_dark_gray()),
             DeletingCollection | RenamingCollection => {
                 let collection_index = self.collections_tree.state.selected()[0];
@@ -147,7 +153,9 @@ impl App<'_> {
             },
 
             /* Cookies */
-            
+
+            ChoosingElementToCreate => String::from(VALIDATION_KEYS),
+
             DisplayingCookies => format!("Esc {FULL_TABLE_KEYS}"),
 
             EditingCookies => String::from(TEXT_INPUT_KEYS),
@@ -244,7 +252,9 @@ impl App<'_> {
             EditingCookies => String::from(TEXT_INPUT_KEYS),
 
             /* Collections */
-            
+
+            ChoosingElementToCreate => String::from(VALIDATION_KEYS),
+
             CreatingNewCollection => String::from(TEXT_INPUT_KEYS),
 
             CreatingNewRequest => format!("{TEXT_INPUT_KEYS} ↑ ↓"),

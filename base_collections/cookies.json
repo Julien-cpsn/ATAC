@@ -50,6 +50,64 @@
         "allow_redirects": true,
         "store_received_cookies": true
       }
+    },
+    {
+      "name": "Set cookie",
+      "url": "https://httpbin.org/cookies/set",
+      "method": "GET",
+      "params": [
+        {
+          "enabled": true,
+          "data": [
+            "name",
+            "value"
+          ]
+        }
+      ],
+      "headers": [
+        {
+          "enabled": true,
+          "data": [
+            "cache-control",
+            "no-cache"
+          ]
+        },
+        {
+          "enabled": true,
+          "data": [
+            "user-agent",
+            "ATAC/v0.10.1"
+          ]
+        },
+        {
+          "enabled": true,
+          "data": [
+            "accept",
+            "*/*"
+          ]
+        },
+        {
+          "enabled": true,
+          "data": [
+            "accept-encoding",
+            "gzip, deflate, br"
+          ]
+        },
+        {
+          "enabled": true,
+          "data": [
+            "connection",
+            "keep-alive"
+          ]
+        }
+      ],
+      "body": "no_body",
+      "auth": "no_auth",
+      "settings": {
+        "use_config_proxy": true,
+        "allow_redirects": true,
+        "store_received_cookies": true
+      }
     }
   ]
 }
