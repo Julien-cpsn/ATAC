@@ -117,14 +117,19 @@ cargo run -- -h
 ### TODO v1.0.0
 
 - **To add**
-  - Cookies management
-  - Insomnia import
   - Create a repo wiki
   - Document whole code
 
 - **To improve**
   - Move requests and collections
+  - Pretty print output
+  - Side scroll results
+  - Sign binary
+  - Expand collection with Enter 
   - Add Multipart form, URL encoded form and request settings from Postman import
+
+- To fix
+  - Query params bug
 
 ### TODO v2.0.0
 
@@ -136,6 +141,8 @@ cargo run -- -h
   - Pre and post-request script (javascript v8 engine)
 
 - **To improve**
+  - Editing cookies
+  - Insomnia import
   - Auto-completion on env file variables
 
 ### Ideas (will think about it later)
