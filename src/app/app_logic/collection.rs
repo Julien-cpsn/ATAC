@@ -118,6 +118,18 @@ impl App<'_> {
         self.normal_state()
     }
 
+    pub fn select_request_or_expand_collection(&mut self) {
+        match self.collections_tree.state.selected().len() {
+            1 => {
+                self.collections_tree.state.toggle_selected();
+            },
+            2 => {
+                self.select_request();
+            },
+            _ => {}
+        }
+    }
+    
     pub fn new_collection(&mut self) {
         let new_collection_name = &self.new_collection_input.text;
 

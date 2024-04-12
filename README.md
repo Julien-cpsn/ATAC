@@ -124,7 +124,6 @@ cargo run -- -h
   - Pretty print output
   - Side scroll results
   - Sign binary
-  - Expand collection with Enter 
   - Add Multipart form, URL encoded form and request settings from Postman import
 
 - **To fix**

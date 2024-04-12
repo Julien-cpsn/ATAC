@@ -39,7 +39,7 @@ impl App<'_> {
                             KeyCode::Right => {
                                 self.collections_tree.state.toggle_selected();
                             },
-                            KeyCode::Enter => self.select_request(),
+                            KeyCode::Enter => self.select_request_or_expand_collection(),
 
                             KeyCode::Char('e') => self.next_environment(),
 
