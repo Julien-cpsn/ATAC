@@ -143,7 +143,7 @@ impl App<'_> {
     pub fn get_available_keys(&self) -> String {
         match self.state {
             Normal => {
-                let mut base_keys = String::from("q or ^c ↑ ↓ ← → Enter (h)elp (n) (d) (r) (c)");
+                let mut base_keys = String::from("q or ^c ^↑ ^↓ ← → Enter (h)elp (n) (d) (r) (c)");
 
                 if !self.environments.is_empty() {
                     base_keys += " (e)";
@@ -236,7 +236,7 @@ impl App<'_> {
     pub fn get_full_available_keys(&self) -> String {
         match self.state {
             Normal => {
-                let mut base_keys = String::from("(q)uit or ^c ↑ ↓ ← → Enter (n)ew (d)elete (r)ename (c)ookies");
+                let mut base_keys = String::from("(q)uit or ^c ^↑ ^↓ ← → Enter (n)ew (d)elete (r)ename (c)ookies");
 
                 if !self.environments.is_empty() {
                     base_keys += " (e)nv";

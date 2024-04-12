@@ -249,4 +249,58 @@ impl App<'_> {
         self.save_collection_to_file(selected_request_index[0]);
         self.normal_state();
     }
+
+    pub fn move_request_up(&mut self) {
+        if self.collections_tree.state.selected().len() != 2 {
+            return;
+        }
+
+        let mut selection = self.collections_tree.state.selected();
+
+        // Cannot decrement selection further
+        if selection[1] == 0 {
+            return;
+        }
+
+        // Retrieve the request
+        let request = self.collections[selection[0]].requests.remove(selection[1]);
+
+        // Increment selection
+        selection[1] -= 1;
+
+        // Insert the request at its new index
+        self.collections[selection[0]].requests.insert(selection[1], request);
+
+        // Update the selection in order to move with the element
+        self.collections_tree.state.select(selection.clone());
+
+        self.save_collection_to_file(selection[0]);
+    }
+
+    pub fn move_request_down(&mut self) {
+        if self.collections_tree.state.selected().len() != 2 {
+            return;
+        }
+
+        let mut selection = self.collections_tree.state.selected();
+
+        // Cannot increment selection further
+        if selection[1] == self.collections[selection[0]].requests.len() - 1 {
+            return;
+        }
+
+        // Retrieve the request
+        let request = self.collections[selection[0]].requests.remove(selection[1]);
+
+        // Increment selection
+        selection[1] += 1;
+
+        // Insert the request at its new index
+        self.collections[selection[0]].requests.insert(selection[1], request);
+
+        // Update the selection in order to move with the element
+        self.collections_tree.state.select(selection.clone());
+
+        self.save_collection_to_file(selection[0]);
+    }
 }

@@ -30,6 +30,9 @@ impl App<'_> {
                             KeyCode::Char('c') if control_pressed => self.should_quit = true,
                             KeyCode::Char('q') => self.should_quit = true,
 
+                            KeyCode::Up if control_pressed => self.move_request_up(),
+                            KeyCode::Down if control_pressed => self.move_request_down(),
+
                             KeyCode::Up => self.collections_tree.up(),
                             KeyCode::Down => self.collections_tree.down(),
                             KeyCode::Left => self.unselect_request(),
