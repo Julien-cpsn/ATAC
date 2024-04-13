@@ -1,3 +1,4 @@
+use std::str::Lines;
 use crate::app::app::App;
 use crate::app::ui::result_tabs::RequestResultTabs;
 
@@ -9,34 +10,71 @@ impl App<'_> {
             RequestResultTabs::Headers => RequestResultTabs::Body,
         };
 
-        self.refresh_result_scrollbar();
+        self.refresh_result_scrollbars();
     }
 
-    pub fn refresh_result_scrollbar(&mut self) {
+    pub fn refresh_result_scrollbars(&mut self) {
+        // Vertical max
         let lines_count: usize;
+        let horizontal_max: usize;
 
         let local_selected_request = self.get_selected_request_as_local();
         let selected_request = local_selected_request.read().unwrap();
 
         match self.request_result_tab {
             RequestResultTabs::Body => {
-                lines_count = match &selected_request.result.body {
-                    None => 0,
-                    Some(body) => body.lines().count()
+                match &selected_request.result.body {
+                    None => {
+                        lines_count = 0;
+                        horizontal_max = 0;
+                    },
+                    Some(body) => {
+                        lines_count = body.lines().count();
+                        horizontal_max = App::get_max_str_len(body.lines());
+                    }
                 }
             }
             RequestResultTabs::Cookies => {
-                lines_count = match &selected_request.result.cookies {
-                    None => 0,
-                    Some(cookies) => cookies.lines().count()
+                match &selected_request.result.cookies {
+                    None => {
+                        lines_count = 0;
+                        horizontal_max = 0;
+                    },
+                    Some(cookies) => {
+                        lines_count = cookies.lines().count();
+                        horizontal_max = App::get_max_str_len(cookies.lines());
+                    }
                 }
             }
             RequestResultTabs::Headers => {
                 lines_count = selected_request.result.headers.len();
+
+                let mut max_tmp = 0;
+
+                for (header, value) in &selected_request.result.headers {
+                    let str_len = header.len() + value.len();
+                    if str_len > max_tmp {
+                        max_tmp = str_len;
+                    }
+                }
+                
+                horizontal_max = max_tmp;
             }
         }
 
-        self.result_scrollbar.set_scroll(lines_count);
+        self.result_vertical_scrollbar.set_scroll(lines_count);
+        self.result_horizontal_scrollbar.set_scroll(horizontal_max);
     }
+    
+    fn get_max_str_len(lines: Lines) -> usize {
+        let mut max_tmp = 0;
 
+        for line in lines {
+            if line.len() > max_tmp {
+                max_tmp = line.len();
+            }
+        }
+
+        return max_tmp;
+    }
 }

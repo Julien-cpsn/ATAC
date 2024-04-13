@@ -8,7 +8,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-reqwest = { version = "0.11.26", default-features = false, features = ["cookies", "rustls-tls-native-roots", "multipart", "gzip", "brotli", "deflate"] }
+reqwest = { version = "0.11.27", default-features = false, features = ["cookies", "rustls-tls-native-roots", "multipart", "gzip", "brotli", "deflate"] }
 reqwest_cookie_store = "0.6.0"
 cookie_store = "0.20.0"
 tokio = { version = "1.36.0", features = ["rt", "rt-multi-thread", "macros"] }
@@ -18,7 +18,7 @@ crossterm = "0.27.0"
 tui-big-text = "0.4.2"
 tui-textarea = { version = "0.4.0", features = ["ratatui"] }
 tui-tree-widget = "0.19.0"
-throbber-widgets-tui = { version = "0.4.1", features = ["ratatui"] }
+throbber-widgets-tui = "0.5.0"
 regex = "1.10.3"
 serde = { version = "1.0.197", features = ["derive", "rc"] }
 serde_json = "1.0.114"

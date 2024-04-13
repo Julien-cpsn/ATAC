@@ -179,7 +179,8 @@ impl App<'_> {
             }
 
             let local_selected_request = self.get_selected_request_as_local();
-
+            let local_last_highlighted = Arc::clone(&self.syntax_highlighting.last_highlighted);
+            
             /* SEND REQUEST */
 
             task::spawn(async move {
@@ -237,10 +238,9 @@ impl App<'_> {
                 local_selected_request.write().unwrap().result.duration = Some(format!("{:?}", elapsed_time));
 
                 local_selected_request.write().unwrap().is_pending = false;
+                *local_last_highlighted.write().unwrap() = None;
             });
         }
-
-        self.refresh_result_scrollbar();
     }
 }
 

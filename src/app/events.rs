@@ -262,8 +262,10 @@ impl App<'_> {
 
                                 KeyCode::Char('s') => self.edit_request_settings_state(),
 
-                                KeyCode::PageUp => self.result_scrollbar.page_up(),
-                                KeyCode::PageDown => self.result_scrollbar.page_down(),
+                                KeyCode::Up if control_pressed => self.result_vertical_scrollbar.page_up(),
+                                KeyCode::Down if control_pressed => self.result_vertical_scrollbar.page_down(),
+                                KeyCode::Left if control_pressed => self.result_horizontal_scrollbar.page_up(),
+                                KeyCode::Right if control_pressed => self.result_horizontal_scrollbar.page_down(),
 
                                 KeyCode::BackTab if shift_pressed => self.next_request_view(),
                                 KeyCode::Tab if control_pressed => self.next_request_result_tab(),

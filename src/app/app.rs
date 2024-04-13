@@ -1,5 +1,5 @@
 use std::fs::File;
-use std::marker::PhantomData;
+use std::sync::{Arc, RwLock};
 use std::time::Duration;
 
 use crossterm::terminal::disable_raw_mode;
@@ -86,11 +86,12 @@ pub struct App<'a> {
     pub request_settings_popup: SettingsPopup,
 
     pub result_throbber_state: ThrobberState,
-    pub result_scrollbar: StatefulScrollbar,
+    pub result_vertical_scrollbar: StatefulScrollbar,
+    pub result_horizontal_scrollbar: StatefulScrollbar,
 
     /* Others */
     
-    pub syntax_highlighting: SyntaxHighlighting<'a>
+    pub syntax_highlighting: SyntaxHighlighting
 }
 
 impl App<'_> {
@@ -154,14 +155,15 @@ impl App<'_> {
             request_settings_popup: SettingsPopup::default(),
             
             result_throbber_state: ThrobberState::default(),
-            result_scrollbar: StatefulScrollbar::default(),
+            result_vertical_scrollbar: StatefulScrollbar::default(),
+            result_horizontal_scrollbar: StatefulScrollbar::default(),
 
             /* Others */
-            
+
             syntax_highlighting: SyntaxHighlighting {
                 syntax_set: SyntaxSet::load_defaults_newlines(),
                 theme_set: ThemeSet::load_defaults(),
-                phantom_data: PhantomData::default(),
+                last_highlighted: Arc::new(RwLock::new(None)),
             },
         }
     }

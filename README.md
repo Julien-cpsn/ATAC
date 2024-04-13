@@ -122,7 +122,6 @@ cargo run -- -h
 
 - **To improve**
   - Pretty print output
-  - Side scroll results
   - Sign binary
   - Add Multipart form, URL encoded form and request settings from Postman import
 
