@@ -27,9 +27,9 @@ ATAC ⚔📩
 
 ## Description
 
-ATAC is **A**rguably a **T**erminal **A**PI **C**lient. It is based on well known clients such as Postman, Insomnia or even Bruno, but inside your terminal without any specific graphical environment needed.
+ATAC is **A**rguably a **T**erminal **A**PI **C**lient. It is based on well known clients such as Postman, Insomnia, or even Bruno, but inside your terminal without any specific graphical environment needed.
 
-The philosophy of ATAC is to be free, account-less and offline for now and forever.
+The philosophy of ATAC is to be free, account-less, and offline for now and forever.
 
 ## How to use
 
@@ -105,10 +105,10 @@ cargo run -- -h
 | **GraphQL**                         | :x: (not planned)                                         | :white_check_mark:   | :white_check_mark:   |
 | **Free**                            | :white_check_mark:                                        | Depends              | Depends              |
 | **Lightweight, fast and efficient** | :white_check_mark:                                        | :x:                  | :x:                  |
-| **Data storage**                    | Your own commitable, readable and versionable files       | Tied to your account | Tied to your account |
+| **Data storage**                    | Your own committable, readable and versioned files       | Tied to your account | Tied to your account |
 | **Offline**                         | :white_check_mark:	                                       | :x:                  | :x:                  |
 | **Real-time collaboration**         | :x: (not planned)                                         | :white_check_mark:   | :white_check_mark:   |
-| **Environment files and variables** | :white_check_mark: (commitable, readable and versionable) | :white_check_mark:   | :white_check_mark:   |
+| **Environment files and variables** | :white_check_mark: (committable, readable and versioned) | :white_check_mark:   | :white_check_mark:   |
 | **View options**                    | :white_check_mark:                                        | :white_check_mark:   | :white_check_mark:   |
 | **Global configuration file**       | :white_check_mark:                                        | :white_check_mark:   | :white_check_mark:   |
 | - HTTP/HTTPS Proxy                  | :white_check_mark:                                        | :white_check_mark:   | :white_check_mark:   |
@@ -129,7 +129,7 @@ cargo run -- -h
   - Add Multipart form, URL encoded form and request settings from Postman import
 
 - **To fix**
-  - Query params bug
+  - Query parameters bug
 
 ### TODO v2.0.0
 
@@ -198,7 +198,7 @@ cargo run -- -h
 
 ### Binary size
 
-The binary file size goes from ~4.5 MB to ~7 MB depending on the platform. I try to keep it the smallest I can.
+The binary file size goes from ~4.5 MB to ~7 MB depending on the platform. I try to keep it as small as possible.
 
 ## Contributors
 
