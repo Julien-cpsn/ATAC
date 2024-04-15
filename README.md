@@ -57,7 +57,7 @@ Simply clone the repository and use:
 cargo run -- -h
 ```
 
-> Build latest release 
+> Build latest release
 > ```bash
 > cargo build --release
 > ```
@@ -66,56 +66,56 @@ cargo run -- -h
 
 ### Current
 
-| Features                            | **ATAC**                                                  | Postman              | Insomnia             |
-|-------------------------------------|-----------------------------------------------------------|----------------------|----------------------|
-| **Manage collections & requests**   | :white_check_mark:	                                       | :white_check_mark:	  | :white_check_mark:	  |
-| **HTTP Client**                     | :white_check_mark:	                                       | :white_check_mark:	  | :white_check_mark:	  |
-| Methods                             | :white_check_mark:	                                       | :white_check_mark:	  | :white_check_mark:	  |
-| - GET                               | :white_check_mark:	                                       | :white_check_mark:	  | :white_check_mark:	  |
-| - POST                              | :white_check_mark:	                                       | :white_check_mark:	  | :white_check_mark:	  |
-| - PUT                               | :white_check_mark:	                                       | :white_check_mark:	  | :white_check_mark:	  |
-| - PATCH                             | :white_check_mark:	                                       | :white_check_mark:	  | :white_check_mark:	  |
-| - DELETE                            | :white_check_mark:	                                       | :white_check_mark:	  | :white_check_mark:	  |
-| - HEAD                              | :white_check_mark:	                                       | :white_check_mark:	  | :white_check_mark:	  |
-| - OPTIONS                           | :white_check_mark:	                                       | :white_check_mark:	  | :white_check_mark:	  |
-| Authentication                      | Partial                                                   | :white_check_mark:   | :white_check_mark:   |
-| - Basic auth                        | :white_check_mark:                                        | :white_check_mark:   | :white_check_mark:   |
-| - Bearer token                      | :white_check_mark:                                        | :white_check_mark:   | :white_check_mark:   |
-| - JWT, Digest, OAuth1-2, AWS        | :x: :soon:                                                | :white_check_mark:   | :white_check_mark:   |
-| Headers                             | :white_check_mark:                                        | :white_check_mark:   | :white_check_mark:   |
-| Body                                | :white_check_mark:                                        | :white_check_mark:   | :white_check_mark:   |
-| - Multipart form                    | :white_check_mark:                                        | :white_check_mark:   | :white_check_mark:   |
-| - URL Encoded from                  | :white_check_mark:                                        | :white_check_mark:   | :white_check_mark:   |
-| - Plain text                        | :white_check_mark:                                        | :white_check_mark:   | :white_check_mark:   |
-| - JSON, XML, HTML                   | :white_check_mark:                                        | :white_check_mark:   | :white_check_mark:   |
-| Full response                       | :white_check_mark:                                        | :white_check_mark:   | :white_check_mark:   |
-| - Status code                       | :white_check_mark:                                        | :white_check_mark:   | :white_check_mark:   |
-| - Cookies                           | :white_check_mark:                                        | :white_check_mark:   | :white_check_mark:   |
-| - Headers                           | :white_check_mark:                                        | :white_check_mark:   | :white_check_mark:   |
-| - Duration                          | :white_check_mark:                                        | :white_check_mark:   | :white_check_mark:   |
-| Scripting                           | :x: :soon:                                                | :x:                  | :x:                  |
-| - Pre-request script                | :x: :soon:                                                | :x:                  | :x:                  |
-| - Post-request script               | :x: :soon:                                                | :white_check_mark:   | :x:                  |
-| Asynchronous requests               | :white_check_mark:                                        | :white_check_mark:   | :white_check_mark:   |
-| Per-request settings                | :white_check_mark:                                        | :white_check_mark:   | :white_check_mark:   |
-| - Use proxy                         | :white_check_mark:                                        | :white_check_mark:   | :white_check_mark:   |
-| - Allow redirects                   | :white_check_mark:                                        | :white_check_mark:   | :white_check_mark:   |
-| - Store cookies                     | :white_check_mark:                                        | :white_check_mark:   | :white_check_mark:   |
-| **WebSocket Client**                | :x: :soon:                                                | :white_check_mark:	  | :white_check_mark:   |
-| **GraphQL**                         | :x: (not planned)                                         | :white_check_mark:   | :white_check_mark:   |
-| **Free**                            | :white_check_mark:                                        | Depends              | Depends              |
-| **Lightweight, fast and efficient** | :white_check_mark:                                        | :x:                  | :x:                  |
+| Features                            | **ATAC**                                                 | Postman              | Insomnia             |
+|-------------------------------------|----------------------------------------------------------|----------------------|----------------------|
+| **Manage collections & requests**   | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
+| **HTTP Client**                     | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
+| Methods                             | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
+| - GET                               | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
+| - POST                              | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
+| - PUT                               | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
+| - PATCH                             | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
+| - DELETE                            | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
+| - HEAD                              | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
+| - OPTIONS                           | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
+| Authentication                      | Partial                                                  | :white_check_mark:   | :white_check_mark:   |
+| - Basic auth                        | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
+| - Bearer token                      | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
+| - JWT, Digest, OAuth1-2, AWS        | :x: :soon:                                               | :white_check_mark:   | :white_check_mark:   |
+| Headers                             | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
+| Body                                | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
+| - Multipart form                    | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
+| - URL Encoded from                  | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
+| - Plain text                        | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
+| - JSON, XML, HTML                   | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
+| Full response                       | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
+| - Status code                       | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
+| - Cookies                           | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
+| - Headers                           | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
+| - Duration                          | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
+| Scripting                           | :x: :soon:                                               | :x:                  | :x:                  |
+| - Pre-request script                | :x: :soon:                                               | :x:                  | :x:                  |
+| - Post-request script               | :x: :soon:                                               | :white_check_mark:   | :x:                  |
+| Asynchronous requests               | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
+| Per-request settings                | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
+| - Use proxy                         | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
+| - Allow redirects                   | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
+| - Store cookies                     | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
+| **WebSocket Client**                | :x: :soon:                                               | :white_check_mark:   | :white_check_mark:   |
+| **GraphQL**                         | :x: (not planned)                                        | :white_check_mark:   | :white_check_mark:   |
+| **Free**                            | :white_check_mark:                                       | Depends              | Depends              |
+| **Lightweight, fast and efficient** | :white_check_mark:                                       | :x:                  | :x:                  |
 | **Data storage**                    | Your own committable, readable and versioned files       | Tied to your account | Tied to your account |
-| **Offline**                         | :white_check_mark:	                                       | :x:                  | :x:                  |
-| **Real-time collaboration**         | :x: (not planned)                                         | :white_check_mark:   | :white_check_mark:   |
+| **Offline**                         | :white_check_mark:                                       | :x:                  | :x:                  |
+| **Real-time collaboration**         | :x: (not planned)                                        | :white_check_mark:   | :white_check_mark:   |
 | **Environment files and variables** | :white_check_mark: (committable, readable and versioned) | :white_check_mark:   | :white_check_mark:   |
-| **View options**                    | :white_check_mark:                                        | :white_check_mark:   | :white_check_mark:   |
-| **Global configuration file**       | :white_check_mark:                                        | :white_check_mark:   | :white_check_mark:   |
-| - HTTP/HTTPS Proxy                  | :white_check_mark:                                        | :white_check_mark:   | :white_check_mark:   |
-| - Disable CORS                      | :white_check_mark:                                        | :x:                  | :x:                  |
-| - Toggle syntax highlighting        | :white_check_mark:                                        | :x:                  | :x:                  |
-| Postman v2.1.0 import               | :white_check_mark:                                        | :white_check_mark:   | :white_check_mark:   |
-| OpenAPI import                      | :x: :soon:                                                | :white_check_mark:   | :white_check_mark:   |
+| **View options**                    | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
+| **Global configuration file**       | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
+| - HTTP/HTTPS Proxy                  | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
+| - Disable CORS                      | :white_check_mark:                                       | :x:                  | :x:                  |
+| - Toggle syntax highlighting        | :white_check_mark:                                       | :x:                  | :x:                  |
+| Postman v2.1.0 import               | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
+| OpenAPI import                      | :x: :soon:                                               | :white_check_mark:   | :white_check_mark:   |
 
 ### TODO v1.0.0
 
