@@ -9,6 +9,11 @@ readme = "README.md"
 documentation = "https://github.com/Julien-cpsn/ATAC/wiki"
 homepage = "https://github.com/Julien-cpsn/ATAC"
 repository = "https://github.com/Julien-cpsn/ATAC"
+keywords = ["API", "TUI", "Postman", "Insomnia"]
+
+exclude = [
+    ".github/*"
+]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
