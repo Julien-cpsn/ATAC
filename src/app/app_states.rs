@@ -180,7 +180,7 @@ impl App<'_> {
                 let local_selected_request = self.get_selected_request_as_local();
                 let selected_request = local_selected_request.read().unwrap();
 
-                let mut base_keys = String::from("Esc ^Enter ^TAB (h)elp (u) (m) ^(a) ^(b) (s) (c)");
+                let mut base_keys = String::from("Esc Space TAB (h)elp (u) (m) ^(a) ^(b) (s) (c) (v)");
 
                 if !self.environments.is_empty() {
                     base_keys += " (e)";
@@ -273,7 +273,7 @@ impl App<'_> {
                 let local_selected_request = self.get_selected_request_as_local();
                 let selected_request = local_selected_request.read().unwrap();
 
-                let mut base_keys = String::from("Esc ^Enter ^TAB (u)rl (m)ethod ^(a)uth ^(b)ody (s)ettings (c)ookies");
+                let mut base_keys = String::from("Esc Space or ^Enter TAB (u)rl (m)ethod ^(a)uth ^(b)ody (s)ettings (c)ookies (v)iew");
 
                 if !self.environments.is_empty() {
                     base_keys += " (e)nv";
