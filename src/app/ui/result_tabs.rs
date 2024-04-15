@@ -104,26 +104,32 @@ impl App<'_> {
                         Paragraph::new(lines)
                     }
                     Some(body) => {
-                        let lines: Vec<Line>;
-                        
+
                         // is not highlighted
-                        if let Some((_, content_type)) = request.result.headers.iter().find(|(header, _)| *header == "content-type") {
-                            let regex = Regex::new(r"\w+/(?<language>\w+)").unwrap();
+                        let lines: Vec<Line> = match request.result.headers.iter().find(|(header, _)| *header == "content-type") {
+                            None => body.lines().map(|line| Line::raw(line)).collect(),
+                            Some((_, content_type)) => {
+                                // Regex that likely catches the file format
+                                let regex = Regex::new(r"\w+/(?<language>\w+)").unwrap();
 
-                            if let Some(capture) = regex.captures(content_type) {
-                                self.syntax_highlighting.highlight(body, &capture["language"]);
-                                let last_highlighted = last_highlighted.read().unwrap().clone().unwrap();
+                                match regex.captures(content_type) {
+                                    // No file format found
+                                    None => body.lines().map(|line| Line::raw(line)).collect(),
+                                    // File format found
+                                    Some(capture) => {
+                                        // Tries to highlight the body
+                                        self.syntax_highlighting.highlight(body, &capture["language"]);
     
-                                lines = last_highlighted_to_lines(last_highlighted);
-
-                                // TODO: find a better way to refresh the scrollbars after getting the response
-                                self.refresh_result_scrollbars();
-                            } else {
-                                lines = body.lines().map(|line| Line::raw(line)).collect();
+                                        match last_highlighted.read().unwrap().clone() {
+                                            // Nothing was highlighted
+                                            None => body.lines().map(|line| Line::raw(line)).collect(),
+                                            // Something was highlighted
+                                            Some(last_highlighted) => last_highlighted_to_lines(last_highlighted)
+                                        }
+                                    },
+                                }
                             }
-                        } else {
-                            lines = body.lines().map(|line| Line::raw(line)).collect();
-                        }
+                        };
 
                         Paragraph::new(lines)
                     }
