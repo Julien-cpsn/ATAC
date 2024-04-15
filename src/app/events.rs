@@ -10,16 +10,12 @@ impl App<'_> {
     pub async fn handle_events(&mut self) {
         // Refreshes the app every tick_rate
         if event::poll(self.tick_rate).unwrap() {
-            // Default state
-            self.display_full_help = false;
-            
             // Block while a key is pressed
             if let Event::Key(key) = event::read().unwrap() {
                 let mut miss_input = false;
 
                 let previous_app_state = self.state;
                 let control_pressed: bool = key.modifiers == KeyModifiers::CONTROL;
-                let shift_pressed: bool = key.modifiers == KeyModifiers::SHIFT;
 
                 // Debug tool
                 //println!("{:?} {:?}", key.modifiers, key.code);
@@ -49,7 +45,7 @@ impl App<'_> {
                             KeyCode::Char('d') => self.delete_element(),
                             KeyCode::Char('r') => self.rename_element(),
                             
-                            KeyCode::Char('h') => self.display_full_help = true,
+                            KeyCode::Char('h') => self.display_full_help = !self.display_full_help,
 
                             _ => miss_input = true
                         },
@@ -191,9 +187,9 @@ impl App<'_> {
                                 RequestParamsTabs::QueryParams => match key.code {
                                     KeyCode::Enter if !control_pressed && self.query_params_table.is_selected() => self.edit_request_param_state(),
 
-                                    KeyCode::Up => self.query_params_table.up(),
-                                    KeyCode::Down => self.query_params_table.down(),
-                                    KeyCode::Left | KeyCode::Right => self.query_params_table.change_y(),
+                                    KeyCode::Up if !control_pressed => self.query_params_table.up(),
+                                    KeyCode::Down if !control_pressed => self.query_params_table.down(),
+                                    KeyCode::Left | KeyCode::Right if !control_pressed => self.query_params_table.change_y(),
 
                                     KeyCode::Char('n') => self.create_new_query_param(),
                                     KeyCode::Char('d') => self.delete_query_param(),
@@ -204,17 +200,17 @@ impl App<'_> {
                                 RequestParamsTabs::Auth if self.auth_text_input_selection.usable => match key.code {
                                     KeyCode::Enter if !control_pressed => self.select_request_auth_input_text(),
 
-                                    KeyCode::Up => self.auth_text_input_selection.previous(),
-                                    KeyCode::Down => self.auth_text_input_selection.next(),
+                                    KeyCode::Up if !control_pressed => self.auth_text_input_selection.previous(),
+                                    KeyCode::Down if !control_pressed => self.auth_text_input_selection.next(),
 
                                     _ => {}
                                 }
                                 RequestParamsTabs::Headers => match key.code {
                                     KeyCode::Enter if !control_pressed && self.headers_table.is_selected() => self.edit_request_header_state(),
 
-                                    KeyCode::Up => self.headers_table.up(),
-                                    KeyCode::Down => self.headers_table.down(),
-                                    KeyCode::Left | KeyCode::Right => self.headers_table.change_y(),
+                                    KeyCode::Up if !control_pressed => self.headers_table.up(),
+                                    KeyCode::Down if !control_pressed => self.headers_table.down(),
+                                    KeyCode::Left | KeyCode::Right if !control_pressed => self.headers_table.change_y(),
 
                                     KeyCode::Char('n') => self.create_new_header(),
                                     KeyCode::Char('d') => self.delete_header(),
@@ -226,9 +222,9 @@ impl App<'_> {
                                     KeyCode::Enter if !control_pressed && self.body_form_table.is_selected() => self.edit_request_body_table_state(),
                                     KeyCode::Enter if !control_pressed => self.edit_request_body_string_state(),
 
-                                    KeyCode::Up => self.body_form_table.up(),
-                                    KeyCode::Down => self.body_form_table.down(),
-                                    KeyCode::Left | KeyCode::Right => self.body_form_table.change_y(),
+                                    KeyCode::Up if !control_pressed => self.body_form_table.up(),
+                                    KeyCode::Down if !control_pressed => self.body_form_table.down(),
+                                    KeyCode::Left | KeyCode::Right if !control_pressed=> self.body_form_table.change_y(),
 
                                     KeyCode::Char('n') => self.create_new_form_data(),
                                     KeyCode::Char('d') => self.delete_form_data(),
@@ -245,7 +241,7 @@ impl App<'_> {
                                 KeyCode::Char('c') => self.display_cookies_state(),
                                 KeyCode::Char('e') => self.next_environment(),
 
-                                KeyCode::Char('h') => self.display_full_help = true,
+                                KeyCode::Char('h') => self.display_full_help = !self.display_full_help,
 
                                 //KeyCode::Char('p') => self.load_request_query_params_tab(),
 
@@ -267,12 +263,15 @@ impl App<'_> {
                                 KeyCode::Left if control_pressed => self.result_horizontal_scrollbar.page_up(),
                                 KeyCode::Right if control_pressed => self.result_horizontal_scrollbar.page_down(),
 
-                                KeyCode::BackTab if shift_pressed => self.next_request_view(),
-                                KeyCode::Tab if control_pressed => self.next_request_result_tab(),
+                                KeyCode::Char('v') => self.next_request_view(),
+                                KeyCode::BackTab => self.next_request_result_tab(),
                                 KeyCode::Tab => self.next_request_param_tab(),
 
+                                // Used to be ctrl + enter, but it doesn't register right on many platforms
+                                // https://github.com/crossterm-rs/crossterm/issues/685
+                                KeyCode::Char(' ') => self.send_request().await,
                                 KeyCode::Enter if control_pressed => self.send_request().await,
-
+                                
                                 _ => miss_input = true
                             }
                         },
