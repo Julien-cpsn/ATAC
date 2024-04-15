@@ -243,6 +243,93 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Test Multipart Form",
+			"protocolProfileBehavior": {
+				"followRedirects": false,
+				"disableCookies": true
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "custname",
+							"value": "ddddd",
+							"type": "text"
+						},
+						{
+							"key": "custtel",
+							"value": "",
+							"type": "text"
+						},
+						{
+							"key": "custemail",
+							"value": "",
+							"type": "text"
+						},
+						{
+							"key": "delivery",
+							"value": "",
+							"type": "text"
+						},
+						{
+							"key": "comments",
+							"value": "",
+							"type": "text"
+						},
+						{
+							"key": "some_file",
+							"type": "file",
+							"src": "/C:/Users/u248244/Documents/Rust/ATAC/LICENSE"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://httpbin.org/post",
+					"protocol": "https",
+					"host": [
+						"httpbin",
+						"org"
+					],
+					"path": [
+						"post"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test URL encoded form",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "some_key",
+							"value": "some_value",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://httpbin.org/post",
+					"protocol": "https",
+					"host": [
+						"httpbin",
+						"org"
+					],
+					"path": [
+						"post"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }

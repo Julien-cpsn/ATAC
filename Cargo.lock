@@ -972,9 +972,9 @@ dependencies = [
 
 [[package]]
 name = "parse_postman_collection"
-version = "0.2.1"
+version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "36e8f13064ec4d862569f13e3fc3dbca48a04799f026fd0ad555f9f4c31f1f6d"
+checksum = "f8af63eab6a89f7d035f4339637d0b32e3a3b15a3c3c77c577c95a4d9f75cff1"
 dependencies = [
  "error-chain",
  "semver",

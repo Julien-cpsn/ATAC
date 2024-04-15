@@ -141,11 +141,11 @@ cargo run -- -h
 - **To add**
   - Create a repo wiki
   - Document whole code
+  - File body content-type
 
 - **To improve**
   - Pretty print output
   - Sign binary
-  - Add Multipart form, URL encoded form and request settings from Postman import
 
 - **To fix**
   - Query parameters bug
@@ -163,6 +163,7 @@ cargo run -- -h
   - Editing cookies
   - Insomnia import
   - Auto-completion on env file variables
+  - Manage multipart Content-type header (auto-generated for now)
 
 ### Ideas (will think about it later)
 

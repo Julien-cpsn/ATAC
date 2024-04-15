@@ -158,7 +158,7 @@ impl Request {
         let mut was_header_found = false;
 
         for header in &mut self.headers {
-            if &header.data.0 == input_header {
+            if header.data.0.to_lowercase() == input_header.to_lowercase() {
                 header.data.1 = value.to_string();
                 was_header_found = true;
             }

@@ -164,7 +164,7 @@ impl App<'_> {
                 ContentType::NoBody => {
                     selected_request.find_and_delete_header(CONTENT_TYPE.as_str())
                 },
-                // Impossible to set the header for multipart yet, because of boundary and content-length that are computed on reqwest's side
+                // TODO: Impossible to set the header for multipart yet, because of boundary and content-length that are computed on reqwest's side
                 ContentType::Multipart(_) => {},
                 // Create or replace Content-Type header with new body content type
                 ContentType::Form(_) | ContentType::Raw(_) | ContentType::Json(_) | ContentType::Xml(_) | ContentType::Html(_) => {

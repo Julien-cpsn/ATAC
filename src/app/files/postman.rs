@@ -1,7 +1,9 @@
 use std::path::PathBuf;
 use std::str::FromStr;
 use std::sync::{Arc, RwLock};
-use parse_postman_collection::v2_1_0::{AuthType, Body, HeaderUnion, Items, Language, Mode, RequestClass, RequestUnion, Url};
+
+use parse_postman_collection::v2_1_0::{AuthType, Body, FormParameterSrcUnion, HeaderUnion, Items, Language, Mode, RequestClass, RequestUnion, Url};
+
 use crate::app::app::App;
 use crate::app::startup::args::ARGS;
 use crate::request::auth::Auth;
@@ -9,7 +11,7 @@ use crate::request::body::ContentType;
 use crate::request::collection::Collection;
 use crate::request::method::Method;
 use crate::request::request::{DEFAULT_HEADERS, KeyValue, Request};
-
+use crate::request::settings::RequestSettings;
 
 impl App<'_> {
     pub fn import_postman_collection(&mut self, path_buf: &PathBuf, max_depth: u16) {
@@ -148,13 +150,23 @@ fn is_folder(folder: &Items) -> bool {
 }
 
 fn parse_request(item: Items) -> Request {
-    let item_name = item.name.unwrap();
+    let item_name = item.name.clone().unwrap();
 
     println!("\t\tFound request \"{}\"", item_name);
 
     let mut request = Request::default();
 
     request.name = item_name;
+
+    /* SETTINGS */
+
+    // TODO: update parse_postman_collection to handle "protocolProfileBehavior"
+    match retrieve_settings(&item) {
+        None => {}
+        Some(request_settings) => request.settings = request_settings
+    }
+
+    /* REQUEST */
 
     let item_request = item.request.unwrap();
 
@@ -189,18 +201,28 @@ fn parse_request(item: Items) -> Request {
                 Some(auth) => request.auth = auth
             }
 
-            /* BODY */
-
-            match retrieve_body(&request_class) {
-                None => {}
-                Some(content_type) => request.body = content_type
-            }
-
             /* HEADERS */
 
             match retrieve_headers(&request_class) {
                 None => {}
                 Some(headers) => request.headers = headers
+            }
+
+            /* BODY */
+
+            match retrieve_body(&request_class) {
+                None => {}
+                Some(body) => {
+                    match &body {
+                        ContentType::Multipart(_) => {} // TODO: Not handled yet
+                        body_type => {
+                            let content_type = body_type.to_content_type().clone();
+                            request.modify_or_create_header("content-type", &content_type);
+                        }
+                    }
+
+                    request.body = body;
+                }
             }
         }
         RequestUnion::String(_) => {}
@@ -235,11 +257,12 @@ fn retrieve_body(request_class: &RequestClass) -> Option<ContentType> {
     match body {
         Body::String(body_as_raw) => Some(ContentType::Raw(body_as_raw)),
         Body::BodyClass(body) => {
-            let body_as_raw = body.raw?;
             let body_mode = body.mode?;
 
             return match body_mode {
                 Mode::Raw => {
+                    let body_as_raw = body.raw?;
+
                     if let Some(options) = body.options {
                         let language = options.raw?.language?;
 
@@ -257,8 +280,61 @@ fn retrieve_body(request_class: &RequestClass) -> Option<ContentType> {
                     }
                 },
                 Mode::File => None,
-                Mode::Formdata => None,
-                Mode::Urlencoded => None
+                Mode::Formdata => {
+                    let form_data = body.formdata?;
+
+                    let mut multipart: Vec<KeyValue> = vec![];
+
+                    for param in form_data {
+                        let param_type = param.form_parameter_type?;
+
+                        let key_value = match param_type.as_str() {
+                            "text" => KeyValue {
+                                enabled: true,
+                                data: (param.key, param.value.unwrap_or(String::new())),
+                            },
+                            "file" => {
+                                let file = match param.src? {
+                                    FormParameterSrcUnion::File(file) => file,
+                                    // If there are many files, tries to get the first one
+                                    FormParameterSrcUnion::Files(files) => files.get(0)?.to_string()
+                                };
+
+                                KeyValue {
+                                    enabled: true,
+                                    data: (param.key, format!("!!{file}")),
+                                }
+                            },
+                            param_type => {
+                                println!("\t\t\tUnknown Multipart form type \"{param_type}\"");
+                                return None;
+                            }
+                        };
+
+                        multipart.push(key_value);
+                    }
+
+                    Some(ContentType::Multipart(multipart))
+                },
+                Mode::Urlencoded => {
+                    let form_data = body.urlencoded?;
+
+                    let mut url_encoded: Vec<KeyValue> = vec![];
+
+                    for param in form_data {
+                        let value = param.value.unwrap_or(String::new());
+                        let is_disabled = param.disabled.unwrap_or(false);
+
+                        let key_value = KeyValue {
+                            enabled: !is_disabled,
+                            data: (param.key, value),
+                        };
+
+                        url_encoded.push(key_value);
+                    }
+
+                    Some(ContentType::Form(url_encoded))
+                }
             }
         }
     }
@@ -326,4 +402,20 @@ fn retrieve_headers(request_class: &RequestClass) -> Option<Vec<KeyValue>> {
         }
         HeaderUnion::String(_) => None
     }
+}
+
+fn retrieve_settings(item: &Items) -> Option<RequestSettings> {
+    let protocol_profile_behavior = item.protocol_profile_behavior.clone()?;
+
+    let mut settings = RequestSettings::default();
+
+    if let Some(follow_redirects) = protocol_profile_behavior.follow_redirects {
+        settings.allow_redirects = follow_redirects;
+    }
+    
+    if let Some(disable_cookies) = protocol_profile_behavior.disable_cookies {
+        settings.store_received_cookies = !disable_cookies;
+    }
+    
+    Some(settings)
 }
