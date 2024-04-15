@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 use std::str::FromStr;
 use std::sync::{Arc, RwLock};
-use postman_collection::v2_1_0::{AuthType, Body, HeaderUnion, Items, Language, Mode, RequestClass, RequestUnion, Url};
+use parse_postman_collection::v2_1_0::{AuthType, Body, HeaderUnion, Items, Language, Mode, RequestClass, RequestUnion, Url};
 use crate::app::app::App;
 use crate::app::startup::args::ARGS;
 use crate::request::auth::Auth;
@@ -13,7 +13,7 @@ use crate::request::request::{DEFAULT_HEADERS, KeyValue, Request};
 
 impl App<'_> {
     pub fn import_postman_collection(&mut self, path_buf: &PathBuf, max_depth: u16) {
-        let mut postman_collection = postman_collection::from_path(path_buf).expect("\tCould not parse Postman collection");
+        let mut postman_collection = parse_postman_collection::from_path(path_buf).expect("\tCould not parse Postman collection");
 
         let collection_name = postman_collection.info.name.clone();
 

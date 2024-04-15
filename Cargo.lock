@@ -130,7 +130,7 @@ dependencies = [
  "crossterm",
  "envfile",
  "lazy_static",
- "postman_collection",
+ "parse_postman_collection",
  "ratatui",
  "regex",
  "reqwest",
@@ -971,6 +971,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "parse_postman_collection"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "36e8f13064ec4d862569f13e3fc3dbca48a04799f026fd0ad555f9f4c31f1f6d"
+dependencies = [
+ "error-chain",
+ "semver",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "url 2.5.0",
+ "url_serde",
+]
+
+[[package]]
 name = "paste"
 version = "1.0.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1018,20 +1033,6 @@ dependencies = [
  "quick-xml",
  "serde",
  "time",
-]
-
-[[package]]
-name = "postman_collection"
-version = "0.2.1"
-source = "git+https://github.com/Julien-cpsn/postman-collection-rs.git?rev=6bf3ec87#6bf3ec87561971b2346dcfec6d8c2f95c82d63e6"
-dependencies = [
- "error-chain",
- "semver",
- "serde",
- "serde_json",
- "serde_yaml",
- "url 2.5.0",
- "url_serde",
 ]
 
 [[package]]
