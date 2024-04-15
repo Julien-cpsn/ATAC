@@ -107,7 +107,8 @@ impl App<'_> {
             self.update_query_params_selection();
             self.update_headers_selection();
             self.update_body_table_selection();
-
+            self.refresh_result_scrollbars();
+            
             self.select_request_state();
         }
     }
