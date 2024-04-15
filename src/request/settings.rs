@@ -1,10 +1,20 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Default, Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RequestSettings {
     pub use_config_proxy: bool,
     pub allow_redirects: bool,
     pub store_received_cookies: bool
+}
+
+impl Default for RequestSettings {
+    fn default() -> Self {
+        RequestSettings {
+            use_config_proxy: true,
+            allow_redirects: true,
+            store_received_cookies: true,
+        }
+    }
 }
 
 impl RequestSettings {
