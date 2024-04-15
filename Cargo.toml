@@ -11,20 +11,20 @@ edition = "2021"
 reqwest = { version = "0.11.27", default-features = false, features = ["cookies", "rustls-tls-native-roots", "multipart", "gzip", "brotli", "deflate"] }
 reqwest_cookie_store = "0.6.0"
 cookie_store = "0.20.0"
-tokio = { version = "1.36.0", features = ["rt", "rt-multi-thread", "macros"] }
-strum = "0.26.2"
 ratatui = "0.26.1"
 crossterm = "0.27.0"
 tui-big-text = "0.4.2"
-tui-textarea = { version = "0.4.0", features = ["ratatui"] }
 tui-tree-widget = "0.19.0"
+tui-textarea = { version = "0.4.0", features = ["ratatui"] }
 throbber-widgets-tui = "0.5.0"
-regex = "1.10.3"
+syntect = "5.2.0"
 serde = { version = "1.0.197", features = ["derive", "rc"] }
 serde_json = "1.0.114"
 toml = "0.8.11"
+envfile = "0.2.1"
 postman_collection = { git = "https://github.com/Julien-cpsn/postman-collection-rs.git", rev = "6bf3ec87" }
 clap = { version = "4.5.0", features = ["derive", "color"] }
+tokio = { version = "1.36.0", features = ["rt", "rt-multi-thread", "macros"] }
+strum = "0.26.2"
 lazy_static = "1.4.0"
-envfile = "0.2.1"
-syntect = "5.2.0"
+regex = "1.10.3"
