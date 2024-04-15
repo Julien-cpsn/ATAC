@@ -11,6 +11,7 @@ ATAC ⚔📩
 
 - [Description](#description)
 - [How to use](#how-to-use)
+   * [Install with cargo](#install-with-cargo)
    * [Binary](#binary)
    * [Compile by yourself](#compile-by-yourself)
 - [Features](#features)
@@ -32,6 +33,24 @@ ATAC is **A**rguably a **T**erminal **A**PI **C**lient. It is based on well know
 The philosophy of ATAC is to be free, account-less, and offline for now and forever.
 
 ## How to use
+
+### Install with cargo
+
+> [!IMPORTANT]
+> First, make sure your rust version is at least 1.76
+
+Simply use:
+```shell
+cargo install atac
+```
+
+Then:
+
+```
+atac -h
+```
+
+Enjoy!
 
 ### Binary
 
