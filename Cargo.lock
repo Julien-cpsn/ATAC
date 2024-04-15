@@ -123,7 +123,7 @@ dependencies = [
 
 [[package]]
 name = "atac"
-version = "0.11.2"
+version = "0.11.3"
 dependencies = [
  "clap",
  "cookie_store",

@@ -12,6 +12,7 @@ ATAC ⚔📩
 - [Description](#description)
 - [How to use](#how-to-use)
    * [Install with cargo](#install-with-cargo)
+   * [Install with Homebrew](#install-with-homebrew)
    * [Binary](#binary)
    * [Compile by yourself](#compile-by-yourself)
 - [Features](#features)
@@ -51,6 +52,23 @@ atac -h
 ```
 
 Enjoy!
+
+### Install with Homebrew
+
+Simply use:
+```shell
+brew tap julien-cpsn/atac
+brew install atac
+```
+
+Then:
+
+```
+atac -h
+```
+
+Enjoy!
+
 
 ### Binary
 
