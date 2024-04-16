@@ -13,6 +13,7 @@ ATAC ⚔📩
 - [How to use](#how-to-use)
    * [Install with cargo](#install-with-cargo)
    * [Install with Homebrew](#install-with-homebrew)
+   * [Install from AUR](#aur)
    * [Binary](#binary)
    * [Compile by yourself](#compile-by-yourself)
 - [Features](#features)
@@ -49,6 +50,16 @@ Then:
 
 ```
 atac -h
+```
+
+Enjoy!
+
+### Install from AUR
+
+You can use your favorite [AUR helper](https://wiki.archlinux.org/title/AUR_helpers) to install. For example,
+
+```shell
+paru -S atac
 ```
 
 Enjoy!
