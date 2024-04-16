@@ -11,29 +11,31 @@ ATAC ⚔📩
 
 - [Description](#description)
 - [How to use](#how-to-use)
-   * [Install with cargo](#install-with-cargo)
-   * [Install with Homebrew](#install-with-homebrew)
-   * [Install from AUR](#aur)
-   * [Binary](#binary)
-   * [Compile by yourself](#compile-by-yourself)
+  * [Install with cargo](#install-with-cargo)
+  * [Install with Homebrew](#install-with-homebrew)
+  * [Install from AUR](#aur)
+  * [Binary](#binary)
+  * [Compile by yourself](#compile-by-yourself)
 - [Features](#features)
-   * [Current](#current)
-   * [TODO v1.0.0](#todo-v100)
-   * [TODO v2.0.0](#todo-v200)
+  * [Current](#current)
+  * [TODO v1.0.0](#todo-v100)
+  * [TODO v2.0.0](#todo-v200)
 - [Documentation](#documentation)
 - [Technical precisions](#technical-precisions)
-   * [Tested on](#tested-on)
-   * [Dependencies](#dependencies)
-   * [Binary size](#binary-size)
+  * [Tested on](#tested-on)
+  * [Dependencies](#dependencies)
+  * [Binary size](#binary-size)
 - [Contributors](#contributors)
-   * [Maintainers](#maintainers)
-   * [Packagers](#packagers)
+  * [Maintainers](#maintainers)
+  * [Packagers](#packagers)
 - [Star history](#star-history)
 - [License](#license)
 
 ## Description
 
-ATAC is **A**rguably a **T**erminal **A**PI **C**lient. It is based on well known clients such as Postman, Insomnia, or even Bruno, but inside your terminal without any specific graphical environment needed.
+ATAC is **A**rguably a **T**erminal **A**PI **C**lient.
+It is based on well-known clients such as Postman, Insomnia, or even Bruno,
+but inside your terminal without any specific graphical environment needed.
 
 The philosophy of ATAC is to be free, account-less, and offline for now and forever.
 
@@ -89,7 +91,9 @@ Enjoy!
 The binaries from the latest release can be found [here](https://github.com/Julien-cpsn/ATAC/releases/latest)
 
 > [!IMPORTANT]
-> Don't forget to run it from a terminal. For example, you can add the binary into your PATH. You won't be able to run it like other graphical applications since it needs CLI arguments.
+> Remember to run it from a terminal.
+> For example, you can add the binary into your PATH.
+> You won't be able to run it like other graphical applications since it needs CLI arguments.
 
 For more:
 
@@ -108,7 +112,7 @@ Simply clone the repository and use:
 cargo run -- -h
 ```
 
-> Build latest release
+> Build the latest release
 > ```bash
 > cargo build --release
 > ```
@@ -200,12 +204,12 @@ cargo run -- -h
 
 ### Ideas (will think about it later)
 
-- Base URL on collection
+- Base URL property on collections
 
 ## Documentation
 
 > [!NOTE]
-> A documentation will soon be published in the wiki section
+> Documentation will soon be published in the wiki section
 
 ## Technical precisions
 
