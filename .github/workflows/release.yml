@@ -68,7 +68,7 @@ jobs:
         with:
           bin: atac
           target: ${{ matrix.target }}
-          archive: $bin-$tag-$target
+          archive: $bin-$tag-$target # https://github.com/taiki-e/upload-rust-binary-action?tab=readme-ov-file#example-workflow-customize-archive-name
           tar: all
           zip: windows
           token: ${{ secrets.GITHUB_TOKEN }}
