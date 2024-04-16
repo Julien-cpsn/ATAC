@@ -91,6 +91,10 @@ The binaries from the latest release can be found [here](https://github.com/Juli
 > [!IMPORTANT]
 > Don't forget to run it from a terminal. For example, you can add the binary into your PATH. You won't be able to run it like other graphical applications since it needs CLI arguments.
 
+
+> Note for macOS users. After downloading the binary you may need to run the command
+> `sudo xattr -rd com.apple.quarantine ~/bin/atac` (modify to reflect the path where `atac` is located).
+
 For more:
 
 ```
