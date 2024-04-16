@@ -30,16 +30,17 @@ impl App<'_> {
             should_display_cursor = true;
         }
 
-        let input_cursor_position = self.body_file_text_input.cursor_position as u16;
+        let adjusted_input_length = file_body_layout[0].width as usize - 2;
+        let (padded_text, input_cursor_position) = self.body_file_text_input.get_padded_text_and_cursor(adjusted_input_length);
 
         if should_display_cursor {
             frame.set_cursor(
-                file_body_layout[0].x + input_cursor_position + 1,
+                file_body_layout[0].x + input_cursor_position as u16 + 1,
                 file_body_layout[0].y + 1
             );
         }
 
-        let file_body_line = self.add_color_to_env_keys(&self.body_file_text_input.text);
+        let file_body_line = self.add_color_to_env_keys(&padded_text);
 
         let file_body_paragraph = Paragraph::new(file_body_line).block(file_body_block);
 
