@@ -13,17 +13,20 @@ impl App<'_> {
 
 
         let area = centered_rect(50, 3, frame.size());
-        let new_request_area = popup_block.inner(area);
+        let renaming_collection_area = popup_block.inner(area);
 
-        let new_request_paragraph = Paragraph::new(self.rename_collection_input.text.as_str());
+        let adjusted_input_length = renaming_collection_area.width as usize;
+        let (padded_text, input_cursor_position) = self.rename_collection_input.get_padded_text_and_cursor(adjusted_input_length);
+        
+        let new_request_paragraph = Paragraph::new(padded_text);
 
         frame.render_widget(Clear, area);
         frame.render_widget(popup_block, area);
-        frame.render_widget(new_request_paragraph, new_request_area);
+        frame.render_widget(new_request_paragraph, renaming_collection_area);
 
         frame.set_cursor(
-            new_request_area.x + self.rename_collection_input.cursor_position as u16,
-            new_request_area.y
+            renaming_collection_area.x + input_cursor_position as u16,
+            renaming_collection_area.y
         )
     }
 }

@@ -39,10 +39,13 @@ impl App<'_> {
 
         let input_selected = self.auth_text_input_selection.selected;
 
+        let adjusted_input_length = bearer_token_auth_layout[0].width as usize - 2;
+        let (padded_text, input_cursor_position) = self.auth_bearer_token_text_input.get_padded_text_and_cursor(adjusted_input_length);
+        
         let input_cursor_position = match input_selected {
             0 if should_color_blocks => {
                 bearer_token_block = bearer_token_block.yellow();
-                self.auth_bearer_token_text_input.cursor_position as u16
+                input_cursor_position as u16
             },
             _ => 0
         };
@@ -54,7 +57,7 @@ impl App<'_> {
             );
         }
 
-        let bearer_token_line = self.add_color_to_env_keys(&self.auth_bearer_token_text_input.text);
+        let bearer_token_line = self.add_color_to_env_keys(&padded_text);
 
         let bearer_token_paragraph = Paragraph::new(bearer_token_line).block(bearer_token_block);
 

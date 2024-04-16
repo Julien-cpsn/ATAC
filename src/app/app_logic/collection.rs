@@ -104,6 +104,17 @@ impl App<'_> {
             }
         }
     }
+    
+    pub fn reset_cursors(&mut self) {
+        self.url_text_input.reset_cursor();
+        self.query_params_table.selection_text_input.reset_cursor();
+        self.auth_basic_username_text_input.reset_cursor();
+        self.auth_basic_password_text_input.reset_cursor();
+        self.auth_bearer_token_text_input.reset_cursor();
+        self.headers_table.selection_text_input.reset_cursor();
+        self.body_form_table.selection_text_input.reset_cursor();
+        self.body_file_text_input.reset_cursor();
+    }
 
     pub fn select_request(&mut self) {
         if self.collections_tree.state.selected().len() == 2 {

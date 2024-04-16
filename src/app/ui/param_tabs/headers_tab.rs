@@ -111,16 +111,18 @@ impl App<'_> {
 
             let selection_position_x = headers_layout[1].x + width_adjustment + horizontal_margin;
             let selection_position_y = headers_layout[1].y + height_adjustment;
-
-            let header_text = self.headers_table.selection_text_input.text.clone();
-
-            let text_input = Paragraph::new(format!("{:fill$}", header_text, fill = (cell_with - horizontal_margin) as usize));
+            
             let text_rect = Rect::new(selection_position_x, selection_position_y, cell_with, 1);
+            
+            let adjusted_input_length = text_rect.width as usize - 2;
+            let (padded_text, input_cursor_position) = self.headers_table.selection_text_input.get_padded_text_and_cursor(adjusted_input_length);
+            
+            let text_input = Paragraph::new(format!("{:fill$}", padded_text, fill = (cell_with - horizontal_margin / 2) as usize));
 
             frame.render_widget(text_input, text_rect);
 
             frame.set_cursor(
-                selection_position_x + self.headers_table.selection_text_input.cursor_position as u16,
+                selection_position_x + input_cursor_position as u16,
                 selection_position_y
             );
         }

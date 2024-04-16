@@ -44,16 +44,22 @@ impl App<'_> {
             _ => {}
         };
 
+        let username_adjusted_input_length = basic_auth_layout[0].width as usize - 2;
+        let (username_padded_text, username_input_cursor_position) = self.auth_basic_username_text_input.get_padded_text_and_cursor(username_adjusted_input_length);
+        
+        let password_adjusted_input_length = basic_auth_layout[1].width as usize - 2;
+        let (password_padded_text, password_input_cursor_position) = self.auth_basic_password_text_input.get_padded_text_and_cursor(password_adjusted_input_length);
+        
         let input_selected = self.auth_text_input_selection.selected;
 
         let input_cursor_position = match input_selected {
             0 if should_color_blocks => {
                 username_block = username_block.yellow();
-                self.auth_basic_username_text_input.cursor_position as u16
+                username_input_cursor_position as u16
             },
             1 if should_color_blocks => {
                 password_block = password_block.yellow();
-                self.auth_basic_password_text_input.cursor_position as u16
+                password_input_cursor_position as u16
             },
             _ => 0
         };
@@ -65,8 +71,8 @@ impl App<'_> {
             );
         }
 
-        let username_line = self.add_color_to_env_keys(&self.auth_basic_username_text_input.text);
-        let password_line = self.add_color_to_env_keys(&self.auth_basic_password_text_input.text);
+        let username_line = self.add_color_to_env_keys(&username_padded_text);
+        let password_line = self.add_color_to_env_keys(&password_padded_text);
 
         let username_paragraph = Paragraph::new(username_line).block(username_block);
         let password_paragraph = Paragraph::new(password_line).block(password_block);

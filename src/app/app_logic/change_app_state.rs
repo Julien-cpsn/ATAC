@@ -92,10 +92,12 @@ impl App<'_> {
     pub fn select_request_state(&mut self) {
         self.state = AppState::SelectedRequest;
         self.update_inputs();
+        self.reset_cursors();
     }
 
     pub fn edit_request_url_state(&mut self) {
         self.state = AppState::EditingRequestUrl;
+        self.update_inputs();
     }
 
     pub fn edit_request_param_state(&mut self) {
@@ -105,14 +107,17 @@ impl App<'_> {
 
     pub fn edit_request_auth_username_state(&mut self) {
         self.state = AppState::EditingRequestAuthUsername;
+        self.update_inputs();
     }
 
     pub fn edit_request_auth_password_state(&mut self) {
         self.state = AppState::EditingRequestAuthPassword;
+        self.update_inputs();
     }
 
     pub fn edit_request_auth_bearer_token_state(&mut self) {
         self.state = AppState::EditingRequestAuthBearerToken;
+        self.update_inputs();
     }
 
     pub fn edit_request_header_state(&mut self) {
@@ -160,6 +165,7 @@ impl App<'_> {
         }
 
         self.request_param_tab = RequestParamsTabs::Body;
+        self.update_inputs();
     }
 
     pub fn edit_request_settings_state(&mut self) {
