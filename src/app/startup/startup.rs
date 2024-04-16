@@ -51,9 +51,6 @@ impl App<'_> {
             else if file_name == "atac.log" {
                 println!("Nothing to parse here")
             }
-            else {
-                panic!("unhandled file type");
-            }
 
             println!();
         }
