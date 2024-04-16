@@ -130,7 +130,7 @@ cargo run -- -h
 | - Cookies                           | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
 | - Headers                           | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
 | - Duration                          | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
-| Scripting                           | :x: :soon:                                               | :x:                  | :x:                  |
+| Scripting                           | :x: :soon:                                               | Partial              | :x:                  |
 | - Pre-request script                | :x: :soon:                                               | :x:                  | :x:                  |
 | - Post-request script               | :x: :soon:                                               | :white_check_mark:   | :x:                  |
 | Asynchronous requests               | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
