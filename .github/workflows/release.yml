@@ -73,6 +73,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
   # https://github.com/marketplace/actions/homebrew-releaser
   homebrew-releaser:
+    needs: upload-assets
     runs-on: ubuntu-latest
     name: homebrew-releaser
     steps:
