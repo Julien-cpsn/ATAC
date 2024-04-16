@@ -26,6 +26,9 @@ ATAC ⚔📩
    * [Dependencies](#dependencies)
    * [Binary size](#binary-size)
 - [Contributors](#contributors)
+   * [Maintainers](#maintainers)
+   * [Packagers](#packagers)
+- [Star history](#star-history)
 - [License](#license)
 
 ## Description
@@ -252,11 +255,16 @@ The binary file size goes from ~4.5 MB to ~7 MB depending on the platform. I try
 
 ## Contributors
 
+### Maintainers
+
 - [@julien-cpsn](https://github.com/julien-cpsn)
 
-## Star history
+### Packagers
 
-## Star History
+- Cargo, Brew - [@julien-cpsn](https://github.com/julien-cpsn)
+- Arch - [@orhun](https://github.com/orhun)
+
+## Star history
 
 <a href="https://star-history.com/#julien-cpsn/atac&Date">
  <picture>
