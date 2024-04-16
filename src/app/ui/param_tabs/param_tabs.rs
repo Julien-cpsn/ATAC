@@ -55,7 +55,7 @@ impl App<'_> {
                     },
                     RequestParamsTabs::Body => match request.body {
                         NoBody => tab.to_string(),
-                        Multipart(_) | Form(_) | Raw(_) | Json(_) | Xml(_) | Html(_) => format!("{} ({})", tab.to_string(), request.body.to_string())
+                        Multipart(_) | Form(_) | File(_) | Raw(_) | Json(_) | Xml(_) | Html(_) => format!("{} ({})", tab.to_string(), request.body.to_string())
                     }
                 }
             });
@@ -161,6 +161,9 @@ impl App<'_> {
                                 self.render_form_body_tab(frame, request_params_layout[1], form, multipart_form_selection);
                             }
                         }
+                    },
+                    File(_) => {
+                      self.render_file_body_tab(frame, request_params_layout[1]);
                     },
                     Raw(_) | Json(_) | Xml(_) | Html(_) => {
                         self.body_text_area.set_line_number_style(Style::new().fg(Color::DarkGray));

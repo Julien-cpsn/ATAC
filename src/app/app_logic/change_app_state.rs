@@ -140,14 +140,19 @@ impl App<'_> {
     }
 
 
-    pub fn edit_request_body_string_state(&mut self) {
+    pub fn edit_request_body_file_or_string_state(&mut self) {
         let local_selected_request = self.get_selected_request_as_local();
 
         {
             let selected_request = local_selected_request.read().unwrap();
 
             match selected_request.body {
-                ContentType::Raw(_) | ContentType::Json(_) | ContentType::Xml(_) | ContentType::Html(_) => {}
+                ContentType::File(_) => {
+                    self.state = AppState::EditingRequestBodyFile;
+                }
+                ContentType::Raw(_) | ContentType::Json(_) | ContentType::Xml(_) | ContentType::Html(_) => {
+                    self.state = AppState::EditingRequestBodyString;
+                }
                 _ => {
                     return;
                 }
@@ -155,7 +160,6 @@ impl App<'_> {
         }
 
         self.request_param_tab = RequestParamsTabs::Body;
-        self.state = AppState::EditingRequestBodyString;
     }
 
     pub fn edit_request_settings_state(&mut self) {

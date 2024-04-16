@@ -80,6 +80,7 @@ pub struct App<'a> {
 
     pub headers_table: StatefulCustomTable,
 
+    pub body_file_text_input: TextInput,
     pub body_form_table: StatefulCustomTable,
     pub body_text_area: TextArea<'a>,
 
@@ -149,6 +150,7 @@ impl App<'_> {
 
             headers_table: StatefulCustomTable::default(),
 
+            body_file_text_input: TextInput::default(),
             body_form_table: StatefulCustomTable::default(),
             body_text_area: TextArea::default(),
 

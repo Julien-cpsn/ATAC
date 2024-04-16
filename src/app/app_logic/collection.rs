@@ -16,6 +16,7 @@ impl App<'_> {
         self.auth_bearer_token_text_input.reset_input();
         self.headers_table.selection_text_input.reset_input();
         self.body_form_table.selection_text_input.reset_input();
+        self.body_file_text_input.reset_input();
     }
 
     pub fn update_inputs(&mut self) {
@@ -94,6 +95,9 @@ impl App<'_> {
 
                 self.refresh_body_textarea(&String::new());
             }
+            ContentType::File(file_path) =>  {
+                self.body_file_text_input.enter_str(file_path);
+            },
             ContentType::Raw(body) | ContentType::Json(body) | ContentType::Xml(body) | ContentType::Html(body) => {
                 self.body_form_table.rows = Vec::new();
                 self.refresh_body_textarea(body);
