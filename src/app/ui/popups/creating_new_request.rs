@@ -33,7 +33,10 @@ impl App<'_> {
                     .borders(Borders::ALL)
             );
 
-        let new_request_name_paragraph = Paragraph::new(self.new_request_popup.text_input.text.as_str())
+        let adjusted_input_length = new_request_layout[1].width as usize - 2;
+        let (padded_text, input_cursor_position) = self.new_request_popup.text_input.get_padded_text_and_cursor(adjusted_input_length);
+        
+        let new_request_name_paragraph = Paragraph::new(padded_text)
             .block(
                 Block::new()
                     .title("Request name")
@@ -46,7 +49,7 @@ impl App<'_> {
         frame.render_widget(new_request_name_paragraph, new_request_layout[1]);
 
         frame.set_cursor(
-            new_request_layout[1].x + self.new_request_popup.text_input.cursor_position as u16 + 1,
+            new_request_layout[1].x + input_cursor_position as u16 + 1,
             new_request_layout[1].y + 1
         )
     }

@@ -66,8 +66,11 @@ impl App<'_> {
             .title("URL")
             .borders(Borders::ALL)
             .padding(Padding::horizontal(1));
-
-        let url_line = self.add_color_to_env_keys(&self.url_text_input.text);
+        
+        let adjusted_input_length = request_header_layout[1].width as usize - 4;
+        let (padded_text, input_cursor_position) = self.url_text_input.get_padded_text_and_cursor(adjusted_input_length);
+        
+        let url_line = self.add_color_to_env_keys(&padded_text);
         
         let url_paragraph = Paragraph::new(url_line).block(url_block);
 
@@ -76,7 +79,7 @@ impl App<'_> {
         match self.state {
             EditingRequestUrl => {
                 frame.set_cursor(
-                    request_header_layout[1].x + self.url_text_input.cursor_position as u16 + 2,
+                    request_header_layout[1].x + input_cursor_position as u16 + 2,
                     request_header_layout[1].y + 1
                 )
             }

@@ -4,6 +4,8 @@ pub struct TextInput {
     pub cursor_position: usize,
 }
 
+const ELLIPSIS: &str = "..";
+const ELLIPSIS_LENGTH: usize = ELLIPSIS.len();
 
 impl TextInput {
     pub fn move_cursor_left(&mut self) {
@@ -85,5 +87,35 @@ impl TextInput {
     pub fn reset_input(&mut self) {
         self.text.clear();
         self.reset_cursor();
+    }
+
+    /// Returns the text with ellipsis if the cursor is further the input box length
+    pub fn get_padded_text_and_cursor(&self, length: usize) -> (String, usize) {
+        // if the text is longer than the desired length
+        if self.text.len() < length {
+            return (self.text.clone(), self.cursor_position);
+        }
+
+        let first_part = &self.text[..length-ELLIPSIS_LENGTH];
+
+        if (self.cursor_position / (length - ELLIPSIS_LENGTH)) == 0 {
+            let text = format!("{first_part}{ELLIPSIS}");
+            return (text, self.cursor_position)
+        }
+
+        let simple_adjusted_length = length  - ELLIPSIS_LENGTH;
+        let double_adjusted_length = length  - 2 * ELLIPSIS_LENGTH;
+        let nb_lengths_text = ((self.text.len() - simple_adjusted_length) / double_adjusted_length) + 1;
+        let nb_lengths_cursor = ((self.cursor_position - simple_adjusted_length) / double_adjusted_length) + 1;
+        let start_index = simple_adjusted_length + (nb_lengths_cursor - 1) * double_adjusted_length;
+
+        if nb_lengths_cursor == nb_lengths_text {
+            let text = format!("{ELLIPSIS}{}", &self.text[start_index..]);
+            return (text, self.cursor_position + ELLIPSIS_LENGTH - start_index)
+        }
+        else {
+            let text = format!("{ELLIPSIS}{}{ELLIPSIS}", &self.text[start_index..start_index + double_adjusted_length]);
+            return (text, self.cursor_position + ELLIPSIS_LENGTH - start_index)
+        }
     }
 }
