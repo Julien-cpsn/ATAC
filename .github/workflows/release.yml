@@ -100,8 +100,8 @@ jobs:
 
           # Custom dependencies in case other formulas are needed to build the current one.
           # Optional - multiline string
-          depends_on: |
-            "bash" => :build
+          #depends_on: |
+          #  "bash" => :build
 
           # Custom install command for your formula.
           # Required - string
