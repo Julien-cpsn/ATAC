@@ -86,11 +86,10 @@ impl App<'_> {
                         AppState::ChoosingElementToCreate => match key.code {
                             KeyCode::Esc => self.normal_state(),
 
-                            KeyCode::Enter if !self.creation_popup.state => self.create_new_collection_state(),
-                            KeyCode::Enter if self.creation_popup.state => self.create_new_request_state(),
+                            KeyCode::Enter => self.new_element(),
 
-                            KeyCode::Left => self.creation_popup.change_state(),
-                            KeyCode::Right => self.creation_popup.change_state(),
+                            KeyCode::Left => self.creation_popup.previous(),
+                            KeyCode::Right => self.creation_popup.next(),
 
                             _ => miss_input = true
                         },

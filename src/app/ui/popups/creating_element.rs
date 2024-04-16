@@ -15,30 +15,37 @@ impl App<'_> {
             .borders(Borders::ALL)
             .style(Style::default().bg(Color::DarkGray));
 
-        let area = centered_rect(30, 3, frame.size());
 
-        let deleting_request_layout = Layout::new(
+        let nb_elements = self.creation_popup.choices.len() as u16;
+
+        let area = centered_rect(nb_elements * 15, 3, frame.size());
+
+        let element_percentage = 100 / nb_elements;
+        let mut constraints: Vec<Constraint> = vec![];
+
+        for _ in &self.creation_popup.choices {
+            constraints.push(Constraint::Percentage(element_percentage));
+        }
+
+        let creating_element_layout = Layout::new(
             Horizontal,
-            vec![
-                Constraint::Percentage(50),
-                Constraint::Percentage(50),
-            ]
+            constraints
         )
             .vertical_margin(1)
             .horizontal_margin(1)
             .split(area);
 
-        let mut collection_paragraph = Paragraph::new("Collection").centered();
-        let mut request_paragraph = Paragraph::new("Request").centered();
-
-        match self.creation_popup.state {
-            false => collection_paragraph = collection_paragraph.fg(Yellow).bold(),
-            true => request_paragraph = request_paragraph.fg(Yellow).bold(),
-        }
-
         frame.render_widget(Clear, area);
         frame.render_widget(popup_block, area);
-        frame.render_widget(collection_paragraph, deleting_request_layout[0]);
-        frame.render_widget(request_paragraph, deleting_request_layout[1]);
+
+        for (index, element) in self.creation_popup.choices.iter().enumerate() {
+            let mut paragraph = Paragraph::new(element.clone()).centered();
+
+            if index == self.creation_popup.selection {
+                paragraph = paragraph.fg(Yellow).bold();
+            }
+
+            frame.render_widget(paragraph, creating_element_layout[index]);
+        }
     }
 }

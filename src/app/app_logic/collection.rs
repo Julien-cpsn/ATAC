@@ -135,6 +135,14 @@ impl App<'_> {
         }
     }
     
+    pub fn new_element(&mut self) {
+        match self.creation_popup.selection {
+            0 => self.create_new_collection_state(),
+            1 => self.create_new_request_state(),
+            _ => {}
+        }
+    }
+    
     pub fn new_collection(&mut self) {
         let new_collection_name = &self.new_collection_input.text;
 

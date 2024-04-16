@@ -10,3 +10,4 @@ pub mod settings_popup;
 pub mod cookies_popup;
 pub mod syntax_highlighting;
 pub mod cookie_table;
+pub mod choice_popup;

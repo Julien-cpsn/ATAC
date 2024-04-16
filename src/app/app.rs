@@ -18,6 +18,7 @@ use crate::app::ui::result_tabs::RequestResultTabs;
 use crate::app::ui::views::RequestView;
 use crate::request::collection::Collection;
 use crate::request::environment::Environment;
+use crate::utils::choice_popup::ChoicePopup;
 use crate::utils::cookies_popup::CookiesPopup;
 use crate::utils::settings_popup::SettingsPopup;
 use crate::utils::stateful_custom_table::StatefulCustomTable;
@@ -57,7 +58,7 @@ pub struct App<'a> {
     pub request_param_tab: RequestParamsTabs,
     pub request_result_tab: RequestResultTabs,
 
-    pub creation_popup: ValidationPopup,
+    pub creation_popup: ChoicePopup,
 
     pub new_collection_input: TextInput,
     pub rename_collection_input: TextInput,
@@ -127,7 +128,10 @@ impl App<'_> {
             request_param_tab: RequestParamsTabs::QueryParams,
             request_result_tab: RequestResultTabs::Body,
 
-            creation_popup: ValidationPopup::default(),
+            creation_popup: ChoicePopup {
+              choices: vec![String::from("Collection"), String::from("Request")],
+              selection: 0
+            },
             
             new_collection_input: TextInput::default(),
             rename_collection_input: TextInput::default(),

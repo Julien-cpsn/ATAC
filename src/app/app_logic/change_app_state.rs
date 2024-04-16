@@ -38,7 +38,14 @@ impl App<'_> {
     }
 
     pub fn create_new_element_state(&mut self) {
-        self.state = AppState::ChoosingElementToCreate;    
+        self.creation_popup.selection = 0;
+        
+        if self.collections.is_empty() {
+            self.create_new_collection_state();
+        }
+        else {
+            self.state = AppState::ChoosingElementToCreate;
+        }
     }
     
     pub fn create_new_collection_state(&mut self) {
