@@ -27,7 +27,7 @@ impl App<'_> {
         return tmp_string;
     }
 
-    pub fn add_color_to_env_keys(&self, input: &String) -> Line {
+    pub fn add_color_to_env_keys(&self, input: &str) -> Line {
         if self.environments.is_empty() || !input.contains('{') {
             return Line::raw(input.to_string());
         }

@@ -160,6 +160,19 @@ impl App<'_> {
 
                     request = request.form(&form);
                 },
+                ContentType::File(file_path) => {
+                    let path = PathBuf::from(file_path);
+
+                    match tokio::fs::File::open(path).await {
+                        Ok(file) => {
+                            request = request.body(file);
+                        }
+                        Err(_) => {
+                            selected_request.result.status_code = Some(String::from("COULD NOT OPEN FILE"));
+                            return;
+                        }
+                    }
+                },
                 ContentType::Raw(body) | ContentType::Json(body) | ContentType::Xml(body) | ContentType::Html(body) => {
                     request = request.body(body.to_string());
                 }

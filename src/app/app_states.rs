@@ -68,10 +68,13 @@ pub enum AppState {
 
     #[strum(to_string = "Editing request header")]
     EditingRequestHeader,
-
+    
     #[strum(to_string = "Editing request body")]
     EditingRequestBodyTable,
-
+    
+    #[strum(to_string = "Editing request body")]
+    EditingRequestBodyFile,
+    
     #[strum(to_string = "Editing request body")]
     EditingRequestBodyString,
 
@@ -117,7 +120,7 @@ impl App<'_> {
             EditingRequestParam |
             EditingRequestAuthUsername | EditingRequestAuthPassword | EditingRequestAuthBearerToken  |
             EditingRequestHeader |
-            EditingRequestBodyTable | EditingRequestBodyString |
+            EditingRequestBodyTable | EditingRequestBodyFile | EditingRequestBodyString |
             EditingRequestSettings 
             => {
                 let local_selected_request = self.get_selected_request_as_local();
@@ -206,7 +209,7 @@ impl App<'_> {
                             true => Some("(n)"),
                             false => Some(TABLE_KEYS)
                         },
-                        ContentType::Raw(_) | ContentType::Json(_) | ContentType::Xml(_) | ContentType::Html(_) => Some("Enter"),
+                        ContentType::File(_) | ContentType::Raw(_) | ContentType::Json(_) | ContentType::Xml(_) | ContentType::Html(_) => Some("Enter"),
                     },
                 };
 
@@ -226,6 +229,8 @@ impl App<'_> {
             EditingRequestHeader => String::from(TEXT_INPUT_KEYS),
 
             EditingRequestBodyTable => String::from(TEXT_INPUT_KEYS),
+            
+            EditingRequestBodyFile => String::from(TEXT_INPUT_KEYS),
 
             EditingRequestBodyString => String::from(TEXT_AREA_INPUT_KEYS),
 
@@ -299,7 +304,7 @@ impl App<'_> {
                             true => Some("(n)"),
                             false => Some(FULL_TABLE_KEYS)
                         }
-                        ContentType::Raw(_) | ContentType::Json(_) | ContentType::Xml(_) | ContentType::Html(_) => Some("Enter"),
+                        ContentType::File(_) | ContentType::Raw(_) | ContentType::Json(_) | ContentType::Xml(_) | ContentType::Html(_) => Some("Enter"),
                     },
                 };
 
@@ -317,9 +322,11 @@ impl App<'_> {
             EditingRequestAuthUsername | EditingRequestAuthPassword | EditingRequestAuthBearerToken => String::from(TEXT_INPUT_KEYS),
 
             EditingRequestHeader => String::from(TEXT_INPUT_KEYS),
-
-            EditingRequestBodyTable => String::from(TEXT_INPUT_KEYS),
             
+            EditingRequestBodyTable => String::from(TEXT_INPUT_KEYS),
+
+            EditingRequestBodyFile => String::from(TEXT_INPUT_KEYS),
+
             EditingRequestBodyString => String::from(TEXT_AREA_INPUT_KEYS),
 
             EditingRequestSettings => String::from("Esc Enter ↑ ↓ ← →"),

@@ -123,6 +123,7 @@ cargo run -- -h
 | Body                                | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
 | - Multipart form                    | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
 | - URL Encoded from                  | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
+| - File                              | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
 | - Plain text                        | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
 | - JSON, XML, HTML                   | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
 | Full response                       | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
@@ -159,11 +160,11 @@ cargo run -- -h
 - **To add**
   - Create a repo wiki
   - Document whole code
-  - File body content-type
 
 - **To improve**
   - Pretty print output
   - Sign binary
+  - Add file to Postman import
 
 - **To fix**
   - Query parameters bug

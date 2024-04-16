@@ -131,12 +131,14 @@ impl App<'_> {
             let mut selected_request = local_selected_request.write().unwrap();
 
             let body_form = &self.body_form_table.rows;
+            let body_file = &self.body_file_text_input.text;
             let body_string = self.body_text_area.lines().join("\n");
 
             let new_body = match selected_request.body {
                 ContentType::NoBody => ContentType::NoBody,
                 ContentType::Multipart(_) => ContentType::Multipart(body_form.clone()),
                 ContentType::Form(_) => ContentType::Form(body_form.clone()),
+                ContentType::File(_) => ContentType::File(body_file.clone()),
                 ContentType::Raw(_) => ContentType::Raw(body_string.clone()),
                 ContentType::Json(_) => ContentType::Json(body_string.clone()),
                 ContentType::Xml(_) => ContentType::Xml(body_string.clone()),
@@ -167,7 +169,7 @@ impl App<'_> {
                 // TODO: Impossible to set the header for multipart yet, because of boundary and content-length that are computed on reqwest's side
                 ContentType::Multipart(_) => {},
                 // Create or replace Content-Type header with new body content type
-                ContentType::Form(_) | ContentType::Raw(_) | ContentType::Json(_) | ContentType::Xml(_) | ContentType::Html(_) => {
+                ContentType::File(_) | ContentType::Form(_) | ContentType::Raw(_) | ContentType::Json(_) | ContentType::Xml(_) | ContentType::Html(_) => {
                     let content_type = &selected_request.body.to_content_type();
                     selected_request.modify_or_create_header(CONTENT_TYPE.as_str(), content_type)
                 }
