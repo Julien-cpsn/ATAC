@@ -133,7 +133,7 @@ cargo run -- -h
 | Headers                             | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
 | Body                                | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
 | - Multipart form                    | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
-| - URL Encoded from                  | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
+| - URL Encoded form                  | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
 | - File                              | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
 | - Plain text                        | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
 | - JSON, XML, HTML                   | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
@@ -253,6 +253,18 @@ The binary file size goes from ~4.5 MB to ~7 MB depending on the platform. I try
 ## Contributors
 
 - [@julien-cpsn](https://github.com/julien-cpsn)
+
+## Star history
+
+## Star History
+
+<a href="https://star-history.com/#julien-cpsn/atac&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=julien-cpsn/atac&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=julien-cpsn/atac&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=julien-cpsn/atac&type=Date" />
+ </picture>
+</a>
 
 ## License
 
