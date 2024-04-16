@@ -68,6 +68,7 @@ jobs:
         with:
           bin: atac
           target: ${{ matrix.target }}
+          archive: $bin-$tag-$target
           tar: all
           zip: windows
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -76,6 +77,7 @@ jobs:
     needs: upload-assets
     runs-on: ubuntu-latest
     name: homebrew-releaser
+    if: ${{ false }} # Temporally disabled
     steps:
       - name: Release my project to my Homebrew tap
         uses: Justintime50/homebrew-releaser@v1
@@ -126,7 +128,7 @@ jobs:
           # the Homebrew formula. Including this when not necessary could lead to uninstallable formula that may
           # not pass `brew audit` due to mismatched or redundant version strings
           # Optional - string
-          #version: '${{ github.ref_name }}'
+          version: '${{ github.ref_name }}'
 
           # Adds URL and checksum targets for different OS and architecture pairs. Using this option assumes
           # a tar archive exists on your GitHub repo with the following URL pattern (this cannot be customized):
