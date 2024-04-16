@@ -192,7 +192,7 @@ cargo run -- -h
 - **To add**
   - Command line usage (send requests, add new requests)
   - keymap configuration (via a config file)
-  - Request body syntax is highlighting
+  - Request body syntax highlighting
   - Export a request to other code formats (curl, PHP, JS, Rust, ...)
   - Pre and post-request script (javascript v8 engine)
 
@@ -204,7 +204,7 @@ cargo run -- -h
 
 ### Ideas (will think about it later)
 
-- Base URL on a collection
+- Base URL property on collections
 
 ## Documentation
 
