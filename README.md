@@ -61,10 +61,10 @@ Enjoy!
 
 ### Install from AUR
 
-You can use your favorite [AUR helper](https://wiki.archlinux.org/title/AUR_helpers) to install. For example,
+You can use [pacman](https://wiki.archlinux.org/title/pacman) to install:
 
 ```shell
-paru -S atac
+pacman -S atac
 ```
 
 Enjoy!
