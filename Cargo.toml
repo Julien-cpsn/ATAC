@@ -1,7 +1,7 @@
 [package]
 name = "atac"
 description = "Arguably a Terminal API Client. Feature-full, free, open-source, offline and account-less."
-version = "0.12.0"
+version = "0.13.0"
 authors = ["julien-cpsn"]
 edition = "2021"
 license = "MIT"
