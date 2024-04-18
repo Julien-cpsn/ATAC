@@ -1,0 +1,16 @@
+name: codespell
+on:
+  pull_request:
+    branches:
+      - main
+permissions: {}
+jobs:
+  codespell:
+    name: Check for spelling errors
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: codespell-project/actions-codespell@master
+        with:
+          only_warn: 1
+          # Other settings are in .codespellrc file

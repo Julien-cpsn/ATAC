@@ -1,0 +1,4 @@
+[codespell]
+builtin=clear,rare,en-GB_to_en-US,code
+# This file contains the list of words you want to exclude
+ignore-words=.github/codespell-ignore.txt
