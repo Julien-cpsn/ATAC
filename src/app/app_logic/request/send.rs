@@ -12,7 +12,7 @@ use tokio::task;
 
 use crate::app::app::App;
 use crate::request::auth::Auth::{BasicAuth, BearerToken, NoAuth};
-use crate::request::body::ContentType;
+use crate::request::body::{ContentType, find_file_format_in_content_type};
 
 impl App<'_> {
     pub async fn send_request(&mut self) {
@@ -222,12 +222,30 @@ impl App<'_> {
                             .collect::<Vec<String>>()
                             .join("\n");
 
-                        let result_body = response.text().await.unwrap();
+                        let mut result_body = response.text().await.unwrap();
 
-                        local_selected_request.write().unwrap().result.status_code = Some(status_code);
-                        local_selected_request.write().unwrap().result.body = Some(result_body);
-                        local_selected_request.write().unwrap().result.cookies = Some(cookies);
-                        local_selected_request.write().unwrap().result.headers = headers;
+                        // If the request response content can be pretty printed
+                        if local_selected_request.read().unwrap().settings.pretty_print_response_content {
+                            // If a file format has been found in the content-type header
+                            if let Some(file_format) = find_file_format_in_content_type(&headers) {
+                                // Match the file format
+                                match file_format.as_str() {
+                                    "json" => {
+                                        result_body = jsonxf::pretty_print(&result_body).unwrap_or(result_body);
+                                    },
+                                    _ => {}
+                                }
+                            }
+                        }
+                        
+                        {
+                            let mut selected_request = local_selected_request.write().unwrap();
+                            selected_request.result.status_code = Some(status_code);
+                            selected_request.result.body = Some(result_body);
+                            selected_request.result.cookies = Some(cookies);
+                            selected_request.result.headers = headers;
+                        }
+                        
                     },
                     Err(error) => {
                         let response_status_code;
@@ -240,10 +258,13 @@ impl App<'_> {
                         let result_body = error.to_string();
 
 
-                        local_selected_request.write().unwrap().result.status_code = response_status_code;
-                        local_selected_request.write().unwrap().result.body = Some(result_body);
-                        local_selected_request.write().unwrap().result.cookies = None;
-                        local_selected_request.write().unwrap().result.headers = vec![];
+                        {
+                            let mut selected_request = local_selected_request.write().unwrap();
+                            selected_request.result.status_code = response_status_code;
+                            selected_request.result.body = Some(result_body);
+                            selected_request.result.cookies = None;
+                            selected_request.result.headers = vec![];
+                        }
                     }
                 };
 

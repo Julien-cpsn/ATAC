@@ -1,6 +1,8 @@
+use regex::Regex;
 use serde::{Deserialize, Serialize};
-use strum::{Display};
-use crate::request::body::ContentType::{NoBody, File, Html, Json, Raw, Xml, Multipart, Form};
+use strum::Display;
+
+use crate::request::body::ContentType::{File, Form, Html, Json, Multipart, NoBody, Raw, Xml};
 use crate::request::request::KeyValue;
 
 #[derive(Default, Debug, Clone, Display, Serialize, Deserialize)]
@@ -62,5 +64,23 @@ pub fn next_content_type(content_type: &ContentType) -> ContentType {
         Json(body) => Xml(body.to_string()),
         Xml(body) => Html(body.to_string()),
         Html(_) => NoBody,
+    }
+}
+
+/// Iter through the headers and tries to catch a file format like `application/<file_format>`
+pub fn find_file_format_in_content_type(headers: &Vec<(String, String)>) -> Option<String> {
+    if let Some((_, content_type)) = headers.iter().find(|(header, _)| *header == "content-type") {
+        // Regex that likely catches the file format
+        let regex = Regex::new(r"\w+/(?<file_format>\w+)").unwrap();
+
+        return match regex.captures(content_type) {
+            // No file format found
+            None => None,
+            // File format found
+            Some(capture) => Some(capture["file_format"].to_string())
+        }
+    }
+    else {
+        return None;
     }
 }

@@ -5,11 +5,11 @@ use ratatui::prelude::Style;
 use ratatui::style::Stylize;
 use ratatui::text::Line;
 use ratatui::widgets::{Block, Borders, Paragraph, Scrollbar, ScrollbarOrientation, Tabs};
-use regex::Regex;
 use strum::{Display, EnumIter, FromRepr, IntoEnumIterator};
 use throbber_widgets_tui::{BRAILLE_DOUBLE, Throbber, WhichUse};
 
 use crate::app::app::App;
+use crate::request::body::find_file_format_in_content_type;
 use crate::request::request::Request;
 use crate::utils::centered_rect::centered_rect;
 use crate::utils::syntax_highlighting::last_highlighted_to_lines;
@@ -104,29 +104,20 @@ impl App<'_> {
                         Paragraph::new(lines)
                     }
                     Some(body) => {
-
+                        let file_format = find_file_format_in_content_type(&request.result.headers);
+                        
                         // is not highlighted
-                        let lines: Vec<Line> = match request.result.headers.iter().find(|(header, _)| *header == "content-type") {
+                        let lines: Vec<Line> = match file_format {
                             None => body.lines().map(|line| Line::raw(line)).collect(),
-                            Some((_, content_type)) => {
-                                // Regex that likely catches the file format
-                                let regex = Regex::new(r"\w+/(?<language>\w+)").unwrap();
+                            Some(file_format) => {
+                                // Tries to highlight the body
+                                self.syntax_highlighting.highlight(body, &file_format);
 
-                                match regex.captures(content_type) {
-                                    // No file format found
+                                match last_highlighted.read().unwrap().clone() {
+                                    // Nothing was highlighted
                                     None => body.lines().map(|line| Line::raw(line)).collect(),
-                                    // File format found
-                                    Some(capture) => {
-                                        // Tries to highlight the body
-                                        self.syntax_highlighting.highlight(body, &capture["language"]);
-    
-                                        match last_highlighted.read().unwrap().clone() {
-                                            // Nothing was highlighted
-                                            None => body.lines().map(|line| Line::raw(line)).collect(),
-                                            // Something was highlighted
-                                            Some(last_highlighted) => last_highlighted_to_lines(last_highlighted)
-                                        }
-                                    },
+                                    // Something was highlighted
+                                    Some(last_highlighted) => last_highlighted_to_lines(last_highlighted)
                                 }
                             }
                         };
