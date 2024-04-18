@@ -42,7 +42,7 @@ impl App<'_> {
 
                             KeyCode::Char('c') => self.display_cookies_state(),
                             
-                            KeyCode::Char('n') => self.create_new_element_state(),
+                            KeyCode::Char('n') => self.choose_element_to_create_state(),
                             KeyCode::Char('d') => self.delete_element(),
                             KeyCode::Char('r') => self.rename_element(),
                             
