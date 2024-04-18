@@ -92,7 +92,7 @@ impl App<'_> {
         // Header input & cursor
 
         if self.state == EditingRequestHeader {
-            let cell_with = headers_layout[1].width / 2;
+            let cell_width = headers_layout[1].width / 2;
 
             let width_adjustment = match header_selection.1 {
                 0 => 0,
@@ -102,7 +102,7 @@ impl App<'_> {
                         0 => 2,
                         _ => 0
                     };
-                    cell_with - even_odd_adjustment
+                    cell_width - even_odd_adjustment
                 },
                 _ => 0
             };
@@ -112,12 +112,12 @@ impl App<'_> {
             let selection_position_x = headers_layout[1].x + width_adjustment + horizontal_margin;
             let selection_position_y = headers_layout[1].y + height_adjustment;
             
-            let text_rect = Rect::new(selection_position_x, selection_position_y, cell_with, 1);
+            let text_rect = Rect::new(selection_position_x, selection_position_y, cell_width, 1);
             
             let adjusted_input_length = text_rect.width as usize - 2;
             let (padded_text, input_cursor_position) = self.headers_table.selection_text_input.get_padded_text_and_cursor(adjusted_input_length);
             
-            let text_input = Paragraph::new(format!("{:fill$}", padded_text, fill = (cell_with - horizontal_margin / 2) as usize));
+            let text_input = Paragraph::new(format!("{:fill$}", padded_text, fill = (cell_width - horizontal_margin / 2) as usize));
 
             frame.render_widget(text_input, text_rect);
 

@@ -1,6 +1,6 @@
 use crate::app::app::App;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub enum RequestView {
     Normal,
     OnlyResult,
