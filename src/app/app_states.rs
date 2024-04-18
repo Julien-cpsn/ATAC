@@ -5,6 +5,7 @@ use strum::Display;
 use crate::app::app::App;
 use crate::app::app_states::AppState::*;
 use crate::app::ui::param_tabs::param_tabs::RequestParamsTabs;
+use crate::app::ui::views::RequestView;
 use crate::request::auth::Auth;
 use crate::request::body::ContentType;
 
@@ -188,7 +189,12 @@ impl App<'_> {
                 if !self.environments.is_empty() {
                     base_keys += " (e)";
                 }
-
+                
+                // If the view only displays the result, then no need to add the additional keys 
+                if self.request_view == RequestView::OnlyResult {
+                    return base_keys;
+                }
+                
                 let additional_keys = match self.request_param_tab {
                     RequestParamsTabs::QueryParams => match selected_request.params.is_empty() {
                         true => Some("(n)"),
