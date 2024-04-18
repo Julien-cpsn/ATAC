@@ -39,7 +39,7 @@ but inside your terminal without any specific graphical environment needed.
 
 The philosophy of ATAC is to be free, account-less, and offline for now and forever.
 
-## How to use
+## How to install
 
 ### Install with cargo
 
@@ -72,18 +72,11 @@ Enjoy!
 ### Install with Homebrew
 
 Simply use:
+
 ```shell
 brew tap julien-cpsn/atac
 brew install atac
 ```
-
-Then:
-
-```
-atac -h
-```
-
-Enjoy!
 
 
 ### Binary
@@ -95,11 +88,9 @@ The binaries from the latest release can be found [here](https://github.com/Juli
 > For example, you can add the binary into your PATH.
 > You won't be able to run it like other graphical applications since it needs CLI arguments.
 
-For more:
-
-```
-atac -h
-```
+> [!TIP]
+> Note for **macOS users**. After downloading the binary you may need to run the command
+> `sudo xattr -rd com.apple.quarantine ~/bin/atac` (modify to reflect the path where `atac` is located).
 
 ### Compile by yourself
 
