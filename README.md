@@ -44,7 +44,7 @@ The philosophy of ATAC is to be free, account-less, and offline for now and fore
 [![Packaging status](https://repology.org/badge/vertical-allrepos/atac.svg)](https://repology.org/project/atac/versions)
 
 <a href="https://crates.io/crates/atac">
-  <img src="https://repology.org/badge/version-for-repo/crates_io/rust:atac.svg" alt="crates.io package" align="right">
+  <img src="https://repology.org/badge/version-for-repo/crates_io/atac.svg" alt="crates.io package" align="right">
 </a>
 
 ### Install with cargo
@@ -179,7 +179,8 @@ cargo run -- -h
 
 - **To improve**
   - Sign binary
-  - Add file to Postman import
+  - Add file content-type to Postman import
+  - Add env variables to file body content-type
 
 - **To fix**
   - Query parameters bug
