@@ -192,11 +192,7 @@ impl App<'_> {
         let new_request = Request {
             name: new_request_name.clone(),
             headers: DEFAULT_HEADERS.clone(),
-            settings: RequestSettings {
-                use_config_proxy: true,
-                allow_redirects: true,
-                store_received_cookies: true,
-            },
+            settings: RequestSettings::default(),
             ..Default::default()
         };
 

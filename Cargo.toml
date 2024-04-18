@@ -30,6 +30,7 @@ throbber-widgets-tui = "0.5.0"
 syntect = "5.2.0"
 serde = { version = "1.0.197", features = ["derive", "rc"] }
 serde_json = "1.0.114"
+jsonxf = "1.1.1"
 toml = "0.8.11"
 envfile = "0.2.1"
 parse_postman_collection = "0.2.2"
