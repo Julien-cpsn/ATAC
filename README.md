@@ -10,10 +10,10 @@ ATAC ⚔📩
 ## Table Of Contents
 
 - [Description](#description)
-- [How to use](#how-to-use)
+- [How to install](#how-to-install)
   * [Install with cargo](#install-with-cargo)
   * [Install with Homebrew](#install-with-homebrew)
-  * [Install from AUR](#aur)
+  * [Install from AUR](#install-from-aur)
   * [Binary](#binary)
   * [Compile by yourself](#compile-by-yourself)
 - [Features](#features)
@@ -41,6 +41,12 @@ The philosophy of ATAC is to be free, account-less, and offline for now and fore
 
 ## How to install
 
+[![Packaging status](https://repology.org/badge/vertical-allrepos/atac.svg)](https://repology.org/project/atac/versions)
+
+<a href="https://crates.io/crates/atac">
+  <img src="https://repology.org/badge/version-for-repo/crates_io/rust:atac.svg" alt="crates.io package" align="right">
+</a>
+
 ### Install with cargo
 
 > [!IMPORTANT]
@@ -51,33 +57,32 @@ Simply use:
 cargo install atac
 ```
 
-Then:
+<a href="https://archlinux.org/packages/extra/x86_64/atac/">
+  <img src="https://repology.org/badge/version-for-repo/arch/atac.svg" alt="Arch package" align="right">
+</a>
 
-```
-atac -h
-```
-
-Enjoy!
 
 ### Install from AUR
 
 You can use your favorite [AUR helper](https://wiki.archlinux.org/title/AUR_helpers) to install. For example,
 
-```shell
+```bash
 paru -S atac
 ```
 
-Enjoy!
 
 ### Install with Homebrew
 
 Simply use:
 
-```shell
+```bash
 brew tap julien-cpsn/atac
 brew install atac
 ```
 
+<a href="https://github.com/Julien-cpsn/ATAC/releases">
+  <img alt="GitHub Release" src="https://img.shields.io/github/v/release/julien-cpsn/atac?label=Release&color=45c017" align="right">
+</a>
 
 ### Binary
 
@@ -100,9 +105,11 @@ The binaries from the latest release can be found [here](https://github.com/Juli
 Simply clone the repository and use:
 
 ```bash
+cargo run
 cargo run -- -h
 ```
 
+> [!TIP]
 > Build the latest release
 > ```bash
 > cargo build --release
