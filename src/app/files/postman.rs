@@ -6,6 +6,7 @@ use parse_postman_collection::v2_1_0::{AuthType, Body, FormParameterSrcUnion, He
 
 use crate::app::app::App;
 use crate::app::startup::args::ARGS;
+use crate::panic_error;
 use crate::request::auth::Auth;
 use crate::request::body::ContentType;
 use crate::request::collection::Collection;
@@ -15,11 +16,16 @@ use crate::request::settings::RequestSettings;
 
 impl App<'_> {
     pub fn import_postman_collection(&mut self, path_buf: &PathBuf, max_depth: u16) {
-        let mut postman_collection = parse_postman_collection::from_path(path_buf).expect("\tCould not parse Postman collection");
+        println!("Parsing Postman collection");
+
+        let mut postman_collection = match parse_postman_collection::from_path(path_buf) {
+            Ok(postman_collection) => postman_collection,
+            Err(e) => panic_error(format!("Could not parse Postman collection\n\t{e}"))
+        };
 
         let collection_name = postman_collection.info.name.clone();
 
-        println!("Parsing Postman collection \"{}\"", collection_name);
+        println!("Collection name: {}", collection_name);
 
         for existing_collection in &self.collections {
             if existing_collection.name == collection_name {
@@ -191,7 +197,10 @@ fn parse_request(item: Items) -> Request {
             /* METHOD */
 
             if let Some(method) = &request_class.method {
-                request.method = Method::from_str(method).expect(&format!("Unknown method \"{method}\""));
+                request.method = match Method::from_str(method) {
+                    Ok(method) => method,
+                    Err(_) => panic_error(format!("Unknown method \"{method}\""))
+                };
             }
 
             /* AUTH */
