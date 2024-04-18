@@ -11,6 +11,7 @@ use reqwest::redirect::Policy;
 use tokio::task;
 
 use crate::app::app::App;
+use crate::panic_error;
 use crate::request::auth::Auth::{BasicAuth, BearerToken, NoAuth};
 use crate::request::body::{ContentType, find_file_format_in_content_type};
 
@@ -51,7 +52,10 @@ impl App<'_> {
                         match &proxy.http_proxy {
                             None => {}
                             Some(http_proxy_str) => {
-                                let proxy = Proxy::http(http_proxy_str).expect("Could not parse HTTP proxy");
+                                let proxy = match Proxy::http(http_proxy_str) {
+                                    Ok(proxy) => proxy,
+                                    Err(e) => panic_error(format!("Could not parse HTTP proxy\n\t{e}"))
+                                };
                                 client_builder = client_builder.proxy(proxy);
                             }
                         }
@@ -59,7 +63,10 @@ impl App<'_> {
                         match &proxy.https_proxy {
                             None => {}
                             Some(https_proxy_str) => {
-                                let proxy = Proxy::https(https_proxy_str).expect("Could not parse HTTPS proxy");
+                                let proxy = match Proxy::https(https_proxy_str) {
+                                    Ok(proxy) => proxy,
+                                    Err(e) => panic_error(format!("Could not parse HTTPS proxy\n\t{e}"))
+                                };
                                 client_builder = client_builder.proxy(proxy);
                             }
                         }

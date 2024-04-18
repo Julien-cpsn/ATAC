@@ -2,8 +2,10 @@ use std::fs;
 use std::fs::OpenOptions;
 use std::io::{Read, Write};
 use std::path::PathBuf;
+
 use crate::app::app::App;
 use crate::app::startup::args::ARGS;
+use crate::panic_error;
 use crate::request::collection::Collection;
 
 impl App<'_> {
@@ -20,32 +22,21 @@ impl App<'_> {
 
         collection_file.read_to_string(&mut file_content).expect("\tCould not read collection file");
 
+        let mut collection: Collection = match serde_json::from_str(&file_content) {
+            Ok(collection) => collection,
+            Err(e) => panic_error(format!("Could not parse collection\n\t{e}"))
+        };
 
-        if file_content.len() == 0 {
-            let collection = Collection {
-                name: path_buf.file_stem().unwrap().to_str().unwrap().to_string(),
-                requests: vec![],
-                path: path_buf,
-            };
+        collection.path = path_buf;
 
-            let collection_json = serde_json::to_string_pretty(&collection).expect("Could not serialize collection");
-
-            collection_file.write_all(collection_json.as_bytes()).expect("Could not write to collection file")
-        }
-        else {
-            let mut collection: Collection = serde_json::from_str(&file_content).expect("\tCould not parse collection");
-
-            collection.path = path_buf;
-
-            self.collections.push(collection);
-        }
+        self.collections.push(collection);
 
         println!("Collection file parsed!");
     }
 
     /// Save app collection in the collection file through a temporary file
     pub fn save_collection_to_file(&mut self, collection_index: usize) {
-        if ARGS.dry_run {
+        if !ARGS.should_save {
             return;
         }
 
@@ -72,7 +63,7 @@ impl App<'_> {
 
     /// Delete collection file
     pub fn delete_collection_file(&mut self, collection: Collection) {
-        if ARGS.dry_run {
+        if !ARGS.should_save {
             return;
         }
 

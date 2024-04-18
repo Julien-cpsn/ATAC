@@ -1,8 +1,9 @@
 use std::fs::OpenOptions;
-use std::io::{Read, Write};
+use std::io::Read;
 use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
 use crate::app::app::App;
+use crate::panic_error;
 
 #[derive(Default, Serialize, Deserialize)]
 pub struct Config {
@@ -26,21 +27,17 @@ impl App<'_> {
         let mut config_file = OpenOptions::new()
             .read(true)
             .write(true)
-            .create(true)
             .open(path_buf.clone())
             .expect("\tCould not open config file");
 
         config_file.read_to_string(&mut file_content).expect("\tCould not read config file");
 
-        if file_content.len() == 0 {
-            let config_toml = toml::to_string_pretty(&self.config).expect("\tCould not serialize config file");
-            config_file.write_all(config_toml.as_bytes()).expect("\tCould not write to config file");
-        }
-        else {
-            let config: Config = toml::from_str(&file_content).expect("\tCould not parse config file");
+        let config: Config = match toml::from_str(&file_content) {
+            Ok(config) => config,
+            Err(e) => panic_error(format!("Could not parse config file\n\t{e}"))
+        };
 
-            self.config = config
-        }
+        self.config = config;
 
         println!("Config file parsed!");
     }
