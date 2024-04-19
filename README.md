@@ -141,7 +141,7 @@ cargo run -- -h
 | - URL Encoded form                  | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
 | - File                              | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
 | - Plain text                        | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
-| - JSON, XML, HTML                   | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
+| - JSON, XML, HTML, Javascript       | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
 | Full response                       | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
 | - Status code                       | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
 | - Cookies                           | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
@@ -156,7 +156,9 @@ cargo run -- -h
 | - Allow redirects                   | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
 | - Store cookies                     | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
 | **WebSocket Client**                | :x: :soon:                                               | :white_check_mark:   | :white_check_mark:   |
-| **GraphQL**                         | :x: (not planned)                                        | :white_check_mark:   | :white_check_mark:   |
+| **GraphQL**                         | :x: :soon:                                               | :white_check_mark:   | :white_check_mark:   |
+| **gRPC**                            | :x: :soon:                                               | :white_check_mark:   | :white_check_mark:   |
+| **MQTT**                            | :x: :soon:                                               | :white_check_mark:   | :x:                  |
 | **Free**                            | :white_check_mark:                                       | Depends              | Depends              |
 | **Lightweight, fast and efficient** | :white_check_mark:                                       | :x:                  | :x:                  |
 | **Data storage**                    | Your own committable, readable and versioned files       | Tied to your account | Tied to your account |
@@ -176,6 +178,7 @@ cargo run -- -h
 - **To add**
   - Create a repo wiki
   - Document whole code
+  - Copy response content to clipboard
 
 - **To improve**
   - Sign binary
@@ -191,16 +194,25 @@ cargo run -- -h
   - Request body syntax highlighting
   - Export a request to other code formats (curl, PHP, JS, Rust, ...)
   - Pre and post-request script (javascript v8 engine)
+  - OpenAPI & Insomnia import
 
 - **To improve**
   - Editing cookies
-  - Insomnia import
   - Auto-completion on env file variables
   - Manage multipart Content-type header (auto-generated for now)
+
+### TODO v3.0.0
+
+- **To add**
+  - WebSocket requests
+  - Maybe GraphQL requests
+  - Maybe MQTT requests
+  - Maybe gRPC requests
 
 ### Ideas (will think about it later)
 
 - Base URL property on collections
+- YAML support for collections file format
 
 ## Documentation
 
