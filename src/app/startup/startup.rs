@@ -7,6 +7,7 @@ use crate::panic_error;
 impl App<'_> {
     /// Method called before running the app
     pub fn startup(&mut self) -> &mut Self {
+        self.parse_key_bindings_file();
         self.parse_app_directory();
 
         // Creates the log file only if the app is allowed to save files

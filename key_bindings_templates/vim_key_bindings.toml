@@ -1,0 +1,9 @@
+[keybindings]
+
+quit = "c"
+
+collections_cursor_up = "k"
+collections_cursor_down = "j"
+
+collections_move_request_up = "ctrl-u"
+collections_move_request_down = "ctrl-d"

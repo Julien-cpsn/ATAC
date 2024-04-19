@@ -13,6 +13,7 @@ use tui_textarea::TextArea;
 use crate::app::app_logic::new_request_popup::NewRequestPopup;
 use crate::app::app_states::AppState;
 use crate::app::files::config::Config;
+use crate::app::files::key_bindings::KeyBindingsConfig;
 use crate::app::ui::param_tabs::param_tabs::RequestParamsTabs;
 use crate::app::ui::result_tabs::RequestResultTabs;
 use crate::app::ui::views::RequestView;

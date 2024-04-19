@@ -1,0 +1,10 @@
+[keybindings]
+
+[keybindings.main_menu]
+quit = "q"
+
+collections_cursor_up = "up"
+collections_cursor_down = "down"
+
+collections_move_request_up = "ctrl-up"
+collections_move_request_down = "ctrl-down"
