@@ -84,6 +84,20 @@ brew install atac
   <img alt="GitHub Release" src="https://img.shields.io/github/v/release/julien-cpsn/atac?label=Release&color=45c017" align="right">
 </a>
 
+### Install from Fedora copr
+
+Simply use:
+
+```bash
+dnf enable joxcat/atac
+dnf install atac
+```
+
+<a href="https://copr.fedorainfracloud.org/coprs/joxcat/atac/">
+  <img alt="Fedora copr Release" src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fcopr.fedorainfracloud.org%2Fapi_3%2Fpackage%3Fownername%3Djoxcat%26projectname%3Datac%26packagename%3Datac%26with_latest_build%3DTrue&query=%24.builds.latest.source_package.version&style=flat&logo=fedora&logoColor=white&label=Fedora%20copr&color=limegreen" align="right">
+</a>
+
+
 ### Binary
 
 The binaries from the latest release can be found [here](https://github.com/Julien-cpsn/ATAC/releases/latest)
@@ -276,6 +290,7 @@ The binary file size goes from ~4.5 MB to ~7 MB depending on the platform. I try
 
 - Cargo, Brew - [@julien-cpsn](https://github.com/julien-cpsn)
 - Arch - [@orhun](https://github.com/orhun)
+- Fedora copr - [@joxcat](https://github.com/joxcat)
 
 ## Star history
 
