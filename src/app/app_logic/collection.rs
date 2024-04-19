@@ -98,7 +98,7 @@ impl App<'_> {
             ContentType::File(file_path) =>  {
                 self.body_file_text_input.enter_str(file_path);
             },
-            ContentType::Raw(body) | ContentType::Json(body) | ContentType::Xml(body) | ContentType::Html(body) => {
+            ContentType::Raw(body) | ContentType::Json(body) | ContentType::Xml(body) | ContentType::Html(body) | ContentType::Javascript(body) => {
                 self.body_form_table.rows = Vec::new();
                 self.refresh_body_textarea(body);
             }

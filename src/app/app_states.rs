@@ -215,7 +215,7 @@ impl App<'_> {
                             true => Some("(n)"),
                             false => Some(TABLE_KEYS)
                         },
-                        ContentType::File(_) | ContentType::Raw(_) | ContentType::Json(_) | ContentType::Xml(_) | ContentType::Html(_) => Some("Enter"),
+                        ContentType::File(_) | ContentType::Raw(_) | ContentType::Json(_) | ContentType::Xml(_) | ContentType::Html(_) | ContentType::Javascript(_) => Some("Enter"),
                     },
                 };
 
@@ -310,7 +310,7 @@ impl App<'_> {
                             true => Some("(n)"),
                             false => Some(FULL_TABLE_KEYS)
                         }
-                        ContentType::File(_) | ContentType::Raw(_) | ContentType::Json(_) | ContentType::Xml(_) | ContentType::Html(_) => Some("Enter"),
+                        ContentType::File(_) | ContentType::Raw(_) | ContentType::Json(_) | ContentType::Xml(_) | ContentType::Html(_) | ContentType::Javascript(_) => Some("Enter"),
                     },
                 };
 

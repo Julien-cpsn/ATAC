@@ -173,7 +173,7 @@ impl App<'_> {
                 ContentType::File(_) => {
                     self.state = AppState::EditingRequestBodyFile;
                 }
-                ContentType::Raw(_) | ContentType::Json(_) | ContentType::Xml(_) | ContentType::Html(_) => {
+                ContentType::Raw(_) | ContentType::Json(_) | ContentType::Xml(_) | ContentType::Html(_) | ContentType::Javascript(_) => {
                     self.state = AppState::EditingRequestBodyString;
                 }
                 _ => {

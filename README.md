@@ -179,7 +179,6 @@ cargo run -- -h
 
 - **To improve**
   - Sign binary
-  - Add file content-type to Postman import
 
 - **To fix**
   - Query parameters bug

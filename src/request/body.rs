@@ -2,7 +2,7 @@ use regex::Regex;
 use serde::{Deserialize, Serialize};
 use strum::Display;
 
-use crate::request::body::ContentType::{File, Form, Html, Json, Multipart, NoBody, Raw, Xml};
+use crate::request::body::ContentType::{File, Form, Html, Javascript, Json, Multipart, NoBody, Raw, Xml};
 use crate::request::request::KeyValue;
 
 #[derive(Default, Debug, Clone, Display, Serialize, Deserialize)]
@@ -24,7 +24,9 @@ pub enum ContentType {
     #[strum(to_string = "XML")]
     Xml(String),
     #[strum(to_string = "HTML")]
-    Html(String)
+    Html(String),
+    #[strum(to_string = "Javascript")]
+    Javascript(String)
 }
 
 impl ContentType {
@@ -35,7 +37,7 @@ impl ContentType {
             Form(_) => String::from("application/x-www-form-urlencoded"),
             Raw(_) => String::from("text/plain"),
             File(_) => String::from("application/octet-stream"),
-            Json(_) | Xml(_) | Html(_) => format!("application/{}", self.to_string().to_lowercase())
+            Json(_) | Xml(_) | Html(_) | Javascript(_) => format!("application/{}", self.to_string().to_lowercase())
         }
     }
 
@@ -63,7 +65,8 @@ pub fn next_content_type(content_type: &ContentType) -> ContentType {
         Raw(body) => Json(body.to_string()),
         Json(body) => Xml(body.to_string()),
         Xml(body) => Html(body.to_string()),
-        Html(_) => NoBody,
+        Html(body) => Javascript(body.to_string()),
+        Javascript(_) => NoBody
     }
 }
 
