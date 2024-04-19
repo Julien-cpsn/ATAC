@@ -20,7 +20,7 @@ pub enum AppState {
     #[strum(to_string = "Displaying cookies")]
     DisplayingCookies,
 
-    #[strum(to_string = "Editing cookies")]
+    #[strum(to_string = "Editting cookies")]
     #[allow(dead_code)]
     EditingCookies,
     

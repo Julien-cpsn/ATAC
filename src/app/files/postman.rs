@@ -11,7 +11,7 @@ use crate::request::auth::Auth;
 use crate::request::body::ContentType;
 use crate::request::collection::Collection;
 use crate::request::method::Method;
-use crate::request::request::{DEFAULT_HEADERS, KeyValue, Request};
+use crate::request::request::{DEFAULT_HEADRS, KeyValue, Request};
 use crate::request::settings::RequestSettings;
 
 impl App<'_> {
@@ -396,7 +396,7 @@ fn retrieve_auth(request_class: &RequestClass) -> Option<Auth> {
 fn retrieve_headers(request_class: &RequestClass) -> Option<Vec<KeyValue>> {
     let headers = request_class.header.clone()?;
 
-    let mut headers_to_return: Vec<KeyValue> = DEFAULT_HEADERS.clone();
+    let mut headers_to_return: Vec<KeyValue> = DEFAULT_HEADRS.clone();
 
     match headers {
         HeaderUnion::HeaderArray(headers) => {

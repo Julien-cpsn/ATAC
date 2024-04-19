@@ -4,7 +4,7 @@ use crate::app::startup::args::ARGS;
 use crate::request::auth::Auth;
 use crate::request::body::ContentType;
 use crate::request::collection::Collection;
-use crate::request::request::{DEFAULT_HEADERS, Request};
+use crate::request::request::{DEFAULT_HEADRS, Request};
 use crate::request::settings::RequestSettings;
 
 impl App<'_> {
@@ -191,7 +191,7 @@ impl App<'_> {
 
         let new_request = Request {
             name: new_request_name.clone(),
-            headers: DEFAULT_HEADERS.clone(),
+            headers: DEFAULT_HEADRS.clone(),
             settings: RequestSettings::default(),
             ..Default::default()
         };
