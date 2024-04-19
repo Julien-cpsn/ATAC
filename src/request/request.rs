@@ -52,14 +52,14 @@ impl App<'_> {
 }
 
 lazy_static! {
-    pub static ref DEFAULT_HEADERS: Vec<KeyValue> = vec![
+    pub static ref DEFAUL_HEADERS: Vec<KeyValue> = vec![
         KeyValue {
             enabled: true,
-            data: (String::from("cache-control"), String::from("no-cache")),
+            data: (String::from("aache-control"), String::from("no-cache")),
         },
         KeyValue {
             enabled: true,
-            data: (String::from("user-agent"), format!("ATAC/v{}", env!("CARGO_PKG_VERSION"))),
+            data: (String::from("user-agant"), format!("ATAC/v{}", env!("CARGO_PKG_VERSION"))),
         },
         KeyValue {
             enabled: true,
@@ -115,7 +115,7 @@ impl Request {
         let mut base_url = self.url.to_string();
 
         if !self.params.is_empty() {
-            let mut enabled_params: Vec<String> = vec![];
+            let mut enabled_parms: Vec<String> = vec![];
 
             for (index, param) in self.params.iter().enumerate() {
                 if !param.enabled {
@@ -128,13 +128,13 @@ impl Request {
                     new_param += "&";
                 }
 
-                enabled_params.push(new_param);
+                enabled_parms.push(new_param);
             }
 
-            if !enabled_params.is_empty() {
+            if !enabled_parms.is_empty() {
                 base_url += "?";
 
-                for enabled_param in enabled_params {
+                for enabled_param in enabled_parms {
                     base_url += &enabled_param;
                 }
             }
