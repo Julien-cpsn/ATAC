@@ -279,7 +279,8 @@ fn retrieve_body(request_class: &RequestClass) -> Option<ContentType> {
                             Language::Html => ContentType::Html(body_as_raw),
                             Language::Json => ContentType::Json(body_as_raw),
                             Language::Text => ContentType::Raw(body_as_raw),
-                            Language::Xml => ContentType::Xml(body_as_raw)
+                            Language::Xml => ContentType::Xml(body_as_raw),
+                            Language::Javascript => ContentType::Javascript(body_as_raw),
                         };
 
                         Some(request_body)
@@ -288,7 +289,12 @@ fn retrieve_body(request_class: &RequestClass) -> Option<ContentType> {
                         Some(ContentType::Raw(body_as_raw))
                     }
                 },
-                Mode::File => None,
+                Mode::File => { 
+                    let file = body.file?;
+                    let file_path = file.src?;
+                    
+                    Some(ContentType::File(file_path))
+                },
                 Mode::Formdata => {
                     let form_data = body.formdata?;
 
