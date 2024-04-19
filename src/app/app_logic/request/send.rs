@@ -168,7 +168,8 @@ impl App<'_> {
                     request = request.form(&form);
                 },
                 ContentType::File(file_path) => {
-                    let path = PathBuf::from(file_path);
+                    let file_path_with_env_values = self.replace_env_keys_by_value(file_path);
+                    let path = PathBuf::from(file_path_with_env_values);
 
                     match tokio::fs::File::open(path).await {
                         Ok(file) => {
