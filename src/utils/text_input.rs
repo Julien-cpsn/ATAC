@@ -33,7 +33,7 @@ impl TextInput {
         }
     }
 
-    pub fn delete_char_backward(&mut self) {
+    pub fn delete_char_forward(&mut self) {
         let is_not_cursor_leftmost = self.cursor_position != 0;
         if is_not_cursor_leftmost {
             // Method "remove" is not used on the saved text for deleting the selected char.
@@ -55,7 +55,7 @@ impl TextInput {
         }
     }
 
-    pub fn delete_char_forward(&mut self) {
+    pub fn delete_char_backward(&mut self) {
         let is_not_cursor_rightmost = self.cursor_position != self.text.len();
 
         if is_not_cursor_rightmost {

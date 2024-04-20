@@ -1,9 +1,73 @@
-[keybindings]
+# Please avoid using Ctrl-v, it will paste your clipboard and trigger many unwanted event
 
-quit = "c"
+[keybindings.main_menu]
+quit = "q" # ctrl-c is implemented by default
 
-collections_cursor_up = "k"
-collections_cursor_down = "j"
+collections_expand = "Right"
+unselect_request = "Left"
 
-collections_move_request_up = "ctrl-u"
-collections_move_request_down = "ctrl-d"
+move_request_up = "Ctrl-k"
+move_request_down = "Ctrl-j"
+
+next_environment = "Shift-E"
+display_cookies = "Shift-C"
+display_help = "Shift-H"
+
+# Collection name, request name, URL, Header, Query param, Basic Auth, Bearer Token
+[keybindings.generic.text_inputs.text_input]
+cancel = "Esc"
+validate = "Ctrl-s"
+
+delete_backward = "Delete"
+delete_forward = "x"
+
+move_cursor_left = "Ctrl-h"
+move_cursor_right = "Ctrl-l"
+
+# Request body
+[keybindings.generic.text_inputs]
+
+# Will simulate most of the Vim key bindings in the text areas (Request body)
+text_area_mode = "VimEmulation"
+
+# Navigation in tables, popups, up and down in the collections list
+[keybindings.generic.navigation]
+move_cursor_up = "k"
+move_cursor_down = "j"
+move_cursor_left = "h"
+move_cursor_right = "l"
+
+go_back = "Esc"
+select = "Enter"
+
+# Collections list, query params, headers, cookies
+[keybindings.generic.list_and_table_actions]
+create_element = "n"
+delete_element = "d"
+edit_element = "c" # Edit query param, header, basic auth, bearer token
+rename_element = "r" # Only used in the collections list (main menu)
+toggle_element = "t" # Only used in tables (Query params, headers, cookies)
+
+[keybindings.request_selected]
+next_tab = "t"
+
+change_url = "Shift-U"
+change_method = "Shift-M"
+request_settings = "Shift-S"
+
+next_view = "Shift-V"
+
+send_request = "Space"
+secondary_send_request = "Ctrl-Enter"
+
+[keybindings.request_selected.param_tabs]
+change_auth_method = "Shift-A"
+change_body_content_type = "Shift-B"
+
+[keybindings.request_selected.result_tabs]
+scroll_up = "Ctrl-y"
+scroll_down = "Ctrl-e"
+scroll_left = "Ctrl-h"
+scroll_right = "Ctrl-l"
+
+secondary_next_tab = "Shift-T" # Will use next_tab depending on the selected view

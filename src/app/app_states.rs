@@ -2,12 +2,10 @@ use ratatui::prelude::Span;
 use ratatui::style::Stylize;
 use ratatui::text::Line;
 use strum::Display;
+
 use crate::app::app::App;
 use crate::app::app_states::AppState::*;
-use crate::app::ui::param_tabs::param_tabs::RequestParamsTabs;
-use crate::app::ui::views::RequestView;
-use crate::request::auth::Auth;
-use crate::request::body::ContentType;
+use crate::app::files::key_bindings::{CREATING_NEW_REQUEST, DISPLAYING_COOKIES, MAIN_MENU_KEYS, NAVIGATION_KEYS, REQUEST_SELECTED_KEYS, TEXT_AREA_INPUT_KEYS, TEXT_INPUT_KEYS, VALIDATION_KEYS};
 
 #[derive(Copy, Clone, PartialEq, Default, Display)]
 pub enum AppState {
@@ -83,12 +81,6 @@ pub enum AppState {
     EditingRequestSettings
 }
 
-const TEXT_INPUT_KEYS: &str = "Esc Enter ← → copy paste";
-const TEXT_AREA_INPUT_KEYS: &str = "Esc Enter Tab ^(s)ave ↑ ↓ ← → copy paste";
-const VALIDATION_KEYS: &str = "Esc Enter ← →";
-const TABLE_KEYS: &str = "↑ ↓ ← → Enter (n) (d) (t)";
-const FULL_TABLE_KEYS: &str = "↑ ↓ ← → Enter (n)ew (d)elete (t)oggle";
-
 impl App<'_> {
     pub fn get_state_line(&self) -> Line {
         match self.state {
@@ -144,198 +136,51 @@ impl App<'_> {
         }
     }
 
-    pub fn get_available_keys(&self) -> String {
+    pub fn get_available_keys(&self) -> Line {
         match self.state {
-            Normal => {
-                let mut base_keys = String::from("q or ^c ^↑ ^↓ ← → Enter (h)elp (n) (d) (r) (c)");
-
-                if !self.environments.is_empty() {
-                    base_keys += " (e)";
-                }
-
-                base_keys
-            },
+            Normal => MAIN_MENU_KEYS.read().unwrap().clone(),
 
             /* Cookies */
 
-            ChoosingElementToCreate => String::from(VALIDATION_KEYS),
+            ChoosingElementToCreate => VALIDATION_KEYS.read().unwrap().clone(),
 
-            DisplayingCookies => String::from("Esc (d)"),
+            DisplayingCookies => DISPLAYING_COOKIES.read().unwrap().clone(),
 
-            EditingCookies => String::from(TEXT_INPUT_KEYS),
+            EditingCookies => TEXT_INPUT_KEYS.read().unwrap().clone(),
 
             /* Collections */
             
-            CreatingNewCollection => String::from(TEXT_INPUT_KEYS),
+            CreatingNewCollection => TEXT_INPUT_KEYS.read().unwrap().clone(),
 
-            CreatingNewRequest => format!("{TEXT_INPUT_KEYS} ↑ ↓"),
+            CreatingNewRequest => CREATING_NEW_REQUEST.read().unwrap().clone(),
 
-            DeletingCollection => String::from(VALIDATION_KEYS),
+            DeletingCollection => VALIDATION_KEYS.read().unwrap().clone(),
 
-            DeletingRequest => String::from(VALIDATION_KEYS),
+            DeletingRequest => VALIDATION_KEYS.read().unwrap().clone(),
 
-            RenamingCollection => String::from(TEXT_INPUT_KEYS),
+            RenamingCollection => TEXT_INPUT_KEYS.read().unwrap().clone(),
 
-            RenamingRequest => String::from(TEXT_INPUT_KEYS),
+            RenamingRequest => TEXT_INPUT_KEYS.read().unwrap().clone(),
 
             /* Request */
 
-            SelectedRequest => {
-                let local_selected_request = self.get_selected_request_as_local();
-                let selected_request = local_selected_request.read().unwrap();
-
-                let mut base_keys = String::from("Esc Space TAB (h)elp (u) (m) ^(a) ^(b) (s) (c) (v)");
-
-                if !self.environments.is_empty() {
-                    base_keys += " (e)";
-                }
-                
-                // If the view only displays the result, then no need to add the additional keys 
-                if self.request_view == RequestView::OnlyResult {
-                    return base_keys;
-                }
-                
-                let additional_keys = match self.request_param_tab {
-                    RequestParamsTabs::QueryParams => match selected_request.params.is_empty() {
-                        true => Some("(n)"),
-                        false => Some(TABLE_KEYS),
-                    },
-                    RequestParamsTabs::Auth => match selected_request.auth {
-                        Auth::NoAuth => None,
-                        Auth::BasicAuth(_, _) => Some("↑ ↓ Enter"),
-                        Auth::BearerToken(_) => Some("Enter"),
-                    },
-                    RequestParamsTabs::Headers => match selected_request.headers.is_empty() {
-                        true => Some("(n)"),
-                        false => Some(TABLE_KEYS)
-                    },
-                    RequestParamsTabs::Body => match selected_request.body {
-                        ContentType::NoBody => None,
-                        ContentType::Multipart(_) | ContentType::Form(_) => match selected_request.body.get_form().unwrap().is_empty() {
-                            true => Some("(n)"),
-                            false => Some(TABLE_KEYS)
-                        },
-                        ContentType::File(_) | ContentType::Raw(_) | ContentType::Json(_) | ContentType::Xml(_) | ContentType::Html(_) | ContentType::Javascript(_) => Some("Enter"),
-                    },
-                };
-
-                if let Some(additional_keys_str) = additional_keys {
-                    base_keys += &format!(" | {additional_keys_str}");
-                }
-
-                base_keys
-            },
+            SelectedRequest => REQUEST_SELECTED_KEYS.read().unwrap().clone(),
             
-            EditingRequestUrl => String::from(TEXT_INPUT_KEYS),
+            EditingRequestUrl => TEXT_INPUT_KEYS.read().unwrap().clone(),
 
-            EditingRequestParam => String::from(TEXT_INPUT_KEYS),
+            EditingRequestParam => TEXT_INPUT_KEYS.read().unwrap().clone(),
 
-            EditingRequestAuthUsername | EditingRequestAuthPassword | EditingRequestAuthBearerToken => String::from(TEXT_INPUT_KEYS),
+            EditingRequestAuthUsername | EditingRequestAuthPassword | EditingRequestAuthBearerToken => TEXT_INPUT_KEYS.read().unwrap().clone(),
 
-            EditingRequestHeader => String::from(TEXT_INPUT_KEYS),
+            EditingRequestHeader => TEXT_INPUT_KEYS.read().unwrap().clone(),
 
-            EditingRequestBodyTable => String::from(TEXT_INPUT_KEYS),
+            EditingRequestBodyTable => TEXT_INPUT_KEYS.read().unwrap().clone(),
             
-            EditingRequestBodyFile => String::from(TEXT_INPUT_KEYS),
+            EditingRequestBodyFile => TEXT_INPUT_KEYS.read().unwrap().clone(),
 
-            EditingRequestBodyString => String::from(TEXT_AREA_INPUT_KEYS),
+            EditingRequestBodyString => TEXT_AREA_INPUT_KEYS.read().unwrap().clone(),
 
-            EditingRequestSettings => String::from("Esc Enter ↑ ↓ ← →"),
-        }
-    }
-
-    pub fn get_full_available_keys(&self) -> String {
-        match self.state {
-            Normal => {
-                let mut base_keys = String::from("(q)uit or ^c ^↑ ^↓ ← → Enter (n)ew (d)elete (r)ename (c)ookies");
-
-                if !self.environments.is_empty() {
-                    base_keys += " (e)nv";
-                }
-
-                base_keys
-            },
-
-            /* Cookies */
-            
-            DisplayingCookies => String::from("Esc (d)elete"),
-
-            EditingCookies => String::from(TEXT_INPUT_KEYS),
-
-            /* Collections */
-
-            ChoosingElementToCreate => String::from(VALIDATION_KEYS),
-
-            CreatingNewCollection => String::from(TEXT_INPUT_KEYS),
-
-            CreatingNewRequest => format!("{TEXT_INPUT_KEYS} ↑ ↓"),
-
-            DeletingCollection => String::from(VALIDATION_KEYS),
-
-            DeletingRequest => String::from(VALIDATION_KEYS),
-
-            RenamingCollection => String::from(TEXT_INPUT_KEYS),
-
-            RenamingRequest => String::from(TEXT_INPUT_KEYS),
-
-            /* Request */
-
-            SelectedRequest => {
-                let local_selected_request = self.get_selected_request_as_local();
-                let selected_request = local_selected_request.read().unwrap();
-
-                let mut base_keys = String::from("Esc Space or ^Enter TAB (u)rl (m)ethod ^(a)uth ^(b)ody (s)ettings (c)ookies (v)iew");
-
-                if !self.environments.is_empty() {
-                    base_keys += " (e)nv";
-                }
-
-                let additional_keys = match self.request_param_tab {
-                    RequestParamsTabs::QueryParams => match selected_request.params.is_empty() {
-                        true => Some("(n)ew param"),
-                        false => Some(FULL_TABLE_KEYS),
-                    },
-                    RequestParamsTabs::Auth => match selected_request.auth {
-                        Auth::NoAuth => None,
-                        Auth::BasicAuth(_, _) => Some("↑ ↓ Enter"),
-                        Auth::BearerToken(_) => Some("Enter"),
-                    },
-                    RequestParamsTabs::Headers => match selected_request.headers.is_empty() {
-                        true => Some("(n)ew header"),
-                        false => Some(FULL_TABLE_KEYS)
-                    },
-                    RequestParamsTabs::Body => match selected_request.body {
-                        ContentType::NoBody => None,
-                        ContentType::Multipart(_) | ContentType::Form(_) => match selected_request.body.get_form().unwrap().is_empty() {
-                            true => Some("(n)"),
-                            false => Some(FULL_TABLE_KEYS)
-                        }
-                        ContentType::File(_) | ContentType::Raw(_) | ContentType::Json(_) | ContentType::Xml(_) | ContentType::Html(_) | ContentType::Javascript(_) => Some("Enter"),
-                    },
-                };
-
-                if let Some(additional_keys_str) = additional_keys {
-                    base_keys += &format!(" | {additional_keys_str}");
-                }
-
-                base_keys
-            },
-            
-            EditingRequestUrl => String::from(TEXT_INPUT_KEYS),
-
-            EditingRequestParam => String::from(TEXT_INPUT_KEYS),
-
-            EditingRequestAuthUsername | EditingRequestAuthPassword | EditingRequestAuthBearerToken => String::from(TEXT_INPUT_KEYS),
-
-            EditingRequestHeader => String::from(TEXT_INPUT_KEYS),
-            
-            EditingRequestBodyTable => String::from(TEXT_INPUT_KEYS),
-
-            EditingRequestBodyFile => String::from(TEXT_INPUT_KEYS),
-
-            EditingRequestBodyString => String::from(TEXT_AREA_INPUT_KEYS),
-
-            EditingRequestSettings => String::from("Esc Enter ↑ ↓ ← →"),
+            EditingRequestSettings => NAVIGATION_KEYS.read().unwrap().clone()
         }
     }
 }

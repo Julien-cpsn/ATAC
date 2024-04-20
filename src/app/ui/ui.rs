@@ -98,14 +98,11 @@ impl App<'_> {
         // FOOTER
 
         let state_line = self.get_state_line();
-        let available_keys = match self.display_full_help {
-            false => self.get_available_keys(),
-            true => self.get_full_available_keys()
-        };
+        let available_keys = self.get_available_keys();
 
         let footer = Block::new()
             .title(Title::from(state_line).alignment(Alignment::Left))
-            .title(Title::from(available_keys.dark_gray()).alignment(Alignment::Right));
+            .title(Title::from(available_keys).alignment(Alignment::Right));
 
         frame.render_widget(footer, main_layout[2]);
 

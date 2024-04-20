@@ -183,7 +183,7 @@ impl App<'_> {
     }
 
     pub fn quit_request_body(&mut self) {
-        self.update_inputs();
         self.select_request_state();
+        self.update_inputs();
     }
 }

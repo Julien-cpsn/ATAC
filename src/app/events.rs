@@ -3,11 +3,13 @@ use crokey::OneToThree::One;
 use crossterm::event;
 use crossterm::event::{Event, KeyCode, KeyEventKind, KeyModifiers};
 use tui_textarea::CursorMove;
-use crate::app::app::{App};
+
+use crate::app::app::App;
 use crate::app::app_states::AppState;
-use crate::app::files::key_bindings::KEY_BINDINGS;
+use crate::app::files::key_bindings::{KEY_BINDINGS, TextAreaMode};
 use crate::app::ui::param_tabs::param_tabs::RequestParamsTabs;
 use crate::app::ui::views::RequestView;
+use crate::utils::vim_emulation::{Vim, VimTransition};
 
 impl App<'_> {
     /// Handle events
@@ -21,35 +23,39 @@ impl App<'_> {
                     return;
                 }
 
+                let key_bindings = KEY_BINDINGS.read().unwrap();
                 let key = KeyCombination::from(key_event);
-                
+
+                // Debug tool
+                //dbg!("{}", key.to_string());
+
                 let mut miss_input = false;
                 let previous_app_state = self.state;
 
                 match self.state {
                     AppState::Normal => match key {
                         key!(ctrl-c)  => self.should_quit = true,
-                        key if key == KEY_BINDINGS.main_menu.quit => self.should_quit = true,
+                        key if key == key_bindings.main_menu.quit => self.should_quit = true,
 
-                        key if key == KEY_BINDINGS.generic.navigation.move_cursor_up => self.collections_tree.up(),
-                        key if key == KEY_BINDINGS.generic.navigation.move_cursor_down => self.collections_tree.down(),
-                        key if key == KEY_BINDINGS.generic.navigation.select => self.select_request_or_expand_collection(),
+                        key if key == key_bindings.generic.navigation.move_cursor_up => self.collections_tree.up(),
+                        key if key == key_bindings.generic.navigation.move_cursor_down => self.collections_tree.down(),
+                        key if key == key_bindings.generic.navigation.select => self.select_request_or_expand_collection(),
 
-                        key if key == KEY_BINDINGS.main_menu.collections_expand => {self.collections_tree.state.toggle_selected();},
-                        key if key == KEY_BINDINGS.main_menu.unselect_request => self.unselect_request(),
+                        key if key == key_bindings.main_menu.collections_expand => {self.collections_tree.state.toggle_selected();},
+                        key if key == key_bindings.main_menu.unselect_request => self.unselect_request(),
 
-                        key if key == KEY_BINDINGS.main_menu.collections_move_request_up => self.move_request_up(),
-                        key if key == KEY_BINDINGS.main_menu.collections_move_request_down => self.move_request_down(),
+                        key if key == key_bindings.main_menu.move_request_up => self.move_request_up(),
+                        key if key == key_bindings.main_menu.move_request_down => self.move_request_down(),
 
-                        key if key == KEY_BINDINGS.main_menu.next_environment => self.next_environment(),
+                        key if key == key_bindings.main_menu.next_environment => self.next_environment(),
 
-                        key if key == KEY_BINDINGS.main_menu.display_cookies => self.display_cookies_state(),
+                        key if key == key_bindings.main_menu.display_cookies => self.display_cookies_state(),
 
-                        key if key == KEY_BINDINGS.generic.list_and_table_actions.create_element => self.choose_element_to_create_state(),
-                        key if key == KEY_BINDINGS.generic.list_and_table_actions.delete_element => self.delete_element(),
-                        key if key == KEY_BINDINGS.generic.list_and_table_actions.rename_element => self.rename_element(),
+                        key if key == key_bindings.generic.list_and_table_actions.create_element => self.choose_element_to_create_state(),
+                        key if key == key_bindings.generic.list_and_table_actions.delete_element => self.delete_element(),
+                        key if key == key_bindings.generic.list_and_table_actions.rename_element => self.rename_element(),
 
-                        key if key == KEY_BINDINGS.main_menu.display_help => self.display_full_help = !self.display_full_help,
+                        key if key == key_bindings.main_menu.display_help => {}, // TODO
 
                         _ => {}
                     },
@@ -57,14 +63,14 @@ impl App<'_> {
                     /* Cookies */
 
                     AppState::DisplayingCookies => match key {
-                        key if key == KEY_BINDINGS.generic.navigation.go_back => self.normal_state(),
+                        key if key == key_bindings.generic.navigation.go_back => self.normal_state(),
 
-                        key if key == KEY_BINDINGS.generic.navigation.move_cursor_up => self.cookies_popup.cookies_table.up(),
-                        key if key == KEY_BINDINGS.generic.navigation.move_cursor_down => self.cookies_popup.cookies_table.down(),
-                        key if key == KEY_BINDINGS.generic.navigation.move_cursor_left => self.cookies_popup.cookies_table.left(),
-                        key if key == KEY_BINDINGS.generic.navigation.move_cursor_right => self.cookies_popup.cookies_table.right(),
+                        key if key == key_bindings.generic.navigation.move_cursor_up => self.cookies_popup.cookies_table.up(),
+                        key if key == key_bindings.generic.navigation.move_cursor_down => self.cookies_popup.cookies_table.down(),
+                        key if key == key_bindings.generic.navigation.move_cursor_left => self.cookies_popup.cookies_table.left(),
+                        key if key == key_bindings.generic.navigation.move_cursor_right => self.cookies_popup.cookies_table.right(),
 
-                        key if key == KEY_BINDINGS.cookies.displaying_cookies.delete_cookie => self.delete_cookie(),
+                        key if key == key_bindings.generic.list_and_table_actions.delete_element => self.delete_cookie(),
 
                         //KeyCode::Enter if !control_pressed && self.cookies_popup.cookies_table.is_selected() => self.edit_cookie_state(),
                         //KeyCode::Char('n') => self.create_new_cookie(),
@@ -90,95 +96,95 @@ impl App<'_> {
                     /* Collections */
 
                     AppState::ChoosingElementToCreate => match key {
-                        key if key == KEY_BINDINGS.generic.navigation.go_back => self.normal_state(),
+                        key if key == key_bindings.generic.navigation.go_back => self.normal_state(),
 
-                        key if key == KEY_BINDINGS.generic.navigation.move_cursor_left => self.creation_popup.previous(),
-                        key if key == KEY_BINDINGS.generic.navigation.move_cursor_right => self.creation_popup.next(),
+                        key if key == key_bindings.generic.navigation.move_cursor_left => self.creation_popup.previous(),
+                        key if key == key_bindings.generic.navigation.move_cursor_right => self.creation_popup.next(),
 
-                        key if key == KEY_BINDINGS.generic.navigation.select => self.new_element(),
+                        key if key == key_bindings.generic.navigation.select => self.new_element(),
 
                         _ => miss_input = true
                     },
 
                     AppState::CreatingNewCollection => match key {
+                        key if key == key_bindings.generic.text_inputs.text_input.cancel => self.normal_state(),
+                        key if key == key_bindings.generic.text_inputs.text_input.validate => self.new_collection(),
+
+                        key if key == key_bindings.generic.text_inputs.text_input.delete_backward => self.new_collection_input.delete_char_backward(),
+                        key if key == key_bindings.generic.text_inputs.text_input.delete_forward => self.new_collection_input.delete_char_forward(),
+                        key if key == key_bindings.generic.text_inputs.text_input.move_cursor_left => self.new_collection_input.move_cursor_left(),
+                        key if key == key_bindings.generic.text_inputs.text_input.move_cursor_right => self.new_collection_input.move_cursor_right(),
+
                         KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.new_collection_input.enter_char(char),
-
-                        key if key == KEY_BINDINGS.generic.text_inputs.small_text_inputs.cancel => self.normal_state(),
-                        key if key == KEY_BINDINGS.generic.text_inputs.small_text_inputs.validate => self.new_collection(),
-
-                        key if key == KEY_BINDINGS.generic.text_inputs.small_text_inputs.delete_forward => self.new_collection_input.delete_char_forward(),
-                        key if key == KEY_BINDINGS.generic.text_inputs.small_text_inputs.delete_backward => self.new_collection_input.delete_char_backward(),
-                        key if key == KEY_BINDINGS.generic.text_inputs.small_text_inputs.move_cursor_left => self.new_collection_input.move_cursor_left(),
-                        key if key == KEY_BINDINGS.generic.text_inputs.small_text_inputs.move_cursor_right => self.new_collection_input.move_cursor_right(),
 
                         _ => miss_input = true
                     },
 
                     AppState::CreatingNewRequest => match key {
+                        key if key == key_bindings.generic.text_inputs.text_input.cancel => self.normal_state(),
+                        key if key == key_bindings.generic.text_inputs.text_input.validate => self.new_request(),
+
+                        key if key == key_bindings.generic.text_inputs.text_input.delete_backward => self.new_request_popup.text_input.delete_char_backward(),
+                        key if key == key_bindings.generic.text_inputs.text_input.delete_forward => self.new_request_popup.text_input.delete_char_forward(),
+                        key if key == key_bindings.generic.text_inputs.text_input.move_cursor_left => self.new_request_popup.text_input.move_cursor_left(),
+                        key if key == key_bindings.generic.text_inputs.text_input.move_cursor_right => self.new_request_popup.text_input.move_cursor_right(),
+
+                        key if key == key_bindings.generic.navigation.move_cursor_up => self.new_request_popup.previous_collection(),
+                        key if key == key_bindings.generic.navigation.move_cursor_down => self.new_request_popup.next_collection(),
+
                         KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.new_request_popup.text_input.enter_char(char),
-
-                        key if key == KEY_BINDINGS.generic.text_inputs.small_text_inputs.cancel => self.normal_state(),
-                        key if key == KEY_BINDINGS.generic.text_inputs.small_text_inputs.validate => self.new_request(),
-
-                        key if key == KEY_BINDINGS.generic.text_inputs.small_text_inputs.delete_forward => self.new_request_popup.text_input.delete_char_forward(),
-                        key if key == KEY_BINDINGS.generic.text_inputs.small_text_inputs.delete_backward => self.new_request_popup.text_input.delete_char_backward(),
-                        key if key == KEY_BINDINGS.generic.text_inputs.small_text_inputs.move_cursor_left => self.new_request_popup.text_input.move_cursor_left(),
-                        key if key == KEY_BINDINGS.generic.text_inputs.small_text_inputs.move_cursor_right => self.new_request_popup.text_input.move_cursor_right(),
-
-                        key if key == KEY_BINDINGS.generic.navigation.move_cursor_up => self.new_request_popup.previous_collection(),
-                        key if key == KEY_BINDINGS.generic.navigation.move_cursor_down => self.new_request_popup.next_collection(),
 
                         _ => miss_input = true
                     },
 
                     AppState::DeletingCollection => match key {
-                        key if key == KEY_BINDINGS.generic.navigation.go_back => self.normal_state(),
+                        key if key == key_bindings.generic.navigation.go_back => self.normal_state(),
 
-                        key if key == KEY_BINDINGS.generic.navigation.select && self.delete_collection_popup.state => self.delete_collection(),
-                        key if key == KEY_BINDINGS.generic.navigation.select && !self.delete_collection_popup.state => self.normal_state(),
+                        key if key == key_bindings.generic.navigation.select && self.delete_collection_popup.state => self.delete_collection(),
+                        key if key == key_bindings.generic.navigation.select && !self.delete_collection_popup.state => self.normal_state(),
 
-                        key if key == KEY_BINDINGS.generic.navigation.move_cursor_left => self.delete_collection_popup.change_state(),
-                        key if key == KEY_BINDINGS.generic.navigation.move_cursor_right => self.delete_collection_popup.change_state(),
+                        key if key == key_bindings.generic.navigation.move_cursor_left => self.delete_collection_popup.change_state(),
+                        key if key == key_bindings.generic.navigation.move_cursor_right => self.delete_collection_popup.change_state(),
 
                         _ => miss_input = true
                     },
 
                     AppState::DeletingRequest => match key {
-                        key if key == KEY_BINDINGS.generic.navigation.go_back => self.normal_state(),
+                        key if key == key_bindings.generic.navigation.go_back => self.normal_state(),
 
-                        key if key == KEY_BINDINGS.generic.navigation.select && self.delete_request_popup.state => self.delete_request(),
-                        key if key == KEY_BINDINGS.generic.navigation.select && !self.delete_request_popup.state => self.normal_state(),
+                        key if key == key_bindings.generic.navigation.select && self.delete_request_popup.state => self.delete_request(),
+                        key if key == key_bindings.generic.navigation.select && !self.delete_request_popup.state => self.normal_state(),
 
-                        key if key == KEY_BINDINGS.generic.navigation.move_cursor_left => self.delete_request_popup.change_state(),
-                        key if key == KEY_BINDINGS.generic.navigation.move_cursor_right => self.delete_request_popup.change_state(),
+                        key if key == key_bindings.generic.navigation.move_cursor_left => self.delete_request_popup.change_state(),
+                        key if key == key_bindings.generic.navigation.move_cursor_right => self.delete_request_popup.change_state(),
 
                         _ => miss_input = true
                     },
 
                     AppState::RenamingCollection => match key {
-                        KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.rename_collection_input.enter_char(char),
+                        key if key == key_bindings.generic.text_inputs.text_input.cancel => self.normal_state(),
+                        key if key == key_bindings.generic.text_inputs.text_input.validate => self.rename_collection(),
 
-                        key if key == KEY_BINDINGS.generic.text_inputs.small_text_inputs.cancel => self.normal_state(),
-                        key if key == KEY_BINDINGS.generic.text_inputs.small_text_inputs.validate => self.rename_collection(),
+                        key if key == key_bindings.generic.text_inputs.text_input.delete_forward => self.rename_collection_input.delete_char_backward(),
+                        key if key == key_bindings.generic.text_inputs.text_input.delete_forward => self.rename_collection_input.delete_char_forward(),
+                        key if key == key_bindings.generic.text_inputs.text_input.move_cursor_left => self.rename_collection_input.move_cursor_left(),
+                        key if key == key_bindings.generic.text_inputs.text_input.move_cursor_right => self.rename_collection_input.move_cursor_right(),
 
-                        key if key == KEY_BINDINGS.generic.text_inputs.small_text_inputs.delete_backward => self.rename_collection_input.delete_char_forward(),
-                        key if key == KEY_BINDINGS.generic.text_inputs.small_text_inputs.delete_backward => self.rename_collection_input.delete_char_backward(),
-                        key if key == KEY_BINDINGS.generic.text_inputs.small_text_inputs.move_cursor_left => self.rename_collection_input.move_cursor_left(),
-                        key if key == KEY_BINDINGS.generic.text_inputs.small_text_inputs.move_cursor_right => self.rename_collection_input.move_cursor_right(),
+                        KeyCombination { codes: One(KeyCode::Char(char)), modifiers: KeyModifiers::NONE } => self.rename_collection_input.enter_char(char),
 
                         _ => miss_input = true
                     },
 
                     AppState::RenamingRequest => match key {
-                        KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.rename_request_input.enter_char(char),
+                        key if key == key_bindings.generic.text_inputs.text_input.cancel => self.normal_state(),
+                        key if key == key_bindings.generic.text_inputs.text_input.validate => self.rename_request(),
 
-                        key if key == KEY_BINDINGS.generic.text_inputs.small_text_inputs.cancel => self.normal_state(),
-                        key if key == KEY_BINDINGS.generic.text_inputs.small_text_inputs.validate => self.rename_request(),
+                        key if key == key_bindings.generic.text_inputs.text_input.delete_forward => self.rename_request_input.delete_char_backward(),
+                        key if key == key_bindings.generic.text_inputs.text_input.delete_forward => self.rename_request_input.delete_char_forward(),
+                        key if key == key_bindings.generic.text_inputs.text_input.move_cursor_left => self.rename_request_input.move_cursor_left(),
+                        key if key == key_bindings.generic.text_inputs.text_input.move_cursor_right => self.rename_request_input.move_cursor_right(),
 
-                        key if key == KEY_BINDINGS.generic.text_inputs.small_text_inputs.delete_backward => self.rename_request_input.delete_char_forward(),
-                        key if key == KEY_BINDINGS.generic.text_inputs.small_text_inputs.delete_backward => self.rename_request_input.delete_char_backward(),
-                        key if key == KEY_BINDINGS.generic.text_inputs.small_text_inputs.move_cursor_left => self.rename_request_input.move_cursor_left(),
-                        key if key == KEY_BINDINGS.generic.text_inputs.small_text_inputs.move_cursor_right => self.rename_request_input.move_cursor_right(),
+                        KeyCombination { codes: One(KeyCode::Char(char)), modifiers: KeyModifiers::NONE } => self.rename_request_input.enter_char(char),
 
                         _ => miss_input = true
                     },
@@ -198,329 +204,290 @@ impl App<'_> {
                         if params_events_allowed {
                             match self.request_param_tab {
                                 RequestParamsTabs::QueryParams => match key {
-                                    key if key == KEY_BINDINGS.generic.navigation.select && self.query_params_table.is_selected() => self.edit_request_param_state(),
+                                    key if key == key_bindings.generic.list_and_table_actions.edit_element && self.query_params_table.is_selected() => self.edit_request_param_state(),
 
-                                    key if key == KEY_BINDINGS.generic.navigation.move_cursor_up => self.query_params_table.up(),
-                                    key if key == KEY_BINDINGS.generic.navigation.move_cursor_down => self.query_params_table.down(),
-                                    key if key == KEY_BINDINGS.generic.navigation.move_cursor_left || key == KEY_BINDINGS.generic.navigation.move_cursor_right => self.query_params_table.change_y(),
+                                    key if key == key_bindings.generic.navigation.move_cursor_up => self.query_params_table.up(),
+                                    key if key == key_bindings.generic.navigation.move_cursor_down => self.query_params_table.down(),
+                                    key if key == key_bindings.generic.navigation.move_cursor_left || key == key_bindings.generic.navigation.move_cursor_right => self.query_params_table.change_y(),
 
-                                    key if key == KEY_BINDINGS.generic.list_and_table_actions.create_element => self.create_new_query_param(),
-                                    key if key == KEY_BINDINGS.generic.list_and_table_actions.delete_element => self.delete_query_param(),
-                                    key if key == KEY_BINDINGS.generic.list_and_table_actions.toggle_element => self.toggle_query_param(),
+                                    key if key == key_bindings.generic.list_and_table_actions.create_element => self.create_new_query_param(),
+                                    key if key == key_bindings.generic.list_and_table_actions.delete_element => self.delete_query_param(),
+                                    key if key == key_bindings.generic.list_and_table_actions.toggle_element => self.toggle_query_param(),
 
                                     _ => {}
                                 },
-                                RequestParamsTabs::Auth => {}
-                                RequestParamsTabs::Headers => {}
-                                RequestParamsTabs::Body => {}
+                                RequestParamsTabs::Auth if self.auth_text_input_selection.usable => match key {
+                                    key if key == key_bindings.generic.list_and_table_actions.edit_element => self.select_request_auth_input_text(),
+
+                                    key if key == key_bindings.generic.navigation.move_cursor_up => self.auth_text_input_selection.previous(),
+                                    key if key == key_bindings.generic.navigation.move_cursor_down => self.auth_text_input_selection.next(),
+
+                                    _ => {}
+                                },
+                                RequestParamsTabs::Headers => match key {
+                                    key if key == key_bindings.generic.list_and_table_actions.edit_element && self.headers_table.is_selected() => self.edit_request_header_state(),
+
+                                    key if key == key_bindings.generic.navigation.move_cursor_up => self.headers_table.up(),
+                                    key if key == key_bindings.generic.navigation.move_cursor_down => self.headers_table.down(),
+                                    key if key == key_bindings.generic.navigation.move_cursor_left || key == key_bindings.generic.navigation.move_cursor_right => self.headers_table.change_y(),
+
+                                    key if key == key_bindings.generic.list_and_table_actions.create_element => self.create_new_header(),
+                                    key if key == key_bindings.generic.list_and_table_actions.delete_element => self.delete_header(),
+                                    key if key == key_bindings.generic.list_and_table_actions.toggle_element => self.toggle_header(),
+
+                                    _ => {}
+                                },
+                                RequestParamsTabs::Body => match key {
+                                    key if key == key_bindings.generic.list_and_table_actions.edit_element && self.body_form_table.is_selected() => self.edit_request_body_table_state(),
+                                    key if key == key_bindings.generic.list_and_table_actions.edit_element => self.edit_request_body_file_or_string_state(),
+
+                                    key if key == key_bindings.generic.navigation.move_cursor_up => self.body_form_table.up(),
+                                    key if key == key_bindings.generic.navigation.move_cursor_down=> self.body_form_table.down(),
+                                    key if key == key_bindings.generic.navigation.move_cursor_left || key == key_bindings.generic.navigation.move_cursor_right => self.body_form_table.change_y(),
+
+                                    key if key == key_bindings.generic.list_and_table_actions.create_element => self.create_new_form_data(),
+                                    key if key == key_bindings.generic.list_and_table_actions.delete_element => self.delete_form_data(),
+                                    key if key == key_bindings.generic.list_and_table_actions.toggle_element => self.toggle_form_data(),
+
+                                    _ => {}
+                                },
+                                _ => {}
+                            }
+
+                            match key {
+                                //KeyCode::Char('p') => self.load_request_query_params_tab(),
+
+                                key if key == key_bindings.request_selected.param_tabs.change_auth_method => self.modify_request_auth(),
+                                //KeyCode::Char('a') => self.load_request_auth_param_tab(),
+
+                                //KeyCode::Char('h') => self.load_request_headers_tab(),
+
+                                key if key == key_bindings.request_selected.param_tabs.change_body_content_type => self.modify_request_content_type(),
+                                //KeyCode::Char('b') => self.load_request_body_param_tab(),
+
+                                key if key == key_bindings.request_selected.next_tab => self.next_request_param_tab(),
+
+                                _ => {}
+                            }
+                        }
+
+                        if result_events_allowed {
+                            match key {
+                                key if key == key_bindings.request_selected.result_tabs.scroll_up => self.result_vertical_scrollbar.page_up(),
+                                key if key == key_bindings.request_selected.result_tabs.scroll_down => self.result_vertical_scrollbar.page_down(),
+                                key if key == key_bindings.request_selected.result_tabs.scroll_left => self.result_horizontal_scrollbar.page_up(),
+                                key if key == key_bindings.request_selected.result_tabs.scroll_right => self.result_horizontal_scrollbar.page_down(),
+
+                                key if key == key_bindings.request_selected.next_tab && !params_events_allowed => self.next_request_result_tab(),
+                                key if key == key_bindings.request_selected.result_tabs.secondary_next_tab && params_events_allowed => self.next_request_result_tab(),
+
+                                _ => {}
                             }
                         }
 
                         match key {
-                            key if key == KEY_BINDINGS.generic.navigation.go_back => self.normal_state(),
+                            key if key == key_bindings.generic.navigation.go_back => self.normal_state(),
+
+                            key if key == key_bindings.main_menu.display_cookies => self.display_cookies_state(),
+                            key if key == key_bindings.main_menu.next_environment => self.next_environment(),
+
+                            key if key == key_bindings.main_menu.display_help => {}, // TODO
+
+                            key if key == key_bindings.request_selected.change_url => self.edit_request_url_state(),
+                            key if key == key_bindings.request_selected.change_method => self.modify_request_method(),
+
+                            key if key == key_bindings.request_selected.request_settings => self.edit_request_settings_state(),
+
+                            key if key == key_bindings.request_selected.next_view => self.next_request_view(),
+
+                            key if key == key_bindings.request_selected.send_request => self.send_request().await,
+                            key if key == key_bindings.request_selected.secondary_send_request => self.send_request().await,
 
                             _ => {}
                         }
+                    },
+
+                    AppState::EditingRequestUrl => match key {
+                        key if key == key_bindings.generic.text_inputs.text_input.cancel => self.select_request_state(),
+                        key if key == key_bindings.generic.text_inputs.text_input.validate => self.modify_request_url(),
+
+                        key if key == key_bindings.generic.text_inputs.text_input.delete_backward => self.url_text_input.delete_char_backward(),
+                        key if key == key_bindings.generic.text_inputs.text_input.delete_forward => self.url_text_input.delete_char_forward(),
+                        key if key == key_bindings.generic.text_inputs.text_input.move_cursor_left => self.url_text_input.move_cursor_left(),
+                        key if key == key_bindings.generic.text_inputs.text_input.move_cursor_right => self.url_text_input.move_cursor_right(),
+
+                        KeyCombination { codes: One(KeyCode::Char(char)), modifiers: KeyModifiers::NONE } => self.url_text_input.enter_char(char),
+
+                        _ => miss_input = true
+                    },
+
+                    AppState::EditingRequestParam => match key {
+                        key if key == key_bindings.generic.text_inputs.text_input.cancel => self.select_request_state(),
+                        key if key == key_bindings.generic.text_inputs.text_input.validate => self.modify_request_query_param(),
+
+                        key if key == key_bindings.generic.text_inputs.text_input.delete_backward => self.query_params_table.selection_text_input.delete_char_backward(),
+                        key if key == key_bindings.generic.text_inputs.text_input.delete_forward => self.query_params_table.selection_text_input.delete_char_forward(),
+                        key if key == key_bindings.generic.text_inputs.text_input.move_cursor_left => self.query_params_table.selection_text_input.move_cursor_left(),
+                        key if key == key_bindings.generic.text_inputs.text_input.move_cursor_right => self.query_params_table.selection_text_input.move_cursor_right(),
+
+                        KeyCombination { codes: One(KeyCode::Char(char)), modifiers: KeyModifiers::NONE } => self.query_params_table.selection_text_input.enter_char(char),
+
+                        _ => miss_input = true
                     }
-                    _ => {}
-                }
 
-                /*
-                // Debug tool
-                //println!("{:?} {:?}", key.modifiers, key.code);
+                    AppState::EditingRequestAuthUsername => match key {
+                        key if key == key_bindings.generic.text_inputs.text_input.cancel => self.select_request_state(),
+                        key if key == key_bindings.generic.text_inputs.text_input.validate => self.modify_request_auth_basic_username(),
 
-                        /* Request */
-                        /* /!\ Below, consider that a request has been selected /!\ */
+                        key if key == key_bindings.generic.text_inputs.text_input.delete_backward => self.auth_basic_username_text_input.delete_char_backward(),
+                        key if key == key_bindings.generic.text_inputs.text_input.delete_forward => self.auth_basic_username_text_input.delete_char_forward(),
+                        key if key == key_bindings.generic.text_inputs.text_input.move_cursor_left => self.auth_basic_username_text_input.move_cursor_left(),
+                        key if key == key_bindings.generic.text_inputs.text_input.move_cursor_right => self.auth_basic_username_text_input.move_cursor_right(),
 
-                        AppState::SelectedRequest => {
-                            // Depending on the current request view, some keys may need to be deactivated
-                            let (params_events_allowed, result_events_allowed) = match self.request_view {
-                                RequestView::Normal => (true, true),
-                                RequestView::OnlyResult => (false, true),
-                                RequestView::OnlyParams => (true, false)
-                            };
-                            
-                            // Param tabs
-                            if params_events_allowed {
-                                match self.request_param_tab {
-                                    RequestParamsTabs::QueryParams => match key.code {
-                                        KeyCode::Enter if !control_pressed && self.query_params_table.is_selected() => self.edit_request_param_state(),
+                        KeyCombination { codes: One(KeyCode::Char(char)), modifiers: KeyModifiers::NONE } => self.auth_basic_username_text_input.enter_char(char),
 
-                                        KeyCode::Up if !control_pressed => self.query_params_table.up(),
-                                        KeyCode::Down if !control_pressed => self.query_params_table.down(),
-                                        KeyCode::Left | KeyCode::Right if !control_pressed => self.query_params_table.change_y(),
+                        _ => miss_input = true
+                    },
 
-                                        KeyCode::Char('n') => self.create_new_query_param(),
-                                        KeyCode::Char('d') => self.delete_query_param(),
-                                        KeyCode::Char('t') => self.toggle_query_param(),
+                    AppState::EditingRequestAuthPassword => match key {
+                        key if key == key_bindings.generic.text_inputs.text_input.cancel => self.select_request_state(),
+                        key if key == key_bindings.generic.text_inputs.text_input.validate => self.modify_request_auth_basic_password(),
 
-                                        _ => {}
-                                    },
-                                    RequestParamsTabs::Auth if params_events_allowed && self.auth_text_input_selection.usable => match key.code {
-                                        KeyCode::Enter if !control_pressed => self.select_request_auth_input_text(),
+                        key if key == key_bindings.generic.text_inputs.text_input.delete_backward => self.auth_basic_password_text_input.delete_char_backward(),
+                        key if key == key_bindings.generic.text_inputs.text_input.delete_forward => self.auth_basic_password_text_input.delete_char_forward(),
+                        key if key == key_bindings.generic.text_inputs.text_input.move_cursor_left => self.auth_basic_password_text_input.move_cursor_left(),
+                        key if key == key_bindings.generic.text_inputs.text_input.move_cursor_right => self.auth_basic_password_text_input.move_cursor_right(),
 
-                                        KeyCode::Up if !control_pressed => self.auth_text_input_selection.previous(),
-                                        KeyCode::Down if !control_pressed => self.auth_text_input_selection.next(),
+                        KeyCombination { codes: One(KeyCode::Char(char)), modifiers: KeyModifiers::NONE } => self.auth_basic_password_text_input.enter_char(char),
 
-                                        _ => {}
-                                    }
-                                    RequestParamsTabs::Headers => match key.code {
-                                        KeyCode::Enter if !control_pressed && self.headers_table.is_selected() => self.edit_request_header_state(),
+                        _ => miss_input = true
+                    },
 
-                                        KeyCode::Up if !control_pressed => self.headers_table.up(),
-                                        KeyCode::Down if !control_pressed => self.headers_table.down(),
-                                        KeyCode::Left | KeyCode::Right if !control_pressed => self.headers_table.change_y(),
+                    AppState::EditingRequestAuthBearerToken => match key {
+                        key if key == key_bindings.generic.text_inputs.text_input.cancel => self.select_request_state(),
+                        key if key == key_bindings.generic.text_inputs.text_input.validate => self.modify_request_auth_bearer_token(),
 
-                                        KeyCode::Char('n') => self.create_new_header(),
-                                        KeyCode::Char('d') => self.delete_header(),
-                                        KeyCode::Char('t') => self.toggle_header(),
+                        key if key == key_bindings.generic.text_inputs.text_input.delete_backward => self.auth_bearer_token_text_input.delete_char_backward(),
+                        key if key == key_bindings.generic.text_inputs.text_input.delete_forward => self.auth_bearer_token_text_input.delete_char_forward(),
+                        key if key == key_bindings.generic.text_inputs.text_input.move_cursor_left => self.auth_bearer_token_text_input.move_cursor_left(),
+                        key if key == key_bindings.generic.text_inputs.text_input.move_cursor_right => self.auth_bearer_token_text_input.move_cursor_right(),
 
-                                        _ => {}
-                                    },
-                                    RequestParamsTabs::Body => match key.code {
-                                        KeyCode::Enter if !control_pressed && self.body_form_table.is_selected() => self.edit_request_body_table_state(),
-                                        KeyCode::Enter if !control_pressed => self.edit_request_body_file_or_string_state(),
+                        KeyCombination { codes: One(KeyCode::Char(char)), modifiers: KeyModifiers::NONE } => self.auth_bearer_token_text_input.enter_char(char),
 
-                                        KeyCode::Up if !control_pressed => self.body_form_table.up(),
-                                        KeyCode::Down if !control_pressed => self.body_form_table.down(),
-                                        KeyCode::Left | KeyCode::Right if !control_pressed => self.body_form_table.change_y(),
+                        _ => miss_input = true
+                    }
 
-                                        KeyCode::Char('n') => self.create_new_form_data(),
-                                        KeyCode::Char('d') => self.delete_form_data(),
-                                        KeyCode::Char('t') => self.toggle_form_data(),
+                    AppState::EditingRequestHeader => match key {
+                        key if key == key_bindings.generic.text_inputs.text_input.cancel => self.select_request_state(),
+                        key if key == key_bindings.generic.text_inputs.text_input.validate => self.modify_request_header(),
 
-                                        _ => {}
-                                    },
-                                    _ => {}
-                                }
+                        key if key == key_bindings.generic.text_inputs.text_input.delete_backward => self.headers_table.selection_text_input.delete_char_backward(),
+                        key if key == key_bindings.generic.text_inputs.text_input.delete_forward => self.headers_table.selection_text_input.delete_char_forward(),
+                        key if key == key_bindings.generic.text_inputs.text_input.move_cursor_left => self.headers_table.selection_text_input.move_cursor_left(),
+                        key if key == key_bindings.generic.text_inputs.text_input.move_cursor_right => self.headers_table.selection_text_input.move_cursor_right(),
+
+                        KeyCombination { codes: One(KeyCode::Char(char)), modifiers: KeyModifiers::NONE } => self.headers_table.selection_text_input.enter_char(char),
+
+                        _ => miss_input = true
+                    }
+
+                    AppState::EditingRequestBodyTable => match key {
+                        key if key == key_bindings.generic.text_inputs.text_input.cancel => self.select_request_state(),
+                        key if key == key_bindings.generic.text_inputs.text_input.validate => self.modify_request_form_data(),
+
+                        key if key == key_bindings.generic.text_inputs.text_input.delete_backward => self.body_form_table.selection_text_input.delete_char_backward(),
+                        key if key == key_bindings.generic.text_inputs.text_input.delete_forward => self.body_form_table.selection_text_input.delete_char_forward(),
+                        key if key == key_bindings.generic.text_inputs.text_input.move_cursor_left => self.body_form_table.selection_text_input.move_cursor_left(),
+                        key if key == key_bindings.generic.text_inputs.text_input.move_cursor_right => self.body_form_table.selection_text_input.move_cursor_right(),
+
+                        KeyCombination { codes: One(KeyCode::Char(char)), modifiers: KeyModifiers::NONE } => self.body_form_table.selection_text_input.enter_char(char),
+
+                        _ => miss_input = true
+                    }
+
+                    AppState::EditingRequestBodyFile => match key {
+                        key if key == key_bindings.generic.text_inputs.text_input.cancel => self.select_request_state(),
+                        key if key == key_bindings.generic.text_inputs.text_input.validate => self.modify_request_body(),
+
+                        key if key == key_bindings.generic.text_inputs.text_input.delete_backward => self.body_file_text_input.delete_char_backward(),
+                        key if key == key_bindings.generic.text_inputs.text_input.delete_forward => self.body_file_text_input.delete_char_forward(),
+                        key if key == key_bindings.generic.text_inputs.text_input.move_cursor_left => self.body_file_text_input.move_cursor_left(),
+                        key if key == key_bindings.generic.text_inputs.text_input.move_cursor_right => self.body_file_text_input.move_cursor_right(),
+
+                        KeyCombination { codes: One(KeyCode::Char(char)), modifiers: KeyModifiers::NONE } => self.body_file_text_input.enter_char(char),
+
+                        _ => miss_input = true
+                    }
+
+                    AppState::EditingRequestBodyString => match key_bindings.generic.text_inputs.text_area_mode {
+                        // Vim Emulation mode
+                        TextAreaMode::VimEmulation => match self.body_text_area_vim_emulation.transition(key, &mut self.body_text_area) {
+                            VimTransition::Mode(mode) if self.body_text_area_vim_emulation.mode != mode => {
+                                self.body_text_area.set_block(mode.block());
+                                self.body_text_area.set_cursor_style(mode.cursor_style());
+                                self.body_text_area_vim_emulation = Vim::new(mode);
                             }
-                            
-                            if params_events_allowed {
-                                match key.code {
-                                    //KeyCode::Char('p') => self.load_request_query_params_tab(),
-
-                                    KeyCode::Char('a') if control_pressed => self.modify_request_auth(),
-                                    //KeyCode::Char('a') => self.load_request_auth_param_tab(),
-
-                                    //KeyCode::Char('h') => self.load_request_headers_tab(),
-
-                                    KeyCode::Char('b') if control_pressed => self.modify_request_content_type(),
-                                    //KeyCode::Char('b') => self.load_request_body_param_tab(),
-
-                                    KeyCode::Tab => self.next_request_param_tab(),
-
-                                    _ => {}
-                                }
-                            }
-
-                            if result_events_allowed {
-                                match key.code {
-                                    KeyCode::Up if control_pressed => self.result_vertical_scrollbar.page_up(),
-                                    KeyCode::Down if control_pressed => self.result_vertical_scrollbar.page_down(),
-                                    KeyCode::Left if control_pressed => self.result_horizontal_scrollbar.page_up(),
-                                    KeyCode::Right if control_pressed => self.result_horizontal_scrollbar.page_down(),
-
-                                    KeyCode::BackTab if params_events_allowed => self.next_request_result_tab(),
-                                    KeyCode::Tab if !params_events_allowed => self.next_request_result_tab(),
-
-                                    _ => {}
-                                }
-                            }
-
-                            match key.code {
-                                KeyCode::Esc => self.normal_state(),
-
-                                KeyCode::Char('c') => self.display_cookies_state(),
-                                KeyCode::Char('e') => self.next_environment(),
-
-                                KeyCode::Char('h') => self.display_full_help = !self.display_full_help,
-
-                                KeyCode::Char('u') => self.edit_request_url_state(),
-                                KeyCode::Char('m') => self.modify_request_method(),
-
-                                KeyCode::Char('s') => self.edit_request_settings_state(),
-
-                                KeyCode::Char('v') => self.next_request_view(),
-
-                                // Used to be ctrl + enter, but it doesn't register right on many platforms
-                                // https://github.com/crossterm-rs/crossterm/issues/685
-                                KeyCode::Char(' ') => self.send_request().await,
-                                KeyCode::Enter if control_pressed => self.send_request().await,
-                                
-                                _ => miss_input = true
-                            }
-                        },
-
-                        AppState::EditingRequestUrl => match key.code {
-                            KeyCode::Char(char) => self.url_text_input.enter_char(char),
-
-                            KeyCode::Esc => self.select_request_state(),
-                            KeyCode::Enter => self.modify_request_url(),
-
-                            KeyCode::Delete => self.url_text_input.delete_char_forward(),
-                            KeyCode::Backspace => self.url_text_input.delete_char_backward(),
-                            KeyCode::Left => self.url_text_input.move_cursor_left(),
-                            KeyCode::Right => self.url_text_input.move_cursor_right(),
-
-                            _ => miss_input = true
-                        },
-
-                        AppState::EditingRequestParam => match key.code {
-                            KeyCode::Char(char) => self.query_params_table.selection_text_input.enter_char(char),
-
-                            KeyCode::Esc => self.select_request_state(),
-                            KeyCode::Enter => self.modify_request_query_param(),
-
-                            KeyCode::Delete => self.query_params_table.selection_text_input.delete_char_forward(),
-                            KeyCode::Backspace => self.query_params_table.selection_text_input.delete_char_backward(),
-                            KeyCode::Left => self.query_params_table.selection_text_input.move_cursor_left(),
-                            KeyCode::Right => self.query_params_table.selection_text_input.move_cursor_right(),
-
-                            _ => miss_input = true
-                        }
-
-                        AppState::EditingRequestAuthUsername => match key.code {
-                            KeyCode::Char(char) => self.auth_basic_username_text_input.enter_char(char),
-
-                            KeyCode::Esc => self.select_request_state(),
-                            KeyCode::Enter => self.modify_request_auth_basic_username(),
-
-                            KeyCode::Delete => self.auth_basic_username_text_input.delete_char_forward(),
-                            KeyCode::Backspace => self.auth_basic_username_text_input.delete_char_backward(),
-                            KeyCode::Left => self.auth_basic_username_text_input.move_cursor_left(),
-                            KeyCode::Right => self.auth_basic_username_text_input.move_cursor_right(),
-
-                            _ => miss_input = true
-                        },
-
-                        AppState::EditingRequestAuthPassword => match key.code {
-                            KeyCode::Char(char) => self.auth_basic_password_text_input.enter_char(char),
-
-                            KeyCode::Esc => self.select_request_state(),
-                            KeyCode::Enter => self.modify_request_auth_basic_password(),
-
-                            KeyCode::Delete => self.auth_basic_password_text_input.delete_char_forward(),
-                            KeyCode::Backspace => self.auth_basic_password_text_input.delete_char_backward(),
-                            KeyCode::Left => self.auth_basic_password_text_input.move_cursor_left(),
-                            KeyCode::Right => self.auth_basic_password_text_input.move_cursor_right(),
-
-                            _ => miss_input = true
-                        },
-
-                        AppState::EditingRequestAuthBearerToken => match key.code {
-                            KeyCode::Char(char) => self.auth_bearer_token_text_input.enter_char(char),
-
-                            KeyCode::Esc => self.select_request_state(),
-                            KeyCode::Enter => self.modify_request_auth_bearer_token(),
-
-                            KeyCode::Delete => self.auth_bearer_token_text_input.delete_char_forward(),
-                            KeyCode::Backspace => self.auth_bearer_token_text_input.delete_char_backward(),
-                            KeyCode::Left => self.auth_bearer_token_text_input.move_cursor_left(),
-                            KeyCode::Right => self.auth_bearer_token_text_input.move_cursor_right(),
-
-                            _ => miss_input = true
-                        }
-
-                        AppState::EditingRequestHeader => match key.code {
-                            KeyCode::Char(char) => self.headers_table.selection_text_input.enter_char(char),
-
-                            KeyCode::Esc => self.select_request_state(),
-                            KeyCode::Enter => self.modify_request_header(),
-
-                            KeyCode::Delete => self.headers_table.selection_text_input.delete_char_forward(),
-                            KeyCode::Backspace => self.headers_table.selection_text_input.delete_char_backward(),
-                            KeyCode::Left => self.headers_table.selection_text_input.move_cursor_left(),
-                            KeyCode::Right => self.headers_table.selection_text_input.move_cursor_right(),
-
-                            _ => miss_input = true
-                        }
-                        
-                        AppState::EditingRequestBodyTable => match key.code {
-                            KeyCode::Char(char) => self.body_form_table.selection_text_input.enter_char(char),
-
-                            KeyCode::Esc => self.select_request_state(),
-                            KeyCode::Enter => self.modify_request_form_data(),
-
-                            KeyCode::Delete => self.body_form_table.selection_text_input.delete_char_forward(),
-                            KeyCode::Backspace => self.body_form_table.selection_text_input.delete_char_backward(),
-                            KeyCode::Left => self.body_form_table.selection_text_input.move_cursor_left(),
-                            KeyCode::Right => self.body_form_table.selection_text_input.move_cursor_right(),
-
-                            _ => miss_input = true
-                        }
-
-                        AppState::EditingRequestBodyFile => match key.code {
-                            KeyCode::Char(char) => self.body_file_text_input.enter_char(char),
-
-                            KeyCode::Esc => self.select_request_state(),
-                            KeyCode::Enter => self.modify_request_body(),
-
-                            KeyCode::Delete => self.body_file_text_input.delete_char_forward(),
-                            KeyCode::Backspace => self.body_file_text_input.delete_char_backward(),
-                            KeyCode::Left => self.body_file_text_input.move_cursor_left(),
-                            KeyCode::Right => self.body_file_text_input.move_cursor_right(),
-
-                            _ => miss_input = true
-                        }
-
-                        AppState::EditingRequestBodyString => match key.code {
-                            KeyCode::Char('c') if control_pressed => self.body_text_area.copy(),
-                            KeyCode::Char('v') if control_pressed => {
-                                self.body_text_area.paste();
+                            VimTransition::Nop | VimTransition::Mode(_) => {
+                                self.body_text_area_vim_emulation = self.body_text_area_vim_emulation.clone();
                             },
-                            KeyCode::Char('z') if control_pressed => {
-                                self.body_text_area.undo();
+                            VimTransition::Pending(input) => {
+                                self.body_text_area_vim_emulation = self.body_text_area_vim_emulation.clone().with_pending(input);
                             },
-                            KeyCode::Char('y') if control_pressed => {
-                                self.body_text_area.redo();
-                            },
-                            KeyCode::Char('s') if control_pressed => self.modify_request_body(),
+                            VimTransition::Quit => self.quit_request_body(),
+                            VimTransition::SaveAndQuit => self.modify_request_body(),
+                        },
+                        // Custom text area key bindings
+                        TextAreaMode::Custom(text_area_bindings) => match key {
+                            key if key == text_area_bindings.copy => self.body_text_area.copy(),
+                            key if key == text_area_bindings.paste => {self.body_text_area.paste();},
 
-                            KeyCode::Char(char) => self.body_text_area.insert_char(char),
+                            key if key == text_area_bindings.undo => {self.body_text_area.undo();},
+                            key if key == text_area_bindings.redo => {self.body_text_area.redo();},
 
-                            KeyCode::Esc => self.quit_request_body(),
-                            KeyCode::Enter => self.body_text_area.insert_newline(),
+                            key if key == text_area_bindings.save_and_quit => self.modify_request_body(),
 
-                            KeyCode::Tab => {
+                            key if key == text_area_bindings.quit_without_saving => self.quit_request_body(),
+                            key if key == text_area_bindings.new_line => self.body_text_area.insert_newline(),
+
+                            key if key == text_area_bindings.indent => {
                                 self.body_text_area.set_hard_tab_indent(true);
                                 self.body_text_area.insert_tab();
                             },
-                            KeyCode::Backspace => {
-                                self.body_text_area.delete_char();
-                            },
-                            KeyCode::Delete => {
-                                self.body_text_area.delete_next_char();
-                            },
+                            key if key == text_area_bindings.backspace => {self.body_text_area.delete_char();},
+                            key if key == text_area_bindings.delete => {self.body_text_area.delete_next_char();},
 
-                            KeyCode::Right if control_pressed => self.body_text_area.move_cursor(CursorMove::WordForward),
-                            KeyCode::Left if control_pressed => self.body_text_area.move_cursor(CursorMove::WordBack),
+                            key if key == text_area_bindings.skip_word_cursor_right => self.body_text_area.move_cursor(CursorMove::WordForward),
+                            key if key == text_area_bindings.skip_word_cursor_left => self.body_text_area.move_cursor(CursorMove::WordBack),
 
-                            KeyCode::Up => self.body_text_area.move_cursor(CursorMove::Up),
-                            KeyCode::Down => self.body_text_area.move_cursor(CursorMove::Bottom),
-                            KeyCode::Right => self.body_text_area.move_cursor(CursorMove::Forward),
-                            KeyCode::Left => self.body_text_area.move_cursor(CursorMove::Back),
+                            key if key == text_area_bindings.move_cursor_up => self.body_text_area.move_cursor(CursorMove::Up),
+                            key if key == text_area_bindings.move_cursor_down => self.body_text_area.move_cursor(CursorMove::Bottom),
+                            key if key == text_area_bindings.move_cursor_left => self.body_text_area.move_cursor(CursorMove::Back),
+                            key if key == text_area_bindings.move_cursor_right => self.body_text_area.move_cursor(CursorMove::Forward),
+
+                            KeyCombination { codes: One(KeyCode::Char(char)), modifiers: KeyModifiers::NONE } => self.body_text_area.insert_char(char),
 
                             _ => miss_input = true
-                        },
-
-                        AppState::EditingRequestSettings => match key.code {
-                            KeyCode::Esc => self.select_request_state(),
-
-                            KeyCode::Enter => self.modify_request_settings(),
-
-                            KeyCode::Up => self.request_settings_popup.previous(),
-                            KeyCode::Down => self.request_settings_popup.next(),
-                            KeyCode::Left => self.request_settings_popup.toggle_setting(),
-                            KeyCode::Right => self.request_settings_popup.toggle_setting(),
-
-                            _ => miss_input = true
-                        },
-                    };
-
-                    if !miss_input {
-                        self.write_to_log_file(format!("{:?}", key.modifiers), format!("{:?}", key.code), previous_app_state.to_string());
+                        }
                     }
-                }*/
+
+                    AppState::EditingRequestSettings => match key {
+                        key if key == key_bindings.generic.navigation.go_back => self.select_request_state(),
+
+                        key if key == key_bindings.generic.navigation.select => self.modify_request_settings(),
+
+                        key if key == key_bindings.generic.navigation.move_cursor_up => self.request_settings_popup.previous(),
+                        key if key == key_bindings.generic.navigation.move_cursor_down => self.request_settings_popup.next(),
+                        key if key == key_bindings.generic.navigation.move_cursor_left => self.request_settings_popup.toggle_setting(),
+                        key if key == key_bindings.generic.navigation.move_cursor_right => self.request_settings_popup.toggle_setting(),
+
+                        _ => miss_input = true
+                    },
+                    _ => {}
+                }
+
+                if !miss_input {
+                    self.write_to_log_file(key.to_string(), previous_app_state.to_string());
+                }
             }
         }
     }

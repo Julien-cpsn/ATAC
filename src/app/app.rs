@@ -13,7 +13,6 @@ use tui_textarea::TextArea;
 use crate::app::app_logic::new_request_popup::NewRequestPopup;
 use crate::app::app_states::AppState;
 use crate::app::files::config::Config;
-use crate::app::files::key_bindings::KeyBindingsConfig;
 use crate::app::ui::param_tabs::param_tabs::RequestParamsTabs;
 use crate::app::ui::result_tabs::RequestResultTabs;
 use crate::app::ui::views::RequestView;
@@ -29,12 +28,12 @@ use crate::utils::syntax_highlighting::SyntaxHighlighting;
 use crate::utils::text_input::TextInput;
 use crate::utils::text_input_selection::TextInputSelection;
 use crate::utils::validation_popup::ValidationPopup;
+use crate::utils::vim_emulation::{Vim, VimMode};
 
 pub struct App<'a> {
     pub tick_rate: Duration,
     pub should_quit: bool,
-    pub display_full_help: bool,
-    
+
     pub state: AppState,
 
     pub config: Config,
@@ -85,6 +84,7 @@ pub struct App<'a> {
     pub body_file_text_input: TextInput,
     pub body_form_table: StatefulCustomTable,
     pub body_text_area: TextArea<'a>,
+    pub body_text_area_vim_emulation: Vim,
 
     pub request_settings_popup: SettingsPopup,
 
@@ -102,8 +102,7 @@ impl App<'_> {
         App {
             tick_rate: Duration::from_millis(250),
             should_quit: false,
-            display_full_help: false,
-            
+
             state: AppState::Normal,
 
             config: Config::default(),
@@ -158,6 +157,8 @@ impl App<'_> {
             body_file_text_input: TextInput::default(),
             body_form_table: StatefulCustomTable::default(),
             body_text_area: TextArea::default(),
+            body_text_area_vim_emulation: Vim::new(VimMode::Normal),
+
 
             request_settings_popup: SettingsPopup::default(),
             

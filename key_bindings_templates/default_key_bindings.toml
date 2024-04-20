@@ -1,10 +1,90 @@
-[keybindings]
+# Please avoid using Ctrl-v, it will paste your clipboard and trigger many unwanted event
 
 [keybindings.main_menu]
-quit = "q"
+quit = "q" # ctrl-c is implemented by default
 
-collections_cursor_up = "up"
-collections_cursor_down = "down"
+collections_expand = "Right"
+unselect_request = "Left"
 
-collections_move_request_up = "ctrl-up"
-collections_move_request_down = "ctrl-down"
+move_request_up = "Ctrl-Up"
+move_request_down = "Ctrl-Down"
+
+next_environment = "e"
+display_cookies = "c"
+display_help = "h"
+
+# Collection name, request name, URL, Header, Query param, Basic Auth, Bearer Token
+[keybindings.generic.text_inputs.text_input]
+cancel = "Esc"
+validate = "Enter"
+
+delete_backward = "Delete"
+delete_forward = "Backspace"
+
+move_cursor_left = "Left"
+move_cursor_right = "Right"
+
+# Request body
+[keybindings.generic.text_inputs.text_area_mode.Custom]
+quit_without_saving = "Esc"
+save_and_quit = "Ctrl-s"
+
+copy = "Ctrl-c"
+paste = "Ctrl-v"
+undo = "Ctrl-z"
+redo = "Ctrl-y"
+
+new_line = "Enter"
+indent = "Tab"
+delete = "Delete"
+backspace = "Backspace"
+
+skip_word_cursor_right = "Ctrl-Right"
+skip_word_cursor_left = "Ctrl-Left"
+
+move_cursor_up = "Up"
+move_cursor_down = "Down"
+move_cursor_left = "Left"
+move_cursor_right = "Right"
+
+# Navigation in tables, popups, up and down in the collections list
+[keybindings.generic.navigation]
+move_cursor_up = "Up"
+move_cursor_down = "Down"
+move_cursor_left = "Left"
+move_cursor_right = "Right"
+
+go_back = "Esc"
+select = "Enter"
+
+# Collections list, query params, headers, cookies
+[keybindings.generic.list_and_table_actions]
+create_element = "n"
+delete_element = "d"
+edit_element = "Enter" # Edit query param, header, basic auth, bearer token
+rename_element = "r" # Only used in the collections list (main menu)
+toggle_element = "t" # Only used in tables (Query params, headers, cookies)
+
+[keybindings.request_selected]
+next_tab = "Tab"
+
+change_url = "u"
+change_method = "m"
+request_settings = "s"
+
+next_view = "v"
+
+send_request = "Space"
+secondary_send_request = "Ctrl-Enter"
+
+[keybindings.request_selected.param_tabs]
+change_auth_method = "Ctrl-a"
+change_body_content_type = "Ctrl-b"
+
+[keybindings.request_selected.result_tabs]
+scroll_up = "Ctrl-Up"
+scroll_down = "Ctrl-Down"
+scroll_left = "Ctrl-Left"
+scroll_right = "Ctrl-Right"
+
+secondary_next_tab = "Shift-BackTab" # Will use next_tab depending on the selected view
