@@ -269,6 +269,7 @@ impl App<'_> {
                                     KeyCode::Left if control_pressed => self.result_horizontal_scrollbar.page_up(),
                                     KeyCode::Right if control_pressed => self.result_horizontal_scrollbar.page_down(),
 
+                                    KeyCode::Char('y') => self.copy_to_clipboard(),
                                     KeyCode::BackTab if params_events_allowed => self.next_request_result_tab(),
                                     KeyCode::Tab if !params_events_allowed => self.next_request_result_tab(),
 

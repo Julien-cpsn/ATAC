@@ -1,6 +1,7 @@
 use std::str::Lines;
 use crate::app::app::App;
 use crate::app::ui::result_tabs::RequestResultTabs;
+use cli_clipboard::{ClipboardContext, ClipboardProvider};
 
 impl App<'_> {
     pub fn next_request_result_tab(&mut self) {
@@ -76,5 +77,41 @@ impl App<'_> {
         }
 
         return max_tmp;
+    }
+
+    pub fn copy_to_clipboard(&mut self) {
+        let mut ctx = ClipboardContext::new().unwrap();
+         match self.request_result_tab {
+            RequestResultTabs::Body => {
+                let body = self.get_selected_request_as_local().read().unwrap().result.body.clone();
+                match body {
+                    Some(body) => {
+                        ctx.set_contents(body).unwrap();
+                    },
+                    None => {}
+                }
+            }
+            RequestResultTabs::Cookies => {
+                let cookies = self.get_selected_request_as_local().read().unwrap().result.cookies.clone();
+                match cookies {
+                    Some(cookies) => {
+                        ctx.set_contents(cookies).unwrap();
+                    },
+                    None => {}
+                }
+            }
+            RequestResultTabs::Headers => {
+                let mut headers = String::new();
+                for (header, value) in &self.get_selected_request_as_local().read().unwrap().result.headers {
+                    headers.push_str(&format!("{header}: {value}\n"));
+                }
+                match headers.len() {
+                    0 => {},
+                    _ => {
+                        ctx.set_contents(headers).unwrap();
+                    },
+                }
+            }
+        }
     }
 }
