@@ -6,6 +6,7 @@ use ratatui::style::Stylize;
 use ratatui::text::Line;
 use ratatui::widgets::{Block, Borders, Paragraph, Tabs};
 use strum::{Display, EnumIter, FromRepr, IntoEnumIterator};
+use cli_clipboard::{ClipboardContext, ClipboardProvider};
 
 use crate::app::app::App;
 use crate::request::auth::Auth::*;
@@ -172,5 +173,62 @@ impl App<'_> {
                 }
             }
         }
+    }
+
+    pub fn copy_as_curl_command(&mut self) {
+        let mut ctx = ClipboardContext::new().unwrap();
+
+        let selected_request_index = &self.collections_tree.selected.unwrap();
+        let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
+
+        let selected_request = local_selected_request.write().unwrap();
+        let mut curl_command =format!(
+                "curl -X {} \"{}\"",
+                selected_request.method,
+                selected_request.url_with_params_to_string()
+            );
+
+        if !selected_request.headers.is_empty() {
+            let headers = selected_request.headers
+                .iter()
+                .map(|key_value| {
+                 format!(" \\\n-H \"{}: {}\"", key_value.data.0, key_value.data.1)})
+                .collect::<Vec<String>>()
+                .join("");
+            curl_command.push_str(&headers);
+        } 
+
+        match &selected_request.auth {
+            NoAuth => {},
+            BasicAuth(username, password) => {
+                curl_command.push_str(&format!(" \\\n-u {}:{}", username, password));
+            },
+            BearerToken(token) => {
+                curl_command.push_str(&format!(" \\\n-H \"Authorization: Bearer {}\"", token));
+            }
+        }
+
+         match &selected_request.body{
+            NoBody => {},
+            Multipart(form) | Form(form) => {
+                let form_data = form.iter().map(|key_value| {
+                    format!(" \\\n-F \"{}={}\"", key_value.data.0, key_value.data.1)
+                }).collect::<Vec<String>>().join("");
+                curl_command.push_str(&form_data);
+            }
+            Raw(content) | Json(content) => {
+                if content != "" {
+                    let res = format!(" \\\n--data-raw '{}'",content);
+                    curl_command.push_str(&res);
+                }
+            },
+            Html(content) | Javascript(content) | Xml(content) | File(content) => {
+                if content != "" {
+                    let res = format!(" \\\n--data-binary '{}'",content);
+                    curl_command.push_str(&res);
+                }
+            },
+        }
+        ctx.set_contents(curl_command).unwrap();
     }
 }
