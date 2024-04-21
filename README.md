@@ -62,14 +62,13 @@ cargo install atac
 </a>
 
 
-### Install from AUR
+### Install from Arch
 
-You can use your favorite [AUR helper](https://wiki.archlinux.org/title/AUR_helpers) to install. For example,
+You can use [pacman](https://wiki.archlinux.org/title/pacman) to install:
 
-```bash
-paru -S atac
+```shell
+pacman -S atac
 ```
-
 
 ### Install with Homebrew
 
