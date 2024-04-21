@@ -1,7 +1,7 @@
 [package]
 name = "atac"
 description = "Arguably a Terminal API Client. Feature-full, free, open-source, offline and account-less."
-version = "0.12.0"
+version = "0.13.0-bis"
 authors = ["julien-cpsn"]
 edition = "2021"
 license = "MIT"
@@ -30,9 +30,10 @@ throbber-widgets-tui = "0.5.0"
 syntect = "5.2.0"
 serde = { version = "1.0.197", features = ["derive", "rc"] }
 serde_json = "1.0.114"
+jsonxf = "1.1.1"
 toml = "0.8.11"
 envfile = "0.2.1"
-parse_postman_collection = "0.2.2"
+parse_postman_collection = "0.2.3"
 clap = { version = "4.5.0", features = ["derive", "color"] }
 tokio = { version = "1.36.0", features = ["rt", "rt-multi-thread", "macros"] }
 futures-io = "0.3.30"

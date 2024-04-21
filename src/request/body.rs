@@ -1,6 +1,8 @@
+use regex::Regex;
 use serde::{Deserialize, Serialize};
-use strum::{Display};
-use crate::request::body::ContentType::{NoBody, File, Html, Json, Raw, Xml, Multipart, Form};
+use strum::Display;
+
+use crate::request::body::ContentType::{File, Form, Html, Javascript, Json, Multipart, NoBody, Raw, Xml};
 use crate::request::request::KeyValue;
 
 #[derive(Default, Debug, Clone, Display, Serialize, Deserialize)]
@@ -22,7 +24,9 @@ pub enum ContentType {
     #[strum(to_string = "XML")]
     Xml(String),
     #[strum(to_string = "HTML")]
-    Html(String)
+    Html(String),
+    #[strum(to_string = "Javascript")]
+    Javascript(String)
 }
 
 impl ContentType {
@@ -33,7 +37,7 @@ impl ContentType {
             Form(_) => String::from("application/x-www-form-urlencoded"),
             Raw(_) => String::from("text/plain"),
             File(_) => String::from("application/octet-stream"),
-            Json(_) | Xml(_) | Html(_) => format!("application/{}", self.to_string().to_lowercase())
+            Json(_) | Xml(_) | Html(_) | Javascript(_) => format!("application/{}", self.to_string().to_lowercase())
         }
     }
 
@@ -61,6 +65,25 @@ pub fn next_content_type(content_type: &ContentType) -> ContentType {
         Raw(body) => Json(body.to_string()),
         Json(body) => Xml(body.to_string()),
         Xml(body) => Html(body.to_string()),
-        Html(_) => NoBody,
+        Html(body) => Javascript(body.to_string()),
+        Javascript(_) => NoBody
+    }
+}
+
+/// Iter through the headers and tries to catch a file format like `application/<file_format>`
+pub fn find_file_format_in_content_type(headers: &Vec<(String, String)>) -> Option<String> {
+    if let Some((_, content_type)) = headers.iter().find(|(header, _)| *header == "content-type") {
+        // Regex that likely catches the file format
+        let regex = Regex::new(r"\w+/(?<file_format>\w+)").unwrap();
+
+        return match regex.captures(content_type) {
+            // No file format found
+            None => None,
+            // File format found
+            Some(capture) => Some(capture["file_format"].to_string())
+        }
+    }
+    else {
+        return None;
     }
 }

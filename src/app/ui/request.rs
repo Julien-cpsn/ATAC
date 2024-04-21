@@ -110,20 +110,30 @@ impl App<'_> {
             .split(request_layout[2]);
 
 
+        let (should_render_params, should_render_result) = match self.request_view {
+            RequestView::Normal => (true, true),
+            RequestView::OnlyResult => (false, true),
+            RequestView::OnlyParams => (true, false)
+        };
+        
         // REQUEST PARAMS
 
-        let params_block = Block::new().borders(Borders::RIGHT);
-        let request_params_area = params_block.inner(request_main_layout[0]);
+        if should_render_params {
+            let params_block = Block::new().borders(Borders::RIGHT);
+            let request_params_area = params_block.inner(request_main_layout[0]);
 
-        frame.render_widget(params_block, request_main_layout[0]);
-        self.render_request_params(frame, request_params_area, &request);
+            frame.render_widget(params_block, request_main_layout[0]);
+            self.render_request_params(frame, request_params_area, &request);
+        }
 
         // REQUEST RESULT LAYOUT
 
-        let result_block = Block::new();
-        let result_block_area = result_block.inner(request_main_layout[1]);
+        if should_render_result {
+            let result_block = Block::new();
+            let result_block_area = result_block.inner(request_main_layout[1]);
 
-        frame.render_widget(result_block, request_main_layout[1]);
-        self.render_request_result(frame, result_block_area, &request);
+            frame.render_widget(result_block, request_main_layout[1]);
+            self.render_request_result(frame, result_block_area, &request);
+        }
     }
 }

@@ -4,6 +4,7 @@ use tui_textarea::CursorMove;
 use crate::app::app::{App};
 use crate::app::app_states::AppState;
 use crate::app::ui::param_tabs::param_tabs::RequestParamsTabs;
+use crate::app::ui::views::RequestView;
 
 impl App<'_> {
     /// Handle events
@@ -41,7 +42,7 @@ impl App<'_> {
 
                             KeyCode::Char('c') => self.display_cookies_state(),
                             
-                            KeyCode::Char('n') => self.create_new_element_state(),
+                            KeyCode::Char('n') => self.choose_element_to_create_state(),
                             KeyCode::Char('d') => self.delete_element(),
                             KeyCode::Char('r') => self.rename_element(),
                             
@@ -181,57 +182,98 @@ impl App<'_> {
                         /* /!\ Below, consider that a request has been selected /!\ */
 
                         AppState::SelectedRequest => {
+                            // Depending on the current request view, some keys may need to be deactivated
+                            let (params_events_allowed, result_events_allowed) = match self.request_view {
+                                RequestView::Normal => (true, true),
+                                RequestView::OnlyResult => (false, true),
+                                RequestView::OnlyParams => (true, false)
+                            };
+                            
                             // Param tabs
-                            match self.request_param_tab {
-                                RequestParamsTabs::QueryParams => match key.code {
-                                    KeyCode::Enter if !control_pressed && self.query_params_table.is_selected() => self.edit_request_param_state(),
+                            if params_events_allowed {
+                                match self.request_param_tab {
+                                    RequestParamsTabs::QueryParams => match key.code {
+                                        KeyCode::Enter if !control_pressed && self.query_params_table.is_selected() => self.edit_request_param_state(),
 
-                                    KeyCode::Up if !control_pressed => self.query_params_table.up(),
-                                    KeyCode::Down if !control_pressed => self.query_params_table.down(),
-                                    KeyCode::Left | KeyCode::Right if !control_pressed => self.query_params_table.change_y(),
+                                        KeyCode::Up if !control_pressed => self.query_params_table.up(),
+                                        KeyCode::Down if !control_pressed => self.query_params_table.down(),
+                                        KeyCode::Left | KeyCode::Right if !control_pressed => self.query_params_table.change_y(),
 
-                                    KeyCode::Char('n') => self.create_new_query_param(),
-                                    KeyCode::Char('d') => self.delete_query_param(),
-                                    KeyCode::Char('t') => self.toggle_query_param(),
+                                        KeyCode::Char('n') => self.create_new_query_param(),
+                                        KeyCode::Char('d') => self.delete_query_param(),
+                                        KeyCode::Char('t') => self.toggle_query_param(),
 
+                                        _ => {}
+                                    },
+                                    RequestParamsTabs::Auth if params_events_allowed && self.auth_text_input_selection.usable => match key.code {
+                                        KeyCode::Enter if !control_pressed => self.select_request_auth_input_text(),
+
+                                        KeyCode::Up if !control_pressed => self.auth_text_input_selection.previous(),
+                                        KeyCode::Down if !control_pressed => self.auth_text_input_selection.next(),
+
+                                        _ => {}
+                                    }
+                                    RequestParamsTabs::Headers => match key.code {
+                                        KeyCode::Enter if !control_pressed && self.headers_table.is_selected() => self.edit_request_header_state(),
+
+                                        KeyCode::Up if !control_pressed => self.headers_table.up(),
+                                        KeyCode::Down if !control_pressed => self.headers_table.down(),
+                                        KeyCode::Left | KeyCode::Right if !control_pressed => self.headers_table.change_y(),
+
+                                        KeyCode::Char('n') => self.create_new_header(),
+                                        KeyCode::Char('d') => self.delete_header(),
+                                        KeyCode::Char('t') => self.toggle_header(),
+
+                                        _ => {}
+                                    },
+                                    RequestParamsTabs::Body => match key.code {
+                                        KeyCode::Enter if !control_pressed && self.body_form_table.is_selected() => self.edit_request_body_table_state(),
+                                        KeyCode::Enter if !control_pressed => self.edit_request_body_file_or_string_state(),
+
+                                        KeyCode::Up if !control_pressed => self.body_form_table.up(),
+                                        KeyCode::Down if !control_pressed => self.body_form_table.down(),
+                                        KeyCode::Left | KeyCode::Right if !control_pressed => self.body_form_table.change_y(),
+
+                                        KeyCode::Char('n') => self.create_new_form_data(),
+                                        KeyCode::Char('d') => self.delete_form_data(),
+                                        KeyCode::Char('t') => self.toggle_form_data(),
+
+                                        _ => {}
+                                    },
                                     _ => {}
-                                },
-                                RequestParamsTabs::Auth if self.auth_text_input_selection.usable => match key.code {
-                                    KeyCode::Enter if !control_pressed => self.select_request_auth_input_text(),
+                                }
+                            }
+                            
+                            if params_events_allowed {
+                                match key.code {
+                                    //KeyCode::Char('p') => self.load_request_query_params_tab(),
 
-                                    KeyCode::Up if !control_pressed => self.auth_text_input_selection.previous(),
-                                    KeyCode::Down if !control_pressed => self.auth_text_input_selection.next(),
+                                    KeyCode::Char('a') if control_pressed => self.modify_request_auth(),
+                                    //KeyCode::Char('a') => self.load_request_auth_param_tab(),
+
+                                    //KeyCode::Char('h') => self.load_request_headers_tab(),
+
+                                    KeyCode::Char('b') if control_pressed => self.modify_request_content_type(),
+                                    //KeyCode::Char('b') => self.load_request_body_param_tab(),
+
+                                    KeyCode::Tab => self.next_request_param_tab(),
 
                                     _ => {}
                                 }
-                                RequestParamsTabs::Headers => match key.code {
-                                    KeyCode::Enter if !control_pressed && self.headers_table.is_selected() => self.edit_request_header_state(),
+                            }
 
-                                    KeyCode::Up if !control_pressed => self.headers_table.up(),
-                                    KeyCode::Down if !control_pressed => self.headers_table.down(),
-                                    KeyCode::Left | KeyCode::Right if !control_pressed => self.headers_table.change_y(),
+                            if result_events_allowed {
+                                match key.code {
+                                    KeyCode::Up if control_pressed => self.result_vertical_scrollbar.page_up(),
+                                    KeyCode::Down if control_pressed => self.result_vertical_scrollbar.page_down(),
+                                    KeyCode::Left if control_pressed => self.result_horizontal_scrollbar.page_up(),
+                                    KeyCode::Right if control_pressed => self.result_horizontal_scrollbar.page_down(),
 
-                                    KeyCode::Char('n') => self.create_new_header(),
-                                    KeyCode::Char('d') => self.delete_header(),
-                                    KeyCode::Char('t') => self.toggle_header(),
-
-                                    _ => {}
-                                },
-                                RequestParamsTabs::Body => match key.code {
-                                    KeyCode::Enter if !control_pressed && self.body_form_table.is_selected() => self.edit_request_body_table_state(),
-                                    KeyCode::Enter if !control_pressed => self.edit_request_body_file_or_string_state(),
-
-                                    KeyCode::Up if !control_pressed => self.body_form_table.up(),
-                                    KeyCode::Down if !control_pressed => self.body_form_table.down(),
-                                    KeyCode::Left | KeyCode::Right if !control_pressed=> self.body_form_table.change_y(),
-
-                                    KeyCode::Char('n') => self.create_new_form_data(),
-                                    KeyCode::Char('d') => self.delete_form_data(),
-                                    KeyCode::Char('t') => self.toggle_form_data(),
+                                    KeyCode::BackTab if params_events_allowed => self.next_request_result_tab(),
+                                    KeyCode::Tab if !params_events_allowed => self.next_request_result_tab(),
 
                                     _ => {}
-                                },
-                                _ => {}
+                                }
                             }
 
                             match key.code {
@@ -242,29 +284,12 @@ impl App<'_> {
 
                                 KeyCode::Char('h') => self.display_full_help = !self.display_full_help,
 
-                                //KeyCode::Char('p') => self.load_request_query_params_tab(),
-
-                                KeyCode::Char('a') if control_pressed => self.modify_request_auth(),
-                                //KeyCode::Char('a') => self.load_request_auth_param_tab(),
-
-                                //KeyCode::Char('h') => self.load_request_headers_tab(),
-
-                                KeyCode::Char('b') if control_pressed => self.modify_request_content_type(),
-                                //KeyCode::Char('b') => self.load_request_body_param_tab(),
-
                                 KeyCode::Char('u') => self.edit_request_url_state(),
                                 KeyCode::Char('m') => self.modify_request_method(),
 
                                 KeyCode::Char('s') => self.edit_request_settings_state(),
 
-                                KeyCode::Up if control_pressed => self.result_vertical_scrollbar.page_up(),
-                                KeyCode::Down if control_pressed => self.result_vertical_scrollbar.page_down(),
-                                KeyCode::Left if control_pressed => self.result_horizontal_scrollbar.page_up(),
-                                KeyCode::Right if control_pressed => self.result_horizontal_scrollbar.page_down(),
-
                                 KeyCode::Char('v') => self.next_request_view(),
-                                KeyCode::BackTab => self.next_request_result_tab(),
-                                KeyCode::Tab => self.next_request_param_tab(),
 
                                 // Used to be ctrl + enter, but it doesn't register right on many platforms
                                 // https://github.com/crossterm-rs/crossterm/issues/685

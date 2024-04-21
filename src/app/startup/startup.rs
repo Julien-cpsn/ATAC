@@ -1,12 +1,18 @@
-use std::fs;
 use std::fs::OpenOptions;
+
 use crate::app::app::App;
 use crate::app::startup::args::{ARGS, Command};
+use crate::panic_error;
 
 impl App<'_> {
     /// Method called before running the app
     pub fn startup(&mut self) -> &mut Self {
         self.parse_app_directory();
+
+        // Creates the log file only if the app is allowed to save files
+        if ARGS.should_save {
+            self.create_log_file();
+        }
 
         if let Some(command) = &ARGS.command {
             match command {
@@ -19,13 +25,11 @@ impl App<'_> {
         self
     }
 
-    pub fn parse_app_directory(&mut self) {
-        // Create the app directory if it does not exist
-        fs::create_dir_all(&ARGS.directory).expect(&format!("Could not create directory \"{}\"", ARGS.directory.display()));
-        
-        let paths = ARGS.directory.read_dir().expect(&format!("Directory \"{}\" not found", ARGS.directory.display()));
-
-        let mut was_config_file_parsed = false;
+    fn parse_app_directory(&mut self) {
+        let paths = match ARGS.directory.read_dir() {
+            Ok(paths) => paths,
+            Err(e) => panic_error(format!("Directory \"{}\" not found\n\t{e}", ARGS.directory.display()))
+        };
 
         for path in paths {
             let path = path.unwrap().path();
@@ -36,7 +40,7 @@ impl App<'_> {
 
             let file_name = path.file_name().unwrap().to_str().unwrap();
 
-            println!("Parsing: {}", path.display());
+            println!("Checking: {}", path.display());
 
             if file_name.ends_with(".json") {
                 self.set_collections_from_file(path);
@@ -46,7 +50,6 @@ impl App<'_> {
             }
             else if file_name == "atac.toml" {
                 self.parse_config_file(path);
-                was_config_file_parsed = true;
             }
             else if file_name == "atac.log" {
                 println!("Nothing to parse here")
@@ -54,18 +57,16 @@ impl App<'_> {
 
             println!();
         }
+    }
 
-        self.log_file = Some(
-            OpenOptions::new()
-                .write(true)
-                .create(true)
-                .truncate(true)
-                .open(ARGS.directory.join("atac.log"))
-                .expect("Could not open log file")
-        );
-        
-        if !was_config_file_parsed {
-            self.parse_config_file(ARGS.directory.join("atac.toml"));
-        }
+    fn create_log_file(&mut self) {
+        let path = ARGS.directory.join("atac.log");
+
+        let log_file = match OpenOptions::new().write(true).create(true).truncate(true).open(path) {
+            Ok(log_file) => log_file,
+            Err(e) => panic_error(format!("Could not open log file\n\t{e}"))
+        };
+
+        self.log_file = Some(log_file);
     }
 }

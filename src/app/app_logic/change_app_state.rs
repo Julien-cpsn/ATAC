@@ -37,7 +37,7 @@ impl App<'_> {
         self.state = AppState::EditingCookies;
     }
 
-    pub fn create_new_element_state(&mut self) {
+    pub fn choose_element_to_create_state(&mut self) {
         self.creation_popup.selection = 0;
         
         if self.collections.is_empty() {
@@ -59,7 +59,18 @@ impl App<'_> {
         if collections_length == 0 {
             return;
         }
+        
+        let selected_collection = &self.collections_tree.state.selected();
 
+        // If a collection is already selected, automatically selects it in the popup
+        let popup_selected_collection_index = if selected_collection.len() > 0 {
+            selected_collection[0]
+        }
+        else {
+            0
+        };
+        
+        self.new_request_popup.selected_collection = popup_selected_collection_index;
         self.new_request_popup.max_selection = collections_length;
         self.state = AppState::CreatingNewRequest;
     }
@@ -162,7 +173,7 @@ impl App<'_> {
                 ContentType::File(_) => {
                     self.state = AppState::EditingRequestBodyFile;
                 }
-                ContentType::Raw(_) | ContentType::Json(_) | ContentType::Xml(_) | ContentType::Html(_) => {
+                ContentType::Raw(_) | ContentType::Json(_) | ContentType::Xml(_) | ContentType::Html(_) | ContentType::Javascript(_) => {
                     self.state = AppState::EditingRequestBodyString;
                 }
                 _ => {

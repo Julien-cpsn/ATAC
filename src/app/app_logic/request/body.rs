@@ -143,6 +143,7 @@ impl App<'_> {
                 ContentType::Json(_) => ContentType::Json(body_string.clone()),
                 ContentType::Xml(_) => ContentType::Xml(body_string.clone()),
                 ContentType::Html(_) => ContentType::Html(body_string.clone()),
+                ContentType::Javascript(_) => ContentType::Javascript(body_string.clone()),
             };
 
             selected_request.body = new_body;
@@ -169,7 +170,7 @@ impl App<'_> {
                 // TODO: Impossible to set the header for multipart yet, because of boundary and content-length that are computed on reqwest's side
                 ContentType::Multipart(_) => {},
                 // Create or replace Content-Type header with new body content type
-                ContentType::File(_) | ContentType::Form(_) | ContentType::Raw(_) | ContentType::Json(_) | ContentType::Xml(_) | ContentType::Html(_) => {
+                ContentType::File(_) | ContentType::Form(_) | ContentType::Raw(_) | ContentType::Json(_) | ContentType::Xml(_) | ContentType::Html(_) | ContentType::Javascript(_) => {
                     let content_type = &selected_request.body.to_content_type();
                     selected_request.modify_or_create_header(CONTENT_TYPE.as_str(), content_type)
                 }

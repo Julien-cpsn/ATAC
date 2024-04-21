@@ -10,10 +10,10 @@ ATAC ⚔📩
 ## Table Of Contents
 
 - [Description](#description)
-- [How to use](#how-to-use)
+- [How to install](#how-to-install)
   * [Install with cargo](#install-with-cargo)
   * [Install with Homebrew](#install-with-homebrew)
-  * [Install from AUR](#aur)
+  * [Install from AUR](#install-from-aur)
   * [Binary](#binary)
   * [Compile by yourself](#compile-by-yourself)
 - [Features](#features)
@@ -39,7 +39,13 @@ but inside your terminal without any specific graphical environment needed.
 
 The philosophy of ATAC is to be free, account-less, and offline for now and forever.
 
-## How to use
+## How to install
+
+[![Packaging status](https://repology.org/badge/vertical-allrepos/atac.svg)](https://repology.org/project/atac/versions)
+
+<a href="https://crates.io/crates/atac">
+  <img src="https://repology.org/badge/version-for-repo/crates_io/atac.svg" alt="crates.io package" align="right">
+</a>
 
 ### Install with cargo
 
@@ -51,13 +57,10 @@ Simply use:
 cargo install atac
 ```
 
-Then:
+<a href="https://archlinux.org/packages/extra/x86_64/atac/">
+  <img src="https://repology.org/badge/version-for-repo/arch/atac.svg" alt="Arch package" align="right">
+</a>
 
-```
-atac -h
-```
-
-Enjoy!
 
 ### Install from Arch
 
@@ -67,24 +70,31 @@ You can use [pacman](https://wiki.archlinux.org/title/pacman) to install:
 pacman -S atac
 ```
 
-Enjoy!
-
 ### Install with Homebrew
 
 Simply use:
-```shell
+
+```bash
 brew tap julien-cpsn/atac
 brew install atac
 ```
 
-Then:
+<a href="https://copr.fedorainfracloud.org/coprs/joxcat/atac/">
+  <img alt="Fedora copr Release" src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fcopr.fedorainfracloud.org%2Fapi_3%2Fpackage%3Fownername%3Djoxcat%26projectname%3Datac%26packagename%3Datac%26with_latest_build%3DTrue&query=%24.builds.latest.source_package.version&style=flat&logo=fedora&logoColor=white&label=Fedora%20copr&color=limegreen" align="right">
+</a>
 
+### Install from Fedora copr
+
+Simply use:
+
+```bash
+dnf enable joxcat/atac
+dnf install atac
 ```
-atac -h
-```
 
-Enjoy!
-
+<a href="https://github.com/Julien-cpsn/ATAC/releases">
+  <img alt="GitHub Release" src="https://img.shields.io/github/v/release/julien-cpsn/atac?label=Release&color=45c017" align="right">
+</a>
 
 ### Binary
 
@@ -95,11 +105,9 @@ The binaries from the latest release can be found [here](https://github.com/Juli
 > For example, you can add the binary into your PATH.
 > You won't be able to run it like other graphical applications since it needs CLI arguments.
 
-For more:
-
-```
-atac -h
-```
+> [!TIP]
+> Note for **macOS users**. After downloading the binary you may need to run the command
+> `sudo xattr -rd com.apple.quarantine ~/bin/atac` (modify to reflect the path where `atac` is located).
 
 ### Compile by yourself
 
@@ -109,9 +117,11 @@ atac -h
 Simply clone the repository and use:
 
 ```bash
+cargo run
 cargo run -- -h
 ```
 
+> [!TIP]
 > Build the latest release
 > ```bash
 > cargo build --release
@@ -143,7 +153,7 @@ cargo run -- -h
 | - URL Encoded form                  | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
 | - File                              | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
 | - Plain text                        | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
-| - JSON, XML, HTML                   | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
+| - JSON, XML, HTML, Javascript       | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
 | Full response                       | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
 | - Status code                       | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
 | - Cookies                           | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
@@ -158,7 +168,9 @@ cargo run -- -h
 | - Allow redirects                   | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
 | - Store cookies                     | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
 | **WebSocket Client**                | :x: :soon:                                               | :white_check_mark:   | :white_check_mark:   |
-| **GraphQL**                         | :x: (not planned)                                        | :white_check_mark:   | :white_check_mark:   |
+| **GraphQL**                         | :x: :soon:                                               | :white_check_mark:   | :white_check_mark:   |
+| **gRPC**                            | :x: :soon:                                               | :white_check_mark:   | :white_check_mark:   |
+| **MQTT**                            | :x: :soon:                                               | :white_check_mark:   | :x:                  |
 | **Free**                            | :white_check_mark:                                       | Depends              | Depends              |
 | **Lightweight, fast and efficient** | :white_check_mark:                                       | :x:                  | :x:                  |
 | **Data storage**                    | Your own committable, readable and versioned files       | Tied to your account | Tied to your account |
@@ -178,11 +190,10 @@ cargo run -- -h
 - **To add**
   - Create a repo wiki
   - Document whole code
+  - Copy response content to clipboard
 
 - **To improve**
-  - Pretty print output
   - Sign binary
-  - Add file to Postman import
 
 - **To fix**
   - Query parameters bug
@@ -195,16 +206,25 @@ cargo run -- -h
   - Request body syntax highlighting
   - Export a request to other code formats (curl, PHP, JS, Rust, ...)
   - Pre and post-request script (javascript v8 engine)
+  - OpenAPI & Insomnia import
 
 - **To improve**
   - Editing cookies
-  - Insomnia import
   - Auto-completion on env file variables
   - Manage multipart Content-type header (auto-generated for now)
+
+### TODO v3.0.0
+
+- **To add**
+  - WebSocket requests
+  - Maybe GraphQL requests
+  - Maybe MQTT requests
+  - Maybe gRPC requests
 
 ### Ideas (will think about it later)
 
 - Base URL property on collections
+- YAML support for collections file format
 
 ## Documentation
 
@@ -244,6 +264,7 @@ cargo run -- -h
 | [throbber-widgets-tui](https://github.com/arkbig/throbber-widgets-tui)                                                                     | 0.4.1             | Display loading UI elements. Used when request is pending.                             |
 | [syntect](https://github.com/trishume/syntect)                                                                                             | 5.2.0             | Syntax highlighting                                                                    |
 | [serde](https://github.com/serde-rs/serde) & [serde_json](https://github.com/serde-rs/json)                                                | 1.0.197 & 1.0.144 | Serialize & Deserialize application data into JSON files                               |
+| [jsonxf](https://github.com/gamache/jsonxf)                                                                                                | 0.1.1             | Pretty print JSON                                                                      |
 | [toml](https://github.com/toml-rs/toml)                                                                                                    | 0.8.11            | Serialize & Deserialize application config files                                       |
 | [envfile](https://github.com/pop-os/envfile)                                                                                               | 0.2.1             | Deserialize application environment files                                              |
 | [My fork](https://github.com/Julien-cpsn/postman-collection-rs) of [postman_collection](https://github.com/mandrean/postman-collection-rs) | 0.2.1             | Deserialize Postman collection files                                                   |
@@ -267,6 +288,7 @@ The binary file size goes from ~4.5 MB to ~7 MB depending on the platform. I try
 
 - Cargo, Brew - [@julien-cpsn](https://github.com/julien-cpsn)
 - Arch - [@orhun](https://github.com/orhun)
+- Fedora copr - [@joxcat](https://github.com/joxcat)
 
 ## Star history
 
