@@ -1,3 +1,4 @@
+pub mod help;
 pub mod cookies;
 pub mod creating_new_collection;
 pub mod creating_new_request;

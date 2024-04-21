@@ -9,6 +9,7 @@ use ratatui::style::Stylize;
 use ratatui::widgets::Block;
 use ratatui::widgets::block::Position;
 use tui_textarea::{CursorMove, Scrolling, TextArea};
+use crate::app::app_states::EMPTY_KEY;
 
 // State of Vim emulation
 #[derive(Copy, Clone)]
@@ -22,7 +23,7 @@ impl Vim {
     pub fn new(mode: VimMode) -> Self {
         Self {
             mode,
-            pending: KeyCombination::one_key(KeyCode::Null, KeyModifiers::NONE),
+            pending: *EMPTY_KEY,
         }
     }
 
@@ -34,7 +35,7 @@ impl Vim {
     }
 
     pub fn transition(&self, input: KeyCombination, textarea: &mut TextArea<'_>) -> VimTransition {
-        if input == KeyCombination::one_key(KeyCode::Null, KeyModifiers::NONE) {
+        if input == *EMPTY_KEY {
             return VimTransition::Nop;
         }
 

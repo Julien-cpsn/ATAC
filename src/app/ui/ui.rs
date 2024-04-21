@@ -4,10 +4,13 @@ use ratatui::layout::{Alignment, Constraint, Layout};
 use ratatui::layout::Direction::{Horizontal, Vertical};
 use ratatui::prelude::{Modifier};
 use ratatui::style::{Stylize};
+use ratatui::text::Line;
 use ratatui::widgets::{Block, Borders};
 use ratatui::widgets::block::Title;
 use crate::app::app::{App};
 use crate::app::app_states::AppState::*;
+use crate::app::app_states::{AVAILABLE_EVENTS, event_available_keys_to_spans};
+use crate::utils::colors::DARK_BLACK;
 
 impl App<'_> {
     fn ui(&mut self, frame: &mut Frame) {
@@ -98,7 +101,8 @@ impl App<'_> {
         // FOOTER
 
         let state_line = self.get_state_line();
-        let available_keys = self.get_available_keys();
+        let events = &*AVAILABLE_EVENTS.read().unwrap();
+        let available_keys = Line::from(event_available_keys_to_spans(events, *DARK_BLACK, true).concat());
 
         let footer = Block::new()
             .title(Title::from(state_line).alignment(Alignment::Left))
@@ -109,8 +113,8 @@ impl App<'_> {
         // POPUPS
 
         match self.state {
-            ChoosingElementToCreate => self.render_creating_element_popup(frame),
             DisplayingCookies | EditingCookies => self.render_cookies_popup(frame),
+            ChoosingElementToCreate => self.render_creating_element_popup(frame),
             CreatingNewCollection => self.render_creating_new_collection_popup(frame),
             CreatingNewRequest => self.render_creating_new_request_popup(frame),
             DeletingCollection => self.render_deleting_collection_popup(frame),
@@ -119,6 +123,10 @@ impl App<'_> {
             RenamingCollection => self.render_renaming_collection_popup(frame),
             RenamingRequest => self.render_renaming_request_popup(frame),
             _ => {}
+        }
+
+        if self.should_display_help {
+            self.render_help_popup(frame);   
         }
     }
 

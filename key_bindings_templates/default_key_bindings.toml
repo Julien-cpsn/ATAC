@@ -3,15 +3,17 @@
 [keybindings.main_menu]
 quit = "q" # ctrl-c is implemented by default
 
-collections_expand = "Right"
 unselect_request = "Left"
+expand_collection = "Right"
 
 move_request_up = "Ctrl-Up"
 move_request_down = "Ctrl-Down"
 
 next_environment = "e"
 display_cookies = "c"
-display_help = "h"
+
+[keybindings.generic]
+display_help = "Ctrl-h" # Take care to not overlap other inputs, the help can be triggered from anywhere
 
 # Collection name, request name, URL, Header, Query param, Basic Auth, Bearer Token
 [keybindings.generic.text_inputs.text_input]
@@ -36,11 +38,11 @@ redo = "Ctrl-y"
 
 new_line = "Enter"
 indent = "Tab"
-delete = "Delete"
-backspace = "Backspace"
+delete_backward = "Delete"
+delete_forward = "Backspace"
 
-skip_word_cursor_right = "Ctrl-Right"
-skip_word_cursor_left = "Ctrl-Left"
+skip_word_right = "Ctrl-Right"
+skip_word_left = "Ctrl-Left"
 
 move_cursor_up = "Up"
 move_cursor_down = "Down"

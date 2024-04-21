@@ -20,6 +20,7 @@ use crate::request::collection::Collection;
 use crate::request::environment::Environment;
 use crate::utils::choice_popup::ChoicePopup;
 use crate::utils::cookies_popup::CookiesPopup;
+use crate::utils::help_popup::HelpPopup;
 use crate::utils::settings_popup::SettingsPopup;
 use crate::utils::stateful_custom_table::StatefulCustomTable;
 use crate::utils::stateful_scrollbar::StatefulScrollbar;
@@ -33,12 +34,17 @@ use crate::utils::vim_emulation::{Vim, VimMode};
 pub struct App<'a> {
     pub tick_rate: Duration,
     pub should_quit: bool,
+    pub should_display_help: bool,
 
     pub state: AppState,
 
     pub config: Config,
 
     pub log_file: Option<File>,
+
+    /* Help */
+
+    pub help_popup: HelpPopup,
 
     /* Environments */
     
@@ -102,12 +108,17 @@ impl App<'_> {
         App {
             tick_rate: Duration::from_millis(250),
             should_quit: false,
-
+            should_display_help: false,
+            
             state: AppState::Normal,
 
             config: Config::default(),
 
             log_file: None,
+
+            /* Help */
+
+            help_popup: HelpPopup::default(),
 
             /* Environments */
 
@@ -180,6 +191,7 @@ impl App<'_> {
         terminal.clear()?;
 
         while !self.should_quit {
+            self.update_current_available_events();
             self.draw(&mut terminal)?;
             self.handle_events().await;
         }

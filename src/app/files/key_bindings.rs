@@ -7,12 +7,13 @@ use std::sync::RwLock;
 use crokey::{key, KeyCombination};
 use lazy_static::lazy_static;
 use nestify::nest;
-use ratatui::style::{Color, Stylize};
+use ratatui::style::Stylize;
 use ratatui::text::{Line, Span};
 use serde::Deserialize;
 
 use crate::app::app::App;
 use crate::panic_error;
+use crate::utils::colors::DARK_BLACK;
 
 #[derive(Default, Copy, Clone, Deserialize)]
 pub struct KeyBindingsConfig {
@@ -26,7 +27,7 @@ nest! {
             /// ctrl-c is implemented by default
             pub quit: KeyCombination,
 
-            pub collections_expand: KeyCombination,
+            pub expand_collection: KeyCombination,
             pub unselect_request: KeyCombination,
 
             pub move_request_up: KeyCombination,
@@ -34,12 +35,11 @@ nest! {
 
             pub next_environment: KeyCombination,
 
-            pub display_cookies: KeyCombination,
-
-            pub display_help: KeyCombination,
-        },
+            pub display_cookies: KeyCombination,},
 
         pub generic: #[derive(Copy, Clone, Deserialize)] pub struct Generic {
+            pub display_help: KeyCombination,
+
             pub text_inputs: #[derive(Copy, Clone, Deserialize)] pub struct TexInputs {
                 /// Collection name, request name, URL, Header, Query param, Basic Auth, Bearer Token
                 pub text_input: #[derive(Copy, Clone, Deserialize)] pub struct TextInput {
@@ -126,11 +126,11 @@ pub struct CustomTextArea {
     pub new_line: KeyCombination,
     pub indent: KeyCombination,
 
-    pub delete: KeyCombination,
-    pub backspace: KeyCombination,
+    pub delete_backward: KeyCombination,
+    pub delete_forward: KeyCombination,
 
-    pub skip_word_cursor_right: KeyCombination,
-    pub skip_word_cursor_left: KeyCombination,
+    pub skip_word_right: KeyCombination,
+    pub skip_word_left: KeyCombination,
 
     pub move_cursor_up: KeyCombination,
     pub move_cursor_down: KeyCombination,
@@ -144,7 +144,7 @@ impl Default for KeyBindings {
             main_menu: MainMenu {
                 quit: key!(q),
 
-                collections_expand: key!(right),
+                expand_collection: key!(right),
                 unselect_request: key!(left),
 
                 move_request_up: key!(ctrl-up),
@@ -153,11 +153,11 @@ impl Default for KeyBindings {
                 next_environment: key!(e),
 
                 display_cookies: key!(c),
-
-                display_help: key!(h),
             },
 
             generic: Generic {
+                display_help: key!(Ctrl-h),
+
                 text_inputs: TexInputs {
                     text_input: TextInput {
                         cancel: key!(esc),
@@ -237,12 +237,12 @@ impl Default for CustomTextArea {
 
             new_line: key!(enter),
             indent: key!(tab),
-            delete: key!(delete),
 
-            backspace: key!(backspace),
+            delete_backward: key!(delete),
+            delete_forward: key!(backspace),
 
-            skip_word_cursor_right: key!(ctrl-right),
-            skip_word_cursor_left: key!(ctrl-left),
+            skip_word_right: key!(ctrl-right),
+            skip_word_left: key!(ctrl-left),
 
             move_cursor_up: key!(up),
             move_cursor_down: key!(down),
@@ -284,45 +284,43 @@ impl App<'_> {
     }
 }
 
-fn unique_help(name: Span<'static>, value: Span<'static>) -> Vec<Span<'static>> {
-    if name.to_string() == value.to_string() {
-        return vec![name];
+pub fn unique_key_and_help(help: Span<'static>, key: Span<'static>) -> Vec<Span<'static>> {
+    if help.to_string() == key.to_string() {
+        return vec![help];
     }
     else {
-        vec![name, Span::raw(" "), value]
+        vec![help, Span::raw(" "), key]
     }
 }
 
 pub fn update_key_helpers() {
-    let dark_black = Color::Rgb(50, 50, 50);
-
     let space = Span::raw(" ");
 
-    let exit = "Exit".bg(dark_black);
+    let exit = "Exit".bg(*DARK_BLACK);
 
-    let main_menu = "Main menu".bg(dark_black);
-    let send = "Send".bg(dark_black);
-    let next_tab = "Next tab".bg(dark_black);
-    let url = "Url".bg(dark_black);
-    let method = "Method".bg(dark_black);
-    let help = "Help".bg(dark_black);
+    let main_menu = "Main menu".bg(*DARK_BLACK);
+    let send = "Send".bg(*DARK_BLACK);
+    let next_tab = "Next tab".bg(*DARK_BLACK);
+    let url = "Url".bg(*DARK_BLACK);
+    let method = "Method".bg(*DARK_BLACK);
+    let help = "Help".bg(*DARK_BLACK);
 
-    let quit = "Quit".bg(dark_black);
-    let save = "Save".bg(dark_black);
-    let indent = "Indent".bg(dark_black);
+    let quit = "Quit".bg(*DARK_BLACK);
+    let save = "Save".bg(*DARK_BLACK);
+    let indent = "Indent".bg(*DARK_BLACK);
 
-    let cancel = "Cancel".bg(dark_black);
-    let validate = "Validate".bg(dark_black);
+    let cancel = "Cancel".bg(*DARK_BLACK);
+    let validate = "Validate".bg(*DARK_BLACK);
 
-    let up = "Up".bg(dark_black);
-    let down = "Down".bg(dark_black);
-    let left = "Left".bg(dark_black);
-    let right = "Right".bg(dark_black);
+    let up = "Up".bg(*DARK_BLACK);
+    let down = "Down".bg(*DARK_BLACK);
+    let left = "Left".bg(*DARK_BLACK);
+    let right = "Right".bg(*DARK_BLACK);
 
-    let copy = "Copy".bg(dark_black);
-    let paste = "Paste".bg(dark_black);
+    let copy = "Copy".bg(*DARK_BLACK);
+    let paste = "Paste".bg(*DARK_BLACK);
 
-    let delete = "Delete".bg(dark_black);
+    let delete = "Delete".bg(*DARK_BLACK);
     
     let key_bindings = KEY_BINDINGS.read().unwrap();
 
@@ -334,7 +332,7 @@ pub fn update_key_helpers() {
         space.clone(),
         help.clone(),
         space.clone(),
-        key_bindings.main_menu.display_help.to_string().dark_gray()
+        key_bindings.generic.display_help.to_string().dark_gray()
     ]);
 
     // Cancel Esc Validate Enter Left Right Copy ctrl-c Paste ctrl-v
@@ -349,9 +347,9 @@ pub fn update_key_helpers() {
             key_bindings.generic.text_inputs.text_input.validate.to_string().dark_gray(),
             space.clone()
         ],
-        unique_help(left.clone(), key_bindings.generic.text_inputs.text_input.move_cursor_left.to_string().dark_gray()),
+        unique_key_and_help(left.clone(), key_bindings.generic.text_inputs.text_input.move_cursor_left.to_string().dark_gray()),
         vec![space.clone()],
-        unique_help(right.clone(), key_bindings.generic.text_inputs.text_input.move_cursor_right.to_string().dark_gray()),
+        unique_key_and_help(right.clone(), key_bindings.generic.text_inputs.text_input.move_cursor_right.to_string().dark_gray()),
         vec![
             space.clone(),
             copy.clone(),
@@ -390,13 +388,13 @@ pub fn update_key_helpers() {
                 custom_text_area.indent.to_string().dark_gray(),
                 space.clone(),
             ],
-            unique_help(up.clone(), custom_text_area.move_cursor_up.to_string().dark_gray()),
+            unique_key_and_help(up.clone(), custom_text_area.move_cursor_up.to_string().dark_gray()),
             vec![space.clone()],
-            unique_help(down.clone(), custom_text_area.move_cursor_down.to_string().dark_gray()),
+            unique_key_and_help(down.clone(), custom_text_area.move_cursor_down.to_string().dark_gray()),
             vec![space.clone()],
-            unique_help(left.clone(), custom_text_area.move_cursor_left.to_string().dark_gray()),
+            unique_key_and_help(left.clone(), custom_text_area.move_cursor_left.to_string().dark_gray()),
             vec![space.clone()],
-            unique_help(right.clone(), custom_text_area.move_cursor_right.to_string().dark_gray()),
+            unique_key_and_help(right.clone(), custom_text_area.move_cursor_right.to_string().dark_gray()),
             vec![
                 space.clone(),
                 copy,
@@ -422,13 +420,13 @@ pub fn update_key_helpers() {
             key_bindings.generic.navigation.select.to_string().dark_gray(),
             space.clone(),
         ],
-        unique_help(up.clone(), key_bindings.generic.navigation.move_cursor_up.to_string().dark_gray()),
+        unique_key_and_help(up.clone(), key_bindings.generic.navigation.move_cursor_up.to_string().dark_gray()),
         vec![space.clone()],
-        unique_help(down.clone(), key_bindings.generic.navigation.move_cursor_down.to_string().dark_gray()),
+        unique_key_and_help(down.clone(), key_bindings.generic.navigation.move_cursor_down.to_string().dark_gray()),
         vec![space.clone()],
-        unique_help(left.clone(), key_bindings.generic.navigation.move_cursor_left.to_string().dark_gray()),
+        unique_key_and_help(left.clone(), key_bindings.generic.navigation.move_cursor_left.to_string().dark_gray()),
         vec![space.clone()],
-        unique_help(right.clone(), key_bindings.generic.navigation.move_cursor_right.to_string().dark_gray()),
+        unique_key_and_help(right.clone(), key_bindings.generic.navigation.move_cursor_right.to_string().dark_gray()),
     ].concat());
 
     // Cancel Esc Validate Enter Left Right
@@ -443,9 +441,21 @@ pub fn update_key_helpers() {
             key_bindings.generic.navigation.select.to_string().dark_gray(),
             space.clone(),
         ],
-        unique_help(left.clone(), key_bindings.generic.navigation.move_cursor_left.to_string().dark_gray()),
+        unique_key_and_help(left.clone(), key_bindings.generic.navigation.move_cursor_left.to_string().dark_gray()),
         vec![space.clone()],
-        unique_help(right.clone(), key_bindings.generic.navigation.move_cursor_right.to_string().dark_gray()),
+        unique_key_and_help(right.clone(), key_bindings.generic.navigation.move_cursor_right.to_string().dark_gray()),
+    ].concat());
+
+    *DISPLAYING_HELP_KEYS.write().unwrap() = Line::from(vec![
+        vec![
+            cancel.clone(),
+            space.clone(),
+            key_bindings.generic.navigation.go_back.to_string().dark_gray(),
+            space.clone(),
+        ],
+        unique_key_and_help(left.clone(), key_bindings.generic.navigation.move_cursor_left.to_string().dark_gray()),
+        vec![space.clone()],
+        unique_key_and_help(right.clone(), key_bindings.generic.navigation.move_cursor_right.to_string().dark_gray()),
     ].concat());
 
     // Main menu Esc Send Space Next tab Tab Shift-BackTab Url u Method m Help h
@@ -474,25 +484,25 @@ pub fn update_key_helpers() {
         space.clone(),
         help,
         space.clone(),
-        key_bindings.main_menu.display_help.to_string().dark_gray(),
+        key_bindings.generic.display_help.to_string().dark_gray(),
         space.clone(),
     ]);
 
     // Cancel Esc Enter Up Down Left Right Delete d
-    *DISPLAYING_COOKIES.write().unwrap() = Line::from(vec![
+    *DISPLAYING_COOKIES_KEYS.write().unwrap() = Line::from(vec![
         vec![
             cancel.clone(),
             space.clone(),
             key_bindings.generic.navigation.go_back.to_string().dark_gray(),
             space.clone(),
         ],
-        unique_help(up.clone(), key_bindings.generic.navigation.move_cursor_up.to_string().dark_gray()),
+        unique_key_and_help(up.clone(), key_bindings.generic.navigation.move_cursor_up.to_string().dark_gray()),
         vec![space.clone()],
-        unique_help(down.clone(), key_bindings.generic.navigation.move_cursor_down.to_string().dark_gray()),
+        unique_key_and_help(down.clone(), key_bindings.generic.navigation.move_cursor_down.to_string().dark_gray()),
         vec![space.clone()],
-        unique_help(left.clone(), key_bindings.generic.navigation.move_cursor_left.to_string().dark_gray()),
+        unique_key_and_help(left.clone(), key_bindings.generic.navigation.move_cursor_left.to_string().dark_gray()),
         vec![space.clone()],
-        unique_help(right.clone(), key_bindings.generic.navigation.move_cursor_right.to_string().dark_gray()),
+        unique_key_and_help(right.clone(), key_bindings.generic.navigation.move_cursor_right.to_string().dark_gray()),
         vec![
             space.clone(),
             delete,
@@ -501,12 +511,12 @@ pub fn update_key_helpers() {
         ],
     ].concat());
 
-    *CREATING_NEW_REQUEST.write().unwrap() = Line::from(vec![
+    *CREATING_NEW_REQUEST_KEYS.write().unwrap() = Line::from(vec![
         TEXT_INPUT_KEYS.read().unwrap().spans.clone(),
         vec![space.clone()],
-        unique_help(up.clone(), key_bindings.generic.navigation.move_cursor_up.to_string().dark_gray()),
+        unique_key_and_help(up.clone(), key_bindings.generic.navigation.move_cursor_up.to_string().dark_gray()),
         vec![space.clone()],
-        unique_help(down.clone(), key_bindings.generic.navigation.move_cursor_down.to_string().dark_gray()),
+        unique_key_and_help(down.clone(), key_bindings.generic.navigation.move_cursor_down.to_string().dark_gray()),
     ].concat());
 }
 
@@ -517,7 +527,8 @@ lazy_static! {
     pub static ref TEXT_AREA_INPUT_KEYS: RwLock<Line<'static>> = RwLock::new(Line::default());
     pub static ref NAVIGATION_KEYS: RwLock<Line<'static>> = RwLock::new(Line::default());
     pub static ref VALIDATION_KEYS: RwLock<Line<'static>> = RwLock::new(Line::default());
+    pub static ref DISPLAYING_HELP_KEYS: RwLock<Line<'static>> = RwLock::new(Line::default());
     pub static ref REQUEST_SELECTED_KEYS: RwLock<Line<'static>> = RwLock::new(Line::default());
-    pub static ref DISPLAYING_COOKIES: RwLock<Line<'static>> = RwLock::new(Line::default());
-    pub static ref CREATING_NEW_REQUEST: RwLock<Line<'static>> = RwLock::new(Line::default());
+    pub static ref DISPLAYING_COOKIES_KEYS: RwLock<Line<'static>> = RwLock::new(Line::default());
+    pub static ref CREATING_NEW_REQUEST_KEYS: RwLock<Line<'static>> = RwLock::new(Line::default());
 }
