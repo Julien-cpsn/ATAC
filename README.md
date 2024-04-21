@@ -59,7 +59,7 @@ atac -h
 
 Enjoy!
 
-### Install from AUR
+### Install from Arch
 
 You can use [pacman](https://wiki.archlinux.org/title/pacman) to install:
 
