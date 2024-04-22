@@ -149,18 +149,18 @@ impl AppState {
 
         match self {
             Normal => vec![
-                ExitApp(EventKeyBinding::new(vec![key!(ctrl-c), key_bindings.main_menu.quit], "Quit", Some("Quit"))),
+                ExitApp(EventKeyBinding::new(vec![key_bindings.main_menu.exit, key!(ctrl-c)], "Exit", Some("Exit"))),
 
                 Documentation(EventKeyBinding::new(vec![key_bindings.generic.display_help], "Display help", Some("Help"))),
 
                 MoveCollectionCursorUp(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_up], "Move up", Some("Up"))),
                 MoveCollectionCursorDown(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_down], "Move down", Some("Down"))),
 
-                SelectRequestOrExpandCollection(EventKeyBinding::new(vec![key_bindings.generic.navigation.select], "Select", None)),
+                SelectRequestOrExpandCollection(EventKeyBinding::new(vec![key_bindings.generic.navigation.select], "Select", Some("Select"))),
                 UnselectRequest(EventKeyBinding::new(vec![key_bindings.main_menu.unselect_request], "Unselect", None)),
                 ExpandCollection(EventKeyBinding::new(vec![key_bindings.main_menu.expand_collection], "Expand", None)),
 
-                CreateElement(EventKeyBinding::new(vec![key_bindings.generic.list_and_table_actions.create_element], "Create element", None)),
+                CreateElement(EventKeyBinding::new(vec![key_bindings.generic.list_and_table_actions.create_element], "Create element", Some("Create"))),
                 DeleteElement(EventKeyBinding::new(vec![key_bindings.generic.list_and_table_actions.delete_element], "Delete element", None)),
                 RenameElement(EventKeyBinding::new(vec![key_bindings.generic.list_and_table_actions.rename_element], "Rename element", None)),
 
@@ -209,8 +209,10 @@ impl AppState {
                 CreatingRequestDeleteCharForward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_forward], "Delete char forward", Some("Backspace"))),
                 CreatingRequestMoveCursorLeft(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_left], "Move cursor left", Some("Left"))),
                 CreatingRequestMoveCursorRight(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_right], "Move cursor right", Some("Right"))),
-                CreatingRequestSelectCollectionUp(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_up], "Collection selection up", Some("Up"))),
-                CreatingRequestSelectCollectionDown(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_down], "Collection selection down", Some("Down"))),
+
+                CreatingRequestSelectCollectionUp(EventKeyBinding::new(vec![key_bindings.generic.navigation.alt_move_cursor_up], "Collection selection up", Some("Up"))),
+                CreatingRequestSelectCollectionDown(EventKeyBinding::new(vec![key_bindings.generic.navigation.alt_move_cursor_down], "Collection selection down", Some("Down"))),
+
                 CreatingRequestCharInput(EventKeyBinding::new(vec![], "Char input", None)),
             ],
             DeletingCollection => vec![
@@ -269,7 +271,7 @@ impl AppState {
 
                     NextView(EventKeyBinding::new(vec![key_bindings.request_selected.next_view], "Next view", None)),
 
-                    SendRequest(EventKeyBinding::new(vec![key_bindings.request_selected.send_request, key_bindings.request_selected.secondary_send_request], "Send request", Some("Send"))),
+                    SendRequest(EventKeyBinding::new(vec![key_bindings.request_selected.send_request, key_bindings.request_selected.alt_send_request], "Send request", Some("Send"))),
 
                     NextEnvironment(EventKeyBinding::new(vec![key_bindings.main_menu.next_environment], "Next environment", None)),
                     DisplayCookies(EventKeyBinding::new(vec![key_bindings.main_menu.display_cookies], "Display cookies", None)),
@@ -281,7 +283,7 @@ impl AppState {
                 // Param tabs
                 if params_events_allowed {
                     base_param_tabs_events = vec![
-                        NextParamTab(EventKeyBinding::new(vec![key_bindings.request_selected.next_tab], "Next param tab", Some("Next tab"))),
+                        NextParamTab(EventKeyBinding::new(vec![key_bindings.request_selected.param_next_tab], "Next param tab", Some("Next tab"))),
 
                         ModifyRequestAuthMethod(EventKeyBinding::new(vec![key_bindings.request_selected.param_tabs.change_auth_method], "Modify auth method", None)),
                         ModifyRequestBodyContentType(EventKeyBinding::new(vec![key_bindings.request_selected.param_tabs.change_body_content_type], "Modify body content-type", None)),
@@ -336,7 +338,7 @@ impl AppState {
                 }
                 else {
                     base_events.push(
-                        NextResultTab(EventKeyBinding::new(vec![key_bindings.request_selected.next_tab], "Next result tab", Some("Next tab"))),
+                        NextResultTab(EventKeyBinding::new(vec![key_bindings.request_selected.param_next_tab], "Next result tab", Some("Next tab"))),
                     );
                 }
 
@@ -350,7 +352,7 @@ impl AppState {
 
                     if params_events_allowed {
                         base_events.push(
-                            NextResultTab(EventKeyBinding::new(vec![key_bindings.request_selected.result_tabs.secondary_next_tab], "Next result tab", None)),
+                            NextResultTab(EventKeyBinding::new(vec![key_bindings.request_selected.result_tabs.result_next_tab], "Next result tab", None)),
                         )
                     }
                 }

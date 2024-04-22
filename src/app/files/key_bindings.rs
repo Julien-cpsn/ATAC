@@ -7,13 +7,11 @@ use std::sync::RwLock;
 use crokey::{key, KeyCombination};
 use lazy_static::lazy_static;
 use nestify::nest;
-use ratatui::style::Stylize;
-use ratatui::text::{Line, Span};
+use ratatui::text::Span;
 use serde::Deserialize;
 
 use crate::app::app::App;
 use crate::panic_error;
-use crate::utils::colors::DARK_BLACK;
 
 #[derive(Default, Copy, Clone, Deserialize)]
 pub struct KeyBindingsConfig {
@@ -25,7 +23,7 @@ nest! {
     pub struct KeyBindings {
         pub main_menu: #[derive(Copy, Clone, Deserialize)] pub struct MainMenu {
             /// ctrl-c is implemented by default
-            pub quit: KeyCombination,
+            pub exit: KeyCombination,
 
             pub expand_collection: KeyCombination,
             pub unselect_request: KeyCombination,
@@ -67,6 +65,11 @@ nest! {
                 pub move_cursor_left: KeyCombination,
                 pub move_cursor_right: KeyCombination,
 
+                pub alt_move_cursor_up: KeyCombination,
+                pub alt_move_cursor_down: KeyCombination,
+                pub alt_move_cursor_left: KeyCombination,
+                pub alt_move_cursor_right: KeyCombination,
+                
                 pub go_back: KeyCombination,
                 pub select: KeyCombination,
             },
@@ -83,7 +86,7 @@ nest! {
         },
 
         pub request_selected: #[derive(Copy, Clone, Deserialize)] pub struct RequestSelected {
-            pub next_tab: KeyCombination,
+            pub param_next_tab: KeyCombination,
             pub change_url: KeyCombination,
             pub change_method: KeyCombination,
             pub request_settings: KeyCombination,
@@ -91,7 +94,7 @@ nest! {
             pub next_view: KeyCombination,
 
             pub send_request: KeyCombination,
-            pub secondary_send_request: KeyCombination,
+            pub alt_send_request: KeyCombination,
 
             pub param_tabs: #[derive(Copy, Clone, Deserialize)] pub struct ParamTabs {
                 pub change_auth_method: KeyCombination,
@@ -104,11 +107,15 @@ nest! {
                 pub scroll_left: KeyCombination,
                 pub scroll_right: KeyCombination,
 
-                /// Will use next_tab depending on the selected view
-                pub secondary_next_tab: KeyCombination,
+                /// Will use param_next_tab depending on the selected view
+                pub result_next_tab: KeyCombination,
             }
         },
     }
+}
+
+lazy_static! {
+    pub static ref KEY_BINDINGS: RwLock<KeyBindings> = RwLock::new(KeyBindings::default());
 }
 
 #[derive(Copy, Clone, PartialEq, Deserialize)]
@@ -142,7 +149,7 @@ impl Default for KeyBindings {
     fn default() -> Self {
         KeyBindings {
             main_menu: MainMenu {
-                quit: key!(q),
+                exit: key!(q),
 
                 expand_collection: key!(right),
                 unselect_request: key!(left),
@@ -178,6 +185,11 @@ impl Default for KeyBindings {
                     move_cursor_left: key!(left),
                     move_cursor_right: key!(right),
 
+                    alt_move_cursor_up: key!(Up),
+                    alt_move_cursor_down: key!(Down),
+                    alt_move_cursor_left: key!(Left),
+                    alt_move_cursor_right: key!(Right),
+                    
                     go_back: key!(esc),
                     select: key!(enter),
                 },
@@ -191,7 +203,7 @@ impl Default for KeyBindings {
             },
 
             request_selected: RequestSelected {
-                next_tab: key!(tab),
+                param_next_tab: key!(tab),
 
                 change_url: key!(u),
                 change_method: key!(m),
@@ -203,7 +215,7 @@ impl Default for KeyBindings {
                 // Used to be ctrl + enter, but it doesn't register right on many platforms
                 // https://github.com/crossterm-rs/crossterm/issues/685
                 send_request: key!(space),
-                secondary_send_request: key!(ctrl-enter),
+                alt_send_request: key!(ctrl-enter),
 
                 param_tabs: ParamTabs {
                     change_auth_method: key!(ctrl-a),
@@ -215,7 +227,7 @@ impl Default for KeyBindings {
                     scroll_left: key!(ctrl-left),
                     scroll_right: key!(ctrl-right),
 
-                    secondary_next_tab: key!(shift-backtab),
+                    result_next_tab: key!(shift-backtab),
                 },
             }
         }
@@ -291,244 +303,4 @@ pub fn unique_key_and_help(help: Span<'static>, key: Span<'static>) -> Vec<Span<
     else {
         vec![help, Span::raw(" "), key]
     }
-}
-
-pub fn update_key_helpers() {
-    let space = Span::raw(" ");
-
-    let exit = "Exit".bg(*DARK_BLACK);
-
-    let main_menu = "Main menu".bg(*DARK_BLACK);
-    let send = "Send".bg(*DARK_BLACK);
-    let next_tab = "Next tab".bg(*DARK_BLACK);
-    let url = "Url".bg(*DARK_BLACK);
-    let method = "Method".bg(*DARK_BLACK);
-    let help = "Help".bg(*DARK_BLACK);
-
-    let quit = "Quit".bg(*DARK_BLACK);
-    let save = "Save".bg(*DARK_BLACK);
-    let indent = "Indent".bg(*DARK_BLACK);
-
-    let cancel = "Cancel".bg(*DARK_BLACK);
-    let validate = "Validate".bg(*DARK_BLACK);
-
-    let up = "Up".bg(*DARK_BLACK);
-    let down = "Down".bg(*DARK_BLACK);
-    let left = "Left".bg(*DARK_BLACK);
-    let right = "Right".bg(*DARK_BLACK);
-
-    let copy = "Copy".bg(*DARK_BLACK);
-    let paste = "Paste".bg(*DARK_BLACK);
-
-    let delete = "Delete".bg(*DARK_BLACK);
-    
-    let key_bindings = KEY_BINDINGS.read().unwrap();
-
-    // Exit Ctrl-c q Help h
-    *MAIN_MENU_KEYS.write().unwrap() = Line::from(vec![
-        exit,
-        " Ctrl-c ".dark_gray(),
-        key_bindings.main_menu.quit.to_string().dark_gray(),
-        space.clone(),
-        help.clone(),
-        space.clone(),
-        key_bindings.generic.display_help.to_string().dark_gray()
-    ]);
-
-    // Cancel Esc Validate Enter Left Right Copy ctrl-c Paste ctrl-v
-    *TEXT_INPUT_KEYS.write().unwrap() = Line::from(vec![
-        vec![
-            cancel.clone(),
-            space.clone(),
-            key_bindings.generic.text_inputs.text_input.cancel.to_string().dark_gray(),
-            space.clone(),
-            validate.clone(),
-            space.clone(),
-            key_bindings.generic.text_inputs.text_input.validate.to_string().dark_gray(),
-            space.clone()
-        ],
-        unique_key_and_help(left.clone(), key_bindings.generic.text_inputs.text_input.move_cursor_left.to_string().dark_gray()),
-        vec![space.clone()],
-        unique_key_and_help(right.clone(), key_bindings.generic.text_inputs.text_input.move_cursor_right.to_string().dark_gray()),
-        vec![
-            space.clone(),
-            copy.clone(),
-            space.clone(),
-            "ctrl-c".dark_gray(),
-            space.clone(),
-            paste.clone(),
-            space.clone(),
-            "ctrl-v".dark_gray(),
-       ]
-    ].concat());
-
-    *TEXT_AREA_INPUT_KEYS.write().unwrap() = match key_bindings.generic.text_inputs.text_area_mode {
-        TextAreaMode::VimEmulation => Line::from(vec![
-            quit.clone(),
-            space.clone(),
-            "q".dark_gray(),
-            space.clone(),
-            save.clone(),
-            space.clone(),
-            "Ctrl-s".dark_gray()
-        ]),
-        // Quit Esc Save Ctrl-s Indent Tab Up Down Left Right Copy Ctrl-c Paste Ctrl-v
-        TextAreaMode::Custom(custom_text_area) => Line::from(vec![
-            vec![
-                quit.clone(),
-                space.clone(),
-                custom_text_area.quit_without_saving.to_string().dark_gray(),
-                space.clone(),
-                save.clone(),
-                space.clone(),
-                custom_text_area.save_and_quit.to_string().dark_gray(),
-                space.clone(),
-                indent.clone(),
-                space.clone(),
-                custom_text_area.indent.to_string().dark_gray(),
-                space.clone(),
-            ],
-            unique_key_and_help(up.clone(), custom_text_area.move_cursor_up.to_string().dark_gray()),
-            vec![space.clone()],
-            unique_key_and_help(down.clone(), custom_text_area.move_cursor_down.to_string().dark_gray()),
-            vec![space.clone()],
-            unique_key_and_help(left.clone(), custom_text_area.move_cursor_left.to_string().dark_gray()),
-            vec![space.clone()],
-            unique_key_and_help(right.clone(), custom_text_area.move_cursor_right.to_string().dark_gray()),
-            vec![
-                space.clone(),
-                copy,
-                space.clone(),
-                custom_text_area.copy.to_string().dark_gray(),
-                space.clone(),
-                paste,
-                space.clone(),
-                custom_text_area.paste.to_string().dark_gray(),
-            ]
-        ].concat())
-    };
-
-    // Cancel Esc Validate Enter Up Down Left Right
-    *NAVIGATION_KEYS.write().unwrap() = Line::from(vec![
-        vec![
-            cancel.clone(),
-            space.clone(),
-            key_bindings.generic.navigation.go_back.to_string().dark_gray(),
-            space.clone(),
-            validate.clone(),
-            space.clone(),
-            key_bindings.generic.navigation.select.to_string().dark_gray(),
-            space.clone(),
-        ],
-        unique_key_and_help(up.clone(), key_bindings.generic.navigation.move_cursor_up.to_string().dark_gray()),
-        vec![space.clone()],
-        unique_key_and_help(down.clone(), key_bindings.generic.navigation.move_cursor_down.to_string().dark_gray()),
-        vec![space.clone()],
-        unique_key_and_help(left.clone(), key_bindings.generic.navigation.move_cursor_left.to_string().dark_gray()),
-        vec![space.clone()],
-        unique_key_and_help(right.clone(), key_bindings.generic.navigation.move_cursor_right.to_string().dark_gray()),
-    ].concat());
-
-    // Cancel Esc Validate Enter Left Right
-    *VALIDATION_KEYS.write().unwrap() = Line::from(vec![
-        vec![
-            cancel.clone(),
-            space.clone(),
-            key_bindings.generic.navigation.go_back.to_string().dark_gray(),
-            space.clone(),
-            validate,
-            space.clone(),
-            key_bindings.generic.navigation.select.to_string().dark_gray(),
-            space.clone(),
-        ],
-        unique_key_and_help(left.clone(), key_bindings.generic.navigation.move_cursor_left.to_string().dark_gray()),
-        vec![space.clone()],
-        unique_key_and_help(right.clone(), key_bindings.generic.navigation.move_cursor_right.to_string().dark_gray()),
-    ].concat());
-
-    *DISPLAYING_HELP_KEYS.write().unwrap() = Line::from(vec![
-        vec![
-            cancel.clone(),
-            space.clone(),
-            key_bindings.generic.navigation.go_back.to_string().dark_gray(),
-            space.clone(),
-        ],
-        unique_key_and_help(left.clone(), key_bindings.generic.navigation.move_cursor_left.to_string().dark_gray()),
-        vec![space.clone()],
-        unique_key_and_help(right.clone(), key_bindings.generic.navigation.move_cursor_right.to_string().dark_gray()),
-    ].concat());
-
-    // Main menu Esc Send Space Next tab Tab Shift-BackTab Url u Method m Help h
-    *REQUEST_SELECTED_KEYS.write().unwrap() = Line::from(vec![
-        main_menu,
-        space.clone(),
-        key_bindings.generic.navigation.go_back.to_string().dark_gray(),
-        space.clone(),
-        send,
-        space.clone(),
-        key_bindings.request_selected.send_request.to_string().dark_gray(),
-        space.clone(),
-        next_tab,
-        space.clone(),
-        key_bindings.request_selected.next_tab.to_string().dark_gray(),
-        space.clone(),
-        key_bindings.request_selected.result_tabs.secondary_next_tab.to_string().dark_gray(),
-        space.clone(),
-        url,
-        space.clone(),
-        key_bindings.request_selected.change_url.to_string().dark_gray(),
-        space.clone(),
-        method,
-        space.clone(),
-        key_bindings.request_selected.change_method.to_string().dark_gray(),
-        space.clone(),
-        help,
-        space.clone(),
-        key_bindings.generic.display_help.to_string().dark_gray(),
-        space.clone(),
-    ]);
-
-    // Cancel Esc Enter Up Down Left Right Delete d
-    *DISPLAYING_COOKIES_KEYS.write().unwrap() = Line::from(vec![
-        vec![
-            cancel.clone(),
-            space.clone(),
-            key_bindings.generic.navigation.go_back.to_string().dark_gray(),
-            space.clone(),
-        ],
-        unique_key_and_help(up.clone(), key_bindings.generic.navigation.move_cursor_up.to_string().dark_gray()),
-        vec![space.clone()],
-        unique_key_and_help(down.clone(), key_bindings.generic.navigation.move_cursor_down.to_string().dark_gray()),
-        vec![space.clone()],
-        unique_key_and_help(left.clone(), key_bindings.generic.navigation.move_cursor_left.to_string().dark_gray()),
-        vec![space.clone()],
-        unique_key_and_help(right.clone(), key_bindings.generic.navigation.move_cursor_right.to_string().dark_gray()),
-        vec![
-            space.clone(),
-            delete,
-            space.clone(),
-            key_bindings.generic.list_and_table_actions.delete_element.to_string().dark_gray()
-        ],
-    ].concat());
-
-    *CREATING_NEW_REQUEST_KEYS.write().unwrap() = Line::from(vec![
-        TEXT_INPUT_KEYS.read().unwrap().spans.clone(),
-        vec![space.clone()],
-        unique_key_and_help(up.clone(), key_bindings.generic.navigation.move_cursor_up.to_string().dark_gray()),
-        vec![space.clone()],
-        unique_key_and_help(down.clone(), key_bindings.generic.navigation.move_cursor_down.to_string().dark_gray()),
-    ].concat());
-}
-
-lazy_static! {
-    pub static ref KEY_BINDINGS: RwLock<KeyBindings> = RwLock::new(KeyBindings::default());
-    pub static ref MAIN_MENU_KEYS: RwLock<Line<'static>> = RwLock::new(Line::default());
-    pub static ref TEXT_INPUT_KEYS: RwLock<Line<'static>> = RwLock::new(Line::default());
-    pub static ref TEXT_AREA_INPUT_KEYS: RwLock<Line<'static>> = RwLock::new(Line::default());
-    pub static ref NAVIGATION_KEYS: RwLock<Line<'static>> = RwLock::new(Line::default());
-    pub static ref VALIDATION_KEYS: RwLock<Line<'static>> = RwLock::new(Line::default());
-    pub static ref DISPLAYING_HELP_KEYS: RwLock<Line<'static>> = RwLock::new(Line::default());
-    pub static ref REQUEST_SELECTED_KEYS: RwLock<Line<'static>> = RwLock::new(Line::default());
-    pub static ref DISPLAYING_COOKIES_KEYS: RwLock<Line<'static>> = RwLock::new(Line::default());
-    pub static ref CREATING_NEW_REQUEST_KEYS: RwLock<Line<'static>> = RwLock::new(Line::default());
 }

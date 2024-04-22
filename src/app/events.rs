@@ -354,8 +354,8 @@ impl App<'_> {
                 SelectElementToCreate(_) => self.new_element(),
 
                 CreateNewCollection(_) => self.new_collection(),
-                CreatingCollectionDeleteCharBackward(_) => self.new_collection_input.delete_char_backward(),
-                CreatingCollectionDeleteCharForward(_) => self.new_collection_input.delete_char_forward(),
+                CreatingCollectionDeleteCharBackward(_) => self.new_collection_input.delete_char_forward(),
+                CreatingCollectionDeleteCharForward(_) => self.new_collection_input.delete_char_backward(),
                 CreatingCollectionMoveCursorLeft(_) => self.new_collection_input.move_cursor_left(),
                 CreatingCollectionMoveCursorRight(_) => self.new_collection_input.move_cursor_right(),
                 CreatingCollectionCharInput(_) => match key {
@@ -364,8 +364,8 @@ impl App<'_> {
                 },
 
                 CreateNewRequest(_) => self.new_request(),
-                CreatingRequestDeleteCharBackward(_) => self.new_request_popup.text_input.delete_char_backward(),
-                CreatingRequestDeleteCharForward(_) => self.new_request_popup.text_input.delete_char_forward(),
+                CreatingRequestDeleteCharBackward(_) => self.new_request_popup.text_input.delete_char_forward(),
+                CreatingRequestDeleteCharForward(_) => self.new_request_popup.text_input.delete_char_backward(),
                 CreatingRequestMoveCursorLeft(_) => self.new_request_popup.text_input.move_cursor_left(),
                 CreatingRequestMoveCursorRight(_) => self.new_request_popup.text_input.move_cursor_right(),
                 CreatingRequestSelectCollectionUp(_) => self.new_request_popup.previous_collection(),
@@ -390,8 +390,8 @@ impl App<'_> {
                 },
 
                 RenameCollection(_) => self.rename_collection(),
-                RenamingCollectionDeleteCharBackward(_) => self.rename_collection_input.delete_char_backward(),
-                RenamingCollectionDeleteCharForward(_) => self.rename_collection_input.delete_char_forward(),
+                RenamingCollectionDeleteCharBackward(_) => self.rename_collection_input.delete_char_forward(),
+                RenamingCollectionDeleteCharForward(_) => self.rename_collection_input.delete_char_backward(),
                 RenamingCollectionMoveCursorLeft(_) => self.rename_collection_input.move_cursor_left(),
                 RenamingCollectionMoveCursorRight(_) => self.rename_collection_input.move_cursor_right(),
                 RenamingCollectionCharInput(_) => match key {
@@ -400,8 +400,8 @@ impl App<'_> {
                 },
                 
                 RenameRequest(_) => self.rename_request(),
-                RenamingRequestDeleteCharBackward(_) => self.rename_request_input.delete_char_backward(),
-                RenamingRequestDeleteCharForward(_) => self.rename_request_input.delete_char_forward(),
+                RenamingRequestDeleteCharBackward(_) => self.rename_request_input.delete_char_forward(),
+                RenamingRequestDeleteCharForward(_) => self.rename_request_input.delete_char_backward(),
                 RenamingRequestMoveCursorLeft(_) => self.rename_request_input.move_cursor_left(),
                 RenamingRequestMoveCursorRight(_) => self.rename_request_input.move_cursor_right(),
                 RenamingRequestCharInput(_) => match key {
@@ -485,8 +485,8 @@ impl App<'_> {
                 /* Request text inputs */
 
                 ModifyRequestUrl(_) => self.modify_request_url(),
-                EditingRequestUrlDeleteCharBackward(_) => self.url_text_input.delete_char_backward(),
-                EditingRequestUrlDeleteCharForward(_) => self.url_text_input.delete_char_forward(),
+                EditingRequestUrlDeleteCharBackward(_) => self.url_text_input.delete_char_forward(),
+                EditingRequestUrlDeleteCharForward(_) => self.url_text_input.delete_char_backward(),
                 EditingRequestUrlMoveCursorLeft(_) => self.url_text_input.move_cursor_left(),
                 EditingRequestUrlMoveCursorRight(_) => self.url_text_input.move_cursor_right(),
                 EditingRequestUrlCharInput(_) => match key {
@@ -495,8 +495,8 @@ impl App<'_> {
                 },
 
                 ModifyRequestQueryParam(_) => self.modify_request_query_param(),
-                EditingRequestQueryParamDeleteCharBackward(_) => self.query_params_table.selection_text_input.delete_char_backward(),
-                EditingRequestQueryParamDeleteCharForward(_) => self.query_params_table.selection_text_input.delete_char_forward(),
+                EditingRequestQueryParamDeleteCharBackward(_) => self.query_params_table.selection_text_input.delete_char_forward(),
+                EditingRequestQueryParamDeleteCharForward(_) => self.query_params_table.selection_text_input.delete_char_backward(),
                 EditingRequestQueryParamMoveCursorLeft(_) => self.query_params_table.selection_text_input.move_cursor_left(),
                 EditingRequestQueryParamMoveCursorRight(_) => self.query_params_table.selection_text_input.move_cursor_right(),
                 EditingRequestQueryParamCharInput(_) => match key {
@@ -509,8 +509,8 @@ impl App<'_> {
                 // self.auth_text_input_selection.usable
 
                 ModifyRequestAuthUsername(_) => self.modify_request_auth_basic_username(),
-                EditingRequestAuthUsernameDeleteCharBackward(_) => self.auth_basic_username_text_input.delete_char_backward(),
-                EditingRequestAuthUsernameDeleteCharForward(_) => self.auth_basic_username_text_input.delete_char_forward(),
+                EditingRequestAuthUsernameDeleteCharBackward(_) => self.auth_basic_username_text_input.delete_char_forward(),
+                EditingRequestAuthUsernameDeleteCharForward(_) => self.auth_basic_username_text_input.delete_char_backward(),
                 EditingRequestAuthUsernameMoveCursorLeft(_) => self.auth_basic_username_text_input.move_cursor_left(),
                 EditingRequestAuthUsernameMoveCursorRight(_) => self.auth_basic_username_text_input.move_cursor_right(),
                 EditingRequestAuthUsernameCharInput(_) => match key {
@@ -519,8 +519,8 @@ impl App<'_> {
                 },
                 
                 ModifyRequestAuthPassword(_) => self.modify_request_auth_basic_password(),
-                EditingRequestAuthPasswordDeleteCharBackward(_) => self.auth_basic_password_text_input.delete_char_backward(),
-                EditingRequestAuthPasswordDeleteCharForward(_) => self.auth_basic_password_text_input.delete_char_forward(),
+                EditingRequestAuthPasswordDeleteCharBackward(_) => self.auth_basic_password_text_input.delete_char_forward(),
+                EditingRequestAuthPasswordDeleteCharForward(_) => self.auth_basic_password_text_input.delete_char_backward(),
                 EditingRequestAuthPasswordMoveCursorLeft(_) => self.auth_basic_password_text_input.move_cursor_left(),
                 EditingRequestAuthPasswordMoveCursorRight(_) => self.auth_basic_password_text_input.move_cursor_right(),
                 EditingRequestAuthPasswordCharInput(_) => match key {
@@ -529,8 +529,8 @@ impl App<'_> {
                 },
                 
                 ModifyRequestAuthBearerToken(_) => self.modify_request_auth_bearer_token(),
-                EditingRequestAuthBearerTokenDeleteCharBackward(_) => self.auth_bearer_token_text_input.delete_char_backward(),
-                EditingRequestAuthBearerTokenDeleteCharForward(_) => self.auth_bearer_token_text_input.delete_char_forward(),
+                EditingRequestAuthBearerTokenDeleteCharBackward(_) => self.auth_bearer_token_text_input.delete_char_forward(),
+                EditingRequestAuthBearerTokenDeleteCharForward(_) => self.auth_bearer_token_text_input.delete_char_backward(),
                 EditingRequestAuthBearerTokenMoveCursorLeft(_) => self.auth_bearer_token_text_input.move_cursor_left(),
                 EditingRequestAuthBearerTokenMoveCursorRight(_) => self.auth_bearer_token_text_input.move_cursor_right(),
                 EditingRequestAuthBearerTokenCharInput(_) => match key {
@@ -541,8 +541,8 @@ impl App<'_> {
                 /* Header */
 
                 ModifyRequestHeader(_) => self.modify_request_header(),
-                EditingRequestHeaderDeleteCharBackward(_) => self.headers_table.selection_text_input.delete_char_backward(),
-                EditingRequestHeaderDeleteCharForward(_) => self.headers_table.selection_text_input.delete_char_forward(),
+                EditingRequestHeaderDeleteCharBackward(_) => self.headers_table.selection_text_input.delete_char_forward(),
+                EditingRequestHeaderDeleteCharForward(_) => self.headers_table.selection_text_input.delete_char_backward(),
                 EditingRequestHeaderMoveCursorLeft(_) => self.headers_table.selection_text_input.move_cursor_left(),
                 EditingRequestHeaderMoveCursorRight(_) => self.headers_table.selection_text_input.move_cursor_right(),
                 EditingRequestHeaderCharInput(_) => match key {
@@ -553,8 +553,8 @@ impl App<'_> {
                 /* Body */
 
                 ModifyRequestBodyTable(_) => self.modify_request_form_data(),
-                EditingRequestBodyTableDeleteCharBackward(_) => self.body_form_table.selection_text_input.delete_char_backward(),
-                EditingRequestBodyTableDeleteCharForward(_) => self.body_form_table.selection_text_input.delete_char_forward(),
+                EditingRequestBodyTableDeleteCharBackward(_) => self.body_form_table.selection_text_input.delete_char_forward(),
+                EditingRequestBodyTableDeleteCharForward(_) => self.body_form_table.selection_text_input.delete_char_backward(),
                 EditingRequestBodyTableMoveCursorLeft(_) => self.body_form_table.selection_text_input.move_cursor_left(),
                 EditingRequestBodyTableMoveCursorRight(_) => self.body_form_table.selection_text_input.move_cursor_right(),
                 EditingRequestBodyTableCharInput(_) => match key {
@@ -563,8 +563,8 @@ impl App<'_> {
                 },
                 
                 ModifyRequestBodyFile(_) => self.modify_request_body(),
-                EditingRequestBodyFileDeleteCharBackward(_) => self.body_file_text_input.delete_char_backward(),
-                EditingRequestBodyFileDeleteCharForward(_) => self.body_file_text_input.delete_char_forward(),
+                EditingRequestBodyFileDeleteCharBackward(_) => self.body_file_text_input.delete_char_forward(),
+                EditingRequestBodyFileDeleteCharForward(_) => self.body_file_text_input.delete_char_backward(),
                 EditingRequestBodyFileMoveCursorLeft(_) => self.body_file_text_input.move_cursor_left(),
                 EditingRequestBodyFileMoveCursorRight(_) => self.body_file_text_input.move_cursor_right(),
                 EditingRequestBodyFileCharInput(_) => match key {

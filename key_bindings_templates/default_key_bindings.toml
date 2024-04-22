@@ -1,7 +1,7 @@
 # Please avoid using Ctrl-v, it will paste your clipboard and trigger many unwanted event
 
 [keybindings.main_menu]
-quit = "q" # ctrl-c is implemented by default
+exit = "q" # ctrl-c is implemented by default
 
 unselect_request = "Left"
 expand_collection = "Right"
@@ -56,6 +56,13 @@ move_cursor_down = "Down"
 move_cursor_left = "Left"
 move_cursor_right = "Right"
 
+# Used when the base keys are not available (Selecting collection while creating a new request)
+# Might not happen when using the default config
+alt_move_cursor_up = "Up"
+alt_move_cursor_down = "Down"
+alt_move_cursor_left = "Left"
+alt_move_cursor_right = "Right"
+
 go_back = "Esc"
 select = "Enter"
 
@@ -68,7 +75,7 @@ rename_element = "r" # Only used in the collections list (main menu)
 toggle_element = "t" # Only used in tables (Query params, headers, cookies)
 
 [keybindings.request_selected]
-next_tab = "Tab"
+param_next_tab = "Tab"
 
 change_url = "u"
 change_method = "m"
@@ -77,7 +84,7 @@ request_settings = "s"
 next_view = "v"
 
 send_request = "Space"
-secondary_send_request = "Ctrl-Enter"
+alt_send_request = "Ctrl-Enter"
 
 [keybindings.request_selected.param_tabs]
 change_auth_method = "Ctrl-a"
@@ -89,4 +96,4 @@ scroll_down = "Ctrl-Down"
 scroll_left = "Ctrl-Left"
 scroll_right = "Ctrl-Right"
 
-secondary_next_tab = "Shift-BackTab" # Will use next_tab depending on the selected view
+result_next_tab = "Shift-BackTab" # Will use param_next_tab depending on the selected view
