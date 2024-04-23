@@ -66,7 +66,7 @@ impl App<'_> {
         self.result_horizontal_scrollbar.set_scroll(horizontal_max);
     }
     
-    fn get_max_str_len(lines: Lines) -> usize {
+    pub fn get_max_str_len(lines: Lines) -> usize {
         let mut max_tmp = 0;
 
         for line in lines {

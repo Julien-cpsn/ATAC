@@ -14,3 +14,4 @@ pub mod cookie_table;
 pub mod choice_popup;
 pub mod vim_emulation;
 pub mod colors;
+pub mod display_popup;

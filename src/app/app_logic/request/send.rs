@@ -201,7 +201,7 @@ impl App<'_> {
 
             let local_selected_request = self.get_selected_request_as_local();
             let local_last_highlighted = Arc::clone(&self.syntax_highlighting.last_highlighted);
-            
+
             /* SEND REQUEST */
 
             task::spawn(async move {

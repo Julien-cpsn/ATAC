@@ -196,4 +196,13 @@ impl App<'_> {
 
         self.state = AppState::EditingRequestSettings;
     }
+
+    pub fn choose_request_export_format_state(&mut self) {
+        self.export_request.selection = 0;
+        self.state = AppState::ChoosingRequestExportFormat;
+    }
+
+    pub fn display_request_export_state(&mut self) {
+        self.state = AppState::DisplayingRequestExport;
+    }
 }

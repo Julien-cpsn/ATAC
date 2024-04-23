@@ -147,7 +147,22 @@ pub enum AppEvent {
     ScrollResultLeft(EventKeyBinding),
     ScrollResultRight(EventKeyBinding),
 
+    /* Others */
+
     CopyResponsePart(EventKeyBinding),
+
+    /* Request export */
+
+    ExportRequest(EventKeyBinding),
+    RequestExportFormatMoveCursorLeft(EventKeyBinding),
+    RequestExportFormatMoveCursorRight(EventKeyBinding),
+    SelectRequestExportFormat(EventKeyBinding),
+
+    ScrollRequestExportUp(EventKeyBinding),
+    ScrollRequestExportDown(EventKeyBinding),
+    ScrollRequestExportLeft(EventKeyBinding),
+    ScrollRequestExportRight(EventKeyBinding),
+    CopyRequestExport(EventKeyBinding),
 
     /* Request Text inputs */
 
@@ -484,7 +499,25 @@ impl App<'_> {
                 ScrollResultLeft(_) => self.result_horizontal_scrollbar.page_up(),
                 ScrollResultRight(_) => self.result_horizontal_scrollbar.page_down(),
 
+                /* Others */
+
                 CopyResponsePart(_) => self.copy_response_body_content_to_clipboard(),
+
+                /* Request Export */
+
+                ExportRequest(_) => self.choose_request_export_format_state(),
+
+                RequestExportFormatMoveCursorLeft(_) => self.export_request.previous(),
+                RequestExportFormatMoveCursorRight(_) => self.export_request.next(),
+
+                SelectRequestExportFormat(_) => self.export_request(),
+
+                ScrollRequestExportUp(_) => self.display_request_export.vertical_scrollbar.page_up(),
+                ScrollRequestExportDown(_) => self.display_request_export.vertical_scrollbar.page_down(),
+                ScrollRequestExportLeft(_) => self.display_request_export.horizontal_scrollbar.page_up(),
+                ScrollRequestExportRight(_) => self.display_request_export.horizontal_scrollbar.page_down(),
+
+                CopyRequestExport(_) => self.copy_request_export_to_clipboard(),
 
                 /* Request text inputs */
 
@@ -732,6 +765,15 @@ impl AppEvent {
             ScrollResultLeft(event_key_bindings) |
             ScrollResultRight(event_key_bindings) |
             CopyResponsePart(event_key_bindings) |
+            ExportRequest(event_key_bindings) |
+            RequestExportFormatMoveCursorLeft(event_key_bindings) |
+            RequestExportFormatMoveCursorRight(event_key_bindings) |
+            SelectRequestExportFormat(event_key_bindings) |
+            ScrollRequestExportUp(event_key_bindings) |
+            ScrollRequestExportDown(event_key_bindings) |
+            ScrollRequestExportLeft(event_key_bindings) |
+            ScrollRequestExportRight(event_key_bindings) |
+            CopyRequestExport(event_key_bindings) |
             ModifyRequestUrl(event_key_bindings) |
             EditingRequestUrlDeleteCharBackward(event_key_bindings) |
             EditingRequestUrlDeleteCharForward(event_key_bindings) |
