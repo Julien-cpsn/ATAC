@@ -348,6 +348,8 @@ impl AppState {
                         ScrollResultDown(EventKeyBinding::new(vec![key_bindings.request_selected.result_tabs.scroll_down], "Scroll result down", None)),
                         ScrollResultLeft(EventKeyBinding::new(vec![key_bindings.request_selected.result_tabs.scroll_left], "Scroll result left", None)),
                         ScrollResultRight(EventKeyBinding::new(vec![key_bindings.request_selected.result_tabs.scroll_right], "Scroll result right", None)),
+                    
+                        CopyResponsePart(EventKeyBinding::new(vec![key_bindings.request_selected.result_tabs.yank_response_part], "Yank response part", None)),
                     ];
 
                     if params_events_allowed {
