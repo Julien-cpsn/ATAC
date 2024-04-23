@@ -13,7 +13,8 @@ ATAC ⚔📩
 - [How to install](#how-to-install)
   * [Install with cargo](#install-with-cargo)
   * [Install with Homebrew](#install-with-homebrew)
-  * [Install from AUR](#install-from-aur)
+  * [Install from Arch](#install-from-arch)
+  * [Install from Fedora copr](#install-from-fedora-copr)
   * [Binary](#binary)
   * [Compile by yourself](#compile-by-yourself)
 - [Features](#features)
@@ -62,14 +63,13 @@ cargo install atac
 </a>
 
 
-### Install from AUR
+### Install from Arch
 
-You can use your favorite [AUR helper](https://wiki.archlinux.org/title/AUR_helpers) to install. For example,
+You can use [pacman](https://wiki.archlinux.org/title/pacman) to install:
 
-```bash
-paru -S atac
+```shell
+pacman -S atac
 ```
-
 
 ### Install with Homebrew
 
@@ -78,6 +78,19 @@ Simply use:
 ```bash
 brew tap julien-cpsn/atac
 brew install atac
+```
+
+<a href="https://copr.fedorainfracloud.org/coprs/joxcat/atac/">
+  <img alt="Fedora copr Release" src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fcopr.fedorainfracloud.org%2Fapi_3%2Fpackage%3Fownername%3Djoxcat%26projectname%3Datac%26packagename%3Datac%26with_latest_build%3DTrue&query=%24.builds.latest.source_package.version&style=flat&logo=fedora&logoColor=white&label=Fedora%20copr&color=limegreen" align="right">
+</a>
+
+### Install from Fedora copr
+
+Simply use:
+
+```bash
+dnf enable joxcat/atac
+dnf install atac
 ```
 
 <a href="https://github.com/Julien-cpsn/ATAC/releases">
@@ -277,6 +290,7 @@ The binary file size goes from ~4.5 MB to ~7 MB depending on the platform. I try
 
 - Cargo, Brew - [@julien-cpsn](https://github.com/julien-cpsn)
 - Arch - [@orhun](https://github.com/orhun)
+- Fedora copr - [@joxcat](https://github.com/joxcat)
 
 ## Star history
 
