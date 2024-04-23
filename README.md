@@ -22,6 +22,8 @@ ATAC ⚔📩
   * [TODO v1.0.0](#todo-v100)
   * [TODO v2.0.0](#todo-v200)
 - [Documentation](#documentation)
+- [Others](#others)
+  * [NeoVim integration](#neovim-integration)
 - [Technical precisions](#technical-precisions)
   * [Tested on](#tested-on)
   * [Dependencies](#dependencies)
@@ -229,6 +231,13 @@ cargo run -- -h
 
 > [!NOTE]
 > Documentation will soon be published in the wiki section
+
+## Others
+
+### NeoVim integration
+
+Thanks to @NachoNievaG you can have an ATAC floating window inside your nvim
+https://github.com/NachoNievaG/atac.nvim
 
 ## Technical precisions
 
