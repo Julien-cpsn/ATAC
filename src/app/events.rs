@@ -147,6 +147,8 @@ pub enum AppEvent {
     ScrollResultLeft(EventKeyBinding),
     ScrollResultRight(EventKeyBinding),
 
+    CopyResponsePart(EventKeyBinding),
+
     /* Request Text inputs */
 
     ModifyRequestUrl(EventKeyBinding),
@@ -482,6 +484,8 @@ impl App<'_> {
                 ScrollResultLeft(_) => self.result_horizontal_scrollbar.page_up(),
                 ScrollResultRight(_) => self.result_horizontal_scrollbar.page_down(),
 
+                CopyResponsePart(_) => self.copy_response_body_content_to_clipboard(),
+
                 /* Request text inputs */
 
                 ModifyRequestUrl(_) => self.modify_request_url(),
@@ -727,6 +731,7 @@ impl AppEvent {
             ScrollResultDown(event_key_bindings) |
             ScrollResultLeft(event_key_bindings) |
             ScrollResultRight(event_key_bindings) |
+            CopyResponsePart(event_key_bindings) |
             ModifyRequestUrl(event_key_bindings) |
             EditingRequestUrlDeleteCharBackward(event_key_bindings) |
             EditingRequestUrlDeleteCharForward(event_key_bindings) |

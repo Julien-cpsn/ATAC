@@ -79,4 +79,6 @@ scroll_down = "Ctrl-j"
 scroll_left = "Ctrl-h"
 scroll_right = "Ctrl-l"
 
+yank_response_part = "Shift-Y" # Used to yank the current result tab (e.g. body, headers, cookies)
+
 result_next_tab = "Ctrl-t" # Will use param_next_tab depending on the selected view
