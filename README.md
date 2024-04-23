@@ -23,6 +23,7 @@ ATAC ⚔📩
   * [TODO v2.0.0](#todo-v200)
 - [Documentation](#documentation)
 - [Others](#others)
+  * [Vim key-bindings](#vim-key-bindings)
   * [NeoVim integration](#neovim-integration)
 - [Technical precisions](#technical-precisions)
   * [Tested on](#tested-on)
@@ -233,6 +234,10 @@ cargo run -- -h
 > Documentation will soon be published in the wiki section
 
 ## Others
+
+### Vim key-bindings
+
+You can read more about it here: https://github.com/Julien-cpsn/ATAC/releases/tag/v0.14.0
 
 ### NeoVim integration
 
