@@ -113,6 +113,9 @@ impl App<'_> {
                                 // Tries to highlight the body
                                 self.syntax_highlighting.highlight(body, &file_format);
 
+                                // TODO: temporary solution, should be refreshed everytime after receiving a response
+                                self.refresh_result_scrollbars();
+
                                 match last_highlighted.read().unwrap().clone() {
                                     // Nothing was highlighted
                                     None => body.lines().map(|line| Line::raw(line)).collect(),
