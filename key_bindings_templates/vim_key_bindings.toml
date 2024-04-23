@@ -74,8 +74,8 @@ change_auth_method = "Shift-A"
 change_body_content_type = "Shift-B"
 
 [keybindings.request_selected.result_tabs]
-scroll_up = "Ctrl-y"
-scroll_down = "Ctrl-e"
+scroll_up = "Ctrl-k"
+scroll_down = "Ctrl-j"
 scroll_left = "Ctrl-h"
 scroll_right = "Ctrl-l"
 
