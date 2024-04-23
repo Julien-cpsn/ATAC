@@ -191,7 +191,6 @@ cargo run -- -h
 - **To add**
   - Create a repo wiki
   - Document whole code
-  - Copy response content to clipboard
 
 - **To improve**
   - Sign binary
