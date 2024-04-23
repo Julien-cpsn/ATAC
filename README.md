@@ -236,7 +236,7 @@ cargo run -- -h
 
 ### NeoVim integration
 
-Thanks to @NachoNievaG you can have an ATAC floating window inside your nvim
+Thanks to [@NachoNievaG](https://github.com/NachoNievaG) you can have an ATAC floating window inside your nvim
 https://github.com/NachoNievaG/atac.nvim
 
 ## Technical precisions
