@@ -204,7 +204,7 @@ cargo run -- -h
 - **To add**
   - Command line usage (send requests, add new requests)
   - Request body syntax highlighting
-  - Export a request to other code formats (curl, PHP, JS, Rust, ...)
+  - Export a request to other code formats ([raw](https://github.com/Kong/insomnia/issues/174)curl, PHP, JS, Rust, ...)
   - Pre and post-request script (javascript v8 engine)
   - OpenAPI & Insomnia import
 
