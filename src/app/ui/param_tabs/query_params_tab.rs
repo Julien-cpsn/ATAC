@@ -118,7 +118,7 @@ impl App<'_> {
             let adjusted_input_length = text_rect.width as usize - 2;
             let (padded_text, input_cursor_position) = self.query_params_table.selection_text_input.get_padded_text_and_cursor(adjusted_input_length);
 
-            let text_input = Paragraph::new(format!("{:fill$}", padded_text, fill = (cell_width - horizontal_margin / 2) as usize));
+            let text_input = Paragraph::new(format!("{:fill$}", padded_text, fill = (cell_width - horizontal_margin) as usize));
 
             frame.render_widget(text_input, text_rect);
 

@@ -203,7 +203,6 @@ cargo run -- -h
 
 - **To add**
   - Command line usage (send requests, add new requests)
-  - keymap configuration (via a config file)
   - Request body syntax highlighting
   - Export a request to other code formats (curl, PHP, JS, Rust, ...)
   - Pre and post-request script (javascript v8 engine)
@@ -257,8 +256,9 @@ cargo run -- -h
 | Library                                                                                                                                    | Version           | Reason                                                                                 |
 |--------------------------------------------------------------------------------------------------------------------------------------------|-------------------|----------------------------------------------------------------------------------------|
 | [reqwest](https://github.com/seanmonstar/reqwest) & [reqwest cookie store](https://github.com/pfernie/reqwest_cookie_store)                | 0.11.27 & 0.6.0   | Send requests                                                                          |
-| [ratatui](https://github.com/ratatui-org/ratatui)                                                                                          | 0.26.1            | Terminal UI framework                                                                  |
+| [ratatui](https://github.com/ratatui-org/ratatui)                                                                                          | 0.26.2            | Terminal UI framework                                                                  |
 | [crossterm](https://github.com/crossterm-rs/crossterm)                                                                                     | 0.27.0            | Terminal Backend                                                                       |
+| [crokey](https://github.com/Canop/crokey)                                                                                                  | 0.6.4             | Used to parse, use key bindings files and some utilities                               |
 | [tui-big-text](https://github.com/joshka/tui-big-text)                                                                                     | 0.4.2             | Display big texts. Only used for displaying ATAC in the homepage.                      |
 | [tui-tree-widget](https://github.com/EdJoPaTo/tui-rs-tree-widget)                                                                          | 0.19.0            | Display tree-like lists. Used for displaying the collections.                          |
 | [tui-textarea](https://github.com/rhysd/tui-textarea)                                                                                      | 0.5.0             | Text area that handle a lot of features. Used for editing request body.                |
@@ -273,6 +273,7 @@ cargo run -- -h
 | [tokio](https://github.com/tokio-rs/tokio)                                                                                                 | 1.0.0             | Handle asynchronous requests                                                           |
 | [strum](https://github.com/Peternator7/strum)                                                                                              | 0.26.2            | Enum facilities                                                                        |
 | [lazy_static](https://github.com/rust-lang-nursery/lazy-static.rs)                                                                         | 1.4.0             | Allows for more flexible constants. Mainly used for accessing CLI arguments everywhere |
+| [nestify](https://github.com/snowfoxsh/nestify)                                                                                            | 0.3.3             | Used to nest struct definitions                                                        |
 | [regex](https://github.com/rust-lang/regex)                                                                                                | 1.10.3            | Regex. Using for parsing requests URL                                                  |
 
 ### Binary size

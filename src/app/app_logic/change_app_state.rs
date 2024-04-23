@@ -10,7 +10,7 @@ impl App<'_> {
     pub fn normal_state(&mut self) {
         self.state = AppState::Normal;
     }
-    
+
     pub fn display_cookies_state(&mut self) {
         let local_cookie_store = Arc::clone(&self.cookies_popup.cookie_store);
 

@@ -1,0 +1,82 @@
+# Please avoid using Ctrl-v, it will paste your clipboard and trigger many unwanted event
+
+[keybindings.main_menu]
+exit = "q" # ctrl-c is implemented by default
+
+unselect_request = "h"
+expand_collection = "l"
+
+move_request_up = "Ctrl-k"
+move_request_down = "Ctrl-j"
+
+next_environment = "Shift-E"
+display_cookies = "Shift-C"
+
+[keybindings.generic]
+display_help = "Shift-h" # Take care to not overlap other inputs, the help can be triggered from anywhere
+
+# Collection name, request name, URL, Header, Query param, Basic Auth, Bearer Token
+[keybindings.generic.text_inputs.text_input]
+cancel = "Esc"
+validate = "Enter"
+
+delete_backward = "Delete"
+delete_forward = "Backspace"
+
+move_cursor_left = "Ctrl-h"
+move_cursor_right = "Ctrl-l"
+
+# Request body
+[keybindings.generic.text_inputs]
+
+# Will simulate most of the Vim key bindings in the text areas (Request body)
+text_area_mode = "VimEmulation"
+
+# Navigation in tables, popups, up and down in the collections list
+[keybindings.generic.navigation]
+move_cursor_up = "k"
+move_cursor_down = "j"
+move_cursor_left = "h"
+move_cursor_right = "l"
+
+# Avoids overlapping when in text input (e.g. selecting a collection while creating a new request)
+# Might not happen when using the default config
+alt_move_cursor_up = "Ctrl-k"
+alt_move_cursor_down = "Ctrl-j"
+alt_move_cursor_left = "Ctrl-h"
+alt_move_cursor_right = "Ctrl-l"
+
+go_back = "Esc"
+select = "Enter"
+
+# Collections list, query params, headers, cookies
+[keybindings.generic.list_and_table_actions]
+create_element = "Shift-N"
+delete_element = "Shift-D"
+edit_element = "Enter" # Edit query param, header, basic auth, bearer token
+rename_element = "Shift-R" # Only used in the collections list (main menu)
+toggle_element = "Shift-T" # Only used in tables (Query params, headers, cookies)
+
+[keybindings.request_selected]
+param_next_tab = "t"
+
+change_url = "Shift-U"
+change_method = "Shift-M"
+request_settings = "Shift-S"
+
+next_view = "Shift-V"
+
+send_request = "Space"
+alt_send_request = "Ctrl-Enter"
+
+[keybindings.request_selected.param_tabs]
+change_auth_method = "Shift-A"
+change_body_content_type = "Shift-B"
+
+[keybindings.request_selected.result_tabs]
+scroll_up = "Ctrl-k"
+scroll_down = "Ctrl-j"
+scroll_left = "Ctrl-h"
+scroll_right = "Ctrl-l"
+
+result_next_tab = "Ctrl-t" # Will use param_next_tab depending on the selected view

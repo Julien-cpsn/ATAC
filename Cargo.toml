@@ -1,7 +1,7 @@
 [package]
 name = "atac"
 description = "Arguably a Terminal API Client. Feature-full, free, open-source, offline and account-less."
-version = "0.13.0-bis"
+version = "0.14.0"
 authors = ["julien-cpsn"]
 edition = "2021"
 license = "MIT"
@@ -21,8 +21,9 @@ exclude = [
 reqwest = { version = "0.11.27", default-features = false, features = ["cookies", "rustls-tls-native-roots", "multipart", "gzip", "brotli", "deflate", "stream"] }
 reqwest_cookie_store = "0.6.0"
 cookie_store = "0.20.0"
-ratatui = "0.26.1"
+ratatui = "0.26.2"
 crossterm = "0.27.0"
+crokey = "0.6.4"
 tui-big-text = "0.4.2"
 tui-tree-widget = "0.19.0"
 tui-textarea = { version = "0.4.0", features = ["ratatui"] }
@@ -39,4 +40,5 @@ tokio = { version = "1.36.0", features = ["rt", "rt-multi-thread", "macros"] }
 futures-io = "0.3.30"
 strum = "0.26.2"
 lazy_static = "1.4.0"
+nestify = "0.3.3"
 regex = "1.10.3"

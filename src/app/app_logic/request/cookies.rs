@@ -58,6 +58,7 @@ impl App<'_> {
         self.update_cookies_table_selection();
     }
 
+    #[allow(dead_code)]
     pub fn modify_cookie(&mut self) {
         /*
         let input_text = self.cookies_popup.cookies_table.selection_text_input.text.clone();
