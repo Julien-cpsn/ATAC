@@ -56,7 +56,7 @@ move_cursor_down = "Down"
 move_cursor_left = "Left"
 move_cursor_right = "Right"
 
-# Used when the base keys are not available (Selecting collection while creating a new request)
+# Avoids overlapping when in text input (e.g. selecting a collection while creating a new request)
 # Might not happen when using the default config
 alt_move_cursor_up = "Up"
 alt_move_cursor_down = "Down"

@@ -216,7 +216,7 @@ impl AppState {
                 CreatingRequestCharInput(EventKeyBinding::new(vec![], "Char input", None)),
             ],
             DeletingCollection => vec![
-                GoBackToMainMenu(EventKeyBinding::new(vec![key_bindings.generic.navigation.go_back], "Quit", Some("Quit"))),
+                GoBackToMainMenu(EventKeyBinding::new(vec![key_bindings.generic.navigation.go_back], "Cancel", Some("Cancel"))),
 
                 DeletingCollectionMoveCursorLeft(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_left], "Move selection left", Some("Left"))),
                 DeletingCollectionMoveCursorRight(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_right], "Move selection right", Some("Right"))),
@@ -224,7 +224,7 @@ impl AppState {
                 DeleteCollection(EventKeyBinding::new(vec![key_bindings.generic.navigation.select], "Select choice", Some("Select"))),
             ],
             DeletingRequest => vec![
-                GoBackToMainMenu(EventKeyBinding::new(vec![key_bindings.generic.navigation.go_back], "Quit", Some("Quit"))),
+                GoBackToMainMenu(EventKeyBinding::new(vec![key_bindings.generic.navigation.go_back], "Cancel", Some("Cancel"))),
 
                 DeletingRequestMoveCursorLeft(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_left], "Move selection left", Some("Left"))),
                 DeletingRequestMoveCursorRight(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_right], "Move selection right", Some("Right"))),
@@ -470,7 +470,7 @@ impl AppState {
                 ],
             },
             EditingRequestSettings => vec![
-                GoBackToRequestMenu(EventKeyBinding::new(vec![key_bindings.generic.navigation.go_back], "Quit", Some("Quit"))),
+                GoBackToRequestMenu(EventKeyBinding::new(vec![key_bindings.generic.navigation.go_back], "Cancel", Some("Cancel"))),
 
                 RequestSettingsMoveUp(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_up], "Move up", Some("Up"))),
                 RequestSettingsMoveDown(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_down], "Move down", Some("Down"))),

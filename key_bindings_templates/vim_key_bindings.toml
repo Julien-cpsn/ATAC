@@ -18,7 +18,7 @@ display_help = "Shift-h" # Take care to not overlap other inputs, the help can b
 # Collection name, request name, URL, Header, Query param, Basic Auth, Bearer Token
 [keybindings.generic.text_inputs.text_input]
 cancel = "Esc"
-validate = "Ctrl-s"
+validate = "Enter"
 
 delete_backward = "Delete"
 delete_forward = "Backspace"
@@ -39,7 +39,7 @@ move_cursor_down = "j"
 move_cursor_left = "h"
 move_cursor_right = "l"
 
-# Used when the base keys are not available (Selecting collection while creating a new request)
+# Avoids overlapping when in text input (e.g. selecting a collection while creating a new request)
 # Might not happen when using the default config
 alt_move_cursor_up = "Ctrl-k"
 alt_move_cursor_down = "Ctrl-j"
@@ -51,11 +51,11 @@ select = "Enter"
 
 # Collections list, query params, headers, cookies
 [keybindings.generic.list_and_table_actions]
-create_element = "n"
-delete_element = "d"
+create_element = "Shift-N"
+delete_element = "Shift-D"
 edit_element = "Enter" # Edit query param, header, basic auth, bearer token
-rename_element = "r" # Only used in the collections list (main menu)
-toggle_element = "t" # Only used in tables (Query params, headers, cookies)
+rename_element = "Shift-R" # Only used in the collections list (main menu)
+toggle_element = "Shift-T" # Only used in tables (Query params, headers, cookies)
 
 [keybindings.request_selected]
 param_next_tab = "t"
@@ -79,4 +79,4 @@ scroll_down = "Ctrl-e"
 scroll_left = "Ctrl-h"
 scroll_right = "Ctrl-l"
 
-result_next_tab = "Shift-T" # Will use param_next_tab depending on the selected view
+result_next_tab = "Ctrl-t" # Will use param_next_tab depending on the selected view
