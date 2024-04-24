@@ -286,7 +286,7 @@ impl App<'_> {
     }
 }
 
-fn get_file_content_with_name(path: PathBuf) -> std::io::Result<(Vec<u8>, String)> {
+pub fn get_file_content_with_name(path: PathBuf) -> std::io::Result<(Vec<u8>, String)> {
     let mut buffer: Vec<u8> = vec![];
     let mut file = File::open(path.clone())?;
 

@@ -23,7 +23,7 @@ reqwest_cookie_store = "0.6.0"
 cookie_store = "0.20.0"
 ratatui = "0.26.2"
 crossterm = "0.27.0"
-crokey = "0.6.4"
+crokey = "1.0.0"
 tui-big-text = "0.4.2"
 tui-tree-widget = "0.19.0"
 tui-textarea = { version = "0.4.0", features = ["ratatui"] }

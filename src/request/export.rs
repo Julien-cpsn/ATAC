@@ -3,8 +3,8 @@ use strum::{Display, VariantArray};
 #[derive(Default, Display, VariantArray)]
 pub enum ExportFormat {
     #[default]
-    #[strum(to_string = "Raw")]
-    Raw,
+    #[strum(to_string = "HTTP")]
+    HTTP,
 
     #[strum(to_string = "cURL")]
     Curl,
