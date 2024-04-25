@@ -18,11 +18,20 @@ impl App<'_> {
         if let Some(command) = &ARGS.command {
             match command {
                 Command::Import(import_args) => {
-                    self.import_postman_collection(&import_args.path, import_args.max_depth.unwrap_or(99));
+                    print!("Importing: {}", import_args.path.display());
+
+                    let extension = import_args.path.extension().unwrap_or_default().to_str().unwrap_or_default();
+                    if extension == "json" {
+                        // If the file is json, we attempt to import postman collection
+                        self.import_postman_collection(&import_args.path, import_args.max_depth.unwrap_or(99));
+                    } else {
+                        // We attempt to import a curl file
+                        self.import_curl_file(&import_args.path);
+                    }
                 }
             }
         }
-        
+
         self
     }
 

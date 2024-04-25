@@ -21,7 +21,7 @@ pub struct Args {
 
 #[derive(Debug, Subcommand, PartialEq)]
 pub enum Command {
-    /// Used to import a collection file such as Postman
+    /// Used to import a collection file such as Postman, or a file containing a curl
     Import(ImportArgs),
 }
 
