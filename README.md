@@ -213,7 +213,7 @@ cargo run -- -h
 - **To improve**
   - Editing cookies
   - Auto-completion on env file variables
-  - Manage multipart Content-type header (auto-generated for now)
+  - Manage multipart Content-type header (auto-generated for now) https://github.com/seanmonstar/reqwest/issues/2259
 
 ### TODO v3.0.0
 
