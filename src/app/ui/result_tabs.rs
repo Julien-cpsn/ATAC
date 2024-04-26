@@ -9,10 +9,8 @@ use strum::{Display, EnumIter, FromRepr, IntoEnumIterator};
 use throbber_widgets_tui::{BRAILLE_DOUBLE, Throbber, WhichUse};
 
 use crate::app::app::App;
-use crate::request::body::find_file_format_in_content_type;
 use crate::request::request::Request;
 use crate::utils::centered_rect::centered_rect;
-use crate::utils::syntax_highlighting::last_highlighted_to_lines;
 
 #[derive(Default, Clone, Copy, Display, FromRepr, EnumIter)]
 pub enum RequestResultTabs {
@@ -23,6 +21,8 @@ pub enum RequestResultTabs {
     Cookies,
     #[strum(to_string = "Headers")]
     Headers,
+    #[strum(to_string = "Console")]
+    Console,
 }
 
 impl App<'_> {
@@ -41,19 +41,28 @@ impl App<'_> {
         // REQUEST RESULT TABS
 
         let result_tabs = RequestResultTabs::iter()
-            .map(|tab| {
+            .filter_map(|tab| {
                 match tab {
                     RequestResultTabs::Body => {
-                        if let Some(duration) = &request.result.duration {
-                            format!("{} ({})", tab.to_string(), duration)
+                        if let Some(duration) = &request.response.duration {
+                            Some(format!("{} ({})", tab.to_string(), duration))
                         }
                         else {
-                            format!("{}", tab.to_string())
+                            Some(format!("{}", tab.to_string()))
                         }
                     },
-                    RequestResultTabs::Cookies | RequestResultTabs::Headers => tab.to_string()
+                    RequestResultTabs::Cookies | RequestResultTabs::Headers => Some(tab.to_string()),
+                    RequestResultTabs::Console => {
+                        let local_console_output = self.script_console.console_output.read().unwrap();
+
+                        match local_console_output.as_ref() {
+                            None => None,
+                            Some(_) => Some(tab.to_string())
+                        }
+                    }
                 }
             });
+        
         let selected_result_tab_index = self.request_result_tab as usize;
 
         let result_tabs = Tabs::new(result_tabs)
@@ -83,7 +92,7 @@ impl App<'_> {
         else {
             // REQUEST RESULT STATUS CODE
 
-            let status_code = match &request.result.status_code {
+            let status_code = match &request.response.status_code {
                 None => "",
                 Some(status_code) => status_code
             };
@@ -94,42 +103,25 @@ impl App<'_> {
 
             // REQUEST RESULT CONTENT
 
-            let last_highlighted = self.syntax_highlighting.last_highlighted.clone();
-
             let mut result_widget: Paragraph = match self.request_result_tab {
-                RequestResultTabs::Body => match &request.result.body {
+                RequestResultTabs::Body => match &request.response.body {
                     None => Paragraph::new(""),
-                    Some(_) if !self.config.disable_syntax_highlighting.unwrap_or(false) && last_highlighted.read().unwrap().is_some() => {
-                        let lines = last_highlighted_to_lines(last_highlighted.read().unwrap().clone().unwrap());
-                        Paragraph::new(lines)
-                    }
                     Some(body) => {
-                        let file_format = find_file_format_in_content_type(&request.result.headers);
-                        
-                        // is not highlighted
-                        let lines: Vec<Line> = match file_format {
-                            None => body.lines().map(|line| Line::raw(line)).collect(),
-                            Some(file_format) => {
-                                // Tries to highlight the body
-                                self.syntax_highlighting.highlight(body, &file_format);
+                        let lines: Vec<Line>;
+                        let last_highlighted = self.syntax_highlighting.highlighted_body.read().unwrap();
 
-                                // TODO: temporary solution, should be refreshed everytime after receiving a response
-                                self.refresh_result_scrollbars();
-
-                                match last_highlighted.read().unwrap().clone() {
-                                    // Nothing was highlighted
-                                    None => body.lines().map(|line| Line::raw(line)).collect(),
-                                    // Something was highlighted
-                                    Some(last_highlighted) => last_highlighted_to_lines(last_highlighted)
-                                }
-                            }
-                        };
+                        if !self.config.disable_syntax_highlighting.unwrap_or(false) && last_highlighted.is_some() {
+                            lines = last_highlighted.clone().unwrap();
+                        }
+                        else {
+                            lines = body.lines().map(|line| Line::raw(line)).collect();
+                        }
 
                         Paragraph::new(lines)
                     }
                 }
                 RequestResultTabs::Cookies => {
-                    let result_cookies = match &request.result.cookies {
+                    let result_cookies = match &request.response.cookies {
                         None => "",
                         Some(cookies) => cookies
                     };
@@ -137,12 +129,16 @@ impl App<'_> {
                     Paragraph::new(result_cookies)
                 }
                 RequestResultTabs::Headers => {
-                    let result_headers: Vec<Line> = request.result.headers
+                    let result_headers: Vec<Line> = request.response.headers
                         .iter()
                         .map(|(header, value)| Line::from(format!("{header}: {value}")))
                         .collect();
 
                     Paragraph::new(result_headers)
+                }
+                RequestResultTabs::Console => {
+                    let highlighted_console_output = self.syntax_highlighting.highlighted_console_output.read().unwrap().clone();
+                    Paragraph::new(highlighted_console_output)
                 }
             };
 

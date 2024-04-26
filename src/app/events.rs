@@ -138,6 +138,10 @@ pub enum AppEvent {
     DeleteRequestBodyTableElement(EventKeyBinding),
     ToggleRequestBodyTableElement(EventKeyBinding),
 
+    EditRequestScript(EventKeyBinding),
+    // Move up or down
+    RequestScriptMove(EventKeyBinding),
+
     /* Result tabs */
 
     NextResultTab(EventKeyBinding),
@@ -230,12 +234,11 @@ pub enum AppEvent {
 
     EditingRequestBodyStringVimInput(EventKeyBinding),
 
+    EditingRequestBodyStringSaveAndQuit(EventKeyBinding),
     EditingRequestBodyStringCopy(EventKeyBinding),
     EditingRequestBodyStringPaste(EventKeyBinding),
     EditingRequestBodyStringUndo(EventKeyBinding),
     EditingRequestBodyStringRedo(EventKeyBinding),
-    EditingRequestBodyStringSaveAndQuit(EventKeyBinding),
-    EditingRequestBodyStringQuitWithoutSaving(EventKeyBinding),
     EditingRequestBodyStringNewLine(EventKeyBinding),
     EditingRequestBodyStringIndent(EventKeyBinding),
     EditingRequestBodyStringDeleteCharBackward(EventKeyBinding),
@@ -248,7 +251,46 @@ pub enum AppEvent {
     EditingRequestBodyStringMoveCursorRight(EventKeyBinding),
     EditingRequestBodyStringCharInput(EventKeyBinding),
 
+    /* Scripts */
 
+    EditingPreRequestScriptVimInput(EventKeyBinding),
+
+    EditingPreRequestScriptSaveAndQuit(EventKeyBinding),
+    EditingPreRequestScriptCopy(EventKeyBinding),
+    EditingPreRequestScriptPaste(EventKeyBinding),
+    EditingPreRequestScriptUndo(EventKeyBinding),
+    EditingPreRequestScriptRedo(EventKeyBinding),
+    EditingPreRequestScriptNewLine(EventKeyBinding),
+    EditingPreRequestScriptIndent(EventKeyBinding),
+    EditingPreRequestScriptDeleteCharBackward(EventKeyBinding),
+    EditingPreRequestScriptDeleteCharForward(EventKeyBinding),
+    EditingPreRequestScriptSkipWordLeft(EventKeyBinding),
+    EditingPreRequestScriptSkipWordRight(EventKeyBinding),
+    EditingPreRequestScriptMoveCursorUp(EventKeyBinding),
+    EditingPreRequestScriptMoveCursorDown(EventKeyBinding),
+    EditingPreRequestScriptMoveCursorLeft(EventKeyBinding),
+    EditingPreRequestScriptMoveCursorRight(EventKeyBinding),
+    EditingPreRequestScriptCharInput(EventKeyBinding),
+
+    EditingPostRequestScriptVimInput(EventKeyBinding),
+
+    EditingPostRequestScriptSaveAndQuit(EventKeyBinding),
+    EditingPostRequestScriptCopy(EventKeyBinding),
+    EditingPostRequestScriptPaste(EventKeyBinding),
+    EditingPostRequestScriptUndo(EventKeyBinding),
+    EditingPostRequestScriptRedo(EventKeyBinding),
+    EditingPostRequestScriptNewLine(EventKeyBinding),
+    EditingPostRequestScriptIndent(EventKeyBinding),
+    EditingPostRequestScriptDeleteCharBackward(EventKeyBinding),
+    EditingPostRequestScriptDeleteCharForward(EventKeyBinding),
+    EditingPostRequestScriptSkipWordLeft(EventKeyBinding),
+    EditingPostRequestScriptSkipWordRight(EventKeyBinding),
+    EditingPostRequestScriptMoveCursorUp(EventKeyBinding),
+    EditingPostRequestScriptMoveCursorDown(EventKeyBinding),
+    EditingPostRequestScriptMoveCursorLeft(EventKeyBinding),
+    EditingPostRequestScriptMoveCursorRight(EventKeyBinding),
+    EditingPostRequestScriptCharInput(EventKeyBinding),
+    
     /* Settings */
 
     RequestSettingsMoveUp(EventKeyBinding),
@@ -490,6 +532,11 @@ impl App<'_> {
                 DeleteRequestBodyTableElement(_) => self.delete_form_data(),
                 ToggleRequestBodyTableElement(_) => self.toggle_form_data(),
 
+                /* Scripts */
+
+                EditRequestScript(_) => self.edit_request_script_state(),
+                RequestScriptMove(_) => self.script_console.change_selection(),
+
                 /* Result tabs */
 
                 NextResultTab(_) => self.next_request_result_tab(),
@@ -621,16 +668,15 @@ impl App<'_> {
                     VimTransition::Pending(input) => {
                         self.body_text_area_vim_emulation = self.body_text_area_vim_emulation.clone().with_pending(input);
                     },
-                    VimTransition::Quit => self.quit_request_body(),
+                    VimTransition::Quit => self.select_request_state(),
                     VimTransition::SaveAndQuit => self.modify_request_body(),
                 },
 
+                EditingRequestBodyStringSaveAndQuit(_) => self.modify_request_body(),
                 EditingRequestBodyStringCopy(_) => self.body_text_area.copy(),
                 EditingRequestBodyStringPaste(_) => {self.body_text_area.paste();},
                 EditingRequestBodyStringUndo(_) => {self.body_text_area.undo();},
                 EditingRequestBodyStringRedo(_) => {self.body_text_area.redo();},
-                EditingRequestBodyStringSaveAndQuit(_) => self.modify_request_body(),
-                EditingRequestBodyStringQuitWithoutSaving(_) => self.quit_request_body(),
                 EditingRequestBodyStringNewLine(_) => self.body_text_area.insert_newline(),
                 EditingRequestBodyStringIndent(_) => {
                     self.body_text_area.set_hard_tab_indent(true);
@@ -638,8 +684,8 @@ impl App<'_> {
                 },
                 EditingRequestBodyStringDeleteCharBackward(_) => {self.body_text_area.delete_char();},
                 EditingRequestBodyStringDeleteCharForward(_) => {self.body_text_area.delete_next_char();},
-                EditingRequestBodyStringSkipWordLeft(_) => self.body_text_area.move_cursor(CursorMove::WordForward),
-                EditingRequestBodyStringSkipWordRight(_) => self.body_text_area.move_cursor(CursorMove::WordBack),
+                EditingRequestBodyStringSkipWordLeft(_) => self.body_text_area.move_cursor(CursorMove::WordBack),
+                EditingRequestBodyStringSkipWordRight(_) => self.body_text_area.move_cursor(CursorMove::WordForward),
                 EditingRequestBodyStringMoveCursorUp(_) => self.body_text_area.move_cursor(CursorMove::Up),
                 EditingRequestBodyStringMoveCursorDown(_) => self.body_text_area.move_cursor(CursorMove::Bottom),
                 EditingRequestBodyStringMoveCursorLeft(_) => self.body_text_area.move_cursor(CursorMove::Back),
@@ -648,7 +694,87 @@ impl App<'_> {
                     KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.body_text_area.insert_char(char),
                     _ => {}
                 },
+                
+                /* Scripts */
 
+                EditingPreRequestScriptVimInput(_) => match self.script_console.vim_emulation.transition(key, &mut self.script_console.pre_request_text_area) {
+                    VimTransition::Mode(mode) if self.script_console.vim_emulation.mode != mode => {
+                        self.script_console.pre_request_text_area.set_block(mode.block());
+                        self.script_console.pre_request_text_area.set_cursor_style(mode.cursor_style());
+                        self.script_console.vim_emulation = Vim::new(mode);
+                    }
+                    VimTransition::Nop | VimTransition::Mode(_) => {
+                        self.script_console.vim_emulation = self.script_console.vim_emulation.clone();
+                    },
+                    VimTransition::Pending(input) => {
+                        self.script_console.vim_emulation = self.script_console.vim_emulation.clone().with_pending(input);
+                    },
+                    VimTransition::Quit => self.select_request_state(),
+                    VimTransition::SaveAndQuit => self.modify_pre_request_script(),
+                },
+
+                EditingPreRequestScriptSaveAndQuit(_) => self.modify_pre_request_script(),
+                EditingPreRequestScriptCopy(_) => self.script_console.pre_request_text_area.copy(),
+                EditingPreRequestScriptPaste(_) => {self.script_console.pre_request_text_area.paste();},
+                EditingPreRequestScriptUndo(_) => {self.script_console.pre_request_text_area.undo();},
+                EditingPreRequestScriptRedo(_) => {self.script_console.pre_request_text_area.redo();},
+                EditingPreRequestScriptNewLine(_) => self.script_console.pre_request_text_area.insert_newline(),
+                EditingPreRequestScriptIndent(_) => {
+                    self.script_console.pre_request_text_area.set_hard_tab_indent(true);
+                    self.script_console.pre_request_text_area.insert_tab();
+                },
+                EditingPreRequestScriptDeleteCharBackward(_) => {self.script_console.pre_request_text_area.delete_next_char();},
+                EditingPreRequestScriptDeleteCharForward(_) => {self.script_console.pre_request_text_area.delete_char();},
+                EditingPreRequestScriptSkipWordLeft(_) => self.script_console.pre_request_text_area.move_cursor(CursorMove::WordBack),
+                EditingPreRequestScriptSkipWordRight(_) => self.script_console.pre_request_text_area.move_cursor(CursorMove::WordForward),
+                EditingPreRequestScriptMoveCursorUp(_) => self.script_console.pre_request_text_area.move_cursor(CursorMove::Up),
+                EditingPreRequestScriptMoveCursorDown(_) => self.script_console.pre_request_text_area.move_cursor(CursorMove::Bottom),
+                EditingPreRequestScriptMoveCursorLeft(_) => self.script_console.pre_request_text_area.move_cursor(CursorMove::Back),
+                EditingPreRequestScriptMoveCursorRight(_) => self.script_console.pre_request_text_area.move_cursor(CursorMove::Forward),
+                EditingPreRequestScriptCharInput(_) => match key {
+                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.script_console.pre_request_text_area.insert_char(char),
+                    _ => {}
+                },
+
+                EditingPostRequestScriptVimInput(_) => match self.script_console.vim_emulation.transition(key, &mut self.script_console.post_request_text_area) {
+                    VimTransition::Mode(mode) if self.script_console.vim_emulation.mode != mode => {
+                        self.script_console.post_request_text_area.set_block(mode.block());
+                        self.script_console.post_request_text_area.set_cursor_style(mode.cursor_style());
+                        self.script_console.vim_emulation = Vim::new(mode);
+                    }
+                    VimTransition::Nop | VimTransition::Mode(_) => {
+                        self.script_console.vim_emulation = self.script_console.vim_emulation.clone();
+                    },
+                    VimTransition::Pending(input) => {
+                        self.script_console.vim_emulation = self.script_console.vim_emulation.clone().with_pending(input);
+                    },
+                    VimTransition::Quit => self.select_request_state(),
+                    VimTransition::SaveAndQuit => self.modify_post_request_script(),
+                },
+
+                EditingPostRequestScriptSaveAndQuit(_) => self.modify_post_request_script(),
+                EditingPostRequestScriptCopy(_) => self.script_console.post_request_text_area.copy(),
+                EditingPostRequestScriptPaste(_) => {self.script_console.post_request_text_area.paste();},
+                EditingPostRequestScriptUndo(_) => {self.script_console.post_request_text_area.undo();},
+                EditingPostRequestScriptRedo(_) => {self.script_console.post_request_text_area.redo();},
+                EditingPostRequestScriptNewLine(_) => self.script_console.post_request_text_area.insert_newline(),
+                EditingPostRequestScriptIndent(_) => {
+                    self.script_console.post_request_text_area.set_hard_tab_indent(true);
+                    self.script_console.post_request_text_area.insert_tab();
+                },
+                EditingPostRequestScriptDeleteCharBackward(_) => {self.script_console.post_request_text_area.delete_next_char();},
+                EditingPostRequestScriptDeleteCharForward(_) => {self.script_console.post_request_text_area.delete_char();},
+                EditingPostRequestScriptSkipWordLeft(_) => self.script_console.post_request_text_area.move_cursor(CursorMove::WordBack),
+                EditingPostRequestScriptSkipWordRight(_) => self.script_console.post_request_text_area.move_cursor(CursorMove::WordForward),
+                EditingPostRequestScriptMoveCursorUp(_) => self.script_console.post_request_text_area.move_cursor(CursorMove::Up),
+                EditingPostRequestScriptMoveCursorDown(_) => self.script_console.post_request_text_area.move_cursor(CursorMove::Bottom),
+                EditingPostRequestScriptMoveCursorLeft(_) => self.script_console.post_request_text_area.move_cursor(CursorMove::Back),
+                EditingPostRequestScriptMoveCursorRight(_) => self.script_console.post_request_text_area.move_cursor(CursorMove::Forward),
+                EditingPostRequestScriptCharInput(_) => match key {
+                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.script_console.post_request_text_area.insert_char(char),
+                    _ => {}
+                },
+                
                 /* Settings */
 
                 RequestSettingsMoveUp(_) => self.request_settings_popup.previous(),
@@ -658,7 +784,7 @@ impl App<'_> {
 
                 /* Others */
 
-                Documentation(_) => {},
+                Documentation(_) => {}
             }
         };
 
@@ -759,6 +885,8 @@ impl AppEvent {
             CreateRequestBodyTableElement(event_key_bindings) |
             DeleteRequestBodyTableElement(event_key_bindings) |
             ToggleRequestBodyTableElement(event_key_bindings) |
+            EditRequestScript(event_key_bindings) |
+            RequestScriptMove(event_key_bindings) |
             NextResultTab(event_key_bindings) |
             ScrollResultUp(event_key_bindings) |
             ScrollResultDown(event_key_bindings) |
@@ -817,18 +945,17 @@ impl AppEvent {
             EditingRequestBodyTableMoveCursorRight(event_key_bindings) |
             EditingRequestBodyTableCharInput(event_key_bindings) |
             ModifyRequestBodyFile(event_key_bindings) |
-            EditingRequestBodyStringVimInput(event_key_bindings) |
             EditingRequestBodyFileDeleteCharBackward(event_key_bindings) |
             EditingRequestBodyFileDeleteCharForward(event_key_bindings) |
             EditingRequestBodyFileMoveCursorLeft(event_key_bindings) |
             EditingRequestBodyFileMoveCursorRight(event_key_bindings) |
             EditingRequestBodyFileCharInput(event_key_bindings) |
+            EditingRequestBodyStringVimInput(event_key_bindings) |
             EditingRequestBodyStringCopy(event_key_bindings) |
             EditingRequestBodyStringPaste(event_key_bindings) |
             EditingRequestBodyStringUndo(event_key_bindings) |
             EditingRequestBodyStringRedo(event_key_bindings) |
             EditingRequestBodyStringSaveAndQuit(event_key_bindings) |
-            EditingRequestBodyStringQuitWithoutSaving(event_key_bindings) |
             EditingRequestBodyStringNewLine(event_key_bindings) |
             EditingRequestBodyStringIndent(event_key_bindings) |
             EditingRequestBodyStringDeleteCharBackward(event_key_bindings) |
@@ -840,6 +967,40 @@ impl AppEvent {
             EditingRequestBodyStringMoveCursorLeft(event_key_bindings) |
             EditingRequestBodyStringMoveCursorRight(event_key_bindings) |
             EditingRequestBodyStringCharInput(event_key_bindings) |
+            EditingPreRequestScriptVimInput(event_key_bindings) |
+            EditingPreRequestScriptCopy(event_key_bindings) |
+            EditingPreRequestScriptPaste(event_key_bindings) |
+            EditingPreRequestScriptUndo(event_key_bindings) |
+            EditingPreRequestScriptRedo(event_key_bindings) |
+            EditingPreRequestScriptSaveAndQuit(event_key_bindings) |
+            EditingPreRequestScriptNewLine(event_key_bindings) |
+            EditingPreRequestScriptIndent(event_key_bindings) |
+            EditingPreRequestScriptDeleteCharBackward(event_key_bindings) |
+            EditingPreRequestScriptDeleteCharForward(event_key_bindings) |
+            EditingPreRequestScriptSkipWordLeft(event_key_bindings) |
+            EditingPreRequestScriptSkipWordRight(event_key_bindings) |
+            EditingPreRequestScriptMoveCursorUp(event_key_bindings) |
+            EditingPreRequestScriptMoveCursorDown(event_key_bindings) |
+            EditingPreRequestScriptMoveCursorLeft(event_key_bindings) |
+            EditingPreRequestScriptMoveCursorRight(event_key_bindings) |
+            EditingPreRequestScriptCharInput(event_key_bindings) |
+            EditingPostRequestScriptVimInput(event_key_bindings) |
+            EditingPostRequestScriptCopy(event_key_bindings) |
+            EditingPostRequestScriptPaste(event_key_bindings) |
+            EditingPostRequestScriptUndo(event_key_bindings) |
+            EditingPostRequestScriptRedo(event_key_bindings) |
+            EditingPostRequestScriptSaveAndQuit(event_key_bindings) |
+            EditingPostRequestScriptNewLine(event_key_bindings) |
+            EditingPostRequestScriptIndent(event_key_bindings) |
+            EditingPostRequestScriptDeleteCharBackward(event_key_bindings) |
+            EditingPostRequestScriptDeleteCharForward(event_key_bindings) |
+            EditingPostRequestScriptSkipWordLeft(event_key_bindings) |
+            EditingPostRequestScriptSkipWordRight(event_key_bindings) |
+            EditingPostRequestScriptMoveCursorUp(event_key_bindings) |
+            EditingPostRequestScriptMoveCursorDown(event_key_bindings) |
+            EditingPostRequestScriptMoveCursorLeft(event_key_bindings) |
+            EditingPostRequestScriptMoveCursorRight(event_key_bindings) |
+            EditingPostRequestScriptCharInput(event_key_bindings) |
             RequestSettingsMoveUp(event_key_bindings) |
             RequestSettingsMoveDown(event_key_bindings) |
             RequestSettingsToggleSetting(event_key_bindings) |

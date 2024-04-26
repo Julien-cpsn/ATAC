@@ -45,6 +45,10 @@
       ],
       "body": "no_body",
       "auth": "no_auth",
+      "scripts": {
+        "pre_request_script": null,
+        "post_request_script": null
+      },
       "settings": {
         "use_config_proxy": true,
         "allow_redirects": true,
@@ -96,6 +100,10 @@
       ],
       "body": "no_body",
       "auth": "no_auth",
+      "scripts": {
+        "pre_request_script": null,
+        "post_request_script": null
+      },
       "settings": {
         "use_config_proxy": true,
         "allow_redirects": true,
@@ -147,6 +155,10 @@
       ],
       "body": "no_body",
       "auth": "no_auth",
+      "scripts": {
+        "pre_request_script": null,
+        "post_request_script": null
+      },
       "settings": {
         "use_config_proxy": true,
         "allow_redirects": true,

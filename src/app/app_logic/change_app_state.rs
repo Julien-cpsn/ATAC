@@ -186,6 +186,18 @@ impl App<'_> {
         self.update_inputs();
     }
 
+    pub fn edit_request_script_state(&mut self) {
+        self.request_param_tab = RequestParamsTabs::Scripts;
+        
+        match self.script_console.script_selection {
+            0 => self.state = AppState::EditingPreRequestScript,
+            1 => self.state = AppState::EditingPostRequestScript,
+            _ => {}
+        }
+        
+        self.update_inputs();
+    }
+
     pub fn edit_request_settings_state(&mut self) {
         self.request_settings_popup.selection = 0;
 

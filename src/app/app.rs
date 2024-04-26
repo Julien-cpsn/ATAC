@@ -5,9 +5,7 @@ use std::time::Duration;
 use crossterm::terminal::disable_raw_mode;
 use ratatui::backend::Backend;
 use ratatui::Terminal;
-use strum::{VariantArray};
-use syntect::highlighting::ThemeSet;
-use syntect::parsing::SyntaxSet;
+use strum::VariantArray;
 use throbber_widgets_tui::ThrobberState;
 use tui_textarea::TextArea;
 
@@ -24,6 +22,7 @@ use crate::utils::choice_popup::ChoicePopup;
 use crate::utils::cookies_popup::CookiesPopup;
 use crate::utils::display_popup::DisplayPopup;
 use crate::utils::help_popup::HelpPopup;
+use crate::utils::script_console::ScriptConsole;
 use crate::utils::settings_popup::SettingsPopup;
 use crate::utils::stateful_custom_table::StatefulCustomTable;
 use crate::utils::stateful_scrollbar::StatefulScrollbar;
@@ -32,7 +31,7 @@ use crate::utils::syntax_highlighting::SyntaxHighlighting;
 use crate::utils::text_input::TextInput;
 use crate::utils::text_input_selection::TextInputSelection;
 use crate::utils::validation_popup::ValidationPopup;
-use crate::utils::vim_emulation::{Vim, VimMode};
+use crate::utils::vim_emulation::Vim;
 
 pub struct App<'a> {
     pub tick_rate: Duration,
@@ -51,7 +50,7 @@ pub struct App<'a> {
 
     /* Environments */
     
-    pub environments: Vec<Environment>,
+    pub environments: Vec<Arc<RwLock<Environment>>>,
     pub selected_environment: usize,
 
     /* Cookies */
@@ -100,6 +99,8 @@ pub struct App<'a> {
     pub result_throbber_state: ThrobberState,
     pub result_vertical_scrollbar: StatefulScrollbar,
     pub result_horizontal_scrollbar: StatefulScrollbar,
+
+    pub script_console: ScriptConsole<'a>,
 
     /* Others */
     
@@ -174,7 +175,7 @@ impl App<'_> {
             body_file_text_input: TextInput::default(),
             body_form_table: StatefulCustomTable::default(),
             body_text_area: TextArea::default(),
-            body_text_area_vim_emulation: Vim::new(VimMode::Normal),
+            body_text_area_vim_emulation: Vim::default(),
 
 
             request_settings_popup: SettingsPopup::default(),
@@ -183,13 +184,11 @@ impl App<'_> {
             result_vertical_scrollbar: StatefulScrollbar::default(),
             result_horizontal_scrollbar: StatefulScrollbar::default(),
 
+            script_console: ScriptConsole::default(),
+
             /* Others */
 
-            syntax_highlighting: SyntaxHighlighting {
-                syntax_set: SyntaxSet::load_defaults_newlines(),
-                theme_set: ThemeSet::load_defaults(),
-                last_highlighted: Arc::new(RwLock::new(None)),
-            },
+            syntax_highlighting: SyntaxHighlighting::default(),
 
             export_request: ChoicePopup {
                 // Retrieves the export format names

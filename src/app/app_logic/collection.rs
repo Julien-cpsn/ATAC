@@ -103,6 +103,19 @@ impl App<'_> {
                 self.refresh_body_textarea(body);
             }
         }
+        
+        let pre_request_script = match &selected_request.scripts.pre_request_script {
+            None => "",
+            Some(pre_request_script) => &pre_request_script
+        };
+
+        let post_request_script = match &selected_request.scripts.post_request_script {
+            None => "",
+            Some(pre_request_script) => &pre_request_script
+        };
+        
+        self.refresh_pre_request_script_textarea(pre_request_script);
+        self.refresh_post_request_script_textarea(post_request_script);
     }
     
     pub fn reset_cursors(&mut self) {

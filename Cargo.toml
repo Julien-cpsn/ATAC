@@ -33,7 +33,7 @@ serde = { version = "1.0.197", features = ["derive", "rc"] }
 serde_json = "1.0.114"
 jsonxf = "1.1.1"
 toml = "0.8.11"
-envfile = "0.2.1"
+deno_core = "0.278.0"
 parse_postman_collection = "0.2.3"
 clap = { version = "4.5.0", features = ["derive", "color"] }
 arboard = "3.3.2"
@@ -42,5 +42,7 @@ futures-io = "0.3.30"
 strum = "0.26.2"
 lazy_static = "1.4.0"
 nestify = "0.3.3"
-regex = "1.10.3"
+snailquote = "0.3.1"
+indexmap = { version = "2.2.6", features = ["serde"] }
 base64 = "0.22.0"
+regex = "1.10.3"

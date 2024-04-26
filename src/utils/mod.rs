@@ -15,3 +15,4 @@ pub mod choice_popup;
 pub mod vim_emulation;
 pub mod colors;
 pub mod display_popup;
+pub mod script_console;

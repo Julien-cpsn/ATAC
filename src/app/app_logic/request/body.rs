@@ -181,9 +181,4 @@ impl App<'_> {
         self.update_body_table_selection();
         self.load_request_body_param_tab();
     }
-
-    pub fn quit_request_body(&mut self) {
-        self.select_request_state();
-        self.update_inputs();
-    }
 }
