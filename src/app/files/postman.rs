@@ -2,7 +2,7 @@ use std::path::PathBuf;
 use std::str::FromStr;
 use std::sync::{Arc, RwLock};
 
-use parse_postman_collection::v2_1_0::{AuthType, Body, FormParameterSrcUnion, HeaderUnion, Items, Language, Mode, RequestClass, RequestUnion, Url};
+use parse_postman_collection::v2_1_0::{AuthType, Body, FormParameterSrcUnion, HeaderUnion, Host, Items, Language, Mode, RequestClass, RequestUnion, Url};
 
 use crate::app::app::App;
 use crate::app::startup::args::ARGS;
@@ -163,6 +163,8 @@ fn parse_request(item: Items) -> Request {
     let mut request = Request::default();
 
     request.name = item_name;
+
+    request.scripts.pre_request_script = retrieve_request_scripts(&item);
 
     /* SETTINGS */
 
@@ -417,6 +419,29 @@ fn retrieve_headers(request_class: &RequestClass) -> Option<Vec<KeyValue>> {
         }
         HeaderUnion::String(_) => None
     }
+}
+
+fn retrieve_request_scripts(item: &Items) -> Option<String> {
+    let events = item.event.clone()?;
+
+
+    for event in events {
+        if event.listen == "prerequest" {
+            let script = event.script?;
+            match script.exec? {
+                Host::String(_) => {}
+                Host::StringArray(exec) => {
+                    let script: String = exec.iter()
+                        .map(|line| line.replace("pm.", "") + "\n")
+                        .collect();
+
+                    return Some(script);
+                }
+            }
+        }
+    }
+
+    None
 }
 
 fn retrieve_settings(item: &Items) -> Option<RequestSettings> {
