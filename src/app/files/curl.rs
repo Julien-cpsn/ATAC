@@ -25,13 +25,24 @@ impl App<'_> {
             Err(e) => panic_error(format!("Could not parse cURL\n\t{e}")),
         };
 
-        let req_name = path_buf.file_name().unwrap().to_str().unwrap().to_string();
+        // For now, the stem of the file is the name of the request
+        let req_name = match extract_file_name(path_buf){
+            Ok(name) => name,
+            Err(e) => panic_error(format!("Could not extract file name\n\t{e}"))
+        };
 
-        // We store the request in a temporary variable so we can add it to the collection
+        // This way we can parse the curl file before application loads, handling any errors. But only apply it once
+        // the application starts
         self.tmp_request = Some(parse_request(&curl, req_name));
-        // Defined by the input, we can either add the request to an existing collection or create a new one
         self.append_or_create_collection_state();
     }
+}
+
+fn extract_file_name(path_buf: &PathBuf) -> Result<String, String> {
+    path_buf.file_stem()
+        .ok_or_else(|| "Filename not found".to_string())
+        .and_then(|name| name.to_str().ok_or_else(|| "Filename is not valid UTF-8".to_string()))
+        .map(|name| name.to_string())
 }
 
 fn parse_request(curl: &Curl, req_name: String) -> Request {
@@ -46,7 +57,6 @@ fn parse_request(curl: &Curl, req_name: String) -> Request {
         Ok(url) => url,
         Err(e) => panic_error(format!("Could not parse URL\n\t{e}")),
     };
-
 
     /* QUERY PARAMS */
 

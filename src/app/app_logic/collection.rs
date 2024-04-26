@@ -161,6 +161,11 @@ impl App<'_> {
             return;
         }
 
+        let pending_saved_req = match &self.tmp_request {
+            Some(req) => req,
+            None => return
+        };
+
         // Check to see if the collection exists, if it does - append the request
         let existing_collection = self.collections.iter().any(|c| c.name == *collection_name);
         if existing_collection {
@@ -170,12 +175,13 @@ impl App<'_> {
                 .iter_mut()
                 .find(|c| c.name == *collection_name)
                 .unwrap();
-            collection.requests.push(Arc::new(RwLock::new(self.tmp_request.take().unwrap())));
+
+            collection.requests.push(Arc::new(RwLock::new(pending_saved_req.clone())));
         } else {
             // Create a new collection and add the request
             let collection = Collection {
                 name: collection_name.clone(),
-                requests: vec![Arc::new(RwLock::new(self.tmp_request.take().unwrap()))],
+                requests: vec![Arc::new(RwLock::new(pending_saved_req.clone()))],
                 path: ARGS.directory.join(format!("{}.json", collection_name.clone())),
             };
             self.collections.push(collection);
