@@ -6,6 +6,7 @@ use ratatui::style::Color::Yellow;
 use ratatui::widgets::{Block, Borders};
 
 use crate::app::app::App;
+use crate::app::app_states::AppState;
 
 impl App<'_> {
     pub(super) fn render_request_script(&mut self, frame: &mut Frame, area: Rect) {
@@ -25,20 +26,28 @@ impl App<'_> {
         let post_request_script_text_area = &mut self.script_console.post_request_text_area;
 
         let title = match self.script_console.script_selection {
-            0 => {
-                pre_request_script_text_area.set_style(Style::new().fg(Yellow));
-                post_request_script_text_area.set_style(Style::new());
-
-                " Pre-request "
-            },
-            1 => {
-                pre_request_script_text_area.set_style(Style::new());
-                post_request_script_text_area.set_style(Style::new().fg(Yellow));
-
-                " Post-request "
-            }
+            0 => " Pre-request ",
+            1 => " Post-request ",
             _ => ""
         };
+        
+        if self.state == AppState::SelectedRequest {
+            match self.script_console.script_selection {
+                0 => {
+                    pre_request_script_text_area.set_style(Style::new().fg(Yellow));
+                    post_request_script_text_area.set_style(Style::new());
+                },
+                1 => {
+                    pre_request_script_text_area.set_style(Style::new());
+                    post_request_script_text_area.set_style(Style::new().fg(Yellow));
+                }
+                _ => {}
+            };
+        }
+        else {
+            pre_request_script_text_area.set_style(Style::new());
+            post_request_script_text_area.set_style(Style::new());
+        }
 
         pre_request_script_text_area.set_block(
             Block::default()
