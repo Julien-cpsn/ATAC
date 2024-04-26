@@ -116,6 +116,7 @@ impl App<'_> {
             DisplayingCookies | EditingCookies => self.render_cookies_popup(frame),
             ChoosingElementToCreate => self.render_creating_element_popup(frame),
             CreatingNewCollection => self.render_creating_new_collection_popup(frame),
+            AppendingOrCreatingCollection => self.render_append_or_create_collection_popup(frame),
             CreatingNewRequest => self.render_creating_new_request_popup(frame),
             DeletingCollection => self.render_deleting_collection_popup(frame),
             DeletingRequest => self.render_deleting_request_popup(frame),

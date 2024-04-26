@@ -40,6 +40,9 @@ pub enum AppState {
     #[strum(to_string = "Creating new collection")]
     CreatingNewCollection,
 
+    #[strum(to_string = "Add to or create collection")]
+    AppendingOrCreatingCollection,
+
     #[strum(to_string = "Creating new request")]
     CreatingNewRequest,
 
@@ -98,6 +101,7 @@ pub fn next_app_state(app_state: &AppState) -> AppState {
         EditingCookies => ChoosingElementToCreate,
         ChoosingElementToCreate => CreatingNewCollection,
         CreatingNewCollection => CreatingNewRequest,
+        AppendingOrCreatingCollection => Normal,
         CreatingNewRequest => DeletingCollection,
         DeletingCollection => DeletingRequest,
         DeletingRequest => RenamingCollection,
@@ -125,6 +129,7 @@ pub fn previous_app_state(app_state: &AppState) -> AppState {
         ChoosingElementToCreate => EditingCookies,
         CreatingNewCollection => ChoosingElementToCreate,
         CreatingNewRequest => CreatingNewCollection,
+        AppendingOrCreatingCollection => Normal,
         DeletingCollection => CreatingNewRequest,
         DeletingRequest => DeletingCollection,
         RenamingCollection => DeletingRequest,
@@ -200,6 +205,16 @@ impl AppState {
                 CreatingCollectionMoveCursorLeft(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_left], "Move cursor left", Some("Left"))),
                 CreatingCollectionMoveCursorRight(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_right], "Move cursor right", Some("Right"))),
                 CreatingCollectionCharInput(EventKeyBinding::new(vec![], "Char input", None)),
+            ],
+            AppendingOrCreatingCollection => vec![
+                GoBackToMainMenu(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.cancel], "Cancel", Some("Cancel"))),
+                AppendOrCreateCollection(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.validate], "Validate", Some("Validate"))),
+
+                AppendingOrCreatingCollectionDeleteCharBackward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_backward], "Delete char backward", Some("Delete"))),
+                AppendingOrCreatingCollectionDeleteCharForward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_forward], "Delete char forward", Some("Backspace"))),
+                AppendingOrCreatingCollectionMoveCursorLeft(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_left], "Move cursor left", Some("Left"))),
+                AppendingOrCreatingCollectionMoveCursorRight(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_right], "Move cursor right", Some("Right"))),
+                AppendingOrCreatingCollectionCharInput(EventKeyBinding::new(vec![], "Char input", None)),
             ],
             CreatingNewRequest => vec![
                 GoBackToMainMenu(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.cancel], "Cancel", Some("Cancel"))),
@@ -520,6 +535,7 @@ impl App<'_> {
             Normal |
             ChoosingElementToCreate |
             CreatingNewCollection | CreatingNewRequest |
+            AppendingOrCreatingCollection |
             DisplayingCookies | EditingCookies => Line::from(self.state.to_string().white().on_dark_gray()),
 
             DeletingCollection | RenamingCollection => {

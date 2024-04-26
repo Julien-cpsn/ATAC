@@ -57,6 +57,13 @@ pub enum AppEvent {
     CreatingCollectionMoveCursorRight(EventKeyBinding),
     CreatingCollectionCharInput(EventKeyBinding),
 
+    AppendOrCreateCollection(EventKeyBinding),
+    AppendingOrCreatingCollectionDeleteCharBackward(EventKeyBinding),
+    AppendingOrCreatingCollectionDeleteCharForward(EventKeyBinding),
+    AppendingOrCreatingCollectionMoveCursorLeft(EventKeyBinding),
+    AppendingOrCreatingCollectionMoveCursorRight(EventKeyBinding),
+    AppendingOrCreatingCollectionCharInput(EventKeyBinding),
+
     CreateNewRequest(EventKeyBinding),
     CreatingRequestDeleteCharBackward(EventKeyBinding),
     CreatingRequestDeleteCharForward(EventKeyBinding),
@@ -365,6 +372,16 @@ impl App<'_> {
                     _ => {}
                 },
 
+                AppendOrCreateCollection(_) => self.append_or_create_collection(),
+                AppendingOrCreatingCollectionDeleteCharBackward(_) => self.append_or_create_collection_input.delete_char_forward(),
+                AppendingOrCreatingCollectionDeleteCharForward(_) => self.append_or_create_collection_input.delete_char_backward(),
+                AppendingOrCreatingCollectionMoveCursorLeft(_) => self.append_or_create_collection_input.move_cursor_left(),
+                AppendingOrCreatingCollectionMoveCursorRight(_) => self.append_or_create_collection_input.move_cursor_right(),
+                AppendingOrCreatingCollectionCharInput(_) => match key {
+                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.append_or_create_collection_input.enter_char(char),
+                    _ => {}
+                },
+
                 CreateNewRequest(_) => self.new_request(),
                 CreatingRequestDeleteCharBackward(_) => self.new_request_popup.text_input.delete_char_forward(),
                 CreatingRequestDeleteCharForward(_) => self.new_request_popup.text_input.delete_char_backward(),
@@ -659,6 +676,12 @@ impl AppEvent {
             ChooseElementToCreateMoveCursorRight(event_key_bindings) |
             SelectElementToCreate(event_key_bindings) |
             CreateNewCollection(event_key_bindings) |
+            AppendOrCreateCollection(event_key_bindings) |
+            AppendingOrCreatingCollectionDeleteCharBackward(event_key_bindings) |
+            AppendingOrCreatingCollectionDeleteCharForward(event_key_bindings) |
+            AppendingOrCreatingCollectionMoveCursorLeft(event_key_bindings) |
+            AppendingOrCreatingCollectionMoveCursorRight(event_key_bindings) |
+            AppendingOrCreatingCollectionCharInput(event_key_bindings) |
             CreatingCollectionDeleteCharBackward(event_key_bindings) |
             CreatingCollectionDeleteCharForward(event_key_bindings) |
             CreatingCollectionMoveCursorLeft(event_key_bindings) |

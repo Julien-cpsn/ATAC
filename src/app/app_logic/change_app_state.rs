@@ -52,6 +52,10 @@ impl App<'_> {
         self.state = AppState::CreatingNewCollection;
     }
 
+    pub fn append_or_create_collection_state(&mut self){
+        self.state = AppState::AppendingOrCreatingCollection;
+    }
+
     pub fn create_new_request_state(&mut self) {
         let collections_length = self.collections.len();
 

@@ -18,7 +18,7 @@ impl App<'_> {
         if let Some(command) = &ARGS.command {
             match command {
                 Command::Import(import_args) => {
-                    print!("Importing: {}", import_args.path.display());
+                    println!("Importing file: {}", import_args.path.display());
 
                     let extension = import_args.path.extension().unwrap_or_default().to_str().unwrap_or_default();
                     if extension == "json" {

@@ -153,6 +153,40 @@ impl App<'_> {
             _ => {}
         }
     }
+
+    pub fn append_or_create_collection(&mut self) {
+        let collection_name = &self.append_or_create_collection_input.text;
+
+        if collection_name.trim().is_empty() {
+            return;
+        }
+
+        // Check to see if the collection exists, if it does - append the request
+        let existing_collection = self.collections.iter().any(|c| c.name == *collection_name);
+        if existing_collection {
+            // Append the request to the existing collection
+            let collection = self
+                .collections
+                .iter_mut()
+                .find(|c| c.name == *collection_name)
+                .unwrap();
+            collection.requests.push(Arc::new(RwLock::new(self.tmp_request.take().unwrap())));
+        } else {
+            // Create a new collection and add the request
+            let collection = Collection {
+                name: collection_name.clone(),
+                requests: vec![Arc::new(RwLock::new(self.tmp_request.take().unwrap()))],
+                path: ARGS.directory.join(format!("{}.json", collection_name.clone())),
+            };
+            self.collections.push(collection);
+        }
+
+        // Now save the collection to file
+        let collection_index = self.collections.iter().position(|c| c.name == *collection_name).unwrap();
+        self.save_collection_to_file(collection_index);
+        self.normal_state();
+        self.tmp_request = None;
+    }
     
     pub fn new_collection(&mut self) {
         let new_collection_name = &self.new_collection_input.text;
