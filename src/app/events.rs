@@ -682,8 +682,8 @@ impl App<'_> {
                     self.body_text_area.set_hard_tab_indent(true);
                     self.body_text_area.insert_tab();
                 },
-                EditingRequestBodyStringDeleteCharBackward(_) => {self.body_text_area.delete_char();},
-                EditingRequestBodyStringDeleteCharForward(_) => {self.body_text_area.delete_next_char();},
+                EditingRequestBodyStringDeleteCharBackward(_) => {self.body_text_area.delete_next_char();},
+                EditingRequestBodyStringDeleteCharForward(_) => {self.body_text_area.delete_char();},
                 EditingRequestBodyStringSkipWordLeft(_) => self.body_text_area.move_cursor(CursorMove::WordBack),
                 EditingRequestBodyStringSkipWordRight(_) => self.body_text_area.move_cursor(CursorMove::WordForward),
                 EditingRequestBodyStringMoveCursorUp(_) => self.body_text_area.move_cursor(CursorMove::Up),
