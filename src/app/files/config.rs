@@ -11,6 +11,8 @@ pub struct Config {
     pub disable_syntax_highlighting: Option<bool>,
     #[serde(default)]
     pub disable_cors: Option<bool>,
+    #[serde(default)]
+    pub enable_display_images: Option<bool>,
     pub proxy: Option<Proxy>
 }
 

@@ -1,10 +1,12 @@
+use image::DynamicImage;
 use lazy_static::lazy_static;
 use ratatui::prelude::{Line, Modifier, Span};
 use ratatui::style::Stylize;
 use serde::{Deserialize, Serialize};
 use tui_tree_widget::TreeItem;
+
 use crate::app::app::App;
-use crate::request::auth::{Auth};
+use crate::request::auth::Auth;
 use crate::request::body::ContentType;
 use crate::request::method::Method;
 use crate::request::settings::RequestSettings;
@@ -80,9 +82,23 @@ lazy_static! {
 pub struct RequestResult {
     pub duration: Option<String>,
     pub status_code: Option<String>,
-    pub body: Option<String>,
+    pub content: Option<ResponseContent>,
     pub cookies: Option<String>,
     pub headers: Vec<(String, String)>
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum ResponseContent {
+    Body(String),
+    Image(ImageResponse)
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ImageResponse {
+    pub data: Vec<u8>,
+    #[serde(skip)]
+    pub image: Option<DynamicImage>
 }
 
 impl Request {

@@ -151,11 +151,13 @@ dependencies = [
  "crossterm",
  "envfile",
  "futures-io",
+ "image",
  "jsonxf",
  "lazy_static",
  "nestify",
  "parse_postman_collection",
  "ratatui",
+ "ratatui-image",
  "regex",
  "reqwest",
  "reqwest_cookie_store",
@@ -206,6 +208,12 @@ checksum = "b1f45e9417d87227c7a56d22e471c6206462cba514c7590c09aff4cf6d1ddcad"
 dependencies = [
  "serde",
 ]
+
+[[package]]
+name = "bit_field"
+version = "0.10.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dc827186963e592360843fb5ba4b973e145841266c1357f7180c43526f2e5b61"
 
 [[package]]
 name = "bitflags"
@@ -478,6 +486,31 @@ dependencies = [
 ]
 
 [[package]]
+name = "crossbeam-deque"
+version = "0.8.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "613f8cc01fe9cf1a3eb3d7f488fd2fa8388403e97039e2f73692932e291a770d"
+dependencies = [
+ "crossbeam-epoch",
+ "crossbeam-utils",
+]
+
+[[package]]
+name = "crossbeam-epoch"
+version = "0.9.18"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5b82ac4a3c2ca9c3460964f020e1402edd5753411d7737aa39c3714ad1b5420e"
+dependencies = [
+ "crossbeam-utils",
+]
+
+[[package]]
+name = "crossbeam-utils"
+version = "0.8.19"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "248e3bacc7dc6baa3b21e405ee045c3047101a49145e7e9eca583ab4c2ca5345"
+
+[[package]]
 name = "crossterm"
 version = "0.27.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -501,6 +534,12 @@ checksum = "acdd7c62a3665c7f6830a51635d9ac9b23ed385797f70a83bb8bafe9c572ab2b"
 dependencies = [
  "winapi",
 ]
+
+[[package]]
+name = "crunchy"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7a81dae078cea95a014a339291cec439d2f232ebe854a9d672b796c6afafa9b7"
 
 [[package]]
 name = "darling"
@@ -578,6 +617,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "dyn-clone"
+version = "1.0.17"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0d6ef0072f8a535281e4876be788938b528e9a1d43900b82c2569af7da799125"
+
+[[package]]
 name = "either"
 version = "1.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -634,6 +679,22 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a0474425d51df81997e2f90a21591180b38eccf27292d755f3e30750225c175b"
 
 [[package]]
+name = "exr"
+version = "1.72.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "887d93f60543e9a9362ef8a21beedd0a833c5d9610e18c67abe15a5963dcb1a4"
+dependencies = [
+ "bit_field",
+ "flume",
+ "half",
+ "lebe",
+ "miniz_oxide",
+ "rayon-core",
+ "smallvec",
+ "zune-inflate",
+]
+
+[[package]]
 name = "fdeflate"
 version = "0.3.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -650,6 +711,15 @@ checksum = "46303f565772937ffe1d394a4fac6f411c6013172fadde9dcdb1e147a086940e"
 dependencies = [
  "crc32fast",
  "miniz_oxide",
+]
+
+[[package]]
+name = "flume"
+version = "0.11.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "55ac459de2512911e4b674ce33cf20befaba382d05b62b008afc1c8b57cbf181"
+dependencies = [
+ "spin",
 ]
 
 [[package]]
@@ -792,6 +862,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "gif"
+version = "0.13.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3fb2d69b19215e18bb912fa30f7ce15846e301408695e44e0ef719f1da9e19f2"
+dependencies = [
+ "color_quant",
+ "weezl",
+]
+
+[[package]]
 name = "gimli"
 version = "0.28.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -814,6 +894,16 @@ dependencies = [
  "tokio",
  "tokio-util",
  "tracing",
+]
+
+[[package]]
+name = "half"
+version = "2.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6dd08c532ae367adf81c312a4580bc67f1d0fe8bc9c460520283f4c0ff277888"
+dependencies = [
+ "cfg-if",
+ "crunchy",
 ]
 
 [[package]]
@@ -911,6 +1001,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "icy_sixel"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "86858ae800284d596cfdefcb0ad435c3493c12f35367431bbe9b2b3858c1155b"
+
+[[package]]
 name = "ident_case"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -956,8 +1052,12 @@ dependencies = [
  "bytemuck",
  "byteorder",
  "color_quant",
+ "exr",
+ "gif",
+ "jpeg-decoder",
  "num-traits",
  "png",
+ "qoi",
  "tiff",
 ]
 
@@ -1003,6 +1103,9 @@ name = "jpeg-decoder"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f5d4a7da358eff58addd2877a45865158f0d78c911d43a5784ceb7bbf52833b0"
+dependencies = [
+ "rayon",
+]
 
 [[package]]
 name = "js-sys"
@@ -1028,6 +1131,12 @@ name = "lazy_static"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
+
+[[package]]
+name = "lebe"
+version = "0.5.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "03087c2bad5e1034e8cace5926dec053fb3790248370865f5117a7d0213354c8"
 
 [[package]]
 name = "libc"
@@ -1406,6 +1515,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "qoi"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7f6d64c71eb498fe9eae14ce4ec935c555749aef511cca85b5568910d6e48001"
+dependencies = [
+ "bytemuck",
+]
+
+[[package]]
 name = "quick-xml"
 version = "0.31.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1471,6 +1589,42 @@ dependencies = [
  "strum",
  "unicode-segmentation",
  "unicode-width",
+]
+
+[[package]]
+name = "ratatui-image"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2264bdb808c89e8395480cfce32c197e75a3d6171063e913bca12e7919a333da"
+dependencies = [
+ "base64",
+ "crossterm",
+ "dyn-clone",
+ "icy_sixel",
+ "image",
+ "rand",
+ "ratatui",
+ "rustix",
+]
+
+[[package]]
+name = "rayon"
+version = "1.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b418a60154510ca1a002a752ca9714984e21e4241e804d32555251faf8b78ffa"
+dependencies = [
+ "either",
+ "rayon-core",
+]
+
+[[package]]
+name = "rayon-core"
+version = "1.12.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1465873a3dfdaa8ae7cb14b4383657caab0b3e8a0aa9ae8e04b044854c8dfce2"
+dependencies = [
+ "crossbeam-deque",
+ "crossbeam-utils",
 ]
 
 [[package]]
@@ -1867,6 +2021,9 @@ name = "spin"
 version = "0.9.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6980e8d7511241f8acf4aebddbb1ff938df5eebe98691418c4468d0b72a96a67"
+dependencies = [
+ "lock_api",
+]
 
 [[package]]
 name = "stability"
@@ -2680,4 +2837,13 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.48",
+]
+
+[[package]]
+name = "zune-inflate"
+version = "0.2.54"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "73ab332fe2f6680068f3582b16a24f90ad7096d5d39b974d1c0aff0125116f02"
+dependencies = [
+ "simd-adler32",
 ]

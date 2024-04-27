@@ -5,12 +5,14 @@ use ratatui::prelude::Style;
 use ratatui::style::Stylize;
 use ratatui::text::Line;
 use ratatui::widgets::{Block, Borders, Paragraph, Scrollbar, ScrollbarOrientation, Tabs};
+use ratatui_image::{Image, Resize};
+use ratatui_image::picker::Picker;
 use strum::{Display, EnumIter, FromRepr, IntoEnumIterator};
 use throbber_widgets_tui::{BRAILLE_DOUBLE, Throbber, WhichUse};
 
 use crate::app::app::App;
 use crate::request::body::find_file_format_in_content_type;
-use crate::request::request::Request;
+use crate::request::request::{Request, ResponseContent};
 use crate::utils::centered_rect::centered_rect;
 use crate::utils::syntax_highlighting::last_highlighted_to_lines;
 
@@ -96,36 +98,68 @@ impl App<'_> {
 
             let last_highlighted = self.syntax_highlighting.last_highlighted.clone();
 
-            let mut result_widget: Paragraph = match self.request_result_tab {
-                RequestResultTabs::Body => match &request.result.body {
-                    None => Paragraph::new(""),
+            match self.request_result_tab {
+                RequestResultTabs::Body => match &request.result.content {
+                    None => {},
                     Some(_) if !self.config.disable_syntax_highlighting.unwrap_or(false) && last_highlighted.read().unwrap().is_some() => {
                         let lines = last_highlighted_to_lines(last_highlighted.read().unwrap().clone().unwrap());
-                        Paragraph::new(lines)
+
+                        let body_paragraph = Paragraph::new(lines)
+                            .scroll((
+                                self.result_vertical_scrollbar.scroll,
+                                self.result_horizontal_scrollbar.scroll
+                            ));
+
+                        frame.render_widget(body_paragraph, request_result_layout[2]);
                     }
-                    Some(body) => {
-                        let file_format = find_file_format_in_content_type(&request.result.headers);
-                        
-                        // is not highlighted
-                        let lines: Vec<Line> = match file_format {
-                            None => body.lines().map(|line| Line::raw(line)).collect(),
-                            Some(file_format) => {
-                                // Tries to highlight the body
-                                self.syntax_highlighting.highlight(body, &file_format);
+                    Some(content) => match content {
+                        ResponseContent::Body(body) => {
+                            let file_format = find_file_format_in_content_type(&request.result.headers);
 
-                                // TODO: temporary solution, should be refreshed everytime after receiving a response
-                                self.refresh_result_scrollbars();
+                            // is not highlighted
+                            let lines: Vec<Line> = match file_format {
+                                None => body.lines().map(|line| Line::raw(line)).collect(),
+                                Some(file_format) => {
+                                    // Tries to highlight the body
+                                    self.syntax_highlighting.highlight(body, &file_format);
 
-                                match last_highlighted.read().unwrap().clone() {
-                                    // Nothing was highlighted
-                                    None => body.lines().map(|line| Line::raw(line)).collect(),
-                                    // Something was highlighted
-                                    Some(last_highlighted) => last_highlighted_to_lines(last_highlighted)
+                                    // TODO: temporary solution, should be refreshed everytime after receiving a response
+                                    self.refresh_result_scrollbars();
+
+                                    match last_highlighted.read().unwrap().clone() {
+                                        // Nothing was highlighted
+                                        None => body.lines().map(|line| Line::raw(line)).collect(),
+                                        // Something was highlighted
+                                        Some(last_highlighted) => last_highlighted_to_lines(last_highlighted)
+                                    }
                                 }
-                            }
-                        };
+                            };
 
-                        Paragraph::new(lines)
+                            let body_paragraph = Paragraph::new(lines)
+                                .scroll((
+                                    self.result_vertical_scrollbar.scroll,
+                                    self.result_horizontal_scrollbar.scroll
+                                ));
+
+                            frame.render_widget(body_paragraph, request_result_layout[2]);
+                        }
+                        ResponseContent::Image(image_response) => match &image_response.image {
+                            Some(image) => {
+                                let mut picker = Picker::new((3, 6));
+                                picker.guess_protocol();
+
+                                let image_static = picker
+                                    .new_protocol(image.clone(), request_result_layout[2], Resize::Fit(None))
+                                    .unwrap();
+
+                                let image = Image::new(image_static.as_ref());
+                                frame.render_widget(image, request_result_layout[2]);
+                            }
+                            None => {
+                                let image_error_paragraph = Paragraph::new("Could not decode image");
+                                frame.render_widget(image_error_paragraph, request_result_layout[2]);
+                            }
+                        },
                     }
                 }
                 RequestResultTabs::Cookies => {
@@ -134,7 +168,13 @@ impl App<'_> {
                         Some(cookies) => cookies
                     };
 
-                    Paragraph::new(result_cookies)
+                    let cookies_paragraph = Paragraph::new(result_cookies)
+                        .scroll((
+                            self.result_vertical_scrollbar.scroll,
+                            self.result_horizontal_scrollbar.scroll
+                        ));
+
+                    frame.render_widget(cookies_paragraph, request_result_layout[2]);
                 }
                 RequestResultTabs::Headers => {
                     let result_headers: Vec<Line> = request.result.headers
@@ -142,16 +182,15 @@ impl App<'_> {
                         .map(|(header, value)| Line::from(format!("{header}: {value}")))
                         .collect();
 
-                    Paragraph::new(result_headers)
+                    let headers_paragraph = Paragraph::new(result_headers)
+                        .scroll((
+                            self.result_vertical_scrollbar.scroll,
+                            self.result_horizontal_scrollbar.scroll
+                        ));
+
+                    frame.render_widget(headers_paragraph, request_result_layout[2]);
                 }
             };
-
-            result_widget = result_widget.scroll((
-                self.result_vertical_scrollbar.scroll,
-                self.result_horizontal_scrollbar.scroll
-            ));
-
-            frame.render_widget(result_widget, request_result_layout[2]);
         }
 
         let result_vertical_scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight);

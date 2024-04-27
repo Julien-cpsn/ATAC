@@ -5,7 +5,7 @@ use std::sync::Arc;
 use std::time::{Duration, Instant};
 
 use reqwest::{ClientBuilder, Proxy, Url};
-use reqwest::header::HeaderMap;
+use reqwest::header::{CONTENT_TYPE, HeaderMap};
 use reqwest::multipart::{Form, Part};
 use reqwest::redirect::Policy;
 use tokio::task;
@@ -14,6 +14,7 @@ use crate::app::app::App;
 use crate::panic_error;
 use crate::request::auth::Auth::{BasicAuth, BearerToken, NoAuth};
 use crate::request::body::{ContentType, find_file_format_in_content_type};
+use crate::request::request::{ImageResponse, ResponseContent};
 
 impl App<'_> {
     pub async fn send_request(&mut self) {
@@ -214,10 +215,16 @@ impl App<'_> {
                     Ok(response) => {
                         let status_code = response.status().to_string();
 
+                        let mut is_image = false;
+
                         let headers: Vec<(String, String)> = response.headers().clone()
                             .iter()
                             .map(|(header_name, header_value)| {
                                 let value = header_value.to_str().unwrap_or("").to_string();
+
+                                if header_name == CONTENT_TYPE && value.starts_with("image/") {
+                                    is_image = true;
+                                }
 
                                 (header_name.to_string(), value)
                             })
@@ -230,26 +237,41 @@ impl App<'_> {
                             .collect::<Vec<String>>()
                             .join("\n");
 
-                        let mut result_body = response.text().await.unwrap();
+                        let response_content = match is_image {
+                            true => {
+                                let content = response.bytes().await.unwrap();
+                                let image = image::load_from_memory(content.as_ref());
+                                
+                                ResponseContent::Image(ImageResponse {
+                                    data: content.to_vec(),
+                                    image: image.ok(),
+                                })
+                            },
+                            false => {
+                                let mut result_body = response.text().await.unwrap();
 
-                        // If the request response content can be pretty printed
-                        if local_selected_request.read().unwrap().settings.pretty_print_response_content {
-                            // If a file format has been found in the content-type header
-                            if let Some(file_format) = find_file_format_in_content_type(&headers) {
-                                // Match the file format
-                                match file_format.as_str() {
-                                    "json" => {
-                                        result_body = jsonxf::pretty_print(&result_body).unwrap_or(result_body);
-                                    },
-                                    _ => {}
+                                // If a file format has been found in the content-type header
+                                if let Some(file_format) = find_file_format_in_content_type(&headers) {
+                                    // If the request response content can be pretty printed
+                                    if local_selected_request.read().unwrap().settings.pretty_print_response_content {
+                                        // Match the file format
+                                        match file_format.as_str() {
+                                            "json" => {
+                                                result_body = jsonxf::pretty_print(&result_body).unwrap_or(result_body);
+                                            },
+                                            _ => {}
+                                        }
+                                    }
                                 }
+
+                                ResponseContent::Body(result_body)
                             }
-                        }
+                        };
                         
                         {
                             let mut selected_request = local_selected_request.write().unwrap();
                             selected_request.result.status_code = Some(status_code);
-                            selected_request.result.body = Some(result_body);
+                            selected_request.result.content = Some(response_content);
                             selected_request.result.cookies = Some(cookies);
                             selected_request.result.headers = headers;
                         }
@@ -263,13 +285,13 @@ impl App<'_> {
                         } else {
                             response_status_code = None;
                         }
-                        let result_body = error.to_string();
 
+                        let result_body = ResponseContent::Body(error.to_string());
 
                         {
                             let mut selected_request = local_selected_request.write().unwrap();
                             selected_request.result.status_code = response_status_code;
-                            selected_request.result.body = Some(result_body);
+                            selected_request.result.content = Some(result_body);
                             selected_request.result.cookies = None;
                             selected_request.result.headers = vec![];
                         }
