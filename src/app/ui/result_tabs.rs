@@ -156,7 +156,7 @@ impl App<'_> {
                                 frame.render_widget(image, request_result_layout[2]);
                             }
                             None => {
-                                let image_error_paragraph = Paragraph::new("Could not decode image");
+                                let image_error_paragraph = Paragraph::new("Could not decode image").centered();
                                 frame.render_widget(image_error_paragraph, request_result_layout[2]);
                             }
                         },
@@ -190,7 +190,7 @@ impl App<'_> {
 
                     frame.render_widget(headers_paragraph, request_result_layout[2]);
                 }
-            };
+            }
         }
 
         let result_vertical_scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight);
