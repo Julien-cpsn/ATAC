@@ -12,7 +12,7 @@ pub struct Config {
     #[serde(default)]
     pub disable_cors: Option<bool>,
     #[serde(default)]
-    pub enable_display_images: Option<bool>,
+    pub disable_images_preview: Option<bool>,
     pub proxy: Option<Proxy>
 }
 
@@ -20,6 +20,20 @@ pub struct Config {
 pub struct Proxy {
     pub http_proxy: Option<String>,
     pub https_proxy: Option<String>,
+}
+
+impl Config {
+    pub fn is_syntax_highlighting_disabled(&self) -> bool {
+        return self.disable_syntax_highlighting.unwrap_or(false)
+    }
+    
+    pub fn is_cors_disabled(&self) -> bool {
+        return self.disable_cors.unwrap_or(false)
+    }
+    
+    pub fn is_image_preview_disabled(&self) -> bool {
+        return self.disable_images_preview.unwrap_or(false)
+    }
 }
 
 impl App<'_> {

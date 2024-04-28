@@ -101,7 +101,7 @@ impl App<'_> {
             match self.request_result_tab {
                 RequestResultTabs::Body => match &request.result.content {
                     None => {},
-                    Some(_) if !self.config.disable_syntax_highlighting.unwrap_or(false) && last_highlighted.read().unwrap().is_some() => {
+                    Some(_) if !self.config.is_syntax_highlighting_disabled() && last_highlighted.read().unwrap().is_some() => {
                         let lines = last_highlighted_to_lines(last_highlighted.read().unwrap().clone().unwrap());
 
                         let body_paragraph = Paragraph::new(lines)
@@ -144,6 +144,10 @@ impl App<'_> {
                             frame.render_widget(body_paragraph, request_result_layout[2]);
                         }
                         ResponseContent::Image(image_response) => match &image_response.image {
+                            _ if self.config.is_image_preview_disabled() => {
+                                let image_disabled_paragraph = Paragraph::new("\nImage preview disabled").centered();
+                                frame.render_widget(image_disabled_paragraph, request_result_layout[2]);
+                            },
                             Some(image) => {
                                 let mut picker = Picker::new((3, 6));
                                 picker.guess_protocol();
@@ -156,7 +160,7 @@ impl App<'_> {
                                 frame.render_widget(image, request_result_layout[2]);
                             }
                             None => {
-                                let image_error_paragraph = Paragraph::new("Could not decode image").centered();
+                                let image_error_paragraph = Paragraph::new("\nCould not decode image").centered();
                                 frame.render_widget(image_error_paragraph, request_result_layout[2]);
                             }
                         },

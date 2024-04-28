@@ -109,7 +109,7 @@ impl App<'_> {
 
             /* CORS */
             
-            if self.config.disable_cors.unwrap_or(false) {
+            if self.config.is_cors_disabled() {
                 request = request.fetch_mode_no_cors();
             }
             
