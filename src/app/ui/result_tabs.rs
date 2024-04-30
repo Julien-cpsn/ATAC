@@ -3,7 +3,7 @@ use ratatui::layout::{Constraint, Layout, Margin, Rect};
 use ratatui::layout::Direction::Vertical;
 use ratatui::prelude::Style;
 use ratatui::style::Stylize;
-use ratatui::text::Line;
+use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, Borders, Paragraph, Scrollbar, ScrollbarOrientation, Tabs};
 use strum::{Display, EnumIter, FromRepr, IntoEnumIterator};
 use throbber_widgets_tui::{BRAILLE_DOUBLE, Throbber, WhichUse};
@@ -139,7 +139,10 @@ impl App<'_> {
                 RequestResultTabs::Headers => {
                     let result_headers: Vec<Line> = request.result.headers
                         .iter()
-                        .map(|(header, value)| Line::from(format!("{header}: {value}")))
+                        .map(
+                            |(header, value)| 
+                                Line::from(vec![Span::raw(header).bold().dark_gray(), Span::raw(": "), Span::raw(value)])
+                        )
                         .collect();
 
                     Paragraph::new(result_headers)
