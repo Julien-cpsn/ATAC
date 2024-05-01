@@ -1,9 +1,9 @@
 {
-  "name": "Status code",
+  "name": "Scripts",
   "requests": [
     {
-      "name": "Test 200",
-      "url": "https://httpbin.org/status/200",
+      "name": "Pre-request script",
+      "url": "https://httpbin.org/get",
       "method": "GET",
       "params": [],
       "headers": [
@@ -18,7 +18,7 @@
           "enabled": true,
           "data": [
             "user-agent",
-            "ATAC/v0.7.0"
+            "ATAC/v0.14.0"
           ]
         },
         {
@@ -46,7 +46,7 @@
       "body": "no_body",
       "auth": "no_auth",
       "scripts": {
-        "pre_request_script": null,
+        "pre_request_script": "console.log(\"Hello\")\npretty_print(request)",
         "post_request_script": null
       },
       "settings": {
@@ -57,9 +57,9 @@
       }
     },
     {
-      "name": "Test 401",
-      "url": "https://httpbin.org/status/401",
-      "method": "POST",
+      "name": "Post-request script",
+      "url": "https://httpbin.org/get",
+      "method": "GET",
       "params": [],
       "headers": [
         {
@@ -73,7 +73,7 @@
           "enabled": true,
           "data": [
             "user-agent",
-            "ATAC/v0.7.0"
+            "ATAC/v0.14.0"
           ]
         },
         {
@@ -102,7 +102,7 @@
       "auth": "no_auth",
       "scripts": {
         "pre_request_script": null,
-        "post_request_script": null
+        "post_request_script": "console.log(\" World!\")\npretty_print(response)"
       },
       "settings": {
         "use_config_proxy": true,
@@ -112,9 +112,9 @@
       }
     },
     {
-      "name": "Test 500",
-      "url": "https://httpbin.org/status/500",
-      "method": "PUT",
+      "name": "Both",
+      "url": "https://httpbin.org/get",
+      "method": "GET",
       "params": [],
       "headers": [
         {
@@ -128,7 +128,7 @@
           "enabled": true,
           "data": [
             "user-agent",
-            "ATAC/v0.7.0"
+            "ATAC/v0.14.0"
           ]
         },
         {
@@ -156,8 +156,8 @@
       "body": "no_body",
       "auth": "no_auth",
       "scripts": {
-        "pre_request_script": null,
-        "post_request_script": null
+        "pre_request_script": "console.log(\"Hello\")\n\nrequest.url = \"https://google.com\"\n\npretty_print(request)",
+        "post_request_script": "console.log(\" World!\")\n\nenv.ID = \"3\"\n\npretty_print(env)\npretty_print(response)"
       },
       "settings": {
         "use_config_proxy": true,

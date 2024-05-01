@@ -163,9 +163,9 @@ cargo run -- -h
 | - Cookies                           | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
 | - Headers                           | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
 | - Duration                          | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
-| Scripting                           | :x: :soon:                                               | Partial              | :x:                  |
-| - Pre-request script                | :x: :soon:                                               | :x:                  | :x:                  |
-| - Post-request script               | :x: :soon:                                               | :white_check_mark:   | :x:                  |
+| Scripting                           | :white_check_mark:                                       | Partial              | :x:                  |
+| - Pre-request script                | :white_check_mark:                                       | :x:                  | :x:                  |
+| - Post-request script               | :white_check_mark:                                       | :white_check_mark:   | :x:                  |
 | Asynchronous requests               | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
 | Per-request settings                | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
 | - Use proxy                         | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
@@ -207,7 +207,6 @@ cargo run -- -h
   - Command line usage (send requests, add new requests)
   - Request body syntax highlighting
   - Export a request to other code formats ([raw](https://github.com/Kong/insomnia/issues/174), curl, PHP, JS, Rust, ...)
-  - Pre and post-request script (javascript v8 engine)
   - OpenAPI & Insomnia import
 
 - **To improve**
@@ -280,7 +279,7 @@ https://github.com/NachoNievaG/atac.nvim
 | [serde](https://github.com/serde-rs/serde) & [serde_json](https://github.com/serde-rs/json)                                                | 1.0.197 & 1.0.144 | Serialize & Deserialize application data into JSON files                               |
 | [jsonxf](https://github.com/gamache/jsonxf)                                                                                                | 0.1.1             | Pretty print JSON                                                                      |
 | [toml](https://github.com/toml-rs/toml)                                                                                                    | 0.8.11            | Serialize & Deserialize application config files                                       |
-| [envfile](https://github.com/pop-os/envfile)                                                                                               | 0.2.1             | Deserialize application environment files                                              |
+| [deno_core](https://github.com/denoland/deno_core)                                                                                         | 0.278.0           | Create Javascript and manager runtimes. Used for pre and post request scripts          |
 | [My fork](https://github.com/Julien-cpsn/postman-collection-rs) of [postman_collection](https://github.com/mandrean/postman-collection-rs) | 0.2.1             | Deserialize Postman collection files                                                   |
 | [clap](https://github.com/clap-rs/clap)                                                                                                    | 4.5.0             | Command Line Argument Parser                                                           |
 | [arboard](https://github.com/1Password/arboard)                                                                                            | 3.3.2             | Copy response body to clipboard                                                        |
@@ -288,6 +287,8 @@ https://github.com/NachoNievaG/atac.nvim
 | [strum](https://github.com/Peternator7/strum)                                                                                              | 0.26.2            | Enum facilities                                                                        |
 | [lazy_static](https://github.com/rust-lang-nursery/lazy-static.rs)                                                                         | 1.4.0             | Allows for more flexible constants. Mainly used for accessing CLI arguments everywhere |
 | [nestify](https://github.com/snowfoxsh/nestify)                                                                                            | 0.3.3             | Used to nest struct definitions                                                        |
+| [snailquote](https://github.com/euank/snailquote)                                                                                          | 0.3.1             | Unescape string                                                                        |
+| [indexmap](https://github.com/indexmap-rs/indexmap)                                                                                        | 2.2.6             | Ordered hashmap. Used in environments to preserve files' values order                  |
 | [regex](https://github.com/rust-lang/regex)                                                                                                | 1.10.3            | Regex. Using for parsing requests URL                                                  |
 
 ### Binary size

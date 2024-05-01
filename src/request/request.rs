@@ -7,6 +7,8 @@ use crate::app::app::App;
 use crate::request::auth::{Auth};
 use crate::request::body::ContentType;
 use crate::request::method::Method;
+use crate::request::response::RequestResponse;
+use crate::request::scripts::RequestScripts;
 use crate::request::settings::RequestSettings;
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
@@ -18,10 +20,11 @@ pub struct Request {
     pub headers: Vec<KeyValue>,
     pub body: ContentType,
     pub auth: Auth,
+    pub scripts: RequestScripts,
     pub settings: RequestSettings,
 
     #[serde(skip)]
-    pub result: RequestResult,
+    pub response: RequestResponse,
 
     #[serde(skip)]
     pub is_pending: bool
@@ -74,15 +77,6 @@ lazy_static! {
             data: (String::from("connection"), String::from("keep-alive")),
         },
     ];
-}
-
-#[derive(Default, Debug, Clone, Serialize, Deserialize)]
-pub struct RequestResult {
-    pub duration: Option<String>,
-    pub status_code: Option<String>,
-    pub body: Option<String>,
-    pub cookies: Option<String>,
-    pub headers: Vec<(String, String)>
 }
 
 impl Request {

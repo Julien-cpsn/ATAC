@@ -18,6 +18,14 @@ pub struct Vim {
     pending: KeyCombination, // Pending input to handle a sequence with two keys like gg
 }
 
+impl Default for Vim {
+    fn default() -> Self {
+        Vim {
+            mode: VimMode::default(),
+            pending: *EMPTY_KEY, 
+        }
+    }
+}
 
 impl Vim {
     pub fn new(mode: VimMode) -> Self {
@@ -190,8 +198,9 @@ impl Vim {
 }
 
 
-#[derive( Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Default, Debug, Clone, Copy, PartialEq, Eq)]
 pub enum VimMode {
+    #[default]
     Normal,
     Insert,
     Visual,

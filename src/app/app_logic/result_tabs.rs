@@ -7,7 +7,15 @@ impl App<'_> {
         self.request_result_tab = match self.request_result_tab {
             RequestResultTabs::Body => RequestResultTabs::Cookies,
             RequestResultTabs::Cookies => RequestResultTabs::Headers,
-            RequestResultTabs::Headers => RequestResultTabs::Body,
+            RequestResultTabs::Headers => {
+                let local_console_output = self.script_console.console_output.read().unwrap();
+
+                match local_console_output.as_ref() {
+                    None => RequestResultTabs::Body,
+                    Some(_) => RequestResultTabs::Console
+                }
+            }
+            RequestResultTabs::Console => RequestResultTabs::Body
         };
 
         self.refresh_result_scrollbars();
@@ -23,7 +31,7 @@ impl App<'_> {
 
         match self.request_result_tab {
             RequestResultTabs::Body => {
-                match &selected_request.result.body {
+                match &selected_request.response.body {
                     None => {
                         lines_count = 0;
                         horizontal_max = 0;
@@ -35,7 +43,7 @@ impl App<'_> {
                 }
             }
             RequestResultTabs::Cookies => {
-                match &selected_request.result.cookies {
+                match &selected_request.response.cookies {
                     None => {
                         lines_count = 0;
                         horizontal_max = 0;
@@ -47,11 +55,11 @@ impl App<'_> {
                 }
             }
             RequestResultTabs::Headers => {
-                lines_count = selected_request.result.headers.len();
+                lines_count = selected_request.response.headers.len();
 
                 let mut max_tmp = 0;
 
-                for (header, value) in &selected_request.result.headers {
+                for (header, value) in &selected_request.response.headers {
                     let str_len = header.len() + value.len();
                     if str_len > max_tmp {
                         max_tmp = str_len;
@@ -60,13 +68,27 @@ impl App<'_> {
                 
                 horizontal_max = max_tmp;
             }
+            RequestResultTabs::Console => {
+                let local_console_output = self.script_console.console_output.read().unwrap();
+
+                match local_console_output.as_ref() {
+                    None => {
+                        lines_count = 0;
+                        horizontal_max = 0;
+                    },
+                    Some(console_output) => {
+                        lines_count = console_output.lines().count();
+                        horizontal_max = App::get_max_str_len(console_output.lines());
+                    }
+                }
+            }
         }
 
         self.result_vertical_scrollbar.set_scroll(lines_count);
         self.result_horizontal_scrollbar.set_scroll(horizontal_max);
     }
     
-    fn get_max_str_len(lines: Lines) -> usize {
+    pub fn get_max_str_len(lines: Lines) -> usize {
         let mut max_tmp = 0;
 
         for line in lines {

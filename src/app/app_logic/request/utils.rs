@@ -22,21 +22,29 @@ impl App<'_> {
         let mut clipboard = Clipboard::new().unwrap();
 
         match self.request_result_tab {
-            RequestResultTabs::Body => match &selected_request.result.body {
+            RequestResultTabs::Body => match &selected_request.response.body {
                 None => {}
                 Some(body) => clipboard.set_text(body).expect("Could not copy body content to clipboard")
             }
-            RequestResultTabs::Cookies => match &selected_request.result.cookies {
+            RequestResultTabs::Cookies => match &selected_request.response.cookies {
                 None => {}
                 Some(cookies) => clipboard.set_text(cookies).expect("Could not copy cookies to clipboard")
             }
             RequestResultTabs::Headers => {
-                let headers_string: String = selected_request.result.headers
+                let headers_string: String = selected_request.response.headers
                     .iter()
                     .map(|(header, value)| format!("{}: {}\n", header, value))
                     .collect();
 
                 clipboard.set_text(headers_string).expect("Could not copy headers to clipboard")
+            }
+            RequestResultTabs::Console => {
+                let local_console_output = self.script_console.console_output.read().unwrap();
+
+                match local_console_output.as_ref() {
+                    None => {}
+                    Some(console_output) => clipboard.set_text(console_output).expect("Could not copy console output to clipboard")
+                }
             }
         }
     }

@@ -95,7 +95,7 @@ nest! {
 
             pub send_request: KeyCombination,
             pub alt_send_request: KeyCombination,
-
+            
             pub param_tabs: #[derive(Copy, Clone, Deserialize)] pub struct ParamTabs {
                 pub change_auth_method: KeyCombination,
                 pub change_body_content_type: KeyCombination,
