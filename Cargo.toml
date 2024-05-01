@@ -35,7 +35,7 @@ serde = { version = "1.0.197", features = ["derive", "rc"] }
 serde_json = "1.0.114"
 jsonxf = "1.1.1"
 toml = "0.8.11"
-deno_core = "0.278.0"
+boa_engine = { version = "0.18.0", default-features = false }
 parse_postman_collection = "0.2.3"
 clap = { version = "4.5.0", features = ["derive", "color"] }
 arboard = "3.3.2"

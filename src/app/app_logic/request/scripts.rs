@@ -1,4 +1,4 @@
-use deno_core::{JsRuntime, RuntimeOptions};
+use boa_engine::{Context, Source};
 use indexmap::IndexMap;
 use tui_textarea::TextArea;
 
@@ -86,7 +86,8 @@ function pretty_print(data) {
 "#;
 
 pub(super) fn execute_pre_request_script(user_script: &String, request: &Request, env: &IndexMap<String, String>) -> (Option<Request>, IndexMap<String, String>, String) {
-    let mut runtime = JsRuntime::new(RuntimeOptions::default());
+    // Instantiate the execution context
+    let mut context = Context::default();
 
     let env = env.clone();
 
@@ -109,17 +110,16 @@ pub(super) fn execute_pre_request_script(user_script: &String, request: &Request
         JSON.stringify([request, env, console_log_output])
     "#);
 
-    let result = match runtime.execute_script("<anon>", script) {
+    let result = match context.eval(Source::from_bytes(&script)) {
         Ok(result) => result,
         Err(error) => {
             return (None, env, error.to_string())
         }
     };
-    let mut scope = &mut runtime.handle_scope();
-    let value = result.open(&mut scope);
-    let result = value.to_rust_string_lossy(&mut scope);
 
-    let (result_request, result_env_values, console_output) = match serde_json::from_str::<(Request, IndexMap<String, String>, String)>(&result) {
+    let stringed_result = result.as_string().unwrap().to_std_string_escaped();
+
+    let (result_request, result_env_values, console_output) = match serde_json::from_str::<(Request, IndexMap<String, String>, String)>(&stringed_result) {
         Ok((result_request, result_env_values, console_output)) => (Some(result_request), result_env_values, console_output),
         Err(error) => (None, env, error.to_string())
     };
@@ -128,7 +128,8 @@ pub(super) fn execute_pre_request_script(user_script: &String, request: &Request
 }
 
 pub(super) fn execute_post_request_script(user_script: &String, response: &RequestResponse, env: &IndexMap<String, String>) -> (Option<RequestResponse>, IndexMap<String, String>, String) {
-    let mut runtime = JsRuntime::new(RuntimeOptions::default());
+    // Instantiate the execution context
+    let mut context = Context::default();
 
     let env = env.clone();
 
@@ -151,17 +152,16 @@ pub(super) fn execute_post_request_script(user_script: &String, response: &Reque
         JSON.stringify([response, env, console_log_output])
     "#);
 
-    let result = match runtime.execute_script("<anon>", script) {
+    let result = match context.eval(Source::from_bytes(&script)) {
         Ok(result) => result,
         Err(error) => {
             return (None, env, error.to_string())
         }
     };
-    let mut scope = &mut runtime.handle_scope();
-    let value = result.open(&mut scope);
-    let result = value.to_rust_string_lossy(&mut scope);
 
-    let (response_result, result_env_values, console_output) = match serde_json::from_str::<(RequestResponse, IndexMap<String, String>, String)>(&result) {
+    let stringed_result = result.as_string().unwrap().to_std_string_escaped();
+
+    let (response_result, result_env_values, console_output) = match serde_json::from_str::<(RequestResponse, IndexMap<String, String>, String)>(&stringed_result) {
         Ok((mut response_result, result_env_values, console_output)) => {
             // Avoid loosing those fields since they are not serialized
             response_result.duration = response.duration.clone();
