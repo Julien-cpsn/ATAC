@@ -171,6 +171,7 @@ cargo run -- -h
 | - Use proxy                         | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
 | - Allow redirects                   | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
 | - Store cookies                     | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
+| Export to other languages           | :x: :soon:                                               | :white_check_mark:   | :x:                  |
 | **WebSocket Client**                | :x: :soon:                                               | :white_check_mark:   | :white_check_mark:   |
 | **GraphQL**                         | :x: :soon:                                               | :white_check_mark:   | :white_check_mark:   |
 | **gRPC**                            | :x: :soon:                                               | :white_check_mark:   | :white_check_mark:   |
@@ -193,17 +194,7 @@ cargo run -- -h
 
 - **To add**
   - Create a repo wiki
-  - Document whole code
-
-- **To improve**
-  - Sign binary
-
-- **To fix**
-  - Query parameters bug
-
-### TODO v2.0.0
-
-- **To add**
+  - Document the whole code
   - Command line usage (send requests, add new requests)
   - Request body syntax highlighting
   - Export a request to other code formats ([raw](https://github.com/Kong/insomnia/issues/174), curl, PHP, JS, Rust, ...)
@@ -214,7 +205,10 @@ cargo run -- -h
   - Auto-completion on env file variables
   - Manage multipart Content-type header (auto-generated for now) https://github.com/seanmonstar/reqwest/issues/2259
 
-### TODO v3.0.0
+- **To fix**
+  - Query parameters bug
+
+### TODO v2.0.0
 
 - **To add**
   - WebSocket requests
