@@ -5,7 +5,6 @@ use std::time::Duration;
 use crossterm::terminal::disable_raw_mode;
 use ratatui::backend::Backend;
 use ratatui::Terminal;
-use strum::VariantArray;
 use throbber_widgets_tui::ThrobberState;
 use tui_textarea::TextArea;
 
@@ -17,10 +16,8 @@ use crate::app::ui::result_tabs::RequestResultTabs;
 use crate::app::ui::views::RequestView;
 use crate::request::collection::Collection;
 use crate::request::environment::Environment;
-use crate::request::export::ExportFormat;
 use crate::utils::choice_popup::ChoicePopup;
 use crate::utils::cookies_popup::CookiesPopup;
-use crate::utils::display_popup::DisplayPopup;
 use crate::utils::help_popup::HelpPopup;
 use crate::utils::script_console::ScriptConsole;
 use crate::utils::settings_popup::SettingsPopup;
@@ -105,9 +102,6 @@ pub struct App<'a> {
     /* Others */
     
     pub syntax_highlighting: SyntaxHighlighting,
-
-    pub export_request: ChoicePopup,
-    pub display_request_export: DisplayPopup,
 }
 
 impl App<'_> {
@@ -189,13 +183,6 @@ impl App<'_> {
             /* Others */
 
             syntax_highlighting: SyntaxHighlighting::default(),
-
-            export_request: ChoicePopup {
-                // Retrieves the export format names
-                choices: ExportFormat::VARIANTS.iter().map(|export_format| export_format.to_string()).collect(),
-                selection: 0,
-            },
-            display_request_export: DisplayPopup::default(),
         }
     }
 

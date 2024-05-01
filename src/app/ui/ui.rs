@@ -122,8 +122,6 @@ impl App<'_> {
             EditingRequestSettings => self.render_request_settings_popup(frame),
             RenamingCollection => self.render_renaming_collection_popup(frame),
             RenamingRequest => self.render_renaming_request_popup(frame),
-            ChoosingRequestExportFormat => self.render_export_format_popup(frame),
-            DisplayingRequestExport => self.display_request_export.render(frame),
             _ => {}
         }
 

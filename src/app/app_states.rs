@@ -95,12 +95,6 @@ pub enum AppState {
 
     #[strum(to_string = "Editing request settings")]
     EditingRequestSettings,
-
-    #[strum(to_string = "Choosing request export format")]
-    ChoosingRequestExportFormat,
-
-    #[strum(to_string = "Displaying request export")]
-    DisplayingRequestExport
 }
 
 pub fn next_app_state(app_state: &AppState) -> AppState {
@@ -127,15 +121,13 @@ pub fn next_app_state(app_state: &AppState) -> AppState {
         EditingRequestBodyString => EditingPreRequestScript,
         EditingPreRequestScript => EditingPostRequestScript,
         EditingPostRequestScript => EditingRequestSettings,
-        EditingRequestSettings => ChoosingRequestExportFormat,
-        ChoosingRequestExportFormat => DisplayingRequestExport,
-        DisplayingRequestExport => Normal,
+        EditingRequestSettings => Normal,
     }
 }
 
 pub fn previous_app_state(app_state: &AppState) -> AppState {
     match app_state {
-        Normal => DisplayingRequestExport,
+        Normal => EditingRequestSettings,
         DisplayingCookies => Normal,
         EditingCookies => DisplayingCookies,
         ChoosingElementToCreate => EditingCookies,
@@ -158,8 +150,6 @@ pub fn previous_app_state(app_state: &AppState) -> AppState {
         EditingPreRequestScript => EditingRequestBodyString,
         EditingPostRequestScript => EditingPreRequestScript,
         EditingRequestSettings => EditingPostRequestScript,
-        ChoosingRequestExportFormat => EditingRequestSettings,
-        DisplayingRequestExport => ChoosingRequestExportFormat,
     }
 }
 
@@ -295,8 +285,6 @@ impl AppState {
 
                     NextEnvironment(EventKeyBinding::new(vec![key_bindings.main_menu.next_environment], "Next environment", None)),
                     DisplayCookies(EventKeyBinding::new(vec![key_bindings.main_menu.display_cookies], "Display cookies", None)),
-                    
-                    ExportRequest(EventKeyBinding::new(vec![key_bindings.request_selected.export_request], "Export request", None)),
                 ];
 
                 let mut base_param_tabs_events: Vec<AppEvent> = vec![];
@@ -560,24 +548,6 @@ impl AppState {
                 RequestSettingsToggleSetting(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_left, key_bindings.generic.navigation.move_cursor_right], "Toggle setting", Some("Toggle"))),
 
                 ModifyRequestSettings(EventKeyBinding::new(vec![key_bindings.generic.navigation.select], "Validate", Some("Validate"))),
-            ],
-            ChoosingRequestExportFormat => vec![
-                GoBackToRequestMenu(EventKeyBinding::new(vec![key_bindings.generic.navigation.go_back], "Quit", Some("Quit"))),
-
-                RequestExportFormatMoveCursorLeft(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_left], "Move selection left", Some("Left"))),
-                RequestExportFormatMoveCursorRight(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_right], "Move selection right", Some("Right"))),
-
-                SelectRequestExportFormat(EventKeyBinding::new(vec![key_bindings.generic.navigation.select], "Select export format", Some("Select"))),
-            ],
-            DisplayingRequestExport => vec![
-                GoBackToRequestMenu(EventKeyBinding::new(vec![key_bindings.generic.navigation.go_back], "Quit", Some("Quit"))),
-
-                ScrollRequestExportUp(EventKeyBinding::new(vec![key_bindings.request_selected.result_tabs.scroll_up], "Scroll request export up", None)),
-                ScrollRequestExportDown(EventKeyBinding::new(vec![key_bindings.request_selected.result_tabs.scroll_down], "Scroll request export down", None)),
-                ScrollRequestExportLeft(EventKeyBinding::new(vec![key_bindings.request_selected.result_tabs.scroll_left], "Scroll request export left", None)),
-                ScrollRequestExportRight(EventKeyBinding::new(vec![key_bindings.request_selected.result_tabs.scroll_right], "Scroll request export right", None)),
-                
-                CopyRequestExport(EventKeyBinding::new(vec![key_bindings.request_selected.result_tabs.yank_response_part], "Yank request export", Some("Yank"))),
             ]
         }
     }
@@ -650,8 +620,7 @@ impl App<'_> {
             EditingRequestHeader |
             EditingRequestBodyTable | EditingRequestBodyFile | EditingRequestBodyString |
             EditingPreRequestScript | EditingPostRequestScript |
-            EditingRequestSettings |
-            ChoosingRequestExportFormat | DisplayingRequestExport
+            EditingRequestSettings
             => {
                 let local_selected_request = self.get_selected_request_as_local();
                 let selected_request = local_selected_request.read().unwrap();
