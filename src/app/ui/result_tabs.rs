@@ -3,7 +3,7 @@ use ratatui::layout::{Constraint, Layout, Margin, Rect};
 use ratatui::layout::Direction::Vertical;
 use ratatui::prelude::Style;
 use ratatui::style::Stylize;
-use ratatui::text::Line;
+use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, Borders, Paragraph, Scrollbar, ScrollbarOrientation, Tabs};
 use ratatui_image::{Image, Resize};
 use ratatui_image::picker::Picker;
@@ -169,7 +169,10 @@ impl App<'_> {
                 RequestResultTabs::Headers => {
                     let result_headers: Vec<Line> = request.response.headers
                         .iter()
-                        .map(|(header, value)| Line::from(format!("{header}: {value}")))
+                        .map(
+                            |(header, value)| 
+                                Line::from(vec![Span::raw(header).bold().dark_gray(), Span::raw(": "), Span::raw(value)])
+                        )
                         .collect();
 
                     let headers_paragraph = Paragraph::new(result_headers)
