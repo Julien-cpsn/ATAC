@@ -1,6 +1,8 @@
 use std::str::Lines;
+
 use crate::app::app::App;
 use crate::app::ui::result_tabs::RequestResultTabs;
+use crate::request::response::ResponseContent;
 
 impl App<'_> {
     pub fn next_request_result_tab(&mut self) {
@@ -31,14 +33,20 @@ impl App<'_> {
 
         match self.request_result_tab {
             RequestResultTabs::Body => {
-                match &selected_request.response.body {
+                match &selected_request.response.content {
                     None => {
                         lines_count = 0;
                         horizontal_max = 0;
                     },
-                    Some(body) => {
-                        lines_count = body.lines().count();
-                        horizontal_max = App::get_max_str_len(body.lines());
+                    Some(content) => match content {
+                        ResponseContent::Body(body) => {
+                            lines_count = body.lines().count();
+                            horizontal_max = App::get_max_str_len(body.lines());
+                        }
+                        ResponseContent::Image(_) => {
+                            lines_count = 0;
+                            horizontal_max = 0;
+                        }
                     }
                 }
             }

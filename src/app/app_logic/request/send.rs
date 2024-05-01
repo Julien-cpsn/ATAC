@@ -7,7 +7,7 @@ use std::time::{Duration, Instant};
 use ratatui::style::Stylize;
 use ratatui::text::Line;
 use reqwest::{ClientBuilder, Proxy, Url};
-use reqwest::header::HeaderMap;
+use reqwest::header::{CONTENT_TYPE, HeaderMap};
 use reqwest::multipart::{Form, Part};
 use reqwest::redirect::Policy;
 use tokio::task;
@@ -19,7 +19,7 @@ use crate::panic_error;
 use crate::request::auth::Auth::{BasicAuth, BearerToken, NoAuth};
 use crate::request::body::{ContentType, find_file_format_in_content_type};
 use crate::request::request::Request;
-use crate::request::response::RequestResponse;
+use crate::request::response::{ImageResponse, RequestResponse, ResponseContent};
 use crate::utils::syntax_highlighting::highlight;
 
 impl App<'_> {
@@ -93,7 +93,7 @@ impl App<'_> {
             // Resets the data
             *local_console_output = None;
             *local_highlighted_console_output = vec![];
-            
+
             let modified_request: Request = match &selected_request.scripts.pre_request_script {
                 None => {
                     selected_request.clone()
@@ -106,16 +106,16 @@ impl App<'_> {
 
                     env.values = env_variables;
                     save_environment_to_file(&*env);
-                    
+
                     // Drops the write mutex
                     drop(env);
 
                     let mut highlighted_console_output = highlight(&console_output, "json").unwrap();
-                    
+
                     highlighted_console_output.insert(0, Line::default());
                     highlighted_console_output.insert(1, Line::raw("----- Pre-request script start -----").dark_gray().centered());
                     highlighted_console_output.push(Line::raw("----- Pre-request script end -----").dark_gray().centered());
-                    
+
                     *local_highlighted_console_output = highlighted_console_output;
 
                     *local_console_output = Some(console_output);
@@ -133,7 +133,7 @@ impl App<'_> {
             // Drops the write mutex
             drop(local_console_output);
             drop(local_highlighted_console_output);
-            
+
             /* CLIENT */
 
             let client = client_builder.build().expect("Could not build HTTP client");
@@ -163,7 +163,7 @@ impl App<'_> {
 
             /* CORS */
             
-            if self.config.disable_cors.unwrap_or(false) {
+            if self.config.is_cors_disabled() {
                 request = request.fetch_mode_no_cors();
             }
             
@@ -271,13 +271,19 @@ impl App<'_> {
                 let mut response = match request.send().await {
                     Ok(response) => {
                         elapsed_time = request_start.elapsed();
-                        
+
                         let status_code = response.status().to_string();
+
+                        let mut is_image = false;
 
                         let headers: Vec<(String, String)> = response.headers().clone()
                             .iter()
                             .map(|(header_name, header_value)| {
                                 let value = header_value.to_str().unwrap_or("").to_string();
+
+                                if header_name == CONTENT_TYPE && value.starts_with("image/") {
+                                    is_image = true;
+                                }
 
                                 (header_name.to_string(), value)
                             })
@@ -290,40 +296,54 @@ impl App<'_> {
                             .collect::<Vec<String>>()
                             .join("\n");
 
-                        let mut result_body = response.text().await.unwrap();
+                        let response_content = match is_image {
+                            true => {
+                                let content = response.bytes().await.unwrap();
+                                let image = image::load_from_memory(content.as_ref());
 
-                        // If a file format has been found in the content-type header
-                        if let Some(file_format) = find_file_format_in_content_type(&headers) {
-                            // If the request response content can be pretty printed
-                            if local_selected_request.read().unwrap().settings.pretty_print_response_content {
+                                ResponseContent::Image(ImageResponse {
+                                    data: content.to_vec(),
+                                    image: image.ok(),
+                                })
+                            },
+                            false => {
+                                let mut result_body = response.text().await.unwrap();
 
-                                // Match the file format
-                                match file_format.as_str() {
-                                    "json" => {
-                                        result_body = jsonxf::pretty_print(&result_body).unwrap_or(result_body);
-                                    },
-                                    _ => {}
+                                // If a file format has been found in the content-type header
+                                if let Some(file_format) = find_file_format_in_content_type(&headers) {
+                                    // If the request response content can be pretty printed
+                                    if local_selected_request.read().unwrap().settings.pretty_print_response_content {
+
+                                        // Match the file format
+                                        match file_format.as_str() {
+                                            "json" => {
+                                                result_body = jsonxf::pretty_print(&result_body).unwrap_or(result_body);
+                                            },
+                                            _ => {}
+                                        }
+                                    }
+
+                                    let highlighted_result_body = highlight(&result_body, &file_format);
+                                    *local_highlighted_body.write().unwrap() = highlighted_result_body;
+                                } else {
+                                    *local_highlighted_body.write().unwrap() = None;
                                 }
-                            }
 
-                            let highlighted_result_body = highlight(&result_body, &file_format);
-                            *local_highlighted_body.write().unwrap() = highlighted_result_body;
-                        }
-                        else {
-                            *local_highlighted_body.write().unwrap() = None;
-                        }
+                                ResponseContent::Body(result_body)
+                            }
+                        };
 
                         RequestResponse {
                             duration: None,
                             status_code: Some(status_code),
-                            body: Some(result_body),
+                            content: Some(response_content),
                             cookies: Some(cookies),
                             headers,
                         }
                     },
                     Err(error) => {
                         elapsed_time = request_start.elapsed();
-                        
+
                         let response_status_code;
 
                         if let Some(status_code) = error.status() {
@@ -331,13 +351,14 @@ impl App<'_> {
                         } else {
                             response_status_code = None;
                         }
-                        let result_body = error.to_string();
+
+                        let result_body = ResponseContent::Body(error.to_string());
 
 
                         RequestResponse {
                             duration: None,
                             status_code: response_status_code,
-                            body: Some(result_body),
+                            content: Some(result_body),
                             cookies: None,
                             headers: vec![],
                         }
@@ -347,10 +368,10 @@ impl App<'_> {
                 response.duration = Some(format!("{:?}", elapsed_time));
 
                 /* POST-REQUEST SCRIPT */
-                
+
                 let mut selected_request = local_selected_request.write().unwrap();
                 let mut console_output = local_console_output.write().unwrap();
-                
+
                 let modified_response: RequestResponse = match &selected_request.scripts.post_request_script {
                     None => {
                         response

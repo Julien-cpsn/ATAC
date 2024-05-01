@@ -28,6 +28,8 @@ tui-big-text = "0.4.2"
 tui-tree-widget = "0.19.0"
 tui-textarea = { version = "0.4.0", features = ["ratatui"] }
 throbber-widgets-tui = "0.5.0"
+ratatui-image = { version = "1.0.0", features = ["crossterm"] }
+image = "0.24.9"
 syntect = "5.2.0"
 serde = { version = "1.0.197", features = ["derive", "rc"] }
 serde_json = "1.0.114"
@@ -38,7 +40,6 @@ parse_postman_collection = "0.2.3"
 clap = { version = "4.5.0", features = ["derive", "color"] }
 arboard = "3.3.2"
 tokio = { version = "1.36.0", features = ["rt", "rt-multi-thread", "macros"] }
-futures-io = "0.3.30"
 strum = "0.26.2"
 lazy_static = "1.4.0"
 nestify = "0.3.3"

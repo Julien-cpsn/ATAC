@@ -3,8 +3,9 @@ use ratatui::prelude::{Line, Modifier, Span};
 use ratatui::style::Stylize;
 use serde::{Deserialize, Serialize};
 use tui_tree_widget::TreeItem;
+
 use crate::app::app::App;
-use crate::request::auth::{Auth};
+use crate::request::auth::Auth;
 use crate::request::body::ContentType;
 use crate::request::method::Method;
 use crate::request::response::RequestResponse;

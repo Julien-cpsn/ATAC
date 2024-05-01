@@ -230,6 +230,90 @@
       }
     },
     {
+      "name": "Large image",
+      "url": "https://images.unsplash.com/1/type-away.jpg",
+      "method": "GET",
+      "params": [
+        {
+          "enabled": true,
+          "data": [
+            "q",
+            "80"
+          ]
+        },
+        {
+          "enabled": true,
+          "data": [
+            "fm",
+            "jpg"
+          ]
+        },
+        {
+          "enabled": true,
+          "data": [
+            "w",
+            "1080"
+          ]
+        },
+        {
+          "enabled": true,
+          "data": [
+            "fit",
+            "max"
+          ]
+        }
+      ],
+      "headers": [
+        {
+          "enabled": true,
+          "data": [
+            "cache-control",
+            "no-cache"
+          ]
+        },
+        {
+          "enabled": true,
+          "data": [
+            "user-agent",
+            "ATAC/v0.14.0"
+          ]
+        },
+        {
+          "enabled": true,
+          "data": [
+            "accept",
+            "*/*"
+          ]
+        },
+        {
+          "enabled": true,
+          "data": [
+            "accept-encoding",
+            "gzip, deflate, br"
+          ]
+        },
+        {
+          "enabled": true,
+          "data": [
+            "connection",
+            "keep-alive"
+          ]
+        }
+      ],
+      "body": "no_body",
+      "auth": "no_auth",
+      "scripts": {
+        "pre_request_script": null,
+        "post_request_script": null
+      },
+      "settings": {
+        "use_config_proxy": true,
+        "allow_redirects": true,
+        "store_received_cookies": true,
+        "pretty_print_response_content": true
+      }
+    },
+    {
       "name": "Rust Homepage",
       "url": "https://www.rust-lang.org",
       "method": "GET",

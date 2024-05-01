@@ -5,11 +5,14 @@ use ratatui::prelude::Style;
 use ratatui::style::Stylize;
 use ratatui::text::Line;
 use ratatui::widgets::{Block, Borders, Paragraph, Scrollbar, ScrollbarOrientation, Tabs};
+use ratatui_image::{Image, Resize};
+use ratatui_image::picker::Picker;
 use strum::{Display, EnumIter, FromRepr, IntoEnumIterator};
 use throbber_widgets_tui::{BRAILLE_DOUBLE, Throbber, WhichUse};
 
 use crate::app::app::App;
 use crate::request::request::Request;
+use crate::request::response::ResponseContent;
 use crate::utils::centered_rect::centered_rect;
 
 #[derive(Default, Clone, Copy, Display, FromRepr, EnumIter)]
@@ -62,7 +65,7 @@ impl App<'_> {
                     }
                 }
             });
-        
+
         let selected_result_tab_index = self.request_result_tab as usize;
 
         let result_tabs = Tabs::new(result_tabs)
@@ -103,21 +106,50 @@ impl App<'_> {
 
             // REQUEST RESULT CONTENT
 
-            let mut result_widget: Paragraph = match self.request_result_tab {
-                RequestResultTabs::Body => match &request.response.body {
-                    None => Paragraph::new(""),
-                    Some(body) => {
-                        let lines: Vec<Line>;
-                        let last_highlighted = self.syntax_highlighting.highlighted_body.read().unwrap();
+            match self.request_result_tab {
+                RequestResultTabs::Body => match &request.response.content {
+                    None => {},
+                    Some(content) => match content {
+                        ResponseContent::Body(body) => {
+                            let lines: Vec<Line>;
+                            let last_highlighted = self.syntax_highlighting.highlighted_body.read().unwrap();
 
-                        if !self.config.disable_syntax_highlighting.unwrap_or(false) && last_highlighted.is_some() {
-                            lines = last_highlighted.clone().unwrap();
-                        }
-                        else {
-                            lines = body.lines().map(|line| Line::raw(line)).collect();
-                        }
+                            if !self.config.is_syntax_highlighting_disabled() && last_highlighted.is_some() {
+                                lines = last_highlighted.clone().unwrap();
+                            }
+                            else {
+                                lines = body.lines().map(|line| Line::raw(line)).collect();
+                            }
 
-                        Paragraph::new(lines)
+                            let body_paragraph = Paragraph::new(lines)
+                                .scroll((
+                                    self.result_vertical_scrollbar.scroll,
+                                    self.result_horizontal_scrollbar.scroll
+                                ));
+
+                            frame.render_widget(body_paragraph, request_result_layout[2]);
+                        }
+                        ResponseContent::Image(image_response) => match &image_response.image {
+                            _ if self.config.is_image_preview_disabled() => {
+                                let image_disabled_paragraph = Paragraph::new("\nImage preview disabled").centered();
+                                frame.render_widget(image_disabled_paragraph, request_result_layout[2]);
+                            },
+                            Some(image) => {
+                                let mut picker = Picker::new((3, 6));
+                                picker.guess_protocol();
+
+                                let image_static = picker
+                                    .new_protocol(image.clone(), request_result_layout[2], Resize::Fit(None))
+                                    .unwrap();
+
+                                let image = Image::new(image_static.as_ref());
+                                frame.render_widget(image, request_result_layout[2]);
+                            }
+                            None => {
+                                let image_error_paragraph = Paragraph::new("\nCould not decode image").centered();
+                                frame.render_widget(image_error_paragraph, request_result_layout[2]);
+                            }
+                        },
                     }
                 }
                 RequestResultTabs::Cookies => {
@@ -126,7 +158,13 @@ impl App<'_> {
                         Some(cookies) => cookies
                     };
 
-                    Paragraph::new(result_cookies)
+                    let cookies_paragraph = Paragraph::new(result_cookies)
+                        .scroll((
+                            self.result_vertical_scrollbar.scroll,
+                            self.result_horizontal_scrollbar.scroll
+                        ));
+
+                    frame.render_widget(cookies_paragraph, request_result_layout[2]);
                 }
                 RequestResultTabs::Headers => {
                     let result_headers: Vec<Line> = request.response.headers
@@ -134,20 +172,26 @@ impl App<'_> {
                         .map(|(header, value)| Line::from(format!("{header}: {value}")))
                         .collect();
 
-                    Paragraph::new(result_headers)
-                }
+                    let headers_paragraph = Paragraph::new(result_headers)
+                        .scroll((
+                            self.result_vertical_scrollbar.scroll,
+                            self.result_horizontal_scrollbar.scroll
+                        ));
+
+                    frame.render_widget(headers_paragraph, request_result_layout[2]);
+                },
                 RequestResultTabs::Console => {
                     let highlighted_console_output = self.syntax_highlighting.highlighted_console_output.read().unwrap().clone();
-                    Paragraph::new(highlighted_console_output)
+                    
+                    let console_paragraph = Paragraph::new(highlighted_console_output)
+                        .scroll((
+                            self.result_vertical_scrollbar.scroll,
+                            self.result_horizontal_scrollbar.scroll
+                        ));
+
+                    frame.render_widget(console_paragraph, request_result_layout[2]);
                 }
             };
-
-            result_widget = result_widget.scroll((
-                self.result_vertical_scrollbar.scroll,
-                self.result_horizontal_scrollbar.scroll
-            ));
-
-            frame.render_widget(result_widget, request_result_layout[2]);
         }
 
         let result_vertical_scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight);
