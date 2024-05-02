@@ -1,12 +1,16 @@
 use std::fs;
 use std::path::PathBuf;
+use std::sync::{Arc, RwLock};
+
 use parser4curls::{parse, Curl};
 use reqwest::Url;
 
 use crate::app::app::App;
+use crate::app::startup::args::ARGS;
 use crate::panic_error;
 use crate::request::auth::Auth;
 use crate::request::body::ContentType;
+use crate::request::collection::Collection;
 use crate::request::method::Method;
 use crate::request::request::{KeyValue, Request};
 
@@ -31,10 +35,28 @@ impl App<'_> {
             Err(e) => panic_error(format!("Could not extract file name\n\t{e}"))
         };
 
-        // This way we can parse the curl file before application loads, handling any errors. But only apply it once
-        // the application starts
-        self.tmp_request = Some(parse_request(&curl, req_name));
-        self.append_or_create_collection_state();
+        // We will check if theres an 'imported collection', if so we will append, else create
+        let imported_exists = self.collections.iter().any(|c| c.name == "imported");
+
+        if imported_exists {
+            let imported = self
+                .collections
+                .iter_mut()
+                .find(|c| c.name == "imported")
+                .unwrap();
+            imported.requests.push(Arc::new(RwLock::new(parse_request(&curl, req_name))));
+        } else {
+            let collection = Collection {
+                name: "imported".to_string(),
+                requests: vec![Arc::new(RwLock::new(parse_request(&curl, req_name)))],
+                path: ARGS.directory.join("imported.json"),
+            };
+
+            self.collections.push(collection);
+        }
+
+        let imported_index = self.collections.iter().position(|c| c.name == "imported").unwrap();
+        self.save_collection_to_file(imported_index);
     }
 }
 
@@ -46,7 +68,7 @@ fn extract_file_name(path_buf: &PathBuf) -> Result<String, String> {
 }
 
 fn parse_request(curl: &Curl, req_name: String) -> Request {
-    println!("Found cURL: {:#?}", curl);
+    print!("Found cURL: {:?}", curl);
 
     let mut request = Request::default();
 

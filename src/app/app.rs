@@ -18,7 +18,6 @@ use crate::app::ui::result_tabs::RequestResultTabs;
 use crate::app::ui::views::RequestView;
 use crate::request::collection::Collection;
 use crate::request::environment::Environment;
-use crate::request::request::Request;
 use crate::utils::choice_popup::ChoicePopup;
 use crate::utils::cookies_popup::CookiesPopup;
 use crate::utils::help_popup::HelpPopup;
@@ -72,8 +71,6 @@ pub struct App<'a> {
     pub new_request_popup: NewRequestPopup,
     pub rename_request_input: TextInput,
 
-    pub append_or_create_collection_input: TextInput,
-
     pub delete_collection_popup: ValidationPopup,
     pub delete_request_popup: ValidationPopup,
 
@@ -103,8 +100,7 @@ pub struct App<'a> {
 
     /* Others */
     
-    pub syntax_highlighting: SyntaxHighlighting,
-    pub tmp_request: Option<Request>,
+    pub syntax_highlighting: SyntaxHighlighting
 }
 
 impl App<'_> {
@@ -149,7 +145,6 @@ impl App<'_> {
             },
             
             new_collection_input: TextInput::default(),
-            append_or_create_collection_input: TextInput::default(),
             rename_collection_input: TextInput::default(),
             new_request_popup: NewRequestPopup::default(),
             rename_request_input: TextInput::default(),
@@ -189,8 +184,6 @@ impl App<'_> {
                 theme_set: ThemeSet::load_defaults(),
                 last_highlighted: Arc::new(RwLock::new(None)),
             },
-
-            tmp_request: None,
         }
     }
 
