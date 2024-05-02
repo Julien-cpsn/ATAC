@@ -15,8 +15,8 @@ use crate::request::method::Method;
 use crate::request::request::{KeyValue, Request};
 
 impl App<'_> {
-    pub fn import_curl_file(&mut self, path_buf: &PathBuf) {
-        println!("Parsing curl file");
+    pub fn import_curl_file(&mut self, path_buf: &PathBuf, save_to: &str) {
+        println!("Importing curl file from {:?} to {:?}", path_buf, save_to);
 
         let original_curl = match fs::read_to_string(path_buf) {
             Ok(original_curl) => original_curl,
@@ -29,46 +29,37 @@ impl App<'_> {
             Err(e) => panic_error(format!("Could not parse cURL\n\t{e}")),
         };
 
-        // For now, the stem of the file is the name of the request
-        let req_name = match extract_file_name(path_buf){
-            Ok(name) => name,
-            Err(e) => panic_error(format!("Could not extract file name\n\t{e}"))
+        let (collection_name, req_name) = match validate_save_to(save_to) {
+            Ok((collection_name, req_name)) => (collection_name, req_name),
+            Err(e) => panic_error(format!("Could not validate chosen collection/request\n\t{e}")),
         };
 
-        // We will check if theres an 'imported collection', if so we will append, else create
-        let imported_exists = self.collections.iter().any(|c| c.name == "imported");
+        let collection_exists = self.collections.iter().any(|c| c.name == collection_name);
 
-        if imported_exists {
+        if collection_exists {
             let imported = self
                 .collections
                 .iter_mut()
-                .find(|c| c.name == "imported")
+                .find(|c| c.name == collection_name.clone())
                 .unwrap();
             imported.requests.push(Arc::new(RwLock::new(parse_request(&curl, req_name))));
         } else {
             let collection = Collection {
-                name: "imported".to_string(),
+                name: collection_name.clone(),
                 requests: vec![Arc::new(RwLock::new(parse_request(&curl, req_name)))],
-                path: ARGS.directory.join("imported.json"),
+                path: ARGS.directory.join(collection_name.clone() + ".json"),
             };
 
             self.collections.push(collection);
         }
 
-        let imported_index = self.collections.iter().position(|c| c.name == "imported").unwrap();
+        let imported_index = self.collections.iter().position(|c| c.name == collection_name).unwrap();
         self.save_collection_to_file(imported_index);
     }
 }
 
-fn extract_file_name(path_buf: &PathBuf) -> Result<String, String> {
-    path_buf.file_stem()
-        .ok_or_else(|| "Filename not found".to_string())
-        .and_then(|name| name.to_str().ok_or_else(|| "Filename is not valid UTF-8".to_string()))
-        .map(|name| name.to_string())
-}
-
 fn parse_request(curl: &Curl, req_name: String) -> Request {
-    print!("Found cURL: {:?}", curl);
+    println!("Found cURL: {:?}", curl);
 
     let mut request = Request::default();
 
@@ -127,7 +118,7 @@ fn parse_request(curl: &Curl, req_name: String) -> Request {
 
     /* BODY */
 
-    // TODO: Handle content type
+    // TODO: Handle content type, for now we just assume raw
     request.body = ContentType::Raw(curl.options_data_raw.to_string());
 
     request
@@ -145,4 +136,14 @@ fn get_http_method(curl: &Curl) -> Method {
     } else {
         Method::GET
     }
+}
+
+fn validate_save_to(save_to: &str) -> Result<(String, String), String> {
+    let parts: Vec<&str> = save_to.split('/').collect();
+
+    if parts.len() != 2 {
+        return Err("Path is not in the format collection/request name".to_string());
+    }
+
+    Ok((parts[0].to_string(), parts[1].to_string()))
 }

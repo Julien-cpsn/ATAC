@@ -2,7 +2,7 @@ use std::env;
 use std::path::PathBuf;
 use clap::{Parser, Subcommand};
 use lazy_static::lazy_static;
-use crate::{panic_error};
+use crate::panic_error;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -27,7 +27,13 @@ pub enum Command {
 
 #[derive(Debug, clap::Args, PartialEq)]
 pub struct ImportArgs {
-    /// A file to import, only Postman v2.1 JSON collection for now
+    /// The type of file to import, Postman v2.1 JSON collection (postman), or a curl file (curl)
+    pub import_type: String,
+
+    /// The path to save the imported collection including the request name (collection/request_name)
+    pub save_to: String,
+    
+    /// A file to import, only Postman v2.1 JSON and curl files are supported
     pub path: PathBuf,
 
     /// Max depth at which import should stop creating nested collections and only get the deeper requests
