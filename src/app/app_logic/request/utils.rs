@@ -1,7 +1,8 @@
-use std::sync::{Arc, RwLock};
+use std::sync::Arc;
 
 use arboard::{Clipboard, ImageData};
 use image::EncodableLayout;
+use parking_lot::RwLock;
 
 use crate::app::app::App;
 use crate::app::ui::result_tabs::RequestResultTabs;
@@ -21,7 +22,7 @@ impl App<'_> {
     /// Copy the response's body content to the clipboard if it's present, otherwise does nothing
     pub fn copy_response_body_content_to_clipboard(&self) {
         let local_selected_request = self.get_selected_request_as_local();
-        let selected_request = local_selected_request.read().unwrap();
+        let selected_request = local_selected_request.read();
 
         let mut clipboard = Clipboard::new().unwrap();
 
@@ -61,7 +62,7 @@ impl App<'_> {
                 clipboard.set_text(headers_string).expect("Could not copy headers to clipboard")
             }
             RequestResultTabs::Console => {
-                let local_console_output = self.script_console.console_output.read().unwrap();
+                let local_console_output = self.script_console.console_output.read();
 
                 match local_console_output.as_ref() {
                     None => {}

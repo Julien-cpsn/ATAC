@@ -30,7 +30,7 @@ impl App<'_> {
         let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
 
         {
-            let mut selected_request = local_selected_request.write().unwrap();
+            let mut selected_request = local_selected_request.write();
 
             let pre_request_script = self.script_console.pre_request_text_area.lines().join("\n");
 
@@ -51,7 +51,7 @@ impl App<'_> {
         let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
 
         {
-            let mut selected_request = local_selected_request.write().unwrap();
+            let mut selected_request = local_selected_request.write();
 
             let post_request_script = self.script_console.post_request_text_area.lines().join("\n");
 

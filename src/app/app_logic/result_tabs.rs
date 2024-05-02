@@ -10,7 +10,7 @@ impl App<'_> {
             RequestResultTabs::Body => RequestResultTabs::Cookies,
             RequestResultTabs::Cookies => RequestResultTabs::Headers,
             RequestResultTabs::Headers => {
-                let local_console_output = self.script_console.console_output.read().unwrap();
+                let local_console_output = self.script_console.console_output.read();
 
                 match local_console_output.as_ref() {
                     None => RequestResultTabs::Body,
@@ -29,7 +29,7 @@ impl App<'_> {
         let horizontal_max: usize;
 
         let local_selected_request = self.get_selected_request_as_local();
-        let selected_request = local_selected_request.read().unwrap();
+        let selected_request = local_selected_request.read();
 
         match self.request_result_tab {
             RequestResultTabs::Body => {
@@ -77,7 +77,7 @@ impl App<'_> {
                 horizontal_max = max_tmp;
             }
             RequestResultTabs::Console => {
-                let local_console_output = self.script_console.console_output.read().unwrap();
+                let local_console_output = self.script_console.console_output.read();
 
                 match local_console_output.as_ref() {
                     None => {

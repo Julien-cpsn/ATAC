@@ -1,6 +1,7 @@
 use std::path::PathBuf;
 use std::str::FromStr;
-use std::sync::{Arc, RwLock};
+use std::sync::Arc;
+use parking_lot::RwLock;
 
 use parse_postman_collection::v2_1_0::{AuthType, Body, FormParameterSrcUnion, HeaderUnion, Host, Items, Language, Mode, RequestClass, RequestUnion, Url};
 

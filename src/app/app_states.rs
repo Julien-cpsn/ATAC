@@ -1,8 +1,7 @@
-use std::sync::RwLock;
-
 use crokey::{key, KeyCombination};
 use crossterm::event::{KeyCode, KeyModifiers};
 use lazy_static::lazy_static;
+use parking_lot::RwLock;
 use ratatui::prelude::Span;
 use ratatui::style::{Color, Stylize};
 use ratatui::text::Line;
@@ -155,7 +154,7 @@ pub fn previous_app_state(app_state: &AppState) -> AppState {
 
 impl AppState {
     pub fn get_available_events(&self, request_view: RequestView, request_param_tab: RequestParamsTabs) -> Vec<AppEvent> {
-        let key_bindings = KEY_BINDINGS.read().unwrap();
+        let key_bindings = KEY_BINDINGS.read();
 
         match self {
             Normal => vec![
@@ -581,7 +580,7 @@ lazy_static! {
 
 impl App<'_> {
     pub fn update_current_available_events(&mut self) {
-        *AVAILABLE_EVENTS.write().unwrap() = self.state.get_available_events(self.request_view, self.request_param_tab);
+        *AVAILABLE_EVENTS.write() = self.state.get_available_events(self.request_view, self.request_param_tab);
     }
 
     pub fn get_state_line(&self) -> Line {
@@ -604,7 +603,7 @@ impl App<'_> {
 
             DeletingRequest | RenamingRequest => {
                 let selected_request_index = &self.collections_tree.state.selected();
-                let selected_request = &self.collections[selected_request_index[0]].requests[selected_request_index[1]].read().unwrap();
+                let selected_request = &self.collections[selected_request_index[0]].requests[selected_request_index[1]].read();
 
                 Line::from(vec![
                     Span::raw("Request > ").dark_gray(),
@@ -623,7 +622,7 @@ impl App<'_> {
             EditingRequestSettings
             => {
                 let local_selected_request = self.get_selected_request_as_local();
-                let selected_request = local_selected_request.read().unwrap();
+                let selected_request = local_selected_request.read();
 
                 if self.state == SelectedRequest {
                     Line::from(vec![

@@ -27,7 +27,7 @@ impl App<'_> {
         let local_selected_request = self.get_selected_request_as_local();
 
         {
-            let mut selected_request = local_selected_request.write().unwrap();
+            let mut selected_request = local_selected_request.write();
 
             // Avoid creating more than one thread
             if selected_request.is_pending {
@@ -87,8 +87,8 @@ impl App<'_> {
             client_builder = client_builder.cookie_provider(local_cookie_store);
 
             /* PRE-REQUEST SCRIPT */
-            let mut local_console_output = self.script_console.console_output.write().unwrap();
-            let mut local_highlighted_console_output = self.syntax_highlighting.highlighted_console_output.write().unwrap();
+            let mut local_console_output = self.script_console.console_output.write();
+            let mut local_highlighted_console_output = self.syntax_highlighting.highlighted_console_output.write();
 
             // Resets the data
             *local_console_output = None;
@@ -100,7 +100,7 @@ impl App<'_> {
                 },
                 Some(pre_request_script) => {
                     let local_env = self.get_selected_env_as_local();
-                    let mut env = local_env.write().unwrap();
+                    let mut env = local_env.write();
 
                     let (result_request, env_variables, console_output) = execute_pre_request_script(pre_request_script, &*selected_request, &env.values);
 
@@ -263,7 +263,7 @@ impl App<'_> {
             /* SEND REQUEST */
 
             task::spawn(async move {
-                local_selected_request.write().unwrap().is_pending = true;
+                local_selected_request.write().is_pending = true;
 
                 let request_start = Instant::now();
                 let elapsed_time: Duration;
@@ -312,7 +312,7 @@ impl App<'_> {
                                 // If a file format has been found in the content-type header
                                 if let Some(file_format) = find_file_format_in_content_type(&headers) {
                                     // If the request response content can be pretty printed
-                                    if local_selected_request.read().unwrap().settings.pretty_print_response_content {
+                                    if local_selected_request.read().settings.pretty_print_response_content {
 
                                         // Match the file format
                                         match file_format.as_str() {
@@ -324,9 +324,9 @@ impl App<'_> {
                                     }
 
                                     let highlighted_result_body = highlight(&result_body, &file_format);
-                                    *local_highlighted_body.write().unwrap() = highlighted_result_body;
+                                    *local_highlighted_body.write() = highlighted_result_body;
                                 } else {
-                                    *local_highlighted_body.write().unwrap() = None;
+                                    *local_highlighted_body.write() = None;
                                 }
 
                                 ResponseContent::Body(result_body)
@@ -369,15 +369,15 @@ impl App<'_> {
 
                 /* POST-REQUEST SCRIPT */
 
-                let mut selected_request = local_selected_request.write().unwrap();
-                let mut console_output = local_console_output.write().unwrap();
+                let mut selected_request = local_selected_request.write();
+                let mut console_output = local_console_output.write();
 
                 let modified_response: RequestResponse = match &selected_request.scripts.post_request_script {
                     None => {
                         response
                     },
                     Some(post_request_script) => {
-                        let mut env = local_env.write().unwrap();
+                        let mut env = local_env.write();
 
                         let (result_response, env_variables, result_console_output) = execute_post_request_script(post_request_script, &response, &env.values);
 
@@ -393,7 +393,7 @@ impl App<'_> {
                         highlighted_console_output.insert(1, Line::raw("----- Post-request script start -----").dark_gray().centered());
                         highlighted_console_output.push(Line::raw("----- Post-request script end -----").dark_gray().centered());
 
-                        let mut local_highlighted_console_output = local_highlighted_console_output.write().unwrap();
+                        let mut local_highlighted_console_output = local_highlighted_console_output.write();
 
                         local_highlighted_console_output.extend(highlighted_console_output);
 

@@ -319,7 +319,7 @@ impl App<'_> {
         //dbg!("{}", key.to_string());
 
         {
-            let key_bindings = KEY_BINDINGS.read().unwrap();
+            let key_bindings = KEY_BINDINGS.read();
 
             // Help is being displayed
             if self.should_display_help {
@@ -346,7 +346,7 @@ impl App<'_> {
         let mut miss_input = false;
         let mut matching_event: Option<&AppEvent> = None;
 
-        let available_app_events = AVAILABLE_EVENTS.read().unwrap();
+        let available_app_events = AVAILABLE_EVENTS.read();
 
         for possible_event in available_app_events.iter() {
             let event_key_bindings = possible_event.get_event_key_bindings();

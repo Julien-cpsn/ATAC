@@ -56,7 +56,7 @@ impl App<'_> {
                     },
                     RequestResultTabs::Cookies | RequestResultTabs::Headers => Some(tab.to_string()),
                     RequestResultTabs::Console => {
-                        let local_console_output = self.script_console.console_output.read().unwrap();
+                        let local_console_output = self.script_console.console_output.read();
 
                         match local_console_output.as_ref() {
                             None => None,
@@ -112,7 +112,7 @@ impl App<'_> {
                     Some(content) => match content {
                         ResponseContent::Body(body) => {
                             let lines: Vec<Line>;
-                            let last_highlighted = self.syntax_highlighting.highlighted_body.read().unwrap();
+                            let last_highlighted = self.syntax_highlighting.highlighted_body.read();
 
                             if !self.config.is_syntax_highlighting_disabled() && last_highlighted.is_some() {
                                 lines = last_highlighted.clone().unwrap();
@@ -184,7 +184,7 @@ impl App<'_> {
                     frame.render_widget(headers_paragraph, request_result_layout[2]);
                 },
                 RequestResultTabs::Console => {
-                    let highlighted_console_output = self.syntax_highlighting.highlighted_console_output.read().unwrap().clone();
+                    let highlighted_console_output = self.syntax_highlighting.highlighted_console_output.read().clone();
                     
                     let console_paragraph = Paragraph::new(highlighted_console_output)
                         .scroll((

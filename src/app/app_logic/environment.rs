@@ -1,4 +1,5 @@
-use std::sync::{Arc, RwLock};
+use std::sync::Arc;
+use parking_lot::RwLock;
 
 use ratatui::style::Stylize;
 use ratatui::text::{Line, Span};
@@ -31,7 +32,7 @@ impl App<'_> {
         let local_env = self.get_selected_env_as_local();
 
         {
-            let env = local_env.read().unwrap();
+            let env = local_env.read();
             
             for (key, value) in &env.values {
                 tmp_string = tmp_string.replace(&format!("{{{{{}}}}}", key), value);
@@ -54,7 +55,7 @@ impl App<'_> {
         let local_env = self.get_selected_env_as_local();
 
         {
-            let env = local_env.read().unwrap();
+            let env = local_env.read();
             
             for match_ in regex.captures_iter(input) {
                 for sub_match in match_.iter() {

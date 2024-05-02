@@ -8,7 +8,7 @@ impl App<'_> {
     /// Reset selection if body form data is provided, either set it to none
     pub fn update_body_table_selection(&mut self) {
         let local_selected_request = self.get_selected_request_as_local();
-        let selected_request = local_selected_request.read().unwrap();
+        let selected_request = local_selected_request.read();
 
         {
             if let Some(form) = selected_request.body.get_form() {
@@ -33,7 +33,7 @@ impl App<'_> {
         let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
 
         {
-            let mut selected_request = local_selected_request.write().unwrap();
+            let mut selected_request = local_selected_request.write();
 
             let selection = self.body_form_table.selection.unwrap();
             let input_text = &self.body_form_table.selection_text_input.text;
@@ -56,7 +56,7 @@ impl App<'_> {
         let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
 
         {
-            let mut selected_request = local_selected_request.write().unwrap();
+            let mut selected_request = local_selected_request.write();
 
             if let Some(form) = selected_request.body.get_form_mut() {
                 form.push(KeyValue {
@@ -80,7 +80,7 @@ impl App<'_> {
         let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
 
         {
-            let mut selected_request = local_selected_request.write().unwrap();
+            let mut selected_request = local_selected_request.write();
 
             if let Some(form) = selected_request.body.get_form_mut() {
                 let selection = self.body_form_table.selection.unwrap();
@@ -102,7 +102,7 @@ impl App<'_> {
         let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
 
         {
-            let mut selected_request = local_selected_request.write().unwrap();
+            let mut selected_request = local_selected_request.write();
 
             if let Some(form) = selected_request.body.get_form_mut() {
                 let row = self.body_form_table.selection.unwrap().0;
@@ -128,7 +128,7 @@ impl App<'_> {
         let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
 
         {
-            let mut selected_request = local_selected_request.write().unwrap();
+            let mut selected_request = local_selected_request.write();
 
             let body_form = &self.body_form_table.rows;
             let body_file = &self.body_file_text_input.text;
@@ -158,7 +158,7 @@ impl App<'_> {
         let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
 
         {
-            let mut selected_request = local_selected_request.write().unwrap();
+            let mut selected_request = local_selected_request.write();
 
             selected_request.body = next_content_type(&selected_request.body);
 

@@ -1,6 +1,7 @@
-use std::sync::{Arc, RwLock};
+use std::sync::Arc;
 
 use lazy_static::lazy_static;
+use parking_lot::RwLock;
 use ratatui::prelude::Color;
 use ratatui::style::Stylize;
 use ratatui::text::{Line, Span};

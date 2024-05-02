@@ -1,8 +1,9 @@
 use std::fs::File;
-use std::sync::{Arc, RwLock};
+use std::sync::Arc;
 use std::time::Duration;
 
 use crossterm::terminal::disable_raw_mode;
+use parking_lot::RwLock;
 use ratatui::backend::Backend;
 use ratatui::Terminal;
 use throbber_widgets_tui::ThrobberState;

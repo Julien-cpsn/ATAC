@@ -2,11 +2,11 @@ use std::env;
 use std::fs::OpenOptions;
 use std::io::Read;
 use std::path::PathBuf;
-use std::sync::RwLock;
 
 use crokey::{key, KeyCombination};
 use lazy_static::lazy_static;
 use nestify::nest;
+use parking_lot::RwLock;
 use ratatui::text::Span;
 use serde::Deserialize;
 
@@ -294,7 +294,7 @@ impl App<'_> {
             Err(e) => panic_error(format!("Could not parse key bindings file\n\t{e}"))
         };
 
-        *KEY_BINDINGS.write().unwrap() = config.keybindings;
+        *KEY_BINDINGS.write() = config.keybindings;
 
         println!("Key bindings file parsed!\n");
     }

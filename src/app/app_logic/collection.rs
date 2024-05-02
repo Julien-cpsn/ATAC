@@ -1,4 +1,5 @@
-use std::sync::{Arc, RwLock};
+use std::sync::Arc;
+use parking_lot::RwLock;
 use crate::app::app::App;
 use crate::app::startup::args::ARGS;
 use crate::request::auth::Auth;
@@ -23,7 +24,7 @@ impl App<'_> {
         self.reset_inputs();
 
         let local_selected_request = self.get_selected_request_as_local();
-        let selected_request = local_selected_request.read().unwrap();
+        let selected_request = local_selected_request.read();
 
         self.url_text_input.enter_str(&selected_request.url_with_params_to_string());
         self.query_params_table.rows = selected_request.params.clone();
@@ -286,7 +287,7 @@ impl App<'_> {
         let local_selected_request = self.get_request_as_local_from_indexes(&(selected_request_index[0], selected_request_index[1]));
 
         {
-            let mut selected_request = local_selected_request.write().unwrap();
+            let mut selected_request = local_selected_request.write();
             
             selected_request.name = new_request_name.to_string();
         }

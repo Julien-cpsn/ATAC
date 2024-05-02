@@ -99,7 +99,7 @@ impl App<'_> {
         let selected_request_index = self.collections_tree.state.selected();
 
         {
-            let selected_request = self.collections[selected_request_index[0]].requests[selected_request_index[1]].read().unwrap();
+            let selected_request = self.collections[selected_request_index[0]].requests[selected_request_index[1]].read();
             self.rename_request_input.text = selected_request.name.clone();
             self.rename_request_input.cursor_position = selected_request.name.len();
         }
@@ -147,7 +147,7 @@ impl App<'_> {
         let local_selected_request = self.get_selected_request_as_local();
 
         {
-            let selected_request = local_selected_request.read().unwrap();
+            let selected_request = local_selected_request.read();
 
             match selected_request.body {
                 ContentType::Multipart(_) | ContentType::Form(_) => {}
@@ -167,7 +167,7 @@ impl App<'_> {
         let local_selected_request = self.get_selected_request_as_local();
 
         {
-            let selected_request = local_selected_request.read().unwrap();
+            let selected_request = local_selected_request.read();
 
             match selected_request.body {
                 ContentType::File(_) => {
@@ -202,7 +202,7 @@ impl App<'_> {
         self.request_settings_popup.selection = 0;
 
         let local_selected_request = self.get_selected_request_as_local();
-        let selected_request = local_selected_request.read().unwrap();
+        let selected_request = local_selected_request.read();
 
         self.request_settings_popup.settings = selected_request.settings.to_vec();
 

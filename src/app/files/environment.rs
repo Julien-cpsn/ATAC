@@ -3,9 +3,10 @@ use std::fs::{File, OpenOptions};
 use std::io::{BufRead, BufReader, Write};
 use std::path::PathBuf;
 use std::str::from_utf8;
-use std::sync::{Arc, RwLock};
+use std::sync::Arc;
 
 use indexmap::IndexMap;
+use parking_lot::RwLock;
 use snailquote::unescape;
 
 use crate::app::app::App;

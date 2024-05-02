@@ -1,4 +1,5 @@
-use std::sync::{Arc, RwLock};
+use std::sync::Arc;
+use parking_lot::RwLock;
 use tui_textarea::TextArea;
 use crate::utils::vim_emulation::Vim;
 

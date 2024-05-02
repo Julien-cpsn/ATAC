@@ -1,5 +1,6 @@
 use std::path::PathBuf;
-use std::sync::{Arc, RwLock};
+use std::sync::Arc;
+use parking_lot::RwLock;
 use ratatui::text::{Line, Span};
 use serde::{Deserialize, Serialize};
 use tui_tree_widget::TreeItem;
@@ -27,7 +28,7 @@ impl Collection {
             .iter()
             .enumerate()
             .map(|(request_index, request)| {
-                request.read().unwrap().to_tree_item(request_index)
+                request.read().to_tree_item(request_index)
             })
             .collect();
 
