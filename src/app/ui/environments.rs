@@ -6,7 +6,7 @@ use crate::app::app::App;
 
 impl<'a> App<'a> {
     pub(super) fn render_environments(&mut self, frame: &mut Frame, rect: Rect) {
-        let local_env = self.get_selected_env_as_local();
+        let local_env = self.get_selected_env_as_local().unwrap();
         let env = local_env.read();
 
         let current_environment = env.name.clone();
