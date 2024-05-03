@@ -100,15 +100,28 @@ impl App<'_> {
                 },
                 Some(pre_request_script) => {
                     let local_env = self.get_selected_env_as_local();
-                    let mut env = local_env.write();
 
-                    let (result_request, env_variables, console_output) = execute_pre_request_script(pre_request_script, &*selected_request, &env.values);
+                    let env_values = match &local_env {
+                        None => None,
+                        Some(local_env) => {
+                            let env = local_env.read();
+                            Some(env.values.clone())
+                        }
+                    };
 
-                    env.values = env_variables;
-                    save_environment_to_file(&*env);
+                    let (result_request, env_variables, console_output) = execute_pre_request_script(pre_request_script, &*selected_request, env_values);
 
-                    // Drops the write mutex
-                    drop(env);
+                    match &local_env {
+                        None => {},
+                        Some(local_env) => match env_variables {
+                            None => {},
+                            Some(env_variables) => {
+                                let mut env = local_env.write();
+                                env.values = env_variables;
+                                save_environment_to_file(&*env);
+                            }
+                        }
+                    }
 
                     let mut highlighted_console_output = highlight(&console_output, "json").unwrap();
 
@@ -377,15 +390,27 @@ impl App<'_> {
                         response
                     },
                     Some(post_request_script) => {
-                        let mut env = local_env.write();
+                        let env_values = match &local_env {
+                            None => None,
+                            Some(local_env) => {
+                                let env = local_env.read();
+                                Some(env.values.clone())
+                            }
+                        };
 
-                        let (result_response, env_variables, result_console_output) = execute_post_request_script(post_request_script, &response, &env.values);
+                        let (result_response, env_variables, result_console_output) = execute_post_request_script(post_request_script, &response, env_values);
 
-                        env.values = env_variables;
-                        save_environment_to_file(&*env);
-
-                        // Drops the write mutex
-                        drop(env);
+                        match &local_env {
+                            None => {},
+                            Some(local_env) => match env_variables {
+                                None => {},
+                                Some(env_variables) => {
+                                    let mut env = local_env.write();
+                                    env.values = env_variables;
+                                    save_environment_to_file(&*env);
+                                }
+                            }
+                        }
 
                         let mut highlighted_console_output = highlight(&result_console_output, "json").unwrap();
 

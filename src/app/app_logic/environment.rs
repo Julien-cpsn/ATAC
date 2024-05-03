@@ -9,8 +9,11 @@ use crate::app::app::App;
 use crate::request::environment::Environment;
 
 impl App<'_> {
-    pub fn get_selected_env_as_local(&self) -> Arc<RwLock<Environment>> {
-        self.environments[self.selected_environment].clone()
+    pub fn get_selected_env_as_local(&self) -> Option<Arc<RwLock<Environment>>> {
+        match self.environments.get(self.selected_environment) {
+            None => None,
+            Some(env) => Some(env.clone())
+        }
     }
     
     pub fn next_environment(&mut self) {
@@ -31,9 +34,9 @@ impl App<'_> {
 
         let local_env = self.get_selected_env_as_local();
 
-        {
+        if let Some(local_env) = local_env {
             let env = local_env.read();
-            
+
             for (key, value) in &env.values {
                 tmp_string = tmp_string.replace(&format!("{{{{{}}}}}", key), value);
             }
@@ -54,7 +57,7 @@ impl App<'_> {
 
         let local_env = self.get_selected_env_as_local();
 
-        {
+        if let Some(local_env) = local_env {
             let env = local_env.read();
             
             for match_ in regex.captures_iter(input) {
@@ -73,9 +76,12 @@ impl App<'_> {
                     }
                 }
             }
-        }
 
-        spans.push(Span::raw(String::from(&input[tmp_index..input.len()])));
+            spans.push(Span::raw(String::from(&input[tmp_index..input.len()])));
+        }
+        else {
+            spans.push(Span::raw(input.to_string()));
+        }
 
         return Line::from(spans);
     }
