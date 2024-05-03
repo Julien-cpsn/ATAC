@@ -1,5 +1,7 @@
 use std::sync::Arc;
+
 use parking_lot::RwLock;
+
 use crate::app::app::App;
 use crate::app::startup::args::ARGS;
 use crate::request::auth::Auth;
@@ -181,11 +183,14 @@ impl App<'_> {
                 return;
             }
         }
-
+        
+        let file_format = self.config.get_preferred_collection_file_format();
+        
         let new_collection = Collection {
             name: new_collection_name.clone(),
             requests: vec![],
-            path: ARGS.directory.join(format!("{}.json", new_collection_name.clone()))
+            path: ARGS.directory.join(format!("{}.{}", new_collection_name.clone(), file_format.to_string())),
+            file_format,
         };
 
         self.collections.push(new_collection);

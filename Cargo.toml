@@ -33,6 +33,7 @@ image = "0.24.9"
 syntect = "5.2.0"
 serde = { version = "1.0.197", features = ["derive", "rc"] }
 serde_json = "1.0.114"
+serde_yaml = "0.9.34"
 jsonxf = "1.1.1"
 toml = "0.8.11"
 boa_engine = { version = "0.18.0", default-features = false }

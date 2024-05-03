@@ -4,15 +4,22 @@ use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
 use crate::app::app::App;
 use crate::panic_error;
+use crate::request::collection::CollectionFileFormat;
 
 #[derive(Default, Serialize, Deserialize)]
 pub struct Config {
     #[serde(default)]
     pub disable_syntax_highlighting: Option<bool>,
+    
     #[serde(default)]
     pub disable_cors: Option<bool>,
+    
     #[serde(default)]
     pub disable_images_preview: Option<bool>,
+    
+    #[serde(default)]
+    pub preferred_collection_file_format: Option<CollectionFileFormat>,
+    
     pub proxy: Option<Proxy>
 }
 
@@ -33,6 +40,13 @@ impl Config {
     
     pub fn is_image_preview_disabled(&self) -> bool {
         return self.disable_images_preview.unwrap_or(false)
+    }
+    
+    pub fn get_preferred_collection_file_format(&self) -> CollectionFileFormat {
+        return match &self.preferred_collection_file_format {
+            None => CollectionFileFormat::default(),
+            Some(file_format) => file_format.clone()
+        };
     }
 }
 
