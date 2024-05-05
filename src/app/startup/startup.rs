@@ -1,7 +1,7 @@
 use std::fs::OpenOptions;
 
 use crate::app::app::App;
-use crate::app::startup::args::{ARGS, Command};
+use crate::app::startup::args::{ARGS, Command, ImportType};
 use crate::panic_error;
 use crate::request::collection::CollectionFileFormat;
 
@@ -18,12 +18,23 @@ impl App<'_> {
 
         if let Some(command) = &ARGS.command {
             match command {
-                Command::Import(import_args) => {
-                    self.import_postman_collection(&import_args.path, import_args.max_depth.unwrap_or(99));
+                Command::Import { import_type} => match import_type {
+                    ImportType::Postman { 
+                        import_path,
+                        max_depth
+                    } => self.import_postman_collection(&import_path, max_depth.unwrap_or(99)),
+                    
+                    ImportType::Curl {
+                        import_path,
+                        collection_name,
+                        request_name,
+                        recursive,
+                        max_depth
+                    } => self.import_curl_file(&import_path, collection_name, request_name, recursive, max_depth.unwrap_or(99))
                 }
             }
         }
-        
+
         self
     }
 

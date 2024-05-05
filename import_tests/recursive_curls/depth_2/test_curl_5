@@ -1,0 +1,2 @@
+curl https://reqbin.com/echo \
+   -u "login:password"

@@ -41,6 +41,20 @@ impl ContentType {
         }
     }
 
+    pub fn from_content_type(content_type: &str, body: String) -> ContentType {
+        match content_type {
+            //"multipart/form-data" => Multipart(body),
+            //"application/x-www-form-urlencoded" => Form(body),
+            "application/octet-stream" => File(body),
+            "text/plain" => Raw(body),
+            "application/json" => Json(body),
+            "application/xml" => Json(body),
+            "application/html" => Json(body),
+            "application/javascript" => Json(body),
+            _ => NoBody
+        }
+    }
+
     pub fn get_form(&self) -> Option<&Vec<KeyValue>> {
         match self {
             Multipart(form) | Form(form) => Some(form),

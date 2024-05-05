@@ -1,0 +1,23 @@
+curl 'https://www.google.com/search?q=some+search&rlz=1C1ONGR_frFR1063FR1063&oq=some+search&gs_lcrp=EgZjaHJvbWUyBggAEEUYOTIGCAEQRRg80gEINzU2OGowajeoAgCwAgA&sourceid=chrome&ie=UTF-8' \
+  -H 'accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7' \
+  -H 'accept-language: fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7' \
+  -H 'cookie: HSID=Av_zeISP2IoC5ffne; SSID=AKgvP_7KP4Q2hAa7J; APISID=BHGY7ZbmZbJ_sm1O/ACh2Z88aE94LAktBN; SAPISID=8Pljvq5JQ81l6i-W/AE7yudhCMIhSx07aA; __Secure-1PAPISID=8Pljvq5JQ81l6i-W/AE7yudhCMIhSx07aA; __Secure-3PAPISID=8Pljvq5JQ81l6i-W/AE7yudhCMIhSx07aA; SID=g.a000iQi34M-7qEaVOkMFrycXCJM8EqqhOMd2x_eD98hvFBtmDGiYVrLlfIjHEiQDF9UR7JMTcwACgYKAW0SAQASFQHGX2Mi67FwpyVk-XamQ4h1n4-YzhoVAUF8yKpmHMVXUV6LSLVgLdR39TtR0076; __Secure-1PSID=g.a000iQi34M-7qEaVOkMFrycXCJM8EqqhOMd2x_eD98hvFBtmDGiYeQ0eDf3PWlHwVAxIQCQZSQACgYKAQ4SAQASFQHGX2Mi8cOFgeIIFTgntS5oW6LNRhoVAUF8yKqTtznLmD3NAcbAgrp4pPgX0076; __Secure-3PSID=g.a000iQi34M-7qEaVOkMFrycXCJM8EqqhOMd2x_eD98hvFBtmDGiYymEt7XyxPJc9XnYV2-s3kwACgYKAagSAQASFQHGX2Mi0MZRs5Ln80PaVraKG-YuwxoVAUF8yKrm83-kkzD22gxazewDzerG0076; OTZ=7515057_48_52_123900_48_436380; NID=513=UWSHg2m07oid_oICg5QPNg42NEXDwmQ-1Re8H5-JeTIKQN1fIIyJmwfPw38LxWLmaGKJLV8e6qrxX_8LEOaL6TRw6LwYyIsdCj-UjQ7yhHF3yApwcWTm9hjTE4cjq4bvD4PO2--Ghy8TYtl_dU3W2HG4TILc6HLhEsyScvpc_P0pWNgKGI2rIOqJyuj9ZhRaYDl1yMeX5jvHTTh5V3cGDaGw9P3iebXTaL23iauLhPI0oTM6zjdyLDpGJrxX2b3qRvosGS2MgOOF1V3cKx_Wn-7MJWj8bKvlvvw2EEJ6w_MkQMNJ7npEhLNjw8Jwp-PZPaVEJ7Pv1tqyWBU0aw1M5aP2KDdFSXrbNNM6o2Yn3fWIzboPmrxufXlIh6a2CVh4uR6CTgXKjrQaUjpbWKZtRg-rqtDuKW14B83lzZjvQR79fUrkGQYjmlmQ1FkU21QXk_ln780-gVTYULlYAUsHlyNFnMq4ynqdaT5LO7ZJW_T36Wv-URtZamHha-9sX1MmRbqqusYMxh3Nr8Uo7y9IA241D2WIKGi-OJj8z65np9nvOCAlzJkIS9WGpV27NDQqokwxJD87aPw4dibeVp2nQLwm1qRTAnwdp4t6ZB3AaAGiVzHuAIvYIfpgHYWUMTSMSIabQhSYGTmvhf5jHA; SEARCH_SAMESITE=CgQIhJsB; AEC=AQTF6HyWxVlqhwtKFurLp8MJDzz-RmIqYYq9Yp2YChWpu2seU7RYeOBnMm0; __Secure-ENID=19.SE=M390Zgw8_lsFMHxTOQYX4mBtx9KVzOdYUw7PL5JfrPlkgJ7YK1NQdieYWRmFd5g7E_PFfugqNnx6oAo7zQ5AxPT0CXQmoI-vnJAQTLR0RNxMP63vrZz7cFqkAEviEJpvhRGf4vUbrgUB_26PLDSAxejYEt6kZGc3ryi9sXgYPXFdJCK06gecG_JC2HF7o5tm0J79_C6rxle9ahzi9UXDN9QhbZ9POmaWKHefIIA3TjcYseTo-mWGLorvQZsVQUHi3hyf0zMq1QoK-2bGY9G1nC8NaFb2fNR3mxF7bu7aAhun1Hl4gHZDtX3CHghXfBGwz6Gx7JPWkSptAdu7z-9Qm1ykttSIQg66r8gysaDwEAfAvwSzSW_-fLlvE-cmjeKk_px3anvx1XiNRGxhNHXQriaQsQjqxES43FFiYGp7wLwCJsenMEB-nTI79JZ9Vh05_qknchOP7QMEXtARm6S7rPnosjBbv0e84VvzarbLpMegmkzWaId32X83ON_2h0y_yzV78urk6qzCf_5CTyD98B6opbWfExK9UGDGql7VMimj8KtqeMCXB9yNe9yKRVhx5uPnfOEIKoBY1e1SKS6UQvtzXv2n-tNqd1iy1OSejS86-J8Lnke8yJKjrfor; DV=Q2LJvyNVsmxWACJ-bZgLX549pDGc9NiJV5getGLf6QAAABAYEUSZHNXSUQAAAAgH7s-UDNE6IAAAANfCf_a5KYAFDgAAAA; __Secure-1PSIDTS=sidts-CjEBLwcBXPYch52QnGCI_H7mp8ew3-QWF1TdVapd-Ot8DKeRG0SCr6TvhFo5NyKRdO8NEAA; __Secure-3PSIDTS=sidts-CjEBLwcBXPYch52QnGCI_H7mp8ew3-QWF1TdVapd-Ot8DKeRG0SCr6TvhFo5NyKRdO8NEAA; SIDCC=AKEyXzVA8OiZZvrJ2RzBTteJTcwb4UfdUZY9dHNEz0DWkEXOI3wWe1fXDKDB8gtDkhxKeWqnYXM; __Secure-1PSIDCC=AKEyXzVfXxqD0IqDytZWO1FbpXVvv0mG_MXUbaQCBjNaX7Tf835kifjhpjNv3fIxS2RqjRiSMMur; __Secure-3PSIDCC=AKEyXzWy7jyQPWXTZICPbhtJllfzaZdxEp9bTurivJihHm0-8k59CDLsTX2_gWp8SOBAgVYiS3lM' \
+  -H 'dnt: 1' \
+  -H 'priority: u=0, i' \
+  -H 'sec-ch-ua: "Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"' \
+  -H 'sec-ch-ua-arch: "x86"' \
+  -H 'sec-ch-ua-bitness: "64"' \
+  -H 'sec-ch-ua-full-version: "124.0.6367.119"' \
+  -H 'sec-ch-ua-full-version-list: "Chromium";v="124.0.6367.119", "Google Chrome";v="124.0.6367.119", "Not-A.Brand";v="99.0.0.0"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-model: ""' \
+  -H 'sec-ch-ua-platform: "Windows"' \
+  -H 'sec-ch-ua-platform-version: "15.0.0"' \
+  -H 'sec-ch-ua-wow64: ?0' \
+  -H 'sec-fetch-dest: document' \
+  -H 'sec-fetch-mode: navigate' \
+  -H 'sec-fetch-site: none' \
+  -H 'sec-fetch-user: ?1' \
+  -H 'upgrade-insecure-requests: 1' \
+  -H 'user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36' \
+  -H 'x-client-data: CIe2yQEIo7bJAQipncoBCJmDywEIkqHLAQia/swBCIWgzQEIk+DNAQiRh84BCPSJzgEY9MnNAQ=='

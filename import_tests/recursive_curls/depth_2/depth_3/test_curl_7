@@ -1,0 +1,3 @@
+curl --location 'https://httpbin.org/post' \
+--header 'Content-Type: application/octet-stream' \
+--data '@/C:/Users/u248244/Documents/Rust/ATAC/import_tests/swagger-petstore-v2.1.0.json'

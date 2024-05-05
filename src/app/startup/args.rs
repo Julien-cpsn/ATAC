@@ -1,11 +1,12 @@
 use std::env;
 use std::path::PathBuf;
 use clap::{Parser, Subcommand};
+use clap::builder::Styles;
 use lazy_static::lazy_static;
-use crate::{panic_error};
+use crate::panic_error;
 
 #[derive(Parser, Debug)]
-#[command(version, about, long_about = None)]
+#[command(version, about, long_about = None, styles = Styles::styled())]
 pub struct Args {
     /// Main application directory, containing JSON collections files, the atac.toml config file and the atac.log file
     #[arg(short, long)]
@@ -15,25 +16,53 @@ pub struct Args {
     pub command: Option<Command>,
 
     /// Avoid saving data to the collection file
-    #[arg(long, default_value_t = false)]
+    #[arg(global = true, long, default_value_t = false)]
     pub dry_run: bool,
 }
 
-#[derive(Debug, Subcommand, PartialEq)]
+#[derive(Subcommand, Debug, PartialEq)]
 pub enum Command {
-    /// Used to import a collection file such as Postman
-    Import(ImportArgs),
+    /// Import a collection or request from other file formats (Postman v2.1.0, cURL)
+    Import {
+        /// The type of file to import
+        #[command(subcommand)]
+        import_type: ImportType,
+    },
 }
 
-#[derive(Debug, clap::Args, PartialEq)]
-pub struct ImportArgs {
-    /// A file to import, only Postman v2.1 JSON collection for now
-    pub path: PathBuf,
+#[derive(Subcommand, Debug, PartialEq)]
+pub enum ImportType {
+    /// Import a Postman v2.1.0 file
+    Postman {
+        /// Path to the file to import
+        import_path: PathBuf,
 
-    /// Max depth at which import should stop creating nested collections and only get the deeper requests
-    #[arg(long)]
-    pub max_depth: Option<u16>,
+        /// Max depth at which import should stop creating nested collections and only get the deeper requests
+        #[arg(long)]
+        max_depth: Option<u16>,
+    },
+
+    /// Import a curl file
+    Curl {
+        /// Path to the file to import
+        import_path: PathBuf,
+
+        /// Collection name to save the request to
+        collection_name: String,
+
+        /// Request name (will use the file name if none is provided)
+        request_name: Option<String>,
+
+        /// Search for deeper files
+        #[arg(short, long, conflicts_with = "request_name")]
+        recursive: bool,
+
+        /// Max depth at which import should stop creating nested collections and only get the deeper requests
+        #[arg(long, requires = "recursive", conflicts_with = "request_name")]
+        max_depth: Option<u16>,
+    },
 }
+
 
 pub struct ParsedArgs {
     pub directory: PathBuf,

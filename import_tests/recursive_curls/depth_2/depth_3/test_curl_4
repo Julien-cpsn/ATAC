@@ -1,0 +1,4 @@
+curl 'https://httpbin.org/put' \
+  -X PUT \
+  -H 'Content-Type: application/json' \
+  -d 'test'
