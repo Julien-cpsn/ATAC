@@ -92,7 +92,7 @@ impl App<'_> {
         match self.collections_tree.selected {
             None => self.render_homepage(frame, inner_layout[1]),
             Some(selection) => {
-                let selected_request = self.get_request_as_local_from_indexes(&selection).read().unwrap().clone();
+                let selected_request = self.get_request_as_local_from_indexes(&selection).read().clone();
 
                 self.render_request(frame, inner_layout[1], selected_request);
             }
@@ -101,7 +101,7 @@ impl App<'_> {
         // FOOTER
 
         let state_line = self.get_state_line();
-        let events = &*AVAILABLE_EVENTS.read().unwrap();
+        let events = &*AVAILABLE_EVENTS.read();
         let available_keys = Line::from(event_available_keys_to_spans(events, *DARK_BLACK, true).concat());
 
         let footer = Block::new()

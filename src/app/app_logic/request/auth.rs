@@ -8,7 +8,7 @@ impl App<'_> {
         let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
 
         {
-            let mut selected_request = local_selected_request.write().unwrap();
+            let mut selected_request = local_selected_request.write();
 
             selected_request.auth = next_auth(&selected_request.auth);
         }
@@ -19,7 +19,7 @@ impl App<'_> {
 
     pub fn select_request_auth_input_text(&mut self) {
         let local_selected_request = self.get_selected_request_as_local();
-        let selected_request = local_selected_request.read().unwrap();
+        let selected_request = local_selected_request.read();
 
         match selected_request.auth {
             NoAuth => {}
@@ -42,7 +42,7 @@ impl App<'_> {
         let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
 
         {
-            let mut selected_request = local_selected_request.write().unwrap();
+            let mut selected_request = local_selected_request.write();
 
             match &selected_request.auth {
                 BasicAuth(_, password) => {
@@ -63,7 +63,7 @@ impl App<'_> {
         let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
 
         {
-            let mut selected_request = local_selected_request.write().unwrap();
+            let mut selected_request = local_selected_request.write();
 
             match &selected_request.auth {
                 BasicAuth(username, _) => {
@@ -84,7 +84,7 @@ impl App<'_> {
         let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
 
         {
-            let mut selected_request = local_selected_request.write().unwrap();
+            let mut selected_request = local_selected_request.write();
 
             match &selected_request.auth {
                 BearerToken(_) => {

@@ -1,15 +1,16 @@
 use std::path::PathBuf;
 use std::str::FromStr;
-use std::sync::{Arc, RwLock};
+use std::sync::Arc;
+use parking_lot::RwLock;
 
-use parse_postman_collection::v2_1_0::{AuthType, Body, FormParameterSrcUnion, HeaderUnion, Items, Language, Mode, RequestClass, RequestUnion, Url};
+use parse_postman_collection::v2_1_0::{AuthType, Body, FormParameterSrcUnion, HeaderUnion, Host, Items, Language, Mode, RequestClass, RequestUnion, Url};
 
 use crate::app::app::App;
 use crate::app::startup::args::ARGS;
 use crate::panic_error;
 use crate::request::auth::Auth;
 use crate::request::body::ContentType;
-use crate::request::collection::Collection;
+use crate::request::collection::{Collection, CollectionFileFormat};
 use crate::request::method::Method;
 use crate::request::request::{DEFAULT_HEADERS, KeyValue, Request};
 use crate::request::settings::RequestSettings;
@@ -33,11 +34,14 @@ impl App<'_> {
             }
         }
 
+        let file_format = self.config.get_preferred_collection_file_format();
+
         let mut collections: Vec<Collection> = vec![
             Collection {
                 name: collection_name.clone(),
                 requests: vec![],
-                path: ARGS.directory.join(format!("{}.json", collection_name))
+                path: ARGS.directory.join(format!("{}.{}", collection_name, file_format.to_string())),
+                file_format,
             }
         ];
         
@@ -59,7 +63,9 @@ impl App<'_> {
                     let mut temp_nesting_prefix = String::new();
                     let new_collections: Vec<Collection> = vec![];
 
-                    recursive_has_requests(&mut item, &mut collections, &mut temp_nesting_prefix, &mut depth_level, max_depth);
+                    let file_format = self.config.get_preferred_collection_file_format();
+
+                    recursive_has_requests(&mut item, &mut collections, &mut temp_nesting_prefix, &mut depth_level, max_depth, file_format);
 
                     collections.extend(new_collections);
                 } else {
@@ -83,7 +89,7 @@ impl App<'_> {
     }
 }
 
-fn recursive_has_requests(item: &mut Items, collections: &mut Vec<Collection>, mut nesting_prefix: &mut String, mut depth_level: &mut u16, max_depth: u16) -> Option<Arc<RwLock<Request>>> {
+fn recursive_has_requests(item: &mut Items, collections: &mut Vec<Collection>, mut nesting_prefix: &mut String, mut depth_level: &mut u16, max_depth: u16, file_format: CollectionFileFormat) -> Option<Arc<RwLock<Request>>> {
     return if is_folder(&item) {
         let mut requests: Vec<Arc<RwLock<Request>>> = vec![];
 
@@ -106,7 +112,7 @@ fn recursive_has_requests(item: &mut Items, collections: &mut Vec<Collection>, m
             let mut has_sub_folders = false;
 
             for mut sub_item in item.item.clone().unwrap() {
-                if let Some(request) = recursive_has_requests(&mut sub_item, collections, &mut nesting_prefix, &mut depth_level, max_depth) {
+                if let Some(request) = recursive_has_requests(&mut sub_item, collections, &mut nesting_prefix, &mut depth_level, max_depth, file_format) {
                     requests.push(request);
                 } else {
                     has_sub_folders = true;
@@ -124,7 +130,8 @@ fn recursive_has_requests(item: &mut Items, collections: &mut Vec<Collection>, m
             let collection = Collection {
                 name: collection_name.clone(),
                 requests,
-                path: ARGS.directory.join(format!("{}.json", collection_name)),
+                path: ARGS.directory.join(format!("{}.{}", collection_name, file_format.to_string())),
+                file_format,
             };
 
             collections.push(collection);
@@ -163,6 +170,8 @@ fn parse_request(item: Items) -> Request {
     let mut request = Request::default();
 
     request.name = item_name;
+
+    request.scripts.pre_request_script = retrieve_request_scripts(&item);
 
     /* SETTINGS */
 
@@ -417,6 +426,29 @@ fn retrieve_headers(request_class: &RequestClass) -> Option<Vec<KeyValue>> {
         }
         HeaderUnion::String(_) => None
     }
+}
+
+fn retrieve_request_scripts(item: &Items) -> Option<String> {
+    let events = item.event.clone()?;
+
+
+    for event in events {
+        if event.listen == "prerequest" {
+            let script = event.script?;
+            match script.exec? {
+                Host::String(_) => {}
+                Host::StringArray(exec) => {
+                    let script: String = exec.iter()
+                        .map(|line| line.replace("pm.", "") + "\n")
+                        .collect();
+
+                    return Some(script);
+                }
+            }
+        }
+    }
+
+    None
 }
 
 fn retrieve_settings(item: &Items) -> Option<RequestSettings> {

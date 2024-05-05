@@ -22,7 +22,9 @@ pub enum RequestParamsTabs {
     #[strum(to_string = "Headers")]
     Headers,
     #[strum(to_string = "Body")]
-    Body
+    Body,
+    #[strum(to_string = "Scripts")]
+    Scripts
 }
 
 impl App<'_> {
@@ -56,7 +58,8 @@ impl App<'_> {
                     RequestParamsTabs::Body => match request.body {
                         NoBody => tab.to_string(),
                         Multipart(_) | Form(_) | File(_) | Raw(_) | Json(_) | Xml(_) | Html(_) | Javascript(_) => format!("{} ({})", tab.to_string(), request.body.to_string())
-                    }
+                    },
+                    RequestParamsTabs::Scripts => tab.to_string(),
                 }
             });
 
@@ -170,6 +173,9 @@ impl App<'_> {
                         frame.render_widget(self.body_text_area.widget(), request_params_layout[1]);
                     }
                 }
+            }
+            RequestParamsTabs::Scripts => {
+                self.render_request_script(frame, request_params_layout[1]);
             }
         }
     }

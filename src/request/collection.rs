@@ -1,7 +1,9 @@
 use std::path::PathBuf;
-use std::sync::{Arc, RwLock};
+use std::sync::Arc;
+use parking_lot::RwLock;
 use ratatui::text::{Line, Span};
 use serde::{Deserialize, Serialize};
+use strum::Display;
 use tui_tree_widget::TreeItem;
 use crate::request::request::Request;
 
@@ -11,7 +13,21 @@ pub struct Collection {
     pub requests: Vec<Arc<RwLock<Request>>>,
 
     #[serde(skip)]
-    pub path: PathBuf
+    pub path: PathBuf,
+
+    #[serde(skip)]
+    pub file_format: CollectionFileFormat
+}
+
+#[derive(Debug, Default, Copy, Clone, Display, Serialize, Deserialize)]
+pub enum CollectionFileFormat {
+    #[default]
+    #[serde(alias="json", alias="JSON")]
+    #[strum(to_string = "json")]
+    Json,
+    #[serde(alias="yaml", alias="YAML")]
+    #[strum(to_string = "yaml")]
+    Yaml
 }
 
 impl Collection {
@@ -27,7 +43,7 @@ impl Collection {
             .iter()
             .enumerate()
             .map(|(request_index, request)| {
-                request.read().unwrap().to_tree_item(request_index)
+                request.read().to_tree_item(request_index)
             })
             .collect();
 

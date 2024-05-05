@@ -4,23 +4,30 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
+use ratatui::style::Stylize;
+use ratatui::text::Line;
 use reqwest::{ClientBuilder, Proxy, Url};
-use reqwest::header::HeaderMap;
+use reqwest::header::{CONTENT_TYPE, HeaderMap};
 use reqwest::multipart::{Form, Part};
 use reqwest::redirect::Policy;
 use tokio::task;
 
 use crate::app::app::App;
+use crate::app::app_logic::request::scripts::{execute_post_request_script, execute_pre_request_script};
+use crate::app::files::environment::save_environment_to_file;
 use crate::panic_error;
 use crate::request::auth::Auth::{BasicAuth, BearerToken, NoAuth};
 use crate::request::body::{ContentType, find_file_format_in_content_type};
+use crate::request::request::Request;
+use crate::request::response::{ImageResponse, RequestResponse, ResponseContent};
+use crate::utils::syntax_highlighting::highlight;
 
 impl App<'_> {
     pub async fn send_request(&mut self) {
         let local_selected_request = self.get_selected_request_as_local();
 
         {
-            let mut selected_request = local_selected_request.write().unwrap();
+            let mut selected_request = local_selected_request.write();
 
             // Avoid creating more than one thread
             if selected_request.is_pending {
@@ -79,22 +86,83 @@ impl App<'_> {
             let local_cookie_store = Arc::clone(&self.cookies_popup.cookie_store);
             client_builder = client_builder.cookie_provider(local_cookie_store);
 
+            /* PRE-REQUEST SCRIPT */
+            let mut local_console_output = self.script_console.console_output.write();
+            let mut local_highlighted_console_output = self.syntax_highlighting.highlighted_console_output.write();
+
+            // Resets the data
+            *local_console_output = None;
+            *local_highlighted_console_output = vec![];
+
+            let modified_request: Request = match &selected_request.scripts.pre_request_script {
+                None => {
+                    selected_request.clone()
+                },
+                Some(pre_request_script) => {
+                    let local_env = self.get_selected_env_as_local();
+
+                    let env_values = match &local_env {
+                        None => None,
+                        Some(local_env) => {
+                            let env = local_env.read();
+                            Some(env.values.clone())
+                        }
+                    };
+
+                    let (result_request, env_variables, console_output) = execute_pre_request_script(pre_request_script, &*selected_request, env_values);
+
+                    match &local_env {
+                        None => {},
+                        Some(local_env) => match env_variables {
+                            None => {},
+                            Some(env_variables) => {
+                                let mut env = local_env.write();
+                                env.values = env_variables;
+                                save_environment_to_file(&*env);
+                            }
+                        }
+                    }
+
+                    let mut highlighted_console_output = highlight(&console_output, "json").unwrap();
+
+                    highlighted_console_output.insert(0, Line::default());
+                    highlighted_console_output.insert(1, Line::raw("----- Pre-request script start -----").dark_gray().centered());
+                    highlighted_console_output.push(Line::raw("----- Pre-request script end -----").dark_gray().centered());
+
+                    *local_highlighted_console_output = highlighted_console_output;
+
+                    *local_console_output = Some(console_output);
+
+                    match result_request {
+                        None => {
+                            selected_request.response.status_code = Some(String::from("(CONSOLE) PRE-SCRIPT ERROR"));
+                            return;
+                        }
+                        Some(request) => request
+                    }
+                }
+            };
+
+            // Drops the write mutex
+            drop(local_console_output);
+            drop(local_highlighted_console_output);
+
             /* CLIENT */
 
             let client = client_builder.build().expect("Could not build HTTP client");
 
             /* PARAMS */
 
-            let params = self.key_value_vec_to_tuple_vec(&selected_request.params);
+            let params = self.key_value_vec_to_tuple_vec(&modified_request.params);
 
             /* URL */
 
-            let url = self.replace_env_keys_by_value(&selected_request.url);
+            let url = self.replace_env_keys_by_value(&modified_request.url);
 
             let url = match Url::parse_with_params(&url, params) {
                 Ok(url) => url,
                 Err(_) => {
-                    selected_request.result.status_code = Some(String::from("INVALID URL"));
+                    selected_request.response.status_code = Some(String::from("INVALID URL"));
                     return;
                 }
             };
@@ -102,19 +170,19 @@ impl App<'_> {
             /* REQUEST */
 
             let mut request = client.request(
-                selected_request.method.to_reqwest(),
+                modified_request.method.to_reqwest(),
                 url
             );
 
             /* CORS */
             
-            if self.config.disable_cors.unwrap_or(false) {
+            if self.config.is_cors_disabled() {
                 request = request.fetch_mode_no_cors();
             }
             
             /* AUTH */
 
-            match &selected_request.auth {
+            match &modified_request.auth {
                 NoAuth => {}
                 BasicAuth(username, password) => {
                     let username = self.replace_env_keys_by_value(username);
@@ -131,7 +199,7 @@ impl App<'_> {
 
             /* BODY */
 
-            match &selected_request.body {
+            match &modified_request.body {
                 ContentType::NoBody => {},
                 ContentType::Multipart(form_data) => {
                     let mut multipart = Form::new();
@@ -150,7 +218,7 @@ impl App<'_> {
                                     multipart = multipart.part(key, part);
                                 }
                                 Err(_) => {
-                                    selected_request.result.status_code = Some(String::from("COULD NOT OPEN FILE"));
+                                    selected_request.response.status_code = Some(String::from("COULD NOT OPEN FILE"));
                                     return;
                                 }
                             }
@@ -176,7 +244,7 @@ impl App<'_> {
                             request = request.body(file);
                         }
                         Err(_) => {
-                            selected_request.result.status_code = Some(String::from("COULD NOT OPEN FILE"));
+                            selected_request.response.status_code = Some(String::from("COULD NOT OPEN FILE"));
                             return;
                         }
                     }
@@ -188,7 +256,7 @@ impl App<'_> {
 
             /* HEADERS */
 
-            for header in &selected_request.headers {
+            for header in &modified_request.headers {
                 if !header.enabled {
                     continue;
                 }
@@ -200,24 +268,35 @@ impl App<'_> {
             }
 
             let local_selected_request = self.get_selected_request_as_local();
-            let local_last_highlighted = Arc::clone(&self.syntax_highlighting.last_highlighted);
-            
+            let local_env = self.get_selected_env_as_local();
+            let local_console_output = Arc::clone(&self.script_console.console_output);
+            let local_highlighted_body = Arc::clone(&self.syntax_highlighting.highlighted_body);
+            let local_highlighted_console_output = Arc::clone(&self.syntax_highlighting.highlighted_console_output);
+
             /* SEND REQUEST */
 
             task::spawn(async move {
-                local_selected_request.write().unwrap().is_pending = true;
+                local_selected_request.write().is_pending = true;
 
                 let request_start = Instant::now();
                 let elapsed_time: Duration;
 
-                match request.send().await {
+                let mut response = match request.send().await {
                     Ok(response) => {
+                        elapsed_time = request_start.elapsed();
+
                         let status_code = response.status().to_string();
+
+                        let mut is_image = false;
 
                         let headers: Vec<(String, String)> = response.headers().clone()
                             .iter()
                             .map(|(header_name, header_value)| {
                                 let value = header_value.to_str().unwrap_or("").to_string();
+
+                                if header_name == CONTENT_TYPE && value.starts_with("image/") {
+                                    is_image = true;
+                                }
 
                                 (header_name.to_string(), value)
                             })
@@ -230,32 +309,54 @@ impl App<'_> {
                             .collect::<Vec<String>>()
                             .join("\n");
 
-                        let mut result_body = response.text().await.unwrap();
+                        let response_content = match is_image {
+                            true => {
+                                let content = response.bytes().await.unwrap();
+                                let image = image::load_from_memory(content.as_ref());
 
-                        // If the request response content can be pretty printed
-                        if local_selected_request.read().unwrap().settings.pretty_print_response_content {
-                            // If a file format has been found in the content-type header
-                            if let Some(file_format) = find_file_format_in_content_type(&headers) {
-                                // Match the file format
-                                match file_format.as_str() {
-                                    "json" => {
-                                        result_body = jsonxf::pretty_print(&result_body).unwrap_or(result_body);
-                                    },
-                                    _ => {}
+                                ResponseContent::Image(ImageResponse {
+                                    data: content.to_vec(),
+                                    image: image.ok(),
+                                })
+                            },
+                            false => {
+                                let mut result_body = response.text().await.unwrap();
+
+                                // If a file format has been found in the content-type header
+                                if let Some(file_format) = find_file_format_in_content_type(&headers) {
+                                    // If the request response content can be pretty printed
+                                    if local_selected_request.read().settings.pretty_print_response_content {
+
+                                        // Match the file format
+                                        match file_format.as_str() {
+                                            "json" => {
+                                                result_body = jsonxf::pretty_print(&result_body).unwrap_or(result_body);
+                                            },
+                                            _ => {}
+                                        }
+                                    }
+
+                                    let highlighted_result_body = highlight(&result_body, &file_format);
+                                    *local_highlighted_body.write() = highlighted_result_body;
+                                } else {
+                                    *local_highlighted_body.write() = None;
                                 }
+
+                                ResponseContent::Body(result_body)
                             }
+                        };
+
+                        RequestResponse {
+                            duration: None,
+                            status_code: Some(status_code),
+                            content: Some(response_content),
+                            cookies: Some(cookies),
+                            headers,
                         }
-                        
-                        {
-                            let mut selected_request = local_selected_request.write().unwrap();
-                            selected_request.result.status_code = Some(status_code);
-                            selected_request.result.body = Some(result_body);
-                            selected_request.result.cookies = Some(cookies);
-                            selected_request.result.headers = headers;
-                        }
-                        
                     },
                     Err(error) => {
+                        elapsed_time = request_start.elapsed();
+
                         let response_status_code;
 
                         if let Some(status_code) = error.status() {
@@ -263,30 +364,87 @@ impl App<'_> {
                         } else {
                             response_status_code = None;
                         }
-                        let result_body = error.to_string();
+
+                        let result_body = ResponseContent::Body(error.to_string());
 
 
-                        {
-                            let mut selected_request = local_selected_request.write().unwrap();
-                            selected_request.result.status_code = response_status_code;
-                            selected_request.result.body = Some(result_body);
-                            selected_request.result.cookies = None;
-                            selected_request.result.headers = vec![];
+                        RequestResponse {
+                            duration: None,
+                            status_code: response_status_code,
+                            content: Some(result_body),
+                            cookies: None,
+                            headers: vec![],
                         }
                     }
                 };
 
-                elapsed_time = request_start.elapsed();
-                local_selected_request.write().unwrap().result.duration = Some(format!("{:?}", elapsed_time));
+                response.duration = Some(format!("{:?}", elapsed_time));
 
-                local_selected_request.write().unwrap().is_pending = false;
-                *local_last_highlighted.write().unwrap() = None;
+                /* POST-REQUEST SCRIPT */
+
+                let mut selected_request = local_selected_request.write();
+                let mut console_output = local_console_output.write();
+
+                let modified_response: RequestResponse = match &selected_request.scripts.post_request_script {
+                    None => {
+                        response
+                    },
+                    Some(post_request_script) => {
+                        let env_values = match &local_env {
+                            None => None,
+                            Some(local_env) => {
+                                let env = local_env.read();
+                                Some(env.values.clone())
+                            }
+                        };
+
+                        let (result_response, env_variables, result_console_output) = execute_post_request_script(post_request_script, &response, env_values);
+
+                        match &local_env {
+                            None => {},
+                            Some(local_env) => match env_variables {
+                                None => {},
+                                Some(env_variables) => {
+                                    let mut env = local_env.write();
+                                    env.values = env_variables;
+                                    save_environment_to_file(&*env);
+                                }
+                            }
+                        }
+
+                        let mut highlighted_console_output = highlight(&result_console_output, "json").unwrap();
+
+                        highlighted_console_output.insert(0, Line::default());
+                        highlighted_console_output.insert(1, Line::raw("----- Post-request script start -----").dark_gray().centered());
+                        highlighted_console_output.push(Line::raw("----- Post-request script end -----").dark_gray().centered());
+
+                        let mut local_highlighted_console_output = local_highlighted_console_output.write();
+
+                        local_highlighted_console_output.extend(highlighted_console_output);
+
+                        *console_output = match console_output.as_ref() {
+                            None => Some(result_console_output),
+                            Some(console_output) => Some(format!("{console_output}\n{result_console_output}"))
+                        };
+
+                        match result_response {
+                            None => {
+                                response.status_code = Some(String::from("(CONSOLE) POST-SCRIPT ERROR"));
+                                response
+                            }
+                            Some(result_response) => result_response
+                        }
+                    }
+                };
+
+                selected_request.response = modified_response;
+                selected_request.is_pending = false;
             });
         }
     }
 }
 
-fn get_file_content_with_name(path: PathBuf) -> std::io::Result<(Vec<u8>, String)> {
+pub fn get_file_content_with_name(path: PathBuf) -> std::io::Result<(Vec<u8>, String)> {
     let mut buffer: Vec<u8> = vec![];
     let mut file = File::open(path.clone())?;
 

@@ -135,79 +135,69 @@ cargo run -- -h
 
 ### Current
 
-| Features                            | **ATAC**                                                 | Postman              | Insomnia             |
-|-------------------------------------|----------------------------------------------------------|----------------------|----------------------|
-| **Manage collections & requests**   | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
-| **HTTP Client**                     | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
-| Methods                             | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
-| - GET                               | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
-| - POST                              | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
-| - PUT                               | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
-| - PATCH                             | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
-| - DELETE                            | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
-| - HEAD                              | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
-| - OPTIONS                           | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
-| Authentication                      | Partial                                                  | :white_check_mark:   | :white_check_mark:   |
-| - Basic auth                        | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
-| - Bearer token                      | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
-| - JWT, Digest, OAuth1-2, AWS        | :x: :soon:                                               | :white_check_mark:   | :white_check_mark:   |
-| Headers                             | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
-| Body                                | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
-| - Multipart form                    | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
-| - URL Encoded form                  | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
-| - File                              | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
-| - Plain text                        | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
-| - JSON, XML, HTML, Javascript       | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
-| Full response                       | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
-| - Status code                       | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
-| - Cookies                           | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
-| - Headers                           | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
-| - Duration                          | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
-| Scripting                           | :x: :soon:                                               | Partial              | :x:                  |
-| - Pre-request script                | :x: :soon:                                               | :x:                  | :x:                  |
-| - Post-request script               | :x: :soon:                                               | :white_check_mark:   | :x:                  |
-| Asynchronous requests               | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
-| Per-request settings                | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
-| - Use proxy                         | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
-| - Allow redirects                   | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
-| - Store cookies                     | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
-| **WebSocket Client**                | :x: :soon:                                               | :white_check_mark:   | :white_check_mark:   |
-| **GraphQL**                         | :x: :soon:                                               | :white_check_mark:   | :white_check_mark:   |
-| **gRPC**                            | :x: :soon:                                               | :white_check_mark:   | :white_check_mark:   |
-| **MQTT**                            | :x: :soon:                                               | :white_check_mark:   | :x:                  |
-| **Free**                            | :white_check_mark:                                       | Depends              | Depends              |
-| **Lightweight, fast and efficient** | :white_check_mark:                                       | :x:                  | :x:                  |
-| **Data storage**                    | Your own committable, readable and versioned files       | Tied to your account | Tied to your account |
-| **Offline**                         | :white_check_mark:                                       | :x:                  | :x:                  |
-| **Real-time collaboration**         | :x: (not planned)                                        | :white_check_mark:   | :white_check_mark:   |
-| **Environment files and variables** | :white_check_mark: (committable, readable and versioned) | :white_check_mark:   | :white_check_mark:   |
-| **View options**                    | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
-| **Global configuration file**       | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
-| - HTTP/HTTPS Proxy                  | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
-| - Disable CORS                      | :white_check_mark:                                       | :x:                  | :x:                  |
-| - Toggle syntax highlighting        | :white_check_mark:                                       | :x:                  | :x:                  |
-| Postman v2.1.0 import               | :white_check_mark:                                       | :white_check_mark:   | :white_check_mark:   |
-| OpenAPI import                      | :x: :soon:                                               | :white_check_mark:   | :white_check_mark:   |
+| Features                            | **ATAC**                                                          | Postman              | Insomnia             |
+|-------------------------------------|-------------------------------------------------------------------|----------------------|----------------------|
+| **Manage collections & requests**   | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
+| **HTTP Client**                     | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
+| Methods                             | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
+| - GET                               | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
+| - POST                              | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
+| - PUT                               | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
+| - PATCH                             | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
+| - DELETE                            | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
+| - HEAD                              | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
+| - OPTIONS                           | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
+| Authentication                      | Partial                                                           | :white_check_mark:   | :white_check_mark:   |
+| - Basic auth                        | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
+| - Bearer token                      | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
+| - JWT, Digest, OAuth1-2, AWS        | :x: :soon:                                                        | :white_check_mark:   | :white_check_mark:   |
+| Headers                             | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
+| Body                                | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
+| - Multipart form                    | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
+| - URL Encoded form                  | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
+| - File                              | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
+| - Plain text                        | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
+| - JSON, XML, HTML, Javascript       | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
+| Full response                       | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
+| - Status code                       | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
+| - Cookies                           | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
+| - Headers                           | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
+| - Duration                          | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
+| Scripting                           | :white_check_mark:                                                | Partial              | :x:                  |
+| - Pre-request script                | :white_check_mark:                                                | :x:                  | :x:                  |
+| - Post-request script               | :white_check_mark:                                                | :white_check_mark:   | :x:                  |
+| Asynchronous requests               | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
+| Per-request settings                | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
+| - Use proxy                         | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
+| - Allow redirects                   | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
+| - Store cookies                     | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
+| Export to other languages           | :x: :soon:                                                        | :white_check_mark:   | :x:                  |
+| **WebSocket Client**                | :x: :soon:                                                        | :white_check_mark:   | :white_check_mark:   |
+| **GraphQL**                         | :x: :soon:                                                        | :white_check_mark:   | :white_check_mark:   |
+| **gRPC**                            | :x: :soon:                                                        | :white_check_mark:   | :white_check_mark:   |
+| **MQTT**                            | :x: :soon:                                                        | :white_check_mark:   | :x:                  |
+| **Free**                            | :white_check_mark:                                                | Depends              | Depends              |
+| **Lightweight, fast and efficient** | :white_check_mark:                                                | :x:                  | :x:                  |
+| **Data storage**                    | Your own committable, readable and versioned files (JSON or YAML) | Tied to your account | Tied to your account |
+| **Offline**                         | :white_check_mark:                                                | :x:                  | :x:                  |
+| **Real-time collaboration**         | :x: (not planned)                                                 | :white_check_mark:   | :white_check_mark:   |
+| **Environment files and variables** | :white_check_mark: (committable, readable and versioned)          | :white_check_mark:   | :white_check_mark:   |
+| **View options**                    | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
+| **Global configuration file**       | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
+| - HTTP/HTTPS Proxy                  | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
+| - Disable CORS                      | :white_check_mark:                                                | :x:                  | :x:                  |
+| - Toggle syntax highlighting        | :white_check_mark:                                                | :x:                  | :x:                  |
+| Postman v2.1.0 import               | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
+| OpenAPI import                      | :x: :soon:                                                        | :white_check_mark:   | :white_check_mark:   |
 
 ### TODO v1.0.0
 
 - **To add**
   - Create a repo wiki
-  - Document whole code
-
-- **To improve**
-  - Sign binary
-
-- **To fix**
-  - Query parameters bug
-
-### TODO v2.0.0
-
-- **To add**
+  - Document the whole code
   - Command line usage (send requests, add new requests)
   - Request body syntax highlighting
   - Export a request to other code formats ([raw](https://github.com/Kong/insomnia/issues/174), curl, PHP, JS, Rust, ...)
-  - Pre and post-request script (javascript v8 engine)
   - OpenAPI & Insomnia import
 
 - **To improve**
@@ -215,7 +205,10 @@ cargo run -- -h
   - Auto-completion on env file variables
   - Manage multipart Content-type header (auto-generated for now) https://github.com/seanmonstar/reqwest/issues/2259
 
-### TODO v3.0.0
+- **To fix**
+  - Query parameters bug
+
+### TODO v2.0.0
 
 - **To add**
   - WebSocket requests
@@ -226,7 +219,6 @@ cargo run -- -h
 ### Ideas (will think about it later)
 
 - Base URL property on collections
-- YAML support for collections file format
 
 ## Documentation
 
@@ -266,29 +258,35 @@ https://github.com/NachoNievaG/atac.nvim
 
 ### Dependencies
 
-| Library                                                                                                                                    | Version           | Reason                                                                                 |
-|--------------------------------------------------------------------------------------------------------------------------------------------|-------------------|----------------------------------------------------------------------------------------|
-| [reqwest](https://github.com/seanmonstar/reqwest) & [reqwest cookie store](https://github.com/pfernie/reqwest_cookie_store)                | 0.11.27 & 0.6.0   | Send requests                                                                          |
-| [ratatui](https://github.com/ratatui-org/ratatui)                                                                                          | 0.26.2            | Terminal UI framework                                                                  |
-| [crossterm](https://github.com/crossterm-rs/crossterm)                                                                                     | 0.27.0            | Terminal Backend                                                                       |
-| [crokey](https://github.com/Canop/crokey)                                                                                                  | 0.6.4             | Used to parse, use key bindings files and some utilities                               |
-| [tui-big-text](https://github.com/joshka/tui-big-text)                                                                                     | 0.4.2             | Display big texts. Only used for displaying ATAC in the homepage.                      |
-| [tui-tree-widget](https://github.com/EdJoPaTo/tui-rs-tree-widget)                                                                          | 0.19.0            | Display tree-like lists. Used for displaying the collections.                          |
-| [tui-textarea](https://github.com/rhysd/tui-textarea)                                                                                      | 0.5.0             | Text area that handle a lot of features. Used for editing request body.                |
-| [throbber-widgets-tui](https://github.com/arkbig/throbber-widgets-tui)                                                                     | 0.4.1             | Display loading UI elements. Used when request is pending.                             |
-| [syntect](https://github.com/trishume/syntect)                                                                                             | 5.2.0             | Syntax highlighting                                                                    |
-| [serde](https://github.com/serde-rs/serde) & [serde_json](https://github.com/serde-rs/json)                                                | 1.0.197 & 1.0.144 | Serialize & Deserialize application data into JSON files                               |
-| [jsonxf](https://github.com/gamache/jsonxf)                                                                                                | 0.1.1             | Pretty print JSON                                                                      |
-| [toml](https://github.com/toml-rs/toml)                                                                                                    | 0.8.11            | Serialize & Deserialize application config files                                       |
-| [envfile](https://github.com/pop-os/envfile)                                                                                               | 0.2.1             | Deserialize application environment files                                              |
-| [My fork](https://github.com/Julien-cpsn/postman-collection-rs) of [postman_collection](https://github.com/mandrean/postman-collection-rs) | 0.2.1             | Deserialize Postman collection files                                                   |
-| [clap](https://github.com/clap-rs/clap)                                                                                                    | 4.5.0             | Command Line Argument Parser                                                           |
-| [arboard](https://github.com/1Password/arboard)                                                                                            | 3.3.2             | Copy response body to clipboard                                                        |
-| [tokio](https://github.com/tokio-rs/tokio)                                                                                                 | 1.0.0             | Handle asynchronous requests                                                           |
-| [strum](https://github.com/Peternator7/strum)                                                                                              | 0.26.2            | Enum facilities                                                                        |
-| [lazy_static](https://github.com/rust-lang-nursery/lazy-static.rs)                                                                         | 1.4.0             | Allows for more flexible constants. Mainly used for accessing CLI arguments everywhere |
-| [nestify](https://github.com/snowfoxsh/nestify)                                                                                            | 0.3.3             | Used to nest struct definitions                                                        |
-| [regex](https://github.com/rust-lang/regex)                                                                                                | 1.10.3            | Regex. Using for parsing requests URL                                                  |
+| Library                                                                                                                                          | Version                   | Reason                                                                                 |
+|--------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------|----------------------------------------------------------------------------------------|
+| [reqwest](https://github.com/seanmonstar/reqwest) & [reqwest cookie store](https://github.com/pfernie/reqwest_cookie_store)                      | 0.11.27 & 0.6.0           | Send requests                                                                          |
+| [ratatui](https://github.com/ratatui-org/ratatui)                                                                                                | 0.26.2                    | Terminal UI framework                                                                  |
+| [crossterm](https://github.com/crossterm-rs/crossterm)                                                                                           | 0.27.0                    | Terminal Backend                                                                       |
+| [crokey](https://github.com/Canop/crokey)                                                                                                        | 0.6.4                     | Used to parse, use key bindings files and some utilities                               |
+| [tui-big-text](https://github.com/joshka/tui-big-text)                                                                                           | 0.4.2                     | Display big texts. Only used for displaying ATAC in the homepage.                      |
+| [tui-tree-widget](https://github.com/EdJoPaTo/tui-rs-tree-widget)                                                                                | 0.19.0                    | Display tree-like lists. Used for displaying the collections.                          |
+| [tui-textarea](https://github.com/rhysd/tui-textarea)                                                                                            | 0.5.0                     | Text area that handle a lot of features. Used for editing request body.                |
+| [throbber-widgets-tui](https://github.com/arkbig/throbber-widgets-tui)                                                                           | 0.4.1                     | Display loading UI elements. Used when request is pending.                             |
+| [ratatui-image](https://github.com/benjajaja/ratatui-image)                                                                                      | 1.0.0                     | Display response images.                                                               |
+| [image](https://github.com/image-rs/image)                                                                                                       | 0.24.9                    | Decode images.                                                                         |
+| [syntect](https://github.com/trishume/syntect)                                                                                                   | 5.2.0                     | Syntax highlighting                                                                    |
+| [serde](https://github.com/serde-rs/serde) ([serde_json](https://github.com/serde-rs/json), [serde-yaml](https://github.com/dtolnay/serde-yaml)) | 1.0.197 (1.0.144, 0.9.34) | Serialize & Deserialize application data into files                                    |
+| [jsonxf](https://github.com/gamache/jsonxf)                                                                                                      | 0.1.1                     | Pretty print JSON                                                                      |
+| [toml](https://github.com/toml-rs/toml)                                                                                                          | 0.8.11                    | Serialize & Deserialize application config files                                       |
+| [boa_engine](https://github.com/boa-dev/boa)                                                                                                     | 0.18.0                    | Create Javascript runtimes. Used for pre and post request scripts                      |
+| [My fork](https://github.com/Julien-cpsn/postman-collection-rs) of [postman_collection](https://github.com/mandrean/postman-collection-rs)       | 0.2.1                     | Deserialize Postman collection files                                                   |
+| [clap](https://github.com/clap-rs/clap)                                                                                                          | 4.5.0                     | Command Line Argument Parser                                                           |
+| [arboard](https://github.com/1Password/arboard)                                                                                                  | 3.3.2                     | Copy response body to clipboard                                                        |
+| [tokio](https://github.com/tokio-rs/tokio)                                                                                                       | 1.0.0                     | Handle asynchronous requests                                                           |
+| [parking_lot](https://github.com/Amanieu/parking_lot)                                                                                            | 0.12.2                    | Smaller, faster and more flexible implementation of RwLock and Mutex. Used everywhere. |
+| [strum](https://github.com/Peternator7/strum)                                                                                                    | 0.26.2                    | Enum facilities                                                                        |
+| [lazy_static](https://github.com/rust-lang-nursery/lazy-static.rs)                                                                               | 1.4.0                     | Allows for more flexible constants. Mainly used for accessing CLI arguments everywhere |
+| [nestify](https://github.com/snowfoxsh/nestify)                                                                                                  | 0.3.3                     | Used to nest struct definitions                                                        |
+| [snailquote](https://github.com/euank/snailquote)                                                                                                | 0.3.1                     | Unescape string                                                                        |
+| [indexmap](https://github.com/indexmap-rs/indexmap)                                                                                              | 2.2.6                     | Ordered hashmap. Used in environments to preserve files' values order                  |
+| [base64](https://github.com/marshallpierce/rust-base64)                                                                                          | 0.22.0                    | Encode auth.                                                                           |
+| [regex](https://github.com/rust-lang/regex)                                                                                                      | 1.10.3                    | Regex. Using for parsing requests URL                                                  |
 
 ### Binary size
 

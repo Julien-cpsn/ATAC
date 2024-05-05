@@ -5,7 +5,7 @@ impl App<'_> {
     /// Reset selection if headers are provided, either set it to none
     pub fn update_headers_selection(&mut self) {
         let local_selected_request = self.get_selected_request_as_local();
-        let selected_request = local_selected_request.read().unwrap();
+        let selected_request = local_selected_request.read();
 
         match selected_request.headers.is_empty() {
             false => {
@@ -26,7 +26,7 @@ impl App<'_> {
         let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
 
         {
-            let mut selected_request = local_selected_request.write().unwrap();
+            let mut selected_request = local_selected_request.write();
 
             let selection = self.headers_table.selection.unwrap();
             let input_text = &self.headers_table.selection_text_input.text;
@@ -47,7 +47,7 @@ impl App<'_> {
         let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
 
         {
-            let mut selected_request = local_selected_request.write().unwrap();
+            let mut selected_request = local_selected_request.write();
 
             selected_request.headers.push(KeyValue {
                 enabled: true,
@@ -69,7 +69,7 @@ impl App<'_> {
         let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
 
         {
-            let mut selected_request = local_selected_request.write().unwrap();
+            let mut selected_request = local_selected_request.write();
 
             let selection = self.headers_table.selection.unwrap();
             selected_request.headers.remove(selection.0);
@@ -89,7 +89,7 @@ impl App<'_> {
         let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
 
         {
-            let mut selected_request = local_selected_request.write().unwrap();
+            let mut selected_request = local_selected_request.write();
 
             let row = self.headers_table.selection.unwrap().0;
             selected_request.headers[row].enabled = !selected_request.headers[row].enabled;

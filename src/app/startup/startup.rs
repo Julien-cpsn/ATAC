@@ -3,6 +3,7 @@ use std::fs::OpenOptions;
 use crate::app::app::App;
 use crate::app::startup::args::{ARGS, Command};
 use crate::panic_error;
+use crate::request::collection::CollectionFileFormat;
 
 impl App<'_> {
     /// Method called before running the app
@@ -53,7 +54,10 @@ impl App<'_> {
             println!("Checking: {}", path.display());
 
             if file_name.ends_with(".json") {
-                self.set_collections_from_file(path);
+                self.set_collections_from_file(path, CollectionFileFormat::Json);
+            }
+            else if file_name.ends_with(".yaml") {
+                self.set_collections_from_file(path, CollectionFileFormat::Yaml);
             }
             else if file_name.starts_with(".env.") {
                 self.add_environment_from_file(path)

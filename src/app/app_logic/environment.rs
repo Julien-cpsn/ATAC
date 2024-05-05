@@ -1,9 +1,21 @@
+use std::sync::Arc;
+use parking_lot::RwLock;
+
 use ratatui::style::Stylize;
 use ratatui::text::{Line, Span};
 use regex::Regex;
+
 use crate::app::app::App;
+use crate::request::environment::Environment;
 
 impl App<'_> {
+    pub fn get_selected_env_as_local(&self) -> Option<Arc<RwLock<Environment>>> {
+        match self.environments.get(self.selected_environment) {
+            None => None,
+            Some(env) => Some(env.clone())
+        }
+    }
+    
     pub fn next_environment(&mut self) {
         if self.selected_environment + 1 < self.environments.len() {
             self.selected_environment += 1;
@@ -20,8 +32,14 @@ impl App<'_> {
 
         let mut tmp_string = input.to_string();
 
-        for (key, value) in &self.environments[self.selected_environment].values {
-            tmp_string = tmp_string.replace(&format!("{{{{{}}}}}", key), value);
+        let local_env = self.get_selected_env_as_local();
+
+        if let Some(local_env) = local_env {
+            let env = local_env.read();
+
+            for (key, value) in &env.values {
+                tmp_string = tmp_string.replace(&format!("{{{{{}}}}}", key), value);
+            }
         }
 
         return tmp_string;
@@ -37,24 +55,33 @@ impl App<'_> {
         let regex = Regex::new(r"\{\{(\w+)}}").unwrap();
         let mut tmp_index: usize = 0;
 
-        for match_ in regex.captures_iter(input) {
-            for sub_match in match_.iter() {
-                if let Some(sub_match) = sub_match {
-                    for (key, _) in &self.environments[self.selected_environment].values {
-                        if sub_match.as_str() == &format!("{{{{{}}}}}", key) {
-                            let range = sub_match.range();
+        let local_env = self.get_selected_env_as_local();
 
-                            spans.push(Span::raw(input[tmp_index..range.start].to_string()));
-                            spans.push(Span::raw(sub_match.as_str().to_owned()).cyan());
+        if let Some(local_env) = local_env {
+            let env = local_env.read();
+            
+            for match_ in regex.captures_iter(input) {
+                for sub_match in match_.iter() {
+                    if let Some(sub_match) = sub_match {
+                        for (key, _) in &env.values {
+                            if sub_match.as_str() == &format!("{{{{{}}}}}", key) {
+                                let range = sub_match.range();
 
-                            tmp_index = range.end;
+                                spans.push(Span::raw(input[tmp_index..range.start].to_string()));
+                                spans.push(Span::raw(sub_match.as_str().to_owned()).cyan());
+
+                                tmp_index = range.end;
+                            }
                         }
                     }
                 }
             }
-        }
 
-        spans.push(Span::raw(String::from(&input[tmp_index..input.len()])));
+            spans.push(Span::raw(String::from(&input[tmp_index..input.len()])));
+        }
+        else {
+            spans.push(Span::raw(input.to_string()));
+        }
 
         return Line::from(spans);
     }

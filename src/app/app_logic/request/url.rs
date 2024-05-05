@@ -10,7 +10,7 @@ impl App<'_> {
         let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
 
         {
-            let mut selected_request = local_selected_request.write().unwrap();
+            let mut selected_request = local_selected_request.write();
 
             let url_parts = input_text.split_once("?");
 

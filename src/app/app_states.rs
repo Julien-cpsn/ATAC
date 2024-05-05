@@ -1,8 +1,7 @@
-use std::sync::RwLock;
-
 use crokey::{key, KeyCombination};
 use crossterm::event::{KeyCode, KeyModifiers};
 use lazy_static::lazy_static;
+use parking_lot::RwLock;
 use ratatui::prelude::Span;
 use ratatui::style::{Color, Stylize};
 use ratatui::text::Line;
@@ -87,8 +86,14 @@ pub enum AppState {
     #[strum(to_string = "Editing request body (Text)")]
     EditingRequestBodyString,
 
+    #[strum(to_string = "Editing pre-request script")]
+    EditingPreRequestScript,
+
+    #[strum(to_string = "Editing post-request script")]
+    EditingPostRequestScript,
+
     #[strum(to_string = "Editing request settings")]
-    EditingRequestSettings
+    EditingRequestSettings,
 }
 
 pub fn next_app_state(app_state: &AppState) -> AppState {
@@ -112,8 +117,10 @@ pub fn next_app_state(app_state: &AppState) -> AppState {
         EditingRequestHeader => EditingRequestBodyTable,
         EditingRequestBodyTable => EditingRequestBodyFile,
         EditingRequestBodyFile => EditingRequestBodyString,
-        EditingRequestBodyString => EditingRequestSettings,
-        EditingRequestSettings => Normal
+        EditingRequestBodyString => EditingPreRequestScript,
+        EditingPreRequestScript => EditingPostRequestScript,
+        EditingPostRequestScript => EditingRequestSettings,
+        EditingRequestSettings => Normal,
     }
 }
 
@@ -139,13 +146,15 @@ pub fn previous_app_state(app_state: &AppState) -> AppState {
         EditingRequestBodyTable => EditingRequestHeader,
         EditingRequestBodyFile => EditingRequestBodyTable,
         EditingRequestBodyString => EditingRequestBodyFile,
-        EditingRequestSettings => EditingRequestBodyString
+        EditingPreRequestScript => EditingRequestBodyString,
+        EditingPostRequestScript => EditingPreRequestScript,
+        EditingRequestSettings => EditingPostRequestScript,
     }
 }
 
 impl AppState {
     pub fn get_available_events(&self, request_view: RequestView, request_param_tab: RequestParamsTabs) -> Vec<AppEvent> {
-        let key_bindings = KEY_BINDINGS.read().unwrap();
+        let key_bindings = KEY_BINDINGS.read();
 
         match self {
             Normal => vec![
@@ -332,6 +341,11 @@ impl AppState {
                             DeleteRequestBodyTableElement(EventKeyBinding::new(vec![key_bindings.generic.list_and_table_actions.delete_element], "Delete form element", None)),
                             ToggleRequestBodyTableElement(EventKeyBinding::new(vec![key_bindings.generic.list_and_table_actions.toggle_element], "Toggle form element", None)),
                         ],
+                        RequestParamsTabs::Scripts => vec![
+                            EditRequestScript(EventKeyBinding::new(vec![key_bindings.generic.list_and_table_actions.edit_element], "Edit request script", Some("Edit"))),
+                            RequestScriptMove(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_up], "Move up", Some("Up"))),
+                            RequestScriptMove(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_down], "Move down", Some("Down"))),
+                        ]
                     };
 
                     base_param_tabs_events.extend(param_tabs_events);
@@ -451,26 +465,80 @@ impl AppState {
                     Documentation(EventKeyBinding::new(vec![key!(q)], "Quit without saving", Some("Quit without saving"))),
                     Documentation(EventKeyBinding::new(vec![key!(Ctrl-s)], "Save and quit", Some("Save and quit"))),
                 ],
-                TextAreaMode::Custom(key_bindings) => vec![
-                    EditingRequestBodyStringCopy(EventKeyBinding::new(vec![key_bindings.copy], "Copy", Some("Copy"))),
-                    EditingRequestBodyStringPaste(EventKeyBinding::new(vec![key_bindings.paste], "Paste", Some("Paste"))),
-                    EditingRequestBodyStringUndo(EventKeyBinding::new(vec![key_bindings.undo], "Undo", Some("Undo"))),
-                    EditingRequestBodyStringRedo(EventKeyBinding::new(vec![key_bindings.redo], "Redo", Some("Redo"))),
-                    EditingRequestBodyStringSaveAndQuit(EventKeyBinding::new(vec![key_bindings.save_and_quit], "Save", Some("Save"))),
-                    EditingRequestBodyStringQuitWithoutSaving(EventKeyBinding::new(vec![key_bindings.quit_without_saving], "Quit", Some("Quit"))),
-                    EditingRequestBodyStringNewLine(EventKeyBinding::new(vec![key_bindings.new_line], "New line", None)),
-                    EditingRequestBodyStringIndent(EventKeyBinding::new(vec![key_bindings.indent], "Indent", None)),
-                    EditingRequestBodyStringDeleteCharBackward(EventKeyBinding::new(vec![key_bindings.delete_backward], "Delete char backward", None)),
-                    EditingRequestBodyStringDeleteCharForward(EventKeyBinding::new(vec![key_bindings.delete_forward], "Delete char forward", None)),
-                    EditingRequestBodyStringSkipWordLeft(EventKeyBinding::new(vec![key_bindings.skip_word_left], "Skip word left", None)),
-                    EditingRequestBodyStringSkipWordRight(EventKeyBinding::new(vec![key_bindings.skip_word_right], "Skip word right", None)),
-                    EditingRequestBodyStringMoveCursorUp(EventKeyBinding::new(vec![key_bindings.move_cursor_up], "Up", Some("Up"))),
-                    EditingRequestBodyStringMoveCursorDown(EventKeyBinding::new(vec![key_bindings.move_cursor_down], "Down", Some("Down"))),
-                    EditingRequestBodyStringMoveCursorLeft(EventKeyBinding::new(vec![key_bindings.move_cursor_left], "Left", Some("Left"))),
-                    EditingRequestBodyStringMoveCursorRight(EventKeyBinding::new(vec![key_bindings.move_cursor_right], "Right", Some("Right"))),
+                TextAreaMode::Custom(text_area_key_bindings) => vec![
+                    GoBackToRequestMenu(EventKeyBinding::new(vec![key_bindings.generic.navigation.go_back], "Quit without saving", Some("Quit"))),
+                    EditingRequestBodyStringSaveAndQuit(EventKeyBinding::new(vec![text_area_key_bindings.save_and_quit], "Save and quit", Some("Save"))),
+                    EditingRequestBodyStringCopy(EventKeyBinding::new(vec![text_area_key_bindings.copy], "Copy", Some("Copy"))),
+                    EditingRequestBodyStringPaste(EventKeyBinding::new(vec![text_area_key_bindings.paste], "Paste", Some("Paste"))),
+                    EditingRequestBodyStringUndo(EventKeyBinding::new(vec![text_area_key_bindings.undo], "Undo", Some("Undo"))),
+                    EditingRequestBodyStringRedo(EventKeyBinding::new(vec![text_area_key_bindings.redo], "Redo", Some("Redo"))),
+                    EditingRequestBodyStringNewLine(EventKeyBinding::new(vec![text_area_key_bindings.new_line], "New line", None)),
+                    EditingRequestBodyStringIndent(EventKeyBinding::new(vec![text_area_key_bindings.indent], "Indent", None)),
+                    EditingRequestBodyStringDeleteCharBackward(EventKeyBinding::new(vec![text_area_key_bindings.delete_backward], "Delete char backward", None)),
+                    EditingRequestBodyStringDeleteCharForward(EventKeyBinding::new(vec![text_area_key_bindings.delete_forward], "Delete char forward", None)),
+                    EditingRequestBodyStringSkipWordLeft(EventKeyBinding::new(vec![text_area_key_bindings.skip_word_left], "Skip word left", None)),
+                    EditingRequestBodyStringSkipWordRight(EventKeyBinding::new(vec![text_area_key_bindings.skip_word_right], "Skip word right", None)),
+                    EditingRequestBodyStringMoveCursorUp(EventKeyBinding::new(vec![text_area_key_bindings.move_cursor_up], "Up", Some("Up"))),
+                    EditingRequestBodyStringMoveCursorDown(EventKeyBinding::new(vec![text_area_key_bindings.move_cursor_down], "Down", Some("Down"))),
+                    EditingRequestBodyStringMoveCursorLeft(EventKeyBinding::new(vec![text_area_key_bindings.move_cursor_left], "Left", Some("Left"))),
+                    EditingRequestBodyStringMoveCursorRight(EventKeyBinding::new(vec![text_area_key_bindings.move_cursor_right], "Right", Some("Right"))),
                     EditingRequestBodyStringCharInput(EventKeyBinding::new(vec![], "Char input", None)),
                 ],
             },
+            EditingPreRequestScript => match key_bindings.generic.text_inputs.text_area_mode {
+                TextAreaMode::VimEmulation => vec![
+                    EditingPreRequestScriptVimInput(EventKeyBinding::new(vec![], "Vim input", None)),
+                    Documentation(EventKeyBinding::new(vec![*crate::app::app_states::EMPTY_KEY], "Vim key-bindings", Some("Vim-like key bindings"))),
+                    Documentation(EventKeyBinding::new(vec![key!(q)], "Quit without saving", Some("Quit without saving"))),
+                    Documentation(EventKeyBinding::new(vec![key!(Ctrl-s)], "Save and quit", Some("Save and quit"))),
+                ],
+                TextAreaMode::Custom(text_area_key_bindings) => vec![
+                    GoBackToRequestMenu(EventKeyBinding::new(vec![key_bindings.generic.navigation.go_back], "Quit without saving", Some("Quit"))),
+                    EditingPreRequestScriptSaveAndQuit(EventKeyBinding::new(vec![text_area_key_bindings.save_and_quit], "Save and quit", Some("Save"))),
+                    EditingPreRequestScriptCopy(EventKeyBinding::new(vec![text_area_key_bindings.copy], "Copy", Some("Copy"))),
+                    EditingPreRequestScriptPaste(EventKeyBinding::new(vec![text_area_key_bindings.paste], "Paste", Some("Paste"))),
+                    EditingPreRequestScriptUndo(EventKeyBinding::new(vec![text_area_key_bindings.undo], "Undo", Some("Undo"))),
+                    EditingPreRequestScriptRedo(EventKeyBinding::new(vec![text_area_key_bindings.redo], "Redo", Some("Redo"))),
+                    EditingPreRequestScriptNewLine(EventKeyBinding::new(vec![text_area_key_bindings.new_line], "New line", None)),
+                    EditingPreRequestScriptIndent(EventKeyBinding::new(vec![text_area_key_bindings.indent], "Indent", None)),
+                    EditingPreRequestScriptDeleteCharBackward(EventKeyBinding::new(vec![text_area_key_bindings.delete_backward], "Delete char backward", None)),
+                    EditingPreRequestScriptDeleteCharForward(EventKeyBinding::new(vec![text_area_key_bindings.delete_forward], "Delete char forward", None)),
+                    EditingPreRequestScriptSkipWordLeft(EventKeyBinding::new(vec![text_area_key_bindings.skip_word_left], "Skip word left", None)),
+                    EditingPreRequestScriptSkipWordRight(EventKeyBinding::new(vec![text_area_key_bindings.skip_word_right], "Skip word right", None)),
+                    EditingPreRequestScriptMoveCursorUp(EventKeyBinding::new(vec![text_area_key_bindings.move_cursor_up], "Up", Some("Up"))),
+                    EditingPreRequestScriptMoveCursorDown(EventKeyBinding::new(vec![text_area_key_bindings.move_cursor_down], "Down", Some("Down"))),
+                    EditingPreRequestScriptMoveCursorLeft(EventKeyBinding::new(vec![text_area_key_bindings.move_cursor_left], "Left", Some("Left"))),
+                    EditingPreRequestScriptMoveCursorRight(EventKeyBinding::new(vec![text_area_key_bindings.move_cursor_right], "Right", Some("Right"))),
+                    EditingPreRequestScriptCharInput(EventKeyBinding::new(vec![], "Char input", None)),
+                ]
+            },
+            EditingPostRequestScript => match key_bindings.generic.text_inputs.text_area_mode {
+                TextAreaMode::VimEmulation => vec![
+                    EditingPostRequestScriptVimInput(EventKeyBinding::new(vec![], "Vim input", None)),
+                    Documentation(EventKeyBinding::new(vec![*crate::app::app_states::EMPTY_KEY], "Vim key-bindings", Some("Vim-like key bindings"))),
+                    Documentation(EventKeyBinding::new(vec![key!(q)], "Quit without saving", Some("Quit without saving"))),
+                    Documentation(EventKeyBinding::new(vec![key!(Ctrl-s)], "Save and quit", Some("Save and quit"))),
+                ],
+                TextAreaMode::Custom(text_area_key_bindings) => vec![
+                    GoBackToRequestMenu(EventKeyBinding::new(vec![key_bindings.generic.navigation.go_back], "Quit without saving", Some("Quit"))),
+                    EditingPostRequestScriptSaveAndQuit(EventKeyBinding::new(vec![text_area_key_bindings.save_and_quit], "Save and quit", Some("Save"))),
+                    EditingPostRequestScriptCopy(EventKeyBinding::new(vec![text_area_key_bindings.copy], "Copy", Some("Copy"))),
+                    EditingPostRequestScriptPaste(EventKeyBinding::new(vec![text_area_key_bindings.paste], "Paste", Some("Paste"))),
+                    EditingPostRequestScriptUndo(EventKeyBinding::new(vec![text_area_key_bindings.undo], "Undo", Some("Undo"))),
+                    EditingPostRequestScriptRedo(EventKeyBinding::new(vec![text_area_key_bindings.redo], "Redo", Some("Redo"))),
+                    EditingPostRequestScriptNewLine(EventKeyBinding::new(vec![text_area_key_bindings.new_line], "New line", None)),
+                    EditingPostRequestScriptIndent(EventKeyBinding::new(vec![text_area_key_bindings.indent], "Indent", None)),
+                    EditingPostRequestScriptDeleteCharBackward(EventKeyBinding::new(vec![text_area_key_bindings.delete_backward], "Delete char backward", None)),
+                    EditingPostRequestScriptDeleteCharForward(EventKeyBinding::new(vec![text_area_key_bindings.delete_forward], "Delete char forward", None)),
+                    EditingPostRequestScriptSkipWordLeft(EventKeyBinding::new(vec![text_area_key_bindings.skip_word_left], "Skip word left", None)),
+                    EditingPostRequestScriptSkipWordRight(EventKeyBinding::new(vec![text_area_key_bindings.skip_word_right], "Skip word right", None)),
+                    EditingPostRequestScriptMoveCursorUp(EventKeyBinding::new(vec![text_area_key_bindings.move_cursor_up], "Up", Some("Up"))),
+                    EditingPostRequestScriptMoveCursorDown(EventKeyBinding::new(vec![text_area_key_bindings.move_cursor_down], "Down", Some("Down"))),
+                    EditingPostRequestScriptMoveCursorLeft(EventKeyBinding::new(vec![text_area_key_bindings.move_cursor_left], "Left", Some("Left"))),
+                    EditingPostRequestScriptMoveCursorRight(EventKeyBinding::new(vec![text_area_key_bindings.move_cursor_right], "Right", Some("Right"))),
+                    EditingPostRequestScriptCharInput(EventKeyBinding::new(vec![], "Char input", None)),
+                ]
+            }
             EditingRequestSettings => vec![
                 GoBackToRequestMenu(EventKeyBinding::new(vec![key_bindings.generic.navigation.go_back], "Cancel", Some("Cancel"))),
 
@@ -479,7 +547,7 @@ impl AppState {
                 RequestSettingsToggleSetting(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_left, key_bindings.generic.navigation.move_cursor_right], "Toggle setting", Some("Toggle"))),
 
                 ModifyRequestSettings(EventKeyBinding::new(vec![key_bindings.generic.navigation.select], "Validate", Some("Validate"))),
-            ],
+            ]
         }
     }
 }
@@ -512,7 +580,7 @@ lazy_static! {
 
 impl App<'_> {
     pub fn update_current_available_events(&mut self) {
-        *AVAILABLE_EVENTS.write().unwrap() = self.state.get_available_events(self.request_view, self.request_param_tab);
+        *AVAILABLE_EVENTS.write() = self.state.get_available_events(self.request_view, self.request_param_tab);
     }
 
     pub fn get_state_line(&self) -> Line {
@@ -535,7 +603,7 @@ impl App<'_> {
 
             DeletingRequest | RenamingRequest => {
                 let selected_request_index = &self.collections_tree.state.selected();
-                let selected_request = &self.collections[selected_request_index[0]].requests[selected_request_index[1]].read().unwrap();
+                let selected_request = &self.collections[selected_request_index[0]].requests[selected_request_index[1]].read();
 
                 Line::from(vec![
                     Span::raw("Request > ").dark_gray(),
@@ -550,10 +618,11 @@ impl App<'_> {
             EditingRequestAuthUsername | EditingRequestAuthPassword | EditingRequestAuthBearerToken  |
             EditingRequestHeader |
             EditingRequestBodyTable | EditingRequestBodyFile | EditingRequestBodyString |
+            EditingPreRequestScript | EditingPostRequestScript |
             EditingRequestSettings
             => {
                 let local_selected_request = self.get_selected_request_as_local();
-                let selected_request = local_selected_request.read().unwrap();
+                let selected_request = local_selected_request.read();
 
                 if self.state == SelectedRequest {
                     Line::from(vec![
