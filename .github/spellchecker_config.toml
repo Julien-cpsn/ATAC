@@ -1,0 +1,5 @@
+[files]
+extend-exclude = [
+    "import_tests/*",
+    "base_collections/*",
+]

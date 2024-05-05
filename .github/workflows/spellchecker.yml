@@ -11,3 +11,5 @@ jobs:
 
     - name: Check spelling of file.txt
       uses: crate-ci/typos@master
+      with:
+        config: ./.github/spellchecker_config.toml
