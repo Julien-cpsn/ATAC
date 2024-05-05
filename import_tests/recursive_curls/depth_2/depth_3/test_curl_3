@@ -1,0 +1,18 @@
+curl 'https://github.com/Julien-cpsn/ATAC' \
+  -H 'accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7' \
+  -H 'accept-language: fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7' \
+  -H 'cache-control: max-age=0' \
+  -H 'cookie: _octo=GH1.1.1959269116.1687182163; _device_id=2811f3b85ff75158a08c56ca3ddbe2df; user_session=LLeRFVtOylajDHngA0_zzjNV2-T0N1S22N0YkkOqFMbJ4djZ; __Host-user_session_same_site=LLeRFVtOylajDHngA0_zzjNV2-T0N1S22N0YkkOqFMbJ4djZ; logged_in=yes; dotcom_user=Julien-cpsn; color_mode=%7B%22color_mode%22%3A%22dark%22%2C%22light_theme%22%3A%7B%22name%22%3A%22light%22%2C%22color_mode%22%3A%22light%22%7D%2C%22dark_theme%22%3A%7B%22name%22%3A%22dark_dimmed%22%2C%22color_mode%22%3A%22dark%22%7D%7D; preferred_color_mode=dark; tz=Europe%2FParis; has_recent_activity=1; _gh_sess=Jt6ZOdffY%2FjmplKDbN0QjKwWSAJJ1DmL5yLrH%2BA7Rjr9R%2B8TvXv7Q8so51Cr5ls27Hh3H6A7pDkZaAqaS0Q5HvEA4E6ia4srs8Z9a4bxJciA%2BkpgSZ7%2FIqaiMY40Fdoi7ewczp3qxwQvBmVNpQXexBPnPxpIMsivDlJQvxVX%2F%2Ff5UpK%2BVtEsDXwe1yPxc3j9nqDxnqHspncdM9PzX7zWizSIveAi0sHyFxU3yaogHmCACKZgVMFXmBnrMaIj80jQMFZo9w4LHdu5aOZATGiZKqP61kXXxT0POepF4I%2F4WWrUftneLW4ju4QEGDGOc6dMXMCHaFPVjiT9BMn8QcLJ6Vg%2BOFPB5RVSc0aBe%2B29WCho0iIvt3A64uIxf687A3JZOzmIjiWIJZpSq9nleumJTVZTi%2FJZaq2njqU4Gxjp4uPoIHqzDBg9YpEbWFmFXVoo4WuAYb28ZAD2qNOHM%2FoUUyePjtMmSpi8V7hPRqf3Ci0QDlBvX5bpnfDePbsCPpJhSHqys9oFZBqkxEYJq%2FthAuf3ZXu2euhO46NlOdcVb%2Bl2kzSbCuRHNyrkXTtt1rdlFpcp5x6ZXAvaJKGFAQuHU7jV%2B7FiAotgnz%2BIvEAEfAqLhr6dbCmdNUrKQcG%2BZk9dZhORKA4hG0sLDQ2eZUngq2dbwsLRQp3XWlZiPg%3D%3D--cq4qh6N4eKXeyUzf--fmdJG1EtntyfVOgFbk8NHA%3D%3D' \
+  -H 'dnt: 1' \
+  -H 'if-none-match: W/"2c8e9a97779f0715b9a44638c8ddabef"' \
+  -H 'priority: u=0, i' \
+  -H 'referer: https://github.com/' \
+  -H 'sec-ch-ua: "Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "Windows"' \
+  -H 'sec-fetch-dest: document' \
+  -H 'sec-fetch-mode: navigate' \
+  -H 'sec-fetch-site: same-origin' \
+  -H 'sec-fetch-user: ?1' \
+  -H 'upgrade-insecure-requests: 1' \
+  -H 'user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'

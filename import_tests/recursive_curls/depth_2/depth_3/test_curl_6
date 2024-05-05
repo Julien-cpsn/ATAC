@@ -1,0 +1,2 @@
+curl --location 'https://httpbin.org/bearer' \
+--header 'Authorization: Bearer my_bearer='
