@@ -18,7 +18,7 @@ display_help = "Shift-h" # Take care to not overlap other inputs, the help can b
 # Collection name, request name, URL, Header, Query param, Basic Auth, Bearer Token
 [keybindings.generic.text_inputs.text_input]
 cancel = "Esc"
-validate = "Enter"
+confirm = "Enter"
 
 delete_backward = "Delete"
 delete_forward = "Backspace"

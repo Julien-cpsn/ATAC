@@ -42,7 +42,7 @@ nest! {
                 /// Collection name, request name, URL, Header, Query param, Basic Auth, Bearer Token
                 pub text_input: #[derive(Copy, Clone, Deserialize)] pub struct TextInput {
                     pub cancel: KeyCombination,
-                    pub validate: KeyCombination,
+                    pub confirm: KeyCombination,
 
                     pub delete_backward: KeyCombination,
                     pub delete_forward: KeyCombination,
@@ -170,7 +170,7 @@ impl Default for KeyBindings {
                 text_inputs: TexInputs {
                     text_input: TextInput {
                         cancel: key!(esc),
-                        validate: key!(enter),
+                        confirm: key!(enter),
 
                         delete_backward: key!(delete),
                         delete_forward: key!(backspace),
