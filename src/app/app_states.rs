@@ -202,7 +202,7 @@ impl AppState {
             ],
             CreatingNewCollection => vec![
                 GoBackToMainMenu(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.cancel], "Cancel", Some("Cancel"))),
-                CreateNewCollection(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.validate], "Validate", Some("Validate"))),
+                CreateNewCollection(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.confirm], "Confirm", Some("Confirm"))),
 
                 CreatingCollectionDeleteCharBackward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_backward], "Delete char backward", Some("Delete"))),
                 CreatingCollectionDeleteCharForward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_forward], "Delete char forward", Some("Backspace"))),
@@ -212,7 +212,7 @@ impl AppState {
             ],
             CreatingNewRequest => vec![
                 GoBackToMainMenu(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.cancel], "Cancel", Some("Cancel"))),
-                CreateNewRequest(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.validate], "Validate", Some("Validate"))),
+                CreateNewRequest(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.confirm], "Confirm", Some("Confirm"))),
 
                 CreatingRequestDeleteCharBackward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_backward], "Delete char backward", Some("Delete"))),
                 CreatingRequestDeleteCharForward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_forward], "Delete char forward", Some("Backspace"))),
@@ -243,7 +243,7 @@ impl AppState {
             ],
             RenamingCollection => vec![
                 GoBackToMainMenu(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.cancel], "Cancel", Some("Cancel"))),
-                RenameCollection(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.validate], "Validate", Some("Validate"))),
+                RenameCollection(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.confirm], "Confirm", Some("Confirm"))),
 
                 RenamingCollectionDeleteCharBackward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_backward], "Delete char backward", Some("Delete"))),
                 RenamingCollectionDeleteCharForward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_forward], "Delete char forward", Some("Backspace"))),
@@ -253,7 +253,7 @@ impl AppState {
             ],
             RenamingRequest => vec![
                 GoBackToMainMenu(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.cancel], "Cancel", Some("Cancel"))),
-                RenameRequest(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.validate], "Validate", Some("Validate"))),
+                RenameRequest(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.confirm], "Confirm", Some("Confirm"))),
 
                 RenamingRequestDeleteCharBackward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_backward], "Delete char backward", Some("Delete"))),
                 RenamingRequestDeleteCharForward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_forward], "Delete char forward", Some("Backspace"))),
@@ -380,7 +380,7 @@ impl AppState {
             },
             EditingRequestUrl => vec![
                 GoBackToRequestMenu(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.cancel], "Cancel", Some("Cancel"))),
-                ModifyRequestUrl(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.validate], "Validate", Some("Validate"))),
+                ModifyRequestUrl(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.confirm], "Confirm", Some("Confirm"))),
 
                 EditingRequestUrlDeleteCharBackward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_backward], "Delete char backward", Some("Delete"))),
                 EditingRequestUrlDeleteCharForward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_forward], "Delete char forward", Some("Backspace"))),
@@ -390,7 +390,7 @@ impl AppState {
             ],
             EditingRequestParam => vec![
                 GoBackToRequestMenu(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.cancel], "Cancel", Some("Cancel"))),
-                ModifyRequestQueryParam(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.validate], "Validate", Some("Validate"))),
+                ModifyRequestQueryParam(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.confirm], "Confirm", Some("Confirm"))),
 
                 EditingRequestQueryParamDeleteCharBackward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_backward], "Delete char backward", Some("Delete"))),
                 EditingRequestQueryParamDeleteCharForward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_forward], "Delete char forward", Some("Backspace"))),
@@ -400,7 +400,7 @@ impl AppState {
             ],
             EditingRequestAuthUsername => vec![
                 GoBackToRequestMenu(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.cancel], "Cancel", Some("Cancel"))),
-                ModifyRequestAuthUsername(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.validate], "Validate", Some("Validate"))),
+                ModifyRequestAuthUsername(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.confirm], "Confirm", Some("Confirm"))),
 
                 EditingRequestAuthUsernameDeleteCharBackward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_backward], "Delete char backward", Some("Delete"))),
                 EditingRequestAuthUsernameDeleteCharForward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_forward], "Delete char forward", Some("Backspace"))),
@@ -410,7 +410,7 @@ impl AppState {
             ],
             EditingRequestAuthPassword => vec![
                 GoBackToRequestMenu(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.cancel], "Cancel", Some("Cancel"))),
-                ModifyRequestAuthPassword(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.validate], "Validate", Some("Validate"))),
+                ModifyRequestAuthPassword(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.confirm], "Confirm", Some("Confirm"))),
 
                 EditingRequestAuthPasswordDeleteCharBackward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_backward], "Delete char backward", Some("Delete"))),
                 EditingRequestAuthPasswordDeleteCharForward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_forward], "Delete char forward", Some("Backspace"))),
@@ -420,7 +420,7 @@ impl AppState {
             ],
             EditingRequestAuthBearerToken => vec![
                 GoBackToRequestMenu(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.cancel], "Cancel", Some("Cancel"))),
-                ModifyRequestAuthBearerToken(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.validate], "Validate", Some("Validate"))),
+                ModifyRequestAuthBearerToken(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.confirm], "Confirm", Some("Confirm"))),
 
                 EditingRequestAuthBearerTokenDeleteCharBackward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_backward], "Delete char backward", Some("Delete"))),
                 EditingRequestAuthBearerTokenDeleteCharForward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_forward], "Delete char forward", Some("Backspace"))),
@@ -430,7 +430,7 @@ impl AppState {
             ],
             EditingRequestHeader => vec![
                 GoBackToRequestMenu(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.cancel], "Cancel", Some("Cancel"))),
-                ModifyRequestHeader(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.validate], "Validate", Some("Validate"))),
+                ModifyRequestHeader(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.confirm], "Confirm", Some("Confirm"))),
 
                 EditingRequestHeaderDeleteCharBackward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_backward], "Delete char backward", Some("Delete"))),
                 EditingRequestHeaderDeleteCharForward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_forward], "Delete char forward", Some("Backspace"))),
@@ -440,7 +440,7 @@ impl AppState {
             ],
             EditingRequestBodyTable => vec![
                 GoBackToRequestMenu(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.cancel], "Cancel", Some("Cancel"))),
-                ModifyRequestBodyTable(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.validate], "Validate", Some("Validate"))),
+                ModifyRequestBodyTable(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.confirm], "Confirm", Some("Confirm"))),
 
                 EditingRequestBodyTableDeleteCharBackward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_backward], "Delete char backward", Some("Delete"))),
                 EditingRequestBodyTableDeleteCharForward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_forward], "Delete char forward", Some("Backspace"))),
@@ -450,7 +450,7 @@ impl AppState {
             ],
             EditingRequestBodyFile => vec![
                 GoBackToRequestMenu(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.cancel], "Cancel", Some("Cancel"))),
-                ModifyRequestBodyFile(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.validate], "Validate", Some("Validate"))),
+                ModifyRequestBodyFile(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.confirm], "Confirm", Some("Confirm"))),
 
                 EditingRequestBodyFileDeleteCharBackward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_backward], "Delete char backward", Some("Delete"))),
                 EditingRequestBodyFileDeleteCharForward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_forward], "Delete char forward", Some("Backspace"))),
@@ -546,7 +546,7 @@ impl AppState {
                 RequestSettingsMoveDown(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_down], "Move down", Some("Down"))),
                 RequestSettingsToggleSetting(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_left, key_bindings.generic.navigation.move_cursor_right], "Toggle setting", Some("Toggle"))),
 
-                ModifyRequestSettings(EventKeyBinding::new(vec![key_bindings.generic.navigation.select], "Validate", Some("Validate"))),
+                ModifyRequestSettings(EventKeyBinding::new(vec![key_bindings.generic.navigation.select], "Confirm", Some("Confirm"))),
             ]
         }
     }
