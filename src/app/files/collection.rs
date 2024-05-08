@@ -4,10 +4,10 @@ use std::io::{Read, Write};
 use std::path::PathBuf;
 
 use crate::app::app::App;
-use crate::app::startup::args::ARGS;
-use crate::panic_error;
-use crate::request::collection::{Collection, CollectionFileFormat};
-use crate::request::collection::CollectionFileFormat::{Json, Yaml};
+use crate::cli::args::ARGS;
+use crate::{panic_error, print_if_not_in_command};
+use crate::models::collection::{Collection, CollectionFileFormat};
+use crate::models::collection::CollectionFileFormat::{Json, Yaml};
 
 impl App<'_> {
     /// Set the app request to the requests found in the collection file
@@ -39,7 +39,7 @@ impl App<'_> {
 
         self.collections.push(collection);
 
-        println!("Collection file parsed!");
+        print_if_not_in_command!("Collection file parsed!");
     }
 
     /// Save app collection in the collection file through a temporary file

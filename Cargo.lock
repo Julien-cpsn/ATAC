@@ -108,6 +108,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "anyhow"
+version = "1.0.83"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "25bdb32cbbdce2b519a9cd7df3a678443100e265d5e25ca763b7572a5104f5f3"
+
+[[package]]
 name = "arboard"
 version = "3.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -150,10 +156,12 @@ dependencies = [
 name = "atac"
 version = "0.16.0"
 dependencies = [
+ "anyhow",
  "arboard",
  "base64 0.22.0",
  "boa_engine",
  "clap",
+ "clap_complete",
  "cookie_store",
  "crokey",
  "crossterm",
@@ -176,6 +184,7 @@ dependencies = [
  "snailquote",
  "strum",
  "syntect",
+ "thiserror",
  "throbber-widgets-tui",
  "tokio",
  "toml",
@@ -493,6 +502,15 @@ dependencies = [
  "anstyle",
  "clap_lex",
  "strsim 0.11.0",
+]
+
+[[package]]
+name = "clap_complete"
+version = "4.5.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dd79504325bf38b10165b02e89b4347300f855f273c4cb30c4a3209e6583275e"
+dependencies = [
+ "clap",
 ]
 
 [[package]]
@@ -2837,18 +2855,18 @@ checksum = "a38c90d48152c236a3ab59271da4f4ae63d678c5d7ad6b7714d7cb9760be5e4b"
 
 [[package]]
 name = "thiserror"
-version = "1.0.57"
+version = "1.0.60"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1e45bcbe8ed29775f228095caf2cd67af7a4ccf756ebff23a306bf3e8b47b24b"
+checksum = "579e9083ca58dd9dcf91a9923bb9054071b9ebbd800b342194c9feb0ee89fc18"
 dependencies = [
  "thiserror-impl",
 ]
 
 [[package]]
 name = "thiserror-impl"
-version = "1.0.57"
+version = "1.0.60"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a953cb265bef375dae3de6663da4d3804eee9682ea80d8e2542529b73c531c81"
+checksum = "e2470041c06ec3ac1ab38d0356a6119054dedaea53e12fbefc0de730a1c08524"
 dependencies = [
  "proc-macro2",
  "quote",

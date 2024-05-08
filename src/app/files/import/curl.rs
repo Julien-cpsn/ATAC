@@ -10,17 +10,24 @@ use reqwest::Url;
 use walkdir::WalkDir;
 
 use crate::app::app::App;
-use crate::app::startup::args::ARGS;
+use crate::cli::args::ARGS;
+use crate::cli::import::CurlImport;
 use crate::panic_error;
-use crate::request::auth::Auth;
-use crate::request::body::ContentType;
-use crate::request::body::ContentType::NoBody;
-use crate::request::collection::Collection;
-use crate::request::method::Method;
-use crate::request::request::{KeyValue, Request};
+use crate::models::auth::Auth;
+use crate::models::body::ContentType;
+use crate::models::body::ContentType::NoBody;
+use crate::models::collection::Collection;
+use crate::models::method::Method;
+use crate::models::request::{KeyValue, Request};
 
 impl App<'_> {
-    pub fn import_curl_file(&mut self, path_buf: &PathBuf, collection_name: &String, request_name: &Option<String>, recursive: &bool, max_depth: u16) {
+    pub fn import_curl_file(&mut self, curl_import: CurlImport) -> anyhow::Result<()> {
+        let path_buf = &curl_import.import_path;
+        let collection_name = &curl_import.collection_name;
+        let request_name = &curl_import.request_name;
+        let recursive = &curl_import.recursive;
+        let max_depth = curl_import.max_depth.unwrap_or(99);
+        
         println!("Parsing cURL request");
 
         println!("Collection name: {}", collection_name);
@@ -61,6 +68,8 @@ impl App<'_> {
         collection.requests.extend(requests);
 
         self.save_collection_to_file(collection_index);
+        
+        Ok(())
     }
 }
 

@@ -10,9 +10,9 @@ use parking_lot::RwLock;
 use snailquote::unescape;
 
 use crate::app::app::App;
-use crate::app::startup::args::ARGS;
-use crate::panic_error;
-use crate::request::environment::Environment;
+use crate::cli::args::ARGS;
+use crate::{panic_error, print_if_not_in_command};
+use crate::models::environment::Environment;
 
 impl App<'_> {
     /// Add the environment file to the app environments
@@ -32,7 +32,7 @@ impl App<'_> {
         
         self.environments.push(Arc::new(RwLock::new(environment)));
 
-        println!("environment file parsed!");
+        print_if_not_in_command!("environment file parsed!");
     }
 }
 

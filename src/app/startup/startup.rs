@@ -1,14 +1,19 @@
 use std::fs::OpenOptions;
 
 use crate::app::app::App;
-use crate::app::startup::args::{ARGS, Command, ImportType};
-use crate::panic_error;
-use crate::request::collection::CollectionFileFormat;
+use crate::cli::args::{ARGS, Command};
+use crate::{panic_error, print_if_not_in_command};
+use crate::app::startup::startup::AppMode::{CLI, TUI};
+use crate::models::collection::CollectionFileFormat;
 
-impl App<'_> {
-    /// Method called before running the app
-    pub fn startup(&mut self) -> &mut Self {
-        self.parse_key_bindings_file();
+pub enum AppMode<'a> {
+    TUI(&'a mut App<'a>),
+    CLI(&'a mut App<'a>, Command),
+}
+
+impl<'a> App<'a> {
+    /// Method called before running the app, returns the app if the TUI should be started
+    pub fn startup(&'a mut self) -> AppMode<'a> {
         self.parse_app_directory();
 
         // Creates the log file only if the app is allowed to save files
@@ -17,25 +22,13 @@ impl App<'_> {
         }
 
         if let Some(command) = &ARGS.command {
-            match command {
-                Command::Import { import_type} => match import_type {
-                    ImportType::Postman { 
-                        import_path,
-                        max_depth
-                    } => self.import_postman_collection(&import_path, max_depth.unwrap_or(99)),
-                    
-                    ImportType::Curl {
-                        import_path,
-                        collection_name,
-                        request_name,
-                        recursive,
-                        max_depth
-                    } => self.import_curl_file(&import_path, collection_name, request_name, recursive, max_depth.unwrap_or(99))
-                }
-            }
+            return CLI(self, command.clone());
         }
+        else {
+            self.parse_key_bindings_file();
 
-        self
+            return TUI(self);
+        }
     }
 
     fn parse_app_directory(&mut self) {
@@ -53,7 +46,7 @@ impl App<'_> {
 
             let file_name = path.file_name().unwrap().to_str().unwrap();
 
-            println!("Checking: {}", path.display());
+            print_if_not_in_command!("Checking: {}", path.display());
 
             if file_name.ends_with(".json") {
                 self.set_collections_from_file(path, CollectionFileFormat::Json);
@@ -68,10 +61,10 @@ impl App<'_> {
                 self.parse_config_file(path);
             }
             else if file_name == "atac.log" {
-                println!("Nothing to parse here")
+                print_if_not_in_command!("Nothing to parse here")
             }
 
-            println!();
+            print_if_not_in_command!();
         }
     }
 

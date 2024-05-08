@@ -12,23 +12,37 @@ use ratatui::backend::CrosstermBackend;
 use ratatui::Terminal;
 
 use crate::app::app::App;
+use crate::app::startup::startup::AppMode;
 
 mod app;
-mod request;
-mod utils;
+mod models;
+mod cli;
+mod tui;
 
 #[tokio::main]
 async fn main() -> Result<()> {
     let terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
     
-    App::new()
-        .startup()
-        .prepare_terminal()
-        .chain_hook()
-        .run(terminal).await?;
+    let mut app = App::new();
+    let app_mode = app.startup();
 
-    stdout().execute(LeaveAlternateScreen)?;
-    disable_raw_mode()?;
+    match app_mode {
+        AppMode::CLI(app, command) => {
+            app
+                .handle_command(command)
+                .await;
+        },
+        AppMode::TUI(app) => {
+            app
+                .prepare_terminal()
+                .chain_hook()
+                .run(terminal).await?;
+
+            stdout().execute(LeaveAlternateScreen)?;
+            disable_raw_mode()?;
+        }
+    }
+
     Ok(())
 }
 

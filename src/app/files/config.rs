@@ -3,8 +3,8 @@ use std::io::Read;
 use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
 use crate::app::app::App;
-use crate::panic_error;
-use crate::request::collection::CollectionFileFormat;
+use crate::{panic_error, print_if_not_in_command};
+use crate::models::collection::CollectionFileFormat;
 
 #[derive(Default, Serialize, Deserialize)]
 pub struct Config {
@@ -69,6 +69,6 @@ impl App<'_> {
 
         self.config = config;
 
-        println!("Config file parsed!");
+        print_if_not_in_command!("Config file parsed!");
     }
 }

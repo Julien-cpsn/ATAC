@@ -67,7 +67,9 @@ nest! {
 
                 pub alt_move_cursor_up: KeyCombination,
                 pub alt_move_cursor_down: KeyCombination,
+                #[allow(dead_code)]
                 pub alt_move_cursor_left: KeyCombination,
+                #[allow(dead_code)]
                 pub alt_move_cursor_right: KeyCombination,
                 
                 pub go_back: KeyCombination,
@@ -274,7 +276,7 @@ impl App<'_> {
             // If the ATAC_KEY_BINDINGS environment variable exists
             Ok(env_key_bindings) => PathBuf::from(env_key_bindings),
             Err(_) => {
-                println!("No key bindings file found\n");
+                println!("No key bindings file found");
                 return;
             }
         };
@@ -296,7 +298,7 @@ impl App<'_> {
 
         *KEY_BINDINGS.write() = config.keybindings;
 
-        println!("Key bindings file parsed!\n");
+        println!("Key bindings file parsed!");
     }
 }
 

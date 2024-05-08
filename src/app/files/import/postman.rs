@@ -1,27 +1,44 @@
-use std::path::PathBuf;
 use std::str::FromStr;
 use std::sync::Arc;
-use parking_lot::RwLock;
 
+use anyhow::anyhow;
+use parking_lot::RwLock;
 use parse_postman_collection::v2_1_0::{AuthType, Body, FormParameterSrcUnion, HeaderUnion, Host, Items, Language, Mode, RequestClass, RequestUnion, Url};
+use thiserror::Error;
 
 use crate::app::app::App;
-use crate::app::startup::args::ARGS;
-use crate::panic_error;
-use crate::request::auth::Auth;
-use crate::request::body::ContentType;
-use crate::request::collection::{Collection, CollectionFileFormat};
-use crate::request::method::Method;
-use crate::request::request::{DEFAULT_HEADERS, KeyValue, Request};
-use crate::request::settings::RequestSettings;
+use crate::app::files::import::postman::ImportPostmanError::{CollectionAlreadyExists, CouldNotParseCollection, UnknownMethod};
+use crate::cli::args::ARGS;
+use crate::cli::import::PostmanImport;
+use crate::models::auth::Auth;
+use crate::models::body::ContentType;
+use crate::models::collection::{Collection, CollectionFileFormat};
+use crate::models::method::Method;
+use crate::models::request::{DEFAULT_HEADERS, KeyValue, Request};
+use crate::models::settings::RequestSettings;
+
+#[derive(Error, Debug)]
+pub enum ImportPostmanError {
+    #[error("Could not parse Postman collection\n\t{0}")]
+    CouldNotParseCollection(String),
+    #[error("Collection \"{0}\" already exists")]
+    CollectionAlreadyExists(String),
+    #[error("Unknown method \"{0}\"")]
+    UnknownMethod(String),
+}
 
 impl App<'_> {
-    pub fn import_postman_collection(&mut self, path_buf: &PathBuf, max_depth: u16) {
+    pub fn import_postman_collection(&mut self, postman_import: PostmanImport) -> anyhow::Result<()> {
+        let path_buf = &postman_import.import_path;
+        let max_depth = postman_import.max_depth.unwrap_or(99);
+
         println!("Parsing Postman collection");
 
         let mut postman_collection = match parse_postman_collection::from_path(path_buf) {
             Ok(postman_collection) => postman_collection,
-            Err(e) => panic_error(format!("Could not parse Postman collection\n\t{e}"))
+            Err(e) => {
+                return Err(anyhow!(CouldNotParseCollection(e.to_string())));
+            }
         };
 
         let collection_name = postman_collection.info.name.clone();
@@ -30,7 +47,7 @@ impl App<'_> {
 
         for existing_collection in &self.collections {
             if existing_collection.name == collection_name {
-                panic!("Collection \"{}\" already exists", collection_name);
+                return Err(anyhow!(CollectionAlreadyExists(collection_name)));
             }
         }
 
@@ -49,7 +66,7 @@ impl App<'_> {
 
         if max_depth == 0 {
             for item in postman_collection.item.iter_mut() {
-                collections[0].requests.extend(recursive_get_requests(item));
+                collections[0].requests.extend(recursive_get_requests(item)?);
             }
         }
         else {
@@ -65,11 +82,11 @@ impl App<'_> {
 
                     let file_format = self.config.get_preferred_collection_file_format();
 
-                    recursive_has_requests(&mut item, &mut collections, &mut temp_nesting_prefix, &mut depth_level, max_depth, file_format);
+                    recursive_has_requests(&mut item, &mut collections, &mut temp_nesting_prefix, &mut depth_level, max_depth, file_format)?;
 
                     collections.extend(new_collections);
                 } else {
-                    collections[0].requests.push(Arc::new(RwLock::new(parse_request(item))));
+                    collections[0].requests.push(Arc::new(RwLock::new(parse_request(item)?)));
                 }
             }
         }
@@ -86,10 +103,12 @@ impl App<'_> {
         for collection_index in 0..collections_length {
             self.save_collection_to_file(collection_index);
         }
+
+        Ok(())
     }
 }
 
-fn recursive_has_requests(item: &mut Items, collections: &mut Vec<Collection>, mut nesting_prefix: &mut String, mut depth_level: &mut u16, max_depth: u16, file_format: CollectionFileFormat) -> Option<Arc<RwLock<Request>>> {
+fn recursive_has_requests(item: &mut Items, collections: &mut Vec<Collection>, mut nesting_prefix: &mut String, mut depth_level: &mut u16, max_depth: u16, file_format: CollectionFileFormat) -> anyhow::Result<Option<Arc<RwLock<Request>>>> {
     return if is_folder(&item) {
         let mut requests: Vec<Arc<RwLock<Request>>> = vec![];
 
@@ -104,7 +123,7 @@ fn recursive_has_requests(item: &mut Items, collections: &mut Vec<Collection>, m
 
         if *depth_level == max_depth {
             println!("\tMet max depth level");
-            requests = recursive_get_requests(item);
+            requests = recursive_get_requests(item)?;
         }
         else {
             nesting_prefix.push_str(&format!("{folder_name} "));
@@ -112,7 +131,7 @@ fn recursive_has_requests(item: &mut Items, collections: &mut Vec<Collection>, m
             let mut has_sub_folders = false;
 
             for mut sub_item in item.item.clone().unwrap() {
-                if let Some(request) = recursive_has_requests(&mut sub_item, collections, &mut nesting_prefix, &mut depth_level, max_depth, file_format) {
+                if let Some(request) = recursive_has_requests(&mut sub_item, collections, &mut nesting_prefix, &mut depth_level, max_depth, file_format)? {
                     requests.push(request);
                 } else {
                     has_sub_folders = true;
@@ -138,23 +157,23 @@ fn recursive_has_requests(item: &mut Items, collections: &mut Vec<Collection>, m
             *depth_level -= 1;
         }
 
-        None
+        Ok(None)
     } else {
-        Some(Arc::new(RwLock::new(parse_request(item.clone()))))
+        Ok(Some(Arc::new(RwLock::new(parse_request(item.clone())?))))
     }
 }
 
-fn recursive_get_requests(item: &mut Items) -> Vec<Arc<RwLock<Request>>> {
+fn recursive_get_requests(item: &mut Items) -> anyhow::Result<Vec<Arc<RwLock<Request>>>> {
     return if let Some(items) = &mut item.item {
         let mut requests: Vec<Arc<RwLock<Request>>> = vec![];
 
         for item in items {
-            requests.extend(recursive_get_requests(item));
+            requests.extend(recursive_get_requests(item)?);
         }
 
-        requests
+        Ok(requests)
     } else {
-        vec![Arc::new(RwLock::new(parse_request(item.clone())))]
+        Ok(vec![Arc::new(RwLock::new(parse_request(item.clone())?))])
     }
 }
 
@@ -162,7 +181,7 @@ fn is_folder(folder: &Items) -> bool {
     folder.item.is_some()
 }
 
-fn parse_request(item: Items) -> Request {
+fn parse_request(item: Items) -> anyhow::Result<Request> {
     let item_name = item.name.clone().unwrap();
 
     println!("\t\tFound request \"{}\"", item_name);
@@ -208,7 +227,9 @@ fn parse_request(item: Items) -> Request {
             if let Some(method) = &request_class.method {
                 request.method = match Method::from_str(method) {
                     Ok(method) => method,
-                    Err(_) => panic_error(format!("Unknown method \"{method}\""))
+                    Err(_) => {
+                        return Err(anyhow!(UnknownMethod(method.clone())))
+                    }
                 };
             }
 
@@ -246,7 +267,7 @@ fn parse_request(item: Items) -> Request {
         RequestUnion::String(_) => {}
     }
 
-    return request;
+    return Ok(request);
 }
 
 fn retrieve_query_params(request_class: &RequestClass) -> Option<Vec<KeyValue>> {
