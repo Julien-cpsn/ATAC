@@ -92,7 +92,7 @@ brew install atac
 Simply use:
 
 ```bash
-dnf enable joxcat/atac
+dnf copr enable joxcat/atac
 dnf install atac
 ```
 
