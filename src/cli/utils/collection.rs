@@ -1,10 +1,9 @@
-use std::sync::Arc;
-use parking_lot::RwLock;
+use anyhow::anyhow;
 use thiserror::Error;
+
 use crate::app::app::App;
 use crate::cli::utils::collection::FindElementError::{CollectionNotFound, RequestNotFound};
 use crate::models::collection::Collection;
-use crate::models::request::Request;
 
 #[derive(Error, Debug)]
 pub enum FindElementError {
@@ -14,42 +13,43 @@ pub enum FindElementError {
     RequestNotFound,
 }
 
-impl<'a> App<'a> {
-    pub fn find_collection(&mut self, collection_name: String) -> Result<&Collection, FindElementError> {
-        for collection in &self.collections {
+impl App<'_> {
+    pub fn find_collection(&mut self, collection_name: &str) -> anyhow::Result<usize> {
+        for (index, collection) in self.collections.iter().enumerate() {
             if collection.name == collection_name {
-                return Ok(collection);
+                return Ok(index);
             }
         }
 
-        return Err(CollectionNotFound);
+        return Err(anyhow!(CollectionNotFound));
     }
 
-    pub fn find_request(&mut self, collection: &Collection, request_name: String) -> Result<Arc<RwLock<Request>>, FindElementError> {
-        for request in &collection.requests {
+    #[allow(dead_code)]
+    pub fn find_request(&mut self, collection: &Collection, request_name: &str) -> anyhow::Result<usize> {
+        for (index, request) in collection.requests.iter().enumerate() {
             if request.read().name == request_name {
-                return Ok(request.clone());
+                return Ok(index);
             }
         }
 
-        return Err(RequestNotFound);
+        return Err(anyhow!(RequestNotFound));
     }
 
-    pub fn find_collection_and_request(&mut self, collection_name: String, request_name: String) -> Result<Arc<RwLock<Request>>, FindElementError> {
-        for collection in &self.collections {
+    pub fn find_collection_and_request(&mut self, collection_name: &str, request_name: &str) -> anyhow::Result<(usize, usize)> {
+        for (collection_index, collection) in self.collections.iter().enumerate() {
             if collection.name != collection_name { 
                 continue;
             }
             
-            for request in &collection.requests {
+            for (request_index, request) in collection.requests.iter().enumerate() {
                 if request.read().name == request_name {
-                    return Ok(request.clone());
+                    return Ok((collection_index, request_index));
                 }
             }
 
-            return Err(RequestNotFound);
+            return Err(anyhow!(RequestNotFound));
         }
 
-        return Err(CollectionNotFound);
+        return Err(anyhow!(CollectionNotFound));
     }
 }

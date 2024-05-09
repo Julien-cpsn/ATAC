@@ -2,35 +2,31 @@ use std::sync::Arc;
 use parking_lot::RwLock;
 use crate::app::app::App;
 use crate::app::business_logic::request::send::send_request;
-use crate::cli::send::CollectionAndRequestArg::{CollectionAndRequest, CollectionOnly};
-use crate::cli::send::SendCommand;
+use crate::cli::commands::request_commands::send::SendCommand;
 use crate::models::request::Request;
 use crate::models::response::ResponseContent;
 
 impl App<'_> {
-    pub async fn send_request_command(&mut self, send_command: SendCommand) -> anyhow::Result<()> {
-        let send_command_copy = send_command.clone();
-        
-        match send_command.collection_and_request {
-            CollectionOnly(collection_name) => {
-                let collection = self.find_collection(collection_name)?;
+    pub async fn send_request_command(&mut self, collection_index: usize, request_index: usize, send_command: &SendCommand) -> anyhow::Result<()> {
+        let local_request = self.get_request_as_local_from_indexes(&(collection_index, request_index));
 
-                let mut requests: Vec<Arc<RwLock<Request>>> = vec![];
-                
-                for request in &collection.requests {
-                    let local_request = request.clone();
-                    requests.push(local_request);
-                }
-                
-                for request in requests {
-                    self.local_send_request(&send_command_copy, request).await?
-                }
-            },
-            CollectionAndRequest(collection_name, request_name) => {
-                let local_request = self.find_collection_and_request(collection_name, request_name)?;
+        self.local_send_request(&send_command, local_request).await?;
 
-                self.local_send_request(&send_command_copy, local_request).await?;
-            }
+        Ok(())
+    }
+
+    pub async fn send_collection_command(&mut self, collection_index: usize, send_command: &SendCommand) -> anyhow::Result<()> {
+        let collection = &self.collections[collection_index];
+
+        let mut requests: Vec<Arc<RwLock<Request>>> = vec![];
+
+        for request in &collection.requests {
+            let local_request = request.clone();
+            requests.push(local_request);
+        }
+
+        for request in requests {
+            self.local_send_request(&send_command, request).await?
         }
 
         Ok(())
@@ -46,8 +42,9 @@ impl App<'_> {
         let (prepared_request, mut console_output) = self.prepare_request(&request).await?;
 
         drop(request);
+        let local_env = self.get_selected_env_as_local();
 
-        let (response, result_console_output, _) = send_request(prepared_request, local_request, &None).await?;
+        let (response, result_console_output, _) = send_request(prepared_request, local_request, &local_env).await?;
 
         console_output = format!("{console_output}{result_console_output}");
 

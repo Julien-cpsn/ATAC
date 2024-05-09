@@ -5,9 +5,9 @@ use clap::CommandFactory;
 use clap_complete::{generate_to, Shell};
 
 use crate::cli::args::{Args, ARGS};
-use crate::cli::completions::CompletionsCommand;
+use crate::cli::commands::completions::CompletionsCommand;
 
-pub fn generate_completions(completions_command: CompletionsCommand) -> anyhow::Result<()> {
+pub fn generate_completions(completions_command: &CompletionsCommand) -> anyhow::Result<()> {
     let shell: Shell = match Shell::from_str(&completions_command.shell) {
         Ok(shell) => shell,
         Err(error) => {

@@ -3,13 +3,12 @@ use std::path::PathBuf;
 
 use clap::{Parser, Subcommand};
 use clap::builder::Styles;
-use clap_complete::Generator;
 use lazy_static::lazy_static;
-use nestify::nest;
 
-use crate::cli::completions::CompletionsCommand;
-use crate::cli::import::ImportCommand;
-use crate::cli::send::SendCommand;
+use crate::cli::commands::collection_commands::collection_commands::CollectionCommand;
+use crate::cli::commands::completions::CompletionsCommand;
+use crate::cli::commands::import::ImportCommand;
+use crate::cli::commands::request_commands::request_commands::RequestCommand;
 use crate::panic_error;
 
 #[derive(Parser, Debug)]
@@ -27,20 +26,41 @@ pub struct Args {
     pub dry_run: bool,
 }
 
-nest! {
-    #[derive(Subcommand, Debug, Clone)]
-    pub enum Command {
-        /// Send a request
-        Send(SendCommand),
+#[derive(Subcommand, Debug, Clone)]
+pub enum Command {
+    /// Collection commands
+    Collection(CollectionCommand),
 
-        /// Import a collection or request from other file formats (Postman v2.1.0, cURL)
-        Import(ImportCommand),
-        
-        /// Create a completion file
-        Completions(CompletionsCommand)
-    }
+    /// Request commands
+    Request(RequestCommand),
+
+    /// List all collections
+    List {
+        /// Also print request names
+        #[arg(long)]
+        request_names: bool
+    },
+
+    /// Create a new collection
+    New {
+        /// Collection name
+        collection_name: String
+    },
+
+    /// Delete a collection
+    Delete {
+        /// Collection name
+        collection_name: String
+    },
+
+    /// Import a collection or request from other file formats (Postman v2.1.0, cURL)
+    Import(ImportCommand),
+
+    /// Create a completion file
+    Completions(CompletionsCommand),
 }
 
+#[derive(Debug)]
 pub struct ParsedArgs {
     pub directory: PathBuf,
     pub command: Option<Command>,

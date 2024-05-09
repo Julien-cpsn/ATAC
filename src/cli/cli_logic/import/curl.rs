@@ -2,17 +2,19 @@ use std::fs;
 use std::path::PathBuf;
 use std::str::FromStr;
 use std::sync::Arc;
+use anyhow::anyhow;
 
 use parking_lot::RwLock;
 use regex::Regex;
 use reqwest::header::CONTENT_TYPE;
 use reqwest::Url;
+use thiserror::Error;
 use walkdir::WalkDir;
 
 use crate::app::app::App;
 use crate::cli::args::ARGS;
-use crate::cli::import::CurlImport;
-use crate::panic_error;
+use crate::cli::cli_logic::import::curl::ImportCurlError::{CouldNotParseCurl, CouldNotParseUrl, CouldNotReadFile, UnknownMethod};
+use crate::cli::commands::import::CurlImport;
 use crate::models::auth::Auth;
 use crate::models::body::ContentType;
 use crate::models::body::ContentType::NoBody;
@@ -20,8 +22,20 @@ use crate::models::collection::Collection;
 use crate::models::method::Method;
 use crate::models::request::{KeyValue, Request};
 
+#[derive(Error, Debug)]
+pub enum ImportCurlError {
+    #[error("Could not read cURL file\n\t{0}")]
+    CouldNotReadFile(String),
+    #[error("Could not parse cURL\n\t{0}")]
+    CouldNotParseCurl(String),
+    #[error("Could not parse URL\n\t{0}")]
+    CouldNotParseUrl(String),
+    #[error("Unknown method\n\t{0}")]
+    UnknownMethod(String),
+}
+
 impl App<'_> {
-    pub fn import_curl_file(&mut self, curl_import: CurlImport) -> anyhow::Result<()> {
+    pub fn import_curl_file(&mut self, curl_import: &CurlImport) -> anyhow::Result<()> {
         let path_buf = &curl_import.import_path;
         let collection_name = &curl_import.collection_name;
         let request_name = &curl_import.request_name;
@@ -59,9 +73,9 @@ impl App<'_> {
 
         let requests = match path_buf.is_file() {
             true => vec![
-                parse_request(path_buf, request_name)
+                parse_request(path_buf, request_name)?
             ],
-            false => parse_requests_recursively(path_buf, *recursive, max_depth),
+            false => parse_requests_recursively(path_buf, *recursive, max_depth)?,
         };
 
         // Add the parsed request to the collection
@@ -73,7 +87,7 @@ impl App<'_> {
     }
 }
 
-fn parse_requests_recursively(path: &PathBuf, recursive: bool, max_depth: u16) -> Vec<Arc<RwLock<Request>>> {
+fn parse_requests_recursively(path: &PathBuf, recursive: bool, max_depth: u16) -> anyhow::Result<Vec<Arc<RwLock<Request>>>> {
     let max_depth: usize = match recursive {
         true => max_depth as usize,
         false => 1
@@ -92,26 +106,30 @@ fn parse_requests_recursively(path: &PathBuf, recursive: bool, max_depth: u16) -
 
         // Will use the file name as the request name
         let file_name = entry.file_name().to_str().unwrap().to_string();
-        let request = parse_request(&entry.path().to_path_buf(), file_name);
+        let request = parse_request(&entry.path().to_path_buf(), file_name)?;
 
         requests.push(request);
     }
 
-    return requests;
+    return Ok(requests);
 }
 
 /// TODO: parse everything with regexes in order to handle everything
-fn parse_request(path: &PathBuf, request_name: String) -> Arc<RwLock<Request>> {
+fn parse_request(path: &PathBuf, request_name: String) -> anyhow::Result<Arc<RwLock<Request>>> {
     let curl_stringed = match fs::read_to_string(path) {
         Ok(original_curl) => original_curl,
-        Err(e) => panic_error(format!("Could not read cURL file\n\t{e}")),
+        Err(e) => {
+            return Err(anyhow!(CouldNotReadFile(e.to_string())))
+        },
     };
 
     println!("\tRequest name: {}", request_name);
 
     let parsed_curl = match curl_parser::ParsedRequest::load(&curl_stringed, None::<String>) {
         Ok(parsed_curl) => parsed_curl,
-        Err(e) => panic_error(format!("Could not parse cURL\n\t{e}")),
+        Err(e) => {
+            return Err(anyhow!(CouldNotParseCurl(e.to_string())))
+        },
     };
 
     /* URL */
@@ -119,7 +137,9 @@ fn parse_request(path: &PathBuf, request_name: String) -> Arc<RwLock<Request>> {
     // Parse the URL so we can transform it
     let mut curl_url = match Url::parse(&parsed_curl.url.to_string()) {
         Ok(url) => url,
-        Err(e) => panic_error(format!("Could not parse URL\n\t{e}")),
+        Err(e) => {
+            return Err(anyhow!(CouldNotParseUrl(e.to_string())))
+        },
     };
 
     curl_url.set_query(None);
@@ -139,7 +159,9 @@ fn parse_request(path: &PathBuf, request_name: String) -> Arc<RwLock<Request>> {
 
     let method = match Method::from_str(parsed_curl.method.as_str()) {
         Ok(method) => method,
-        Err(e) => panic_error(format!("Unknown method\n\t{e}")),
+        Err(e) => {
+            return Err(anyhow!(UnknownMethod(e.to_string())))
+        },
     };
 
     /* HEADERS */
@@ -207,5 +229,5 @@ fn parse_request(path: &PathBuf, request_name: String) -> Arc<RwLock<Request>> {
         ..Default::default()
     };
 
-    return Arc::new(RwLock::new(request));
+    return Ok(Arc::new(RwLock::new(request)));
 }

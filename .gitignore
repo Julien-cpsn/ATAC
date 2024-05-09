@@ -3,3 +3,5 @@
 
 base_collections/atac.log
 base_collections/atac.toml
+
+*.ps1

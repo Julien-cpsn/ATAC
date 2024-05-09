@@ -7,9 +7,9 @@ use parse_postman_collection::v2_1_0::{AuthType, Body, FormParameterSrcUnion, He
 use thiserror::Error;
 
 use crate::app::app::App;
-use crate::app::files::import::postman::ImportPostmanError::{CollectionAlreadyExists, CouldNotParseCollection, UnknownMethod};
 use crate::cli::args::ARGS;
-use crate::cli::import::PostmanImport;
+use crate::cli::cli_logic::import::postman::ImportPostmanError::{CollectionAlreadyExists, CouldNotParseCollection, UnknownMethod};
+use crate::cli::commands::import::PostmanImport;
 use crate::models::auth::Auth;
 use crate::models::body::ContentType;
 use crate::models::collection::{Collection, CollectionFileFormat};
@@ -28,7 +28,7 @@ pub enum ImportPostmanError {
 }
 
 impl App<'_> {
-    pub fn import_postman_collection(&mut self, postman_import: PostmanImport) -> anyhow::Result<()> {
+    pub fn import_postman_collection(&mut self, postman_import: &PostmanImport) -> anyhow::Result<()> {
         let path_buf = &postman_import.import_path;
         let max_depth = postman_import.max_depth.unwrap_or(99);
 

@@ -1,11 +1,5 @@
-use crate::cli::utils::arguments_validators::collection_and_request_validator;
-
 #[derive(clap::Args, Debug, Clone)]
 pub struct SendCommand {
-    /// e.g. my_collection/my_request, my_collection
-    #[arg(value_parser = collection_and_request_validator)]
-    pub collection_and_request: CollectionAndRequestArg,
-
     /// Hide response content
     #[arg(long, default_value_t = false)]
     pub hide_content: bool,
@@ -33,10 +27,4 @@ pub struct SendCommand {
     /// Show the request name
     #[arg(long, default_value_t = false)]
     pub request_name: bool,
-}
-
-#[derive(Debug, Clone)]
-pub enum CollectionAndRequestArg {
-    CollectionOnly(String),
-    CollectionAndRequest(String, String),
 }

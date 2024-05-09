@@ -1,4 +1,5 @@
 use std::sync::Arc;
+use anyhow::anyhow;
 
 use parking_lot::RwLock;
 use thiserror::Error;
@@ -26,15 +27,15 @@ pub enum RequestError {
 }
 
 impl App<'_> {
-    pub fn new_collection(&mut self, new_collection_name: String) -> Result<(), CollectionError> {
+    pub fn new_collection(&mut self, new_collection_name: String) -> anyhow::Result<()> {
         if new_collection_name.trim().is_empty() {
-            return Err(CollectionNameIsEmpty);
+            return Err(anyhow!(CollectionNameIsEmpty));
         }
 
         // Check that collection names are unique (like files)
         for collection in &self.collections {
             if new_collection_name == collection.name {
-                return Err(CollectionNameAlreadyExists);
+                return Err(anyhow!(CollectionNameAlreadyExists));
             }
         }
         
@@ -87,15 +88,15 @@ impl App<'_> {
         self.save_collection_to_file(collection_index);
     }
 
-    pub fn rename_collection(&mut self, new_collection_name: String, collection_index: usize) -> Result<(), CollectionError> {
+    pub fn rename_collection(&mut self, new_collection_name: String, collection_index: usize) -> anyhow::Result<()> {
         if new_collection_name.trim().is_empty() {
-            return Err(CollectionNameIsEmpty);
+            return Err(anyhow!(CollectionNameIsEmpty));
         }
 
         // Check that collection names are unique (like files)
         for collection in &self.collections {
             if new_collection_name == collection.name {
-                return Err(CollectionNameIsEmpty);
+                return Err(anyhow!(CollectionNameIsEmpty));
             }
         }
 

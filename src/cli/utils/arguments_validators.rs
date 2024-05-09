@@ -1,19 +1,20 @@
 use clap::Error;
 use clap::error::ErrorKind::InvalidValue;
-use crate::cli::send::CollectionAndRequestArg;
-use crate::cli::send::CollectionAndRequestArg::{CollectionAndRequest, CollectionOnly};
 
-pub fn collection_and_request_validator(arg: &str) -> Result<CollectionAndRequestArg, Error> {
-    let regex = regex::Regex::new(r#"^(?<collection>[a-zA-Z0-9_ ]+)(/(?<request>[a-zA-Z0-9_ ]+))?$"#).unwrap();
+const ELEMENT_NAME_REGEX: &str = "[a-zA-Z0-9-_ ]+";
+
+pub fn collection_validator(arg: &str) -> Result<String, Error> {
+    let regex = regex::Regex::new(&format!(r#"^(?<collection>{ELEMENT_NAME_REGEX})$"#)).unwrap();
     match regex.captures(arg) {
         None => Err(Error::new(InvalidValue)),
-        Some(capture) => match capture.name("request") {
-            None => Ok(
-                CollectionOnly(capture["collection"].to_string())
-            ),
-            Some(request_name) => Ok(
-                CollectionAndRequest(capture["collection"].to_string(), request_name.as_str().to_string())
-            )
-        }
+        Some(capture) => Ok(capture["collection"].to_string())
+    }
+}
+
+pub fn collection_and_request_validator(arg: &str) -> Result<(String, String), Error> {
+    let regex = regex::Regex::new(&format!(r#"^(?<collection>{ELEMENT_NAME_REGEX})/(?<request>{ELEMENT_NAME_REGEX})$"#)).unwrap();
+    match regex.captures(arg) {
+        None => Err(Error::new(InvalidValue)),
+        Some(capture) => Ok((capture["collection"].to_string(), capture["request"].to_string()))
     }
 }
