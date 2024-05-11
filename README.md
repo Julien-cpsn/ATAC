@@ -218,7 +218,8 @@ cargo run -- -h
 
 ### Ideas (will think about it later)
 
-- Base URL property on collections
+- Base URL property and authorization on collections
+- VScode plugin to see and send requests
 
 ## Documentation
 
