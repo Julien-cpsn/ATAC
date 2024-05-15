@@ -51,3 +51,4 @@ snailquote = "0.3.1"
 indexmap = { version = "2.2.6", features = ["serde"] }
 base64 = "0.22.0"
 regex = "1.10.3"
+shellexpand = "3.1.0"

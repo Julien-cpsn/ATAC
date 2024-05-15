@@ -3,6 +3,7 @@ use std::path::PathBuf;
 use clap::{Parser, Subcommand};
 use clap::builder::Styles;
 use lazy_static::lazy_static;
+use shellexpand::tilde;
 use crate::panic_error;
 
 #[derive(Parser, Debug)]
@@ -81,7 +82,7 @@ lazy_static! {
             // If no directory was provided with the CLI
             None => match env::var("ATAC_MAIN_DIR") {
                 // If the ATAC_MAIN_DIR environment variable exists
-                Ok(env_directory) => (PathBuf::from(env_directory), true),
+                Ok(env_directory) => (PathBuf::from(tilde(&env_directory).as_ref()), true),
                 Err(_) => panic_error("No directory provided, provide one either with `--directory <dir>` or via the environment variable `ATAC_MAIN_DIR`")
             }
         };
