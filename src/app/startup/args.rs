@@ -3,6 +3,7 @@ use std::path::PathBuf;
 use clap::{Parser, Subcommand};
 use clap::builder::Styles;
 use lazy_static::lazy_static;
+use crate::app::files::utils::expand_tilde;
 use crate::panic_error;
 
 #[derive(Parser, Debug)]
@@ -77,11 +78,11 @@ lazy_static! {
 
         let (directory, is_directory_from_env) = match args.directory {
             // If a directory was provided with a CLI argument
-            Some(arg_directory) => (arg_directory, false),
+            Some(arg_directory) => (expand_tilde(arg_directory), false),
             // If no directory was provided with the CLI
             None => match env::var("ATAC_MAIN_DIR") {
                 // If the ATAC_MAIN_DIR environment variable exists
-                Ok(env_directory) => (PathBuf::from(env_directory), true),
+                Ok(env_directory) => (expand_tilde(PathBuf::from(env_directory)), true),
                 Err(_) => panic_error("No directory provided, provide one either with `--directory <dir>` or via the environment variable `ATAC_MAIN_DIR`")
             }
         };
