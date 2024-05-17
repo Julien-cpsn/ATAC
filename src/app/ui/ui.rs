@@ -4,6 +4,7 @@ use ratatui::layout::{Alignment, Constraint, Layout};
 use ratatui::layout::Direction::{Horizontal, Vertical};
 use ratatui::prelude::{Modifier};
 use ratatui::style::{Stylize};
+use ratatui::style::Color::DarkGray;
 use ratatui::text::Line;
 use ratatui::widgets::{Block, Borders};
 use ratatui::widgets::block::Title;
@@ -102,7 +103,7 @@ impl App<'_> {
 
         let state_line = self.get_state_line();
         let events = &*AVAILABLE_EVENTS.read();
-        let available_keys = Line::from(event_available_keys_to_spans(events, *DARK_BLACK, true).concat());
+        let available_keys = Line::from(event_available_keys_to_spans(events, DarkGray, *DARK_BLACK, true).concat());
 
         let footer = Block::new()
             .title(Title::from(state_line).alignment(Alignment::Left))
