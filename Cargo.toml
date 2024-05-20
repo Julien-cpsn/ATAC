@@ -21,7 +21,7 @@ exclude = [
 reqwest = { version = "0.11.27", default-features = false, features = ["cookies", "rustls-tls-native-roots", "multipart", "gzip", "brotli", "deflate", "stream"] }
 reqwest_cookie_store = "0.6.0"
 cookie_store = "0.20.0"
-ratatui = "0.26.2"
+ratatui = "0.26.3"
 crossterm = "0.27.0"
 crokey = "1.0.0"
 tui-big-text = "0.4.2"
