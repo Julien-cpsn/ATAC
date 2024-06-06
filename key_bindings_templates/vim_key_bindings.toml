@@ -26,6 +26,8 @@ delete_forward = "Backspace"
 move_cursor_left = "Ctrl-h"
 move_cursor_right = "Ctrl-l"
 
+validate = "Enter"
+
 # Request body
 [keybindings.generic.text_inputs]
 
