@@ -195,6 +195,8 @@ cargo run -- -h
 - **To add**
   - Create a repo wiki
   - Document the whole code
+  - Reserved env variables like {{AUTO_TIMESTAMP}} or {{AUTO_UUID}} (https://github.com/Julien-cpsn/ATAC/issues/81)
+  - Cancel pending request
   - Command line usage (send requests, add new requests)
   - Request body syntax highlighting
   - Export a request to other code formats ([raw](https://github.com/Kong/insomnia/issues/174), curl, PHP, JS, Rust, ...)
