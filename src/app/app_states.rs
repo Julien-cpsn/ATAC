@@ -270,6 +270,7 @@ impl AppState {
                 };
 
                 let mut base_events: Vec<AppEvent> = vec![
+                    ExitApp(EventKeyBinding::new(vec![key_bindings.main_menu.exit], "Exit", Some("Exit"))),
                     GoBackToMainMenu(EventKeyBinding::new(vec![key_bindings.generic.navigation.go_back], "Quit", Some("Quit"))),
                     Documentation(EventKeyBinding::new(vec![key_bindings.generic.display_help], "Display help", Some("Help"))),
 
