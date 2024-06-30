@@ -8,6 +8,7 @@ use std::sync::Arc;
 use indexmap::IndexMap;
 use parking_lot::RwLock;
 use snailquote::unescape;
+use rayon::prelude::*;
 
 use crate::app::app::App;
 use crate::app::startup::args::ARGS;
@@ -63,7 +64,7 @@ fn parse_line(entry: &[u8]) -> Option<(String, String)> {
 
         let vline = line.as_bytes();
 
-        vline.iter().position(|&x| x == b'=').and_then(|pos| {
+        vline.par_iter().position_first(|&x| x == b'=').and_then(|pos| {
             from_utf8(&vline[..pos]).ok().and_then(|x| {
                 from_utf8(&vline[pos+1..]).ok().and_then(|right| {
                     // The right hand side value can be a quoted string
@@ -93,6 +94,7 @@ pub fn save_environment_to_file(environment: &Environment) {
 
     let mut data: String = environment.values
         .iter()
+        .par_bridge()
         .map(|(key, value)| format!("{key}={value}\n"))
         .collect();
     

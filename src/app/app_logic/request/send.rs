@@ -11,6 +11,7 @@ use reqwest::header::{CONTENT_TYPE, HeaderMap};
 use reqwest::multipart::{Form, Part};
 use reqwest::redirect::Policy;
 use tokio::task;
+use rayon::prelude::*;
 
 use crate::app::app::App;
 use crate::app::app_logic::request::scripts::{execute_post_request_script, execute_pre_request_script};
@@ -303,6 +304,7 @@ impl App<'_> {
                             .collect();
 
                         let cookies = response.cookies()
+                            .par_bridge()
                             .map(|cookie| {
                                 format!("{}: {}", cookie.name(), cookie.value())
                             })

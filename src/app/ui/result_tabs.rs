@@ -9,6 +9,7 @@ use ratatui_image::{Image, Resize};
 use ratatui_image::picker::Picker;
 use strum::{Display, EnumIter, FromRepr, IntoEnumIterator};
 use throbber_widgets_tui::{BRAILLE_DOUBLE, Throbber, WhichUse};
+use rayon::prelude::*;
 
 use crate::app::app::App;
 use crate::request::request::Request;
@@ -118,7 +119,7 @@ impl App<'_> {
                                 lines = last_highlighted.clone().unwrap();
                             }
                             else {
-                                lines = body.lines().map(|line| Line::raw(line)).collect();
+                                lines = body.lines().par_bridge().map(|line| Line::raw(line)).collect();
                             }
 
                             let body_paragraph = Paragraph::new(lines)
@@ -168,7 +169,7 @@ impl App<'_> {
                 }
                 RequestResultTabs::Headers => {
                     let result_headers: Vec<Line> = request.response.headers
-                        .iter()
+                        .par_iter()
                         .map(
                             |(header, value)| 
                                 Line::from(vec![Span::raw(header).bold().dark_gray(), Span::raw(": "), Span::raw(value)])

@@ -1,5 +1,7 @@
 use reqwest::header::CONTENT_TYPE;
 use tui_textarea::TextArea;
+use rayon::prelude::*;
+
 use crate::app::app::App;
 use crate::request::body::{ContentType, next_content_type};
 use crate::request::request::KeyValue;
@@ -116,7 +118,7 @@ impl App<'_> {
 
     pub fn refresh_body_textarea(&mut self, text: &String) {
         let lines: Vec<String> = text
-            .lines()
+            .par_lines()
             .map(|line| line.to_string())
             .collect();
 

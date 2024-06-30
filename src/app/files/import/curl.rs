@@ -8,6 +8,7 @@ use regex::Regex;
 use reqwest::header::CONTENT_TYPE;
 use reqwest::Url;
 use walkdir::WalkDir;
+use rayon::prelude::*;
 
 use crate::app::app::App;
 use crate::app::startup::args::ARGS;
@@ -25,7 +26,10 @@ impl App<'_> {
 
         println!("Collection name: {}", collection_name);
 
-        let (collection_index, collection) = match self.collections.iter_mut().enumerate().find(|(_, collection)| collection.name == collection_name.as_str()) {
+        let (collection_index, collection) = match self.collections
+            .par_iter_mut()
+            .enumerate()
+            .find_any(|(_, collection)| collection.name == collection_name.as_str()) {
             Some((index, collection)) => (index, collection),
             None => {
                 println!("Collection does not exist. Creating it...");
@@ -120,6 +124,7 @@ fn parse_request(path: &PathBuf, request_name: String) -> Arc<RwLock<Request>> {
 
     let params = curl_url
         .query_pairs()
+        .par_bridge()
         .map(|(k, v)| KeyValue {
             enabled: true,
             data: (k.to_string(), v.to_string()),
@@ -137,6 +142,7 @@ fn parse_request(path: &PathBuf, request_name: String) -> Arc<RwLock<Request>> {
 
     let headers: Vec<KeyValue> = parsed_curl.headers
         .iter()
+        .par_bridge()
         .filter(|(header_name, _)| header_name.as_str() != "authorization") // Exclude Authorization header, as that will be handled by the auth field
         .map(|(k, v)| KeyValue {
             enabled: true,
@@ -152,7 +158,8 @@ fn parse_request(path: &PathBuf, request_name: String) -> Arc<RwLock<Request>> {
         None => {
             let bearer_token_header = parsed_curl.headers
                 .iter()
-                .find(|(header_name, value)| header_name.as_str() == "authorization" && value.to_str().unwrap().starts_with("Bearer "));
+                .par_bridge()
+                .find_any(|(header_name, value)| header_name.as_str() == "authorization" && value.to_str().unwrap().starts_with("Bearer "));
 
             if let Some((_, bearer_token)) = bearer_token_header {
                 let bearer_token = &bearer_token.to_str().unwrap()[7..];
@@ -172,7 +179,7 @@ fn parse_request(path: &PathBuf, request_name: String) -> Arc<RwLock<Request>> {
 
     // TODO: does not support forms yet
     if !parsed_curl.body.is_empty() {
-        let content_type_header = headers.iter().find(|header| header.data.0 == CONTENT_TYPE.as_str());
+        let content_type_header = headers.par_iter().find_any(|header| header.data.0 == CONTENT_TYPE.as_str());
         let body_stringed = parsed_curl.body.join("\n");
 
 

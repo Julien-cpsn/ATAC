@@ -1,6 +1,7 @@
 use boa_engine::{Context, Source};
 use indexmap::IndexMap;
 use tui_textarea::TextArea;
+use rayon::prelude::*;
 
 use crate::app::app::App;
 use crate::request::request::Request;
@@ -9,7 +10,7 @@ use crate::request::response::RequestResponse;
 impl App<'_> {
     pub fn refresh_pre_request_script_textarea(&mut self, text: &str) {
         let lines: Vec<String> = text
-            .lines()
+            .par_lines()
             .map(|line| line.to_string())
             .collect();
 
@@ -18,7 +19,7 @@ impl App<'_> {
 
     pub fn refresh_post_request_script_textarea(&mut self, text: &str) {
         let lines: Vec<String> = text
-            .lines()
+            .par_lines()
             .map(|line| line.to_string())
             .collect();
 
