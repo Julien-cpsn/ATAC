@@ -54,7 +54,7 @@ The philosophy of ATAC is to be free, account-less, and offline for now and fore
 ### Install with cargo
 
 > [!IMPORTANT]
-> First, make sure your rust version is at least 1.76
+> First, make sure your rust version is at least 1.78
 
 Simply use:
 ```shell
@@ -195,6 +195,8 @@ cargo run -- -h
 - **To add**
   - Create a repo wiki
   - Document the whole code
+  - Reserved env variables like {{AUTO_TIMESTAMP}} or {{AUTO_UUID}} (https://github.com/Julien-cpsn/ATAC/issues/81)
+  - Cancel pending request
   - Command line usage (send requests, add new requests)
   - Request body syntax highlighting
   - Export a request to other code formats ([raw](https://github.com/Kong/insomnia/issues/174), curl, PHP, JS, Rust, ...)
@@ -220,6 +222,7 @@ cargo run -- -h
 
 - Base URL property and authorization on collections
 - VScode plugin to see and send requests
+- Scoop installation 
 
 ## Documentation
 
