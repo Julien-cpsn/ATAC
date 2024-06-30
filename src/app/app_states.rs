@@ -1,5 +1,5 @@
 use crokey::{key, KeyCombination};
-use crossterm::event::{KeyCode, KeyModifiers};
+use ratatui::crossterm::event::{KeyCode, KeyModifiers};
 use lazy_static::lazy_static;
 use parking_lot::RwLock;
 use ratatui::prelude::Span;

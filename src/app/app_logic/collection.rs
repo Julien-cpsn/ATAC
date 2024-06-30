@@ -246,8 +246,11 @@ impl App<'_> {
     }
 
     pub fn delete_request(&mut self) {
-        let selected_request_index = self.collections_tree.state.selected();
-        self.collections[selected_request_index[0]].requests.remove(selected_request_index[1]);
+        let selected_request_index = self.collections_tree.state.selected().to_vec();
+        let collection_index = selected_request_index[0].clone();
+        let request_index = selected_request_index[1].clone();
+
+        self.collections[collection_index].requests.remove(request_index);
 
         self.collections_tree.state.select(Vec::new());
         self.collections_tree.selected = None;
@@ -306,7 +309,7 @@ impl App<'_> {
             return;
         }
 
-        let mut selection = self.collections_tree.state.selected();
+        let mut selection = self.collections_tree.state.selected().to_vec();
 
         // Cannot decrement selection further
         if selection[1] == 0 {
@@ -333,7 +336,7 @@ impl App<'_> {
             return;
         }
 
-        let mut selection = self.collections_tree.state.selected();
+        let mut selection = self.collections_tree.state.selected().to_vec();
 
         // Cannot increment selection further
         if selection[1] == self.collections[selection[0]].requests.len() - 1 {

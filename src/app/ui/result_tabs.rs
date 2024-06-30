@@ -203,7 +203,7 @@ impl App<'_> {
 
         frame.render_stateful_widget(
             result_vertical_scrollbar,
-            rect.inner(&Margin {
+            rect.inner(Margin {
                 // using an inner vertical margin of 1 unit makes the scrollbar inside the block
                 vertical: 1,
                 horizontal: 0,
@@ -213,7 +213,7 @@ impl App<'_> {
 
         frame.render_stateful_widget(
             result_horizontal_scrollbar,
-            rect.inner(&Margin {
+            rect.inner(Margin {
                 // using an inner vertical margin of 1 unit makes the scrollbar inside the block
                 vertical: 0,
                 horizontal: 1,

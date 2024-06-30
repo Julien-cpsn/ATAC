@@ -4,9 +4,9 @@ use std::fmt::Display;
 use std::io::{Result, stdout};
 use std::process::exit;
 
-use crossterm::ExecutableCommand;
-use crossterm::style::Stylize;
-use crossterm::terminal::{disable_raw_mode, LeaveAlternateScreen};
+use ratatui::crossterm::ExecutableCommand;
+use ratatui::crossterm::style::Stylize;
+use ratatui::crossterm::terminal::{disable_raw_mode, LeaveAlternateScreen};
 pub use ratatui::backend::Backend;
 use ratatui::backend::CrosstermBackend;
 use ratatui::Terminal;
