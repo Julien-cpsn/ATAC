@@ -67,6 +67,7 @@ pub enum ImportType {
 
 pub struct ParsedArgs {
     pub directory: PathBuf,
+    #[allow(dead_code)]
     pub is_directory_from_env: bool,
     pub command: Option<Command>,
     pub should_save: bool

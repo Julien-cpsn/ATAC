@@ -68,7 +68,9 @@ nest! {
 
                 pub alt_move_cursor_up: KeyCombination,
                 pub alt_move_cursor_down: KeyCombination,
+                #[allow(dead_code)]
                 pub alt_move_cursor_left: KeyCombination,
+                #[allow(dead_code)]
                 pub alt_move_cursor_right: KeyCombination,
                 
                 pub go_back: KeyCombination,
