@@ -181,6 +181,7 @@ dependencies = [
  "arboard",
  "base64 0.22.1",
  "boa_engine",
+ "chrono",
  "clap",
  "cookie_store",
  "crokey",
@@ -210,6 +211,7 @@ dependencies = [
  "tui-big-text",
  "tui-textarea-julien-cpsn",
  "tui-tree-widget",
+ "uuid",
  "walkdir",
 ]
 
@@ -555,6 +557,15 @@ name = "cfg-if"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
+
+[[package]]
+name = "chrono"
+version = "0.4.38"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a21f936df1771bf62b77f047b726c4625ff2e8aa607c01ec06e5a05bd8463401"
+dependencies = [
+ "num-traits",
+]
 
 [[package]]
 name = "clap"
@@ -3749,6 +3760,15 @@ name = "utf8parse"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "711b9620af191e0cdc7468a8d14e709c3dcdb115b36f838e601583af800a370a"
+
+[[package]]
+name = "uuid"
+version = "1.9.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5de17fd2f7da591098415cff336e12965a28061ddace43b59cb3c430179c9439"
+dependencies = [
+ "getrandom",
+]
 
 [[package]]
 name = "v_frame"

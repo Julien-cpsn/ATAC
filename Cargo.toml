@@ -11,10 +11,7 @@ documentation = "https://github.com/Julien-cpsn/ATAC/wiki"
 homepage = "https://github.com/Julien-cpsn/ATAC"
 repository = "https://github.com/Julien-cpsn/ATAC"
 keywords = ["API", "Client", "TUI", "Postman", "Insomnia"]
-
-exclude = [
-    ".github/*"
-]
+exclude = [".github/*"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -50,5 +47,7 @@ nestify = "0.3.3"
 walkdir = "2.5.0"
 snailquote = "0.3.1"
 indexmap = { version = "2.2.6", features = ["serde"] }
+chrono = { version = "0.4.38", default-features = false, features = ["now"] }
+uuid = { version = "1.9.1", features = ["v4", "v7"] }
 base64 = "0.22.1"
 regex = "1.10.5"
