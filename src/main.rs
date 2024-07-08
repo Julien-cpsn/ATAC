@@ -7,9 +7,9 @@ use std::process::exit;
 use ratatui::crossterm::ExecutableCommand;
 use ratatui::crossterm::style::Stylize;
 use ratatui::crossterm::terminal::{disable_raw_mode, LeaveAlternateScreen};
-pub use ratatui::backend::Backend;
 use ratatui::backend::CrosstermBackend;
 use ratatui::Terminal;
+pub use ratatui::backend::Backend;
 
 use crate::app::app::App;
 use crate::app::startup::startup::AppMode;
