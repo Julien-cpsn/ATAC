@@ -199,7 +199,7 @@ impl App<'_> {
     }
 
     pub fn tui_delete_collection(&mut self) {
-        let selected_request_index = self.collections_tree.state.selected();
+        let selected_request_index = self.collections_tree.state.selected().to_vec();
         
         self.collections_tree.state.select(Vec::new());
         self.collections_tree.selected = None;
@@ -210,12 +210,14 @@ impl App<'_> {
     }
 
     pub fn tui_delete_request(&mut self) {
-        let selected_request_index = self.collections_tree.state.selected();
-        
+        let selected_request_index = self.collections_tree.state.selected().to_vec();
+        let collection_index = selected_request_index[0];
+        let request_index = selected_request_index[1];
+
         self.collections_tree.state.select(Vec::new());
         self.collections_tree.selected = None;
 
-        self.delete_request(selected_request_index[0], selected_request_index[1]);
+        self.delete_request(collection_index, request_index);
 
         self.normal_state();
     }
@@ -263,7 +265,7 @@ impl App<'_> {
             return;
         }
 
-        let mut selection = self.collections_tree.state.selected();
+        let mut selection = self.collections_tree.state.selected().to_vec();
 
         // Cannot decrement selection further
         if selection[1] == 0 {
@@ -290,7 +292,7 @@ impl App<'_> {
             return;
         }
 
-        let mut selection = self.collections_tree.state.selected();
+        let mut selection = self.collections_tree.state.selected().to_vec();
 
         // Cannot increment selection further
         if selection[1] == self.collections[selection[0]].requests.len() - 1 {

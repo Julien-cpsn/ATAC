@@ -1,6 +1,6 @@
 use std::io::stdout;
-use crossterm::ExecutableCommand;
-use crossterm::terminal::{enable_raw_mode, EnterAlternateScreen};
+use ratatui::crossterm::ExecutableCommand;
+use ratatui::crossterm::terminal::{enable_raw_mode, EnterAlternateScreen};
 use crate::app::app::App;
 
 impl App<'_> {

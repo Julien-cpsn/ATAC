@@ -9,11 +9,11 @@ pub struct StatefulTree<'a> {
 
 impl StatefulTree<'_> {
     pub fn up(&mut self) {
-        self.state.key_up(&self.items);
+        self.state.key_up();
     }
 
     pub fn down(&mut self) {
-        self.state.key_down(&self.items);
+        self.state.key_down();
     }
 
     pub fn set_selected(&mut self) {

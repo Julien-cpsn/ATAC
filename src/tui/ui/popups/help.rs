@@ -2,7 +2,7 @@ use ratatui::Frame;
 use ratatui::layout::{Constraint, Layout};
 use ratatui::layout::Direction::{Horizontal, Vertical};
 use ratatui::prelude::Line;
-use ratatui::style::Color::DarkGray;
+use ratatui::style::Color::{DarkGray, Gray};
 use ratatui::style::Stylize;
 use ratatui::widgets::{Block, Borders, Clear, Paragraph};
 
@@ -67,7 +67,7 @@ impl App<'_> {
         let right_layout = Layout::new(Vertical, lines.clone()).split(help_keys_layout[2]);
 
         let events = &self.help_popup.selection.get_available_events(self.request_view, self.request_param_tab);
-        let keys = event_available_keys_to_spans(events, DarkGray, false);
+        let keys = event_available_keys_to_spans(events, Gray, DarkGray, false);
 
         for i in 0..3 * NB_LINES {
             if i >= keys.len() {

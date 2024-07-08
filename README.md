@@ -54,7 +54,7 @@ The philosophy of ATAC is to be free, account-less, and offline for now and fore
 ### Install with cargo
 
 > [!IMPORTANT]
-> First, make sure your rust version is at least 1.76
+> First, make sure your rust version is at least 1.78
 
 Simply use:
 ```shell
@@ -92,7 +92,7 @@ brew install atac
 Simply use:
 
 ```bash
-dnf enable joxcat/atac
+dnf copr enable joxcat/atac
 dnf install atac
 ```
 
@@ -195,6 +195,8 @@ cargo run -- -h
 - **To add**
   - Create a repo wiki
   - Document the whole code
+  - Reserved env variables like {{AUTO_TIMESTAMP}} or {{AUTO_UUID}} (https://github.com/Julien-cpsn/ATAC/issues/81)
+  - Cancel pending request
   - Command line usage (send requests, add new requests)
   - Request body syntax highlighting
   - Export a request to other code formats ([raw](https://github.com/Kong/insomnia/issues/174), curl, PHP, JS, Rust, ...)
@@ -218,7 +220,9 @@ cargo run -- -h
 
 ### Ideas (will think about it later)
 
-- Base URL property on collections
+- Base URL property and authorization on collections
+- VScode plugin to see and send requests
+- Scoop installation 
 
 ## Documentation
 
@@ -242,10 +246,11 @@ https://github.com/NachoNievaG/atac.nvim
 
 - Console Host
   - Windows 11 (Pro)
-  - WSL2 Debian
+  - WSL2 Debian 12
   - Windows 10 (Pro)
   - Windows 8.1 (N)
 - Ubuntu Desktop Terminal
+  - Ubuntu 23.04 64-bit
   - Ubuntu 17.10
   - Pop!_OS 20.04
 - (Arch, Manjaro) KDE Konsole
@@ -253,6 +258,9 @@ https://github.com/NachoNievaG/atac.nvim
 - Linux Mint
 - (OpenSuse) Alacritty
 - (Chrome OS) Crostini
+- Apple
+  - macOS Monterey 12.7.1 (Intel-Chip)
+  - macOS Sonama 14.4 (M1 Max, Apple Silicon-Chip)
 
 (List from [here](https://github.com/crossterm-rs/crossterm#tested-terminals))
 
@@ -260,35 +268,35 @@ https://github.com/NachoNievaG/atac.nvim
 
 | Library                                                                                                                                          | Version                   | Reason                                                                                 |
 |--------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------|----------------------------------------------------------------------------------------|
-| [reqwest](https://github.com/seanmonstar/reqwest) & [reqwest cookie store](https://github.com/pfernie/reqwest_cookie_store)                      | 0.11.27 & 0.6.0           | Send requests                                                                          |
-| [ratatui](https://github.com/ratatui-org/ratatui)                                                                                                | 0.26.2                    | Terminal UI framework                                                                  |
-| [crossterm](https://github.com/crossterm-rs/crossterm)                                                                                           | 0.27.0                    | Terminal Backend                                                                       |
-| [crokey](https://github.com/Canop/crokey)                                                                                                        | 0.6.4                     | Used to parse, use key bindings files and some utilities                               |
-| [tui-big-text](https://github.com/joshka/tui-big-text)                                                                                           | 0.4.2                     | Display big texts. Only used for displaying ATAC in the homepage.                      |
-| [tui-tree-widget](https://github.com/EdJoPaTo/tui-rs-tree-widget)                                                                                | 0.19.0                    | Display tree-like lists. Used for displaying the collections.                          |
-| [tui-textarea](https://github.com/rhysd/tui-textarea)                                                                                            | 0.5.0                     | Text area that handle a lot of features. Used for editing request body.                |
-| [throbber-widgets-tui](https://github.com/arkbig/throbber-widgets-tui)                                                                           | 0.4.1                     | Display loading UI elements. Used when request is pending.                             |
-| [ratatui-image](https://github.com/benjajaja/ratatui-image)                                                                                      | 1.0.0                     | Display response images.                                                               |
-| [image](https://github.com/image-rs/image)                                                                                                       | 0.24.9                    | Decode images.                                                                         |
+| [reqwest](https://github.com/seanmonstar/reqwest) & [reqwest cookie store](https://github.com/pfernie/reqwest_cookie_store)                      | 0.12.5 & 0.8.0            | Send requests                                                                          |
+| [ratatui](https://github.com/ratatui-org/ratatui)                                                                                                | 0.27.0                    | Terminal UI framework                                                                  |
+| [crokey](https://github.com/Canop/crokey)                                                                                                        | 1.0                       | Used to parse, use key bindings files and some utilities                               |
+| [tui-big-text](https://github.com/joshka/tui-big-text)                                                                                           | 0.4.5                     | Display big texts. Only used for displaying ATAC in the homepage.                      |
+| [tui-tree-widget](https://github.com/EdJoPaTo/tui-rs-tree-widget)                                                                                | 0.21.0                    | Display tree-like lists. Used for displaying the collections.                          |
+| [My fork](https://github.com/Julien-cpsn/tui-textarea) of [tui-textarea](https://github.com/rhysd/tui-textarea)                                  | 0.4.1                     | Text area that handle a lot of features. Used for editing request body.                |
+| [throbber-widgets-tui](https://github.com/arkbig/throbber-widgets-tui)                                                                           | 0.6.0                     | Display loading UI elements. Used when request is pending.                             |
+| [ratatui-image](https://github.com/benjajaja/ratatui-image)                                                                                      | 1.0.1                     | Display response images.                                                               |
+| [image](https://github.com/image-rs/image)                                                                                                       | 0.25.1                    | Decode images.                                                                         |
 | [syntect](https://github.com/trishume/syntect)                                                                                                   | 5.2.0                     | Syntax highlighting                                                                    |
-| [serde](https://github.com/serde-rs/serde) ([serde_json](https://github.com/serde-rs/json), [serde-yaml](https://github.com/dtolnay/serde-yaml)) | 1.0.197 (1.0.144, 0.9.34) | Serialize & Deserialize application data into files                                    |
+| [serde](https://github.com/serde-rs/serde) ([serde_json](https://github.com/serde-rs/json), [serde-yaml](https://github.com/dtolnay/serde-yaml)) | 1.0.203 (1.0.118, 0.9.34) | Serialize & Deserialize application data into files                                    |
 | [jsonxf](https://github.com/gamache/jsonxf)                                                                                                      | 0.1.1                     | Pretty print JSON                                                                      |
-| [toml](https://github.com/toml-rs/toml)                                                                                                          | 0.8.11                    | Serialize & Deserialize application config files                                       |
+| [toml](https://github.com/toml-rs/toml)                                                                                                          | 0.8.14                    | Serialize & Deserialize application config files                                       |
 | [boa_engine](https://github.com/boa-dev/boa)                                                                                                     | 0.18.0                    | Create Javascript runtimes. Used for pre and post request scripts                      |
-| [My fork](https://github.com/Julien-cpsn/postman-collection-rs) of [postman_collection](https://github.com/mandrean/postman-collection-rs)       | 0.2.1                     | Deserialize Postman collection files                                                   |
+| [My fork](https://github.com/Julien-cpsn/postman-collection-rs) of [postman_collection](https://github.com/mandrean/postman-collection-rs)       | 0.2.3                     | Deserialize Postman collection files                                                   |
 | [curl-parser](https://github.com/tyrchen/curl-parser)                                                                                            | 0.3.1                     | Parse cURL request files                                                               |
-| [clap](https://github.com/clap-rs/clap)                                                                                                          | 4.5.0                     | Command Line Argument Parser                                                           |
-| [arboard](https://github.com/1Password/arboard)                                                                                                  | 3.3.2                     | Copy response body to clipboard                                                        |
-| [tokio](https://github.com/tokio-rs/tokio)                                                                                                       | 1.0.0                     | Handle asynchronous requests                                                           |
-| [parking_lot](https://github.com/Amanieu/parking_lot)                                                                                            | 0.12.2                    | Smaller, faster and more flexible implementation of RwLock and Mutex. Used everywhere. |
-| [strum](https://github.com/Peternator7/strum)                                                                                                    | 0.26.2                    | Enum facilities                                                                        |
-| [lazy_static](https://github.com/rust-lang-nursery/lazy-static.rs)                                                                               | 1.4.0                     | Allows for more flexible constants. Mainly used for accessing CLI arguments everywhere |
+| [clap](https://github.com/clap-rs/clap)                                                                                                          | 4.5.8                     | Command Line Argument Parser                                                           |
+| [dirs](https://github.com/dirs-dev/dirs-rs)                                                                                                      | 5.0.1                     | Use system files                                                                       |
+| [arboard](https://github.com/1Password/arboard)                                                                                                  | 3.4.0                     | Copy response body to clipboard                                                        |
+| [tokio](https://github.com/tokio-rs/tokio)                                                                                                       | 1.38.0                    | Handle asynchronous requests                                                           |
+| [parking_lot](https://github.com/Amanieu/parking_lot)                                                                                            | 0.12.3                    | Smaller, faster and more flexible implementation of RwLock and Mutex. Used everywhere. |
+| [strum](https://github.com/Peternator7/strum)                                                                                                    | 0.26.3                    | Enum facilities                                                                        |
+| [lazy_static](https://github.com/rust-lang-nursery/lazy-static.rs)                                                                               | 1.5.0                     | Allows for more flexible constants. Mainly used for accessing CLI arguments everywhere |
 | [nestify](https://github.com/snowfoxsh/nestify)                                                                                                  | 0.3.3                     | Used to nest struct definitions                                                        |
 | [walkdir](https://github.com/BurntSushi/walkdir)                                                                                                 | 2.5.0                     | Recursively retrieve files                                                             |
 | [snailquote](https://github.com/euank/snailquote)                                                                                                | 0.3.1                     | Unescape string                                                                        |
 | [indexmap](https://github.com/indexmap-rs/indexmap)                                                                                              | 2.2.6                     | Ordered hashmap. Used in environments to preserve files' values order                  |
-| [base64](https://github.com/marshallpierce/rust-base64)                                                                                          | 0.22.0                    | Encode auth.                                                                           |
-| [regex](https://github.com/rust-lang/regex)                                                                                                      | 1.10.3                    | Regex. Using for parsing requests URL                                                  |
+| [base64](https://github.com/marshallpierce/rust-base64)                                                                                          | 0.22.1                    | Encode auth.                                                                           |
+| [regex](https://github.com/rust-lang/regex)                                                                                                      | 1.10.5                    | Regex. Using for parsing requests URL                                                  |
 
 ### Binary size
 

@@ -1,7 +1,7 @@
 use crokey::KeyCombination;
 use crokey::OneToThree::One;
-use crossterm::event;
-use crossterm::event::{Event, KeyCode, KeyEventKind};
+use ratatui::crossterm::event;
+use ratatui::crossterm::event::{Event, KeyCode, KeyEventKind};
 use tui_textarea::CursorMove;
 
 use crate::app::app::App;

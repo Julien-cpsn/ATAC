@@ -1,5 +1,5 @@
 use crokey::{key, KeyCombination};
-use crossterm::event::{KeyCode, KeyModifiers};
+use ratatui::crossterm::event::{KeyCode, KeyModifiers};
 use lazy_static::lazy_static;
 use parking_lot::RwLock;
 use ratatui::prelude::Span;
@@ -552,7 +552,7 @@ impl AppState {
     }
 }
 
-pub fn event_available_keys_to_spans(events: &Vec<AppEvent>, bg_color: Color, short_only: bool) -> Vec<Vec<Span>> {
+pub fn event_available_keys_to_spans(events: &Vec<AppEvent>, fg_color: Color, bg_color: Color, short_only: bool) -> Vec<Vec<Span>> {
     let mut spans: Vec<Vec<Span>> = vec![];
 
     for event in events.iter() {
@@ -563,7 +563,7 @@ pub fn event_available_keys_to_spans(events: &Vec<AppEvent>, bg_color: Color, sh
 
         let event_key_bindings = event.get_event_key_bindings();
 
-        if let Some(key_spans) = event_key_bindings.to_spans(bg_color, short_only, is_documentation) {
+        if let Some(key_spans) = event_key_bindings.to_spans(fg_color, bg_color, short_only, is_documentation) {
             spans.push(key_spans);
         }
     }

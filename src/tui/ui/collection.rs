@@ -15,7 +15,10 @@ impl<'a> App<'a> {
             })
             .collect();
 
-        let collections_tree = Tree::new(self.collections_tree.items.clone())
+        
+        let tree_items = self.collections_tree.items.clone();
+        
+        let collections_tree = Tree::new(&tree_items)
             .unwrap()
             .highlight_style(Style::default().add_modifier(Modifier::BOLD))
             .highlight_symbol(">")

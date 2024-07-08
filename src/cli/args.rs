@@ -9,6 +9,7 @@ use crate::cli::commands::collection_commands::collection_commands::CollectionCo
 use crate::cli::commands::completions::CompletionsCommand;
 use crate::cli::commands::import::ImportCommand;
 use crate::cli::commands::request_commands::request_commands::RequestCommand;
+use crate::app::files::utils::expand_tilde;
 use crate::panic_error;
 
 #[derive(Parser, Debug)]
@@ -79,11 +80,11 @@ lazy_static! {
         
         let directory = match args.directory {
             // If a directory was provided with a CLI argument
-            Some(arg_directory) => arg_directory,
+            Some(arg_directory) => (expand_tilde(arg_directory), false),
             // If no directory was provided with the CLI
             None => match env::var("ATAC_MAIN_DIR") {
                 // If the ATAC_MAIN_DIR environment variable exists
-                Ok(env_directory) => PathBuf::from(env_directory),
+                Ok(env_directory) => (expand_tilde(PathBuf::from(env_directory)), true),
                 Err(_) => panic_error("No directory provided, provide one either with `--directory <dir>` or via the environment variable `ATAC_MAIN_DIR`")
             }
         };

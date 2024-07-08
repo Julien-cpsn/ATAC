@@ -11,6 +11,7 @@ use ratatui::text::Span;
 use serde::Deserialize;
 
 use crate::app::app::App;
+use crate::app::files::utils::expand_tilde;
 use crate::panic_error;
 
 #[derive(Default, Copy, Clone, Deserialize)]
@@ -274,7 +275,7 @@ impl App<'_> {
     pub fn parse_key_bindings_file(&mut self) {
         let path = match env::var("ATAC_KEY_BINDINGS") {
             // If the ATAC_KEY_BINDINGS environment variable exists
-            Ok(env_key_bindings) => PathBuf::from(env_key_bindings),
+            Ok(env_key_bindings) => expand_tilde(PathBuf::from(env_key_bindings)),
             Err(_) => {
                 println!("No key bindings file found");
                 return;

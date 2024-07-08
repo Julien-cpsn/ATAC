@@ -2,7 +2,7 @@ use std::fmt::{Display, Error, Formatter};
 
 use crokey::{key, KeyCombination};
 use crokey::OneToThree::One;
-use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
+use ratatui::crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 use ratatui::layout::Alignment;
 use ratatui::prelude::{Color, Modifier, Style};
 use ratatui::style::Stylize;

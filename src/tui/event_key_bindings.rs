@@ -24,7 +24,7 @@ impl EventKeyBinding {
         }
     }
 
-    pub fn to_spans(&self, bg_color: Color, short_only: bool, is_documentation: bool) -> Option<Vec<Span<'static>>> {
+    pub fn to_spans(&self, fg_color: Color, bg_color: Color, short_only: bool, is_documentation: bool) -> Option<Vec<Span<'static>>> {
         if self.keys.is_empty() {
             return None;
         }
@@ -51,7 +51,7 @@ impl EventKeyBinding {
 
         let mut spans = unique_key_and_help(
             Span::raw(name.clone()).bg(bg_color),
-            Span::raw(self.keys[0].to_string()).dark_gray()
+            Span::raw(self.keys[0].to_string()).fg(fg_color)
         );
 
         spans.push(Span::raw(" "));
@@ -61,7 +61,7 @@ impl EventKeyBinding {
         }
         
         if let Some(key) = self.keys.get(1) {
-            spans.push(Span::raw(key.to_string()).dark_gray());
+            spans.push(Span::raw(key.to_string()).fg(fg_color));
             spans.push(Span::raw(" "));
         }
 
