@@ -27,6 +27,38 @@ pub struct Args {
     pub dry_run: bool,
 }
 
+/*
+* atac
+*   - collection
+*       - list (all collections)
+*       - info
+*       - new
+*       - rename
+*       - delete
+*       - send
+*           - "collection name"
+*   - request
+*       - list (all "collections/request")
+*       - info
+*       - new
+*       - rename
+*       - delete
+*       - send
+*       - method
+*       - params
+*       - auth
+*       - headers
+*       - body
+*       - scripts
+*       - settings
+*           - "collection name/request name"
+*  - import
+*       - postman
+*       - curl
+*  - completions
+*       - bash, powershell, fish
+*/
+
 #[derive(Subcommand, Debug, Clone)]
 pub enum Command {
     /// Collection commands
