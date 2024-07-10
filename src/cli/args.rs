@@ -3,6 +3,7 @@ use std::path::PathBuf;
 
 use clap::{Parser, Subcommand};
 use clap::builder::Styles;
+use clap_verbosity_flag::{InfoLevel, Verbosity};
 use lazy_static::lazy_static;
 
 use crate::cli::commands::collection_commands::collection_commands::CollectionCommand;
@@ -25,6 +26,9 @@ pub struct Args {
     /// Avoid saving data to the collection and environment files
     #[arg(global = true, long, default_value_t = false)]
     pub dry_run: bool,
+
+    #[command(flatten)]
+    pub verbose: Verbosity<InfoLevel>,
 }
 
 /*
@@ -32,19 +36,34 @@ pub struct Args {
 *   - collection
 *       - list (all collections)
 *       - info
+*           - "collection name"
 *       - new
-*       - rename
+*           - "collection name"
 *       - delete
-*       - send
+*           - "collection name"
+*       - rename
+*           - "collection name" "new collection name"
+*       - send (all request from collection)
 *           - "collection name"
 *   - request
-*       - list (all "collections/request")
 *       - info
+*           - "collection/request"
 *       - new
-*       - rename
+*           - "collection/request"
 *       - delete
+*           - "collection/request"
+*       - rename
+*           - "collection/request" "new request name"
 *       - send
+*           - "collection/request"
+*       - url
+*           - "collection/request"
+*               - get
+*               - set "new url"
 *       - method
+*           - get
+*           - set
+                - GET, POST, PUT, PATCH, DELETE, HEAD, OPTION
 *       - params
 *       - auth
 *       - headers
@@ -52,7 +71,16 @@ pub struct Args {
 *       - scripts
 *       - settings
 *           - "collection name/request name"
-*  - import
+*   - env
+*       - new
+*       - delete
+*           "env name"
+*       - key
+*           - add
+*           - set
+*           - delete
+*               "key", "value"
+*   - import
 *       - postman
 *       - curl
 *  - completions
@@ -66,25 +94,6 @@ pub enum Command {
 
     /// Request commands
     Request(RequestCommand),
-
-    /// List all collections
-    List {
-        /// Also print request names
-        #[arg(long)]
-        request_names: bool
-    },
-
-    /// Create a new collection
-    New {
-        /// Collection name
-        collection_name: String
-    },
-
-    /// Delete a collection
-    Delete {
-        /// Collection name
-        collection_name: String
-    },
 
     /// Import a collection or request from other file formats (Postman v2.1.0, cURL)
     Import(ImportCommand),
@@ -109,6 +118,8 @@ impl ParsedArgs {
 lazy_static! {
     pub static ref ARGS: ParsedArgs = {
         let args = Args::parse();
+
+        // TODO: add env log with args.verbose.log_level_filter();
         
         let directory = match args.directory {
             // If a directory was provided with a CLI argument

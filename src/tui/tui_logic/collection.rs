@@ -236,7 +236,7 @@ impl App<'_> {
         let new_collection_name = self.rename_collection_input.text.clone();
         let selected_request_index = self.collections_tree.state.selected();
 
-        match self.rename_collection(new_collection_name, selected_request_index[0]) {
+        match self.rename_collection(selected_request_index[0], new_collection_name) {
             Ok(_) => {}
             Err(_) => {
                 return;

@@ -15,7 +15,8 @@ impl App<'_> {
         Ok(())
     }
 
-    pub async fn send_collection_command(&mut self, collection_index: usize, send_command: &SendCommand) -> anyhow::Result<()> {
+    pub async fn send_collection_command(&mut self, collection_name: &str, send_command: &SendCommand) -> anyhow::Result<()> {
+        let collection_index = self.find_collection(collection_name)?;
         let collection = &self.collections[collection_index];
 
         let mut requests: Vec<Arc<RwLock<Request>>> = vec![];

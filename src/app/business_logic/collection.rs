@@ -88,7 +88,7 @@ impl App<'_> {
         self.save_collection_to_file(collection_index);
     }
 
-    pub fn rename_collection(&mut self, new_collection_name: String, collection_index: usize) -> anyhow::Result<()> {
+    pub fn rename_collection(&mut self, collection_index: usize, new_collection_name: String) -> anyhow::Result<()> {
         if new_collection_name.trim().is_empty() {
             return Err(anyhow!(CollectionNameIsEmpty));
         }

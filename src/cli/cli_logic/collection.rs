@@ -10,10 +10,11 @@ impl App<'_> {
         Ok(())
     }
 
-    pub fn describe_collection(&mut self, collection_index: usize) -> anyhow::Result<()> {
+    pub fn describe_collection(&mut self, collection_name: &str, without_request_names: bool) -> anyhow::Result<()> {
+        let collection_index = self.find_collection(collection_name)?;
         let collection = &self.collections[collection_index];
 
-        print_collection(&collection, true);
+        print_collection(&collection, !without_request_names);
         
         Ok(())
     }
@@ -23,6 +24,14 @@ impl App<'_> {
 
         self.delete_collection(collection_index);
         
+        Ok(())
+    }
+
+    pub fn cli_rename_collection(&mut self, collection_name: &str, new_collection_name: String) -> anyhow::Result<()> {
+        let collection_index = self.find_collection(collection_name)?;
+
+        self.rename_collection(collection_index, new_collection_name)?;
+
         Ok(())
     }
 }
