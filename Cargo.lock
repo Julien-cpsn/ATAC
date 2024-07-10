@@ -184,6 +184,7 @@ dependencies = [
  "base64 0.22.1",
  "boa_engine",
  "clap",
+ "clap-verbosity-flag",
  "clap_complete",
  "cookie_store",
  "crokey",
@@ -569,6 +570,16 @@ checksum = "84b3edb18336f4df585bc9aa31dd99c036dfa5dc5e9a2939a722a188f3a8970d"
 dependencies = [
  "clap_builder",
  "clap_derive",
+]
+
+[[package]]
+name = "clap-verbosity-flag"
+version = "2.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bb9b20c0dd58e4c2e991c8d203bbeb76c11304d1011659686b5b644bc29aa478"
+dependencies = [
+ "clap",
+ "log",
 ]
 
 [[package]]
