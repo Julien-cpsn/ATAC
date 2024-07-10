@@ -33,8 +33,8 @@ pub struct Request {
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
 pub struct KeyValue {
-    pub data: (String, String),
     pub enabled: bool,
+    pub data: (String, String),
 }
 
 impl App<'_> {
