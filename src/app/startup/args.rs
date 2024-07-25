@@ -84,7 +84,7 @@ lazy_static! {
             None => match env::var("ATAC_MAIN_DIR") {
                 // If the ATAC_MAIN_DIR environment variable exists
                 Ok(env_directory) => (expand_tilde(PathBuf::from(env_directory)), true),
-                Err(_) => panic_error("No directory provided, provide one either with `--directory <dir>` or via the environment variable `ATAC_MAIN_DIR`")
+                Err(_) => panic_error("No directory provided, provide one either with `-d|--directory <dir>` or via the environment variable `ATAC_MAIN_DIR`")
             }
         };
 
