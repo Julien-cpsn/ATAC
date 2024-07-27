@@ -89,6 +89,7 @@ nest! {
         },
 
         pub request_selected: #[derive(Copy, Clone, Deserialize)] pub struct RequestSelected {
+            pub exit: KeyCombination,
             pub param_next_tab: KeyCombination,
             pub change_url: KeyCombination,
             pub change_method: KeyCombination,
@@ -208,6 +209,7 @@ impl Default for KeyBindings {
             },
 
             request_selected: RequestSelected {
+                exit: key!(q),
                 param_next_tab: key!(tab),
 
                 change_url: key!(u),
