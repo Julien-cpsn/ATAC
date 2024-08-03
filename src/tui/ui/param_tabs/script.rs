@@ -1,3 +1,4 @@
+use std::ops::Deref;
 use ratatui::Frame;
 use ratatui::layout::{Alignment, Constraint, Layout, Rect};
 use ratatui::layout::Direction::Vertical;
@@ -56,7 +57,7 @@ impl App<'_> {
                 .title_alignment(Alignment::Center)
         );
 
-        frame.render_widget(pre_request_script_text_area.widget(), scripts_layout[0]);
-        frame.render_widget(post_request_script_text_area.widget(), scripts_layout[1]);
+        frame.render_widget(pre_request_script_text_area.deref(), scripts_layout[0]);
+        frame.render_widget(post_request_script_text_area.deref(), scripts_layout[1]);
     }
 }

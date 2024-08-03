@@ -170,7 +170,7 @@ impl App<'_> {
                     },
                     Raw(_) | Json(_) | Xml(_) | Html(_) | Javascript(_) => {
                         self.body_text_area.set_line_number_style(Style::new().fg(Color::DarkGray));
-                        frame.render_widget(self.body_text_area.widget(), request_params_layout[1]);
+                        frame.render_widget(&self.body_text_area, request_params_layout[1]);
                     }
                 }
             }

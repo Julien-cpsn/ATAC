@@ -40,8 +40,7 @@ impl App<'_> {
             .lines([
                 "ATAC".into(),
             ])
-            .build()
-            .unwrap();
+            .build();
 
 
         let welcome_to = Paragraph::new("Welcome to").centered();

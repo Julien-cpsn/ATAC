@@ -19,40 +19,56 @@ exclude = [
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+# Request
 reqwest = { version = "0.12.5", default-features = false, features = ["cookies", "rustls-tls-native-roots", "multipart", "gzip", "brotli", "deflate", "stream"] }
 reqwest_cookie_store = "0.8.0"
 cookie_store = "0.21.0"
+
+# TUI
 ratatui = "0.27.0"
 crokey = "1.0.1"
-tui-big-text = "0.4.5"
+tui-big-text = "0.5.3"
 tui-tree-widget = "0.21.0"
-tui-textarea = { package = "tui-textarea-julien-cpsn", version = "0.4.1", features = ["ratatui"] }
+tui-textarea = { version = "0.5.3", features = ["ratatui"] }
 throbber-widgets-tui = "0.6.0"
-ratatui-image = { version = "1.0.1", features = ["crossterm"] }
-image = "0.25.1"
+ratatui-image = { version = "1.0.5", features = ["crossterm"] }
+image = "0.25.2"
+
+# Main functionnalities
 syntect = "5.2.0"
-serde = { version = "1.0.203", features = ["derive", "rc"] }
-serde_json = "1.0.118"
+serde = { version = "1.0.204", features = ["derive", "rc"] }
+serde_json = "1.0.122"
 serde_yaml = "0.9.34"
 jsonxf = "1.1.1"
-toml = "0.8.14"
-boa_engine = { version = "0.18.0", default-features = false }
+toml = "0.8.19"
+boa_engine = { version = "0.19.0", default-features = false }
 parse_postman_collection = "0.2.3"
 curl-parser = { version = "0.3.1", default-features = false }
-clap = { version = "4.5.8", features = ["derive", "color", "suggestions"] }
-clap-verbosity-flag = "2.2.0"
+clap = { version = "4.5.13", features = ["derive", "color", "suggestions"] }
+clap-verbosity-flag = "2.2.1"
 dirs = "5.0.1"
 arboard = "3.4.0"
-tokio = { version = "1.38.0", features = ["rt", "rt-multi-thread", "macros"] }
+
+# Async
+tokio = { version = "1.39.2", features = ["rt", "rt-multi-thread", "macros"] }
 parking_lot = { version = "0.12.3", features = ["serde", "send_guard"] }
+
+# Utils
 strum = "0.26.3"
 lazy_static = "1.5.0"
 nestify = "0.3.3"
 walkdir = "2.5.0"
 snailquote = "0.3.1"
-indexmap = { version = "2.2.6", features = ["serde"] }
-thiserror = "1.0.60"
-anyhow = "1.0.83"
-clap_complete = "4.5.2"
+indexmap = { version = "2.3.0", features = ["serde"] }
+thiserror = "1.0.63"
+anyhow = "1.0.86"
+clap_complete = "4.5.12"
 base64 = "0.22.1"
-regex = "1.10.5"
+regex = "1.10.6"
+
+# Tracing
+tracing = { version = "0.1.40", features = ["async-await"] }
+tracing-subscriber = { version = "0.3.18", features = ["parking_lot", "chrono", "regex"]}
+tracing-log = "0.2.0"
+reqwest-tracing = "0.5.2"
+reqwest-middleware = { version = "0.3.2", features = ["rustls-tls", "json", "multipart"]}
