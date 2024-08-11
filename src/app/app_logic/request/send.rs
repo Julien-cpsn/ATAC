@@ -297,11 +297,20 @@ impl App<'_> {
                     }
                 };
 
+                let timeout = tokio::time::sleep(Duration::from_secs(30));
+
                 let mut response = tokio::select! {
                     _ = cancel_watcher => {
                         elapsed_time = request_start.elapsed();
                         RequestResponse {
                             content: Some(ResponseContent::Body("Request canceled".to_string())),
+                            ..Default::default()
+                        }
+                    }
+                    _ = timeout => {
+                        elapsed_time = request_start.elapsed();
+                        RequestResponse {
+                            content: Some(ResponseContent::Body("Request timed out".to_string())),
                             ..Default::default()
                         }
                     }
