@@ -84,6 +84,7 @@ request_settings = "s"
 next_view = "v"
 
 send_request = "Space"
+cancel_request = "Ctrl-c"
 alt_send_request = "Ctrl-Enter"
 
 [keybindings.request_selected.param_tabs]

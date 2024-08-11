@@ -4,6 +4,7 @@ pub mod headers;
 pub mod method;
 pub mod query_params;
 pub mod send;
+pub mod cancel;
 pub mod settings;
 pub mod url;
 pub(super) mod utils;

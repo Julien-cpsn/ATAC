@@ -1,7 +1,10 @@
+use std::sync::{Arc, Mutex};
+
 use lazy_static::lazy_static;
 use ratatui::prelude::{Line, Modifier, Span};
 use ratatui::style::Stylize;
 use serde::{Deserialize, Serialize};
+use tokio::sync::watch::Sender;
 use tui_tree_widget::TreeItem;
 
 use crate::app::app::App;
@@ -27,6 +30,8 @@ pub struct Request {
     #[serde(skip)]
     pub response: RequestResponse,
 
+    #[serde(skip)]
+    pub abort_tx: Option<Arc<Mutex<Sender<bool>>>>,
     #[serde(skip)]
     pub is_pending: bool
 }

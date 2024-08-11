@@ -1,7 +1,7 @@
 use std::fs::File;
 use std::io::Read;
 use std::path::PathBuf;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
 use ratatui::style::Stylize;
@@ -10,6 +10,7 @@ use reqwest::{ClientBuilder, Proxy, Url};
 use reqwest::header::{CONTENT_TYPE, HeaderMap};
 use reqwest::multipart::{Form, Part};
 use reqwest::redirect::Policy;
+use tokio::sync::watch;
 use tokio::task;
 
 use crate::app::app::App;
@@ -281,99 +282,125 @@ impl App<'_> {
                 let request_start = Instant::now();
                 let elapsed_time: Duration;
 
-                let mut response = match request.send().await {
-                    Ok(response) => {
-                        elapsed_time = request_start.elapsed();
+                let (tx, mut rx) = watch::channel(false);
+                local_selected_request.write().abort_tx = Some(Arc::new(Mutex::new(tx)));
 
-                        let status_code = response.status().to_string();
+                let cancel_watcher = async {
+                    loop {
+                        if rx.changed().await.is_ok() {
+                            let cancel = *rx.borrow();
 
-                        let mut is_image = false;
-
-                        let headers: Vec<(String, String)> = response.headers().clone()
-                            .iter()
-                            .map(|(header_name, header_value)| {
-                                let value = header_value.to_str().unwrap_or("").to_string();
-
-                                if header_name == CONTENT_TYPE && value.starts_with("image/") {
-                                    is_image = true;
-                                }
-
-                                (header_name.to_string(), value)
-                            })
-                            .collect();
-
-                        let cookies = response.cookies()
-                            .map(|cookie| {
-                                format!("{}: {}", cookie.name(), cookie.value())
-                            })
-                            .collect::<Vec<String>>()
-                            .join("\n");
-
-                        let response_content = match is_image {
-                            true => {
-                                let content = response.bytes().await.unwrap();
-                                let image = image::load_from_memory(content.as_ref());
-
-                                ResponseContent::Image(ImageResponse {
-                                    data: content.to_vec(),
-                                    image: image.ok(),
-                                })
-                            },
-                            false => {
-                                let mut result_body = response.text().await.unwrap();
-
-                                // If a file format has been found in the content-type header
-                                if let Some(file_format) = find_file_format_in_content_type(&headers) {
-                                    // If the request response content can be pretty printed
-                                    if local_selected_request.read().settings.pretty_print_response_content {
-
-                                        // Match the file format
-                                        match file_format.as_str() {
-                                            "json" => {
-                                                result_body = jsonxf::pretty_print(&result_body).unwrap_or(result_body);
-                                            },
-                                            _ => {}
-                                        }
-                                    }
-
-                                    let highlighted_result_body = highlight(&result_body, &file_format);
-                                    *local_highlighted_body.write() = highlighted_result_body;
-                                } else {
-                                    *local_highlighted_body.write() = None;
-                                }
-
-                                ResponseContent::Body(result_body)
+                            if cancel {
+                                break;
                             }
-                        };
-
-                        RequestResponse {
-                            duration: None,
-                            status_code: Some(status_code),
-                            content: Some(response_content),
-                            cookies: Some(cookies),
-                            headers,
                         }
-                    },
-                    Err(error) => {
+                    }
+                };
+
+                let mut response = tokio::select! {
+                    _ = cancel_watcher => {
                         elapsed_time = request_start.elapsed();
-
-                        let response_status_code;
-
-                        if let Some(status_code) = error.status() {
-                            response_status_code = Some(status_code.to_string());
-                        } else {
-                            response_status_code = None;
-                        }
-
-                        let result_body = ResponseContent::Body(error.to_string());
-
-
                         RequestResponse {
-                            duration: None,
-                            status_code: response_status_code,
-                            content: Some(result_body),
-                            cookies: None,
-                            headers: vec![],
+                            content: Some(ResponseContent::Body("Request canceled".to_string())),
+                            ..Default::default()
+                        }
+                    }
+                    response = request.send() => {
+                        match response {
+                            Ok(response) => {
+                                elapsed_time = request_start.elapsed();
+
+                                let status_code = response.status().to_string();
+
+                                let mut is_image = false;
+
+                                let headers: Vec<(String, String)> = response.headers().clone()
+                                    .iter()
+                                    .map(|(header_name, header_value)| {
+                                        let value = header_value.to_str().unwrap_or("").to_string();
+
+                                        if header_name == CONTENT_TYPE && value.starts_with("image/") {
+                                            is_image = true;
+                                        }
+
+                                        (header_name.to_string(), value)
+                                    })
+                                    .collect();
+
+                                let cookies = response.cookies()
+                                    .map(|cookie| {
+                                        format!("{}: {}", cookie.name(), cookie.value())
+                                    })
+                                    .collect::<Vec<String>>()
+                                    .join("\n");
+
+                                let response_content = match is_image {
+                                    true => {
+                                        let content = response.bytes().await.unwrap();
+                                        let image = image::load_from_memory(content.as_ref());
+
+                                        ResponseContent::Image(ImageResponse {
+                                            data: content.to_vec(),
+                                            image: image.ok(),
+                                        })
+                                    },
+                                    false => {
+                                        let mut result_body = response.text().await.unwrap();
+
+                                        // If a file format has been found in the content-type header
+                                        if let Some(file_format) = find_file_format_in_content_type(&headers) {
+                                            // If the request response content can be pretty printed
+                                            if local_selected_request.read().settings.pretty_print_response_content {
+
+                                                // Match the file format
+                                                match file_format.as_str() {
+                                                    "json" => {
+                                                        result_body = jsonxf::pretty_print(&result_body).unwrap_or(result_body);
+                                                    },
+                                                    _ => {}
+                                                }
+                                            }
+
+                                            let highlighted_result_body = highlight(&result_body, &file_format);
+                                            *local_highlighted_body.write() = highlighted_result_body;
+                                        } else {
+                                            *local_highlighted_body.write() = None;
+                                        }
+
+                                        ResponseContent::Body(result_body)
+                                    }
+                                };
+
+                                RequestResponse {
+                                    duration: None,
+                                    status_code: Some(status_code),
+                                    content: Some(response_content),
+                                    cookies: Some(cookies),
+                                    headers,
+                                }
+                            },
+                            Err(error) => {
+                                elapsed_time = request_start.elapsed();
+
+                                let response_status_code;
+
+                                if let Some(status_code) = error.status() {
+                                    response_status_code = Some(status_code.to_string());
+                                } else {
+                                    response_status_code = None;
+                                }
+
+                                let result_body = ResponseContent::Body(error.to_string());
+
+
+                                RequestResponse {
+                                    duration: None,
+                                    status_code: response_status_code,
+                                    content: Some(result_body),
+                                    cookies: None,
+                                    headers: vec![],
+                                }
+                            }
                         }
                     }
                 };

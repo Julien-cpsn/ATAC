@@ -281,6 +281,7 @@ impl AppState {
                     NextView(EventKeyBinding::new(vec![key_bindings.request_selected.next_view], "Next view", None)),
 
                     SendRequest(EventKeyBinding::new(vec![key_bindings.request_selected.send_request, key_bindings.request_selected.alt_send_request], "Send request", Some("Send"))),
+                    CancelRequest(EventKeyBinding::new(vec![key_bindings.request_selected.cancel_request], "Cancel request", Some("Cancel"))),
 
                     NextEnvironment(EventKeyBinding::new(vec![key_bindings.main_menu.next_environment], "Next environment", None)),
                     DisplayCookies(EventKeyBinding::new(vec![key_bindings.main_menu.display_cookies], "Display cookies", None)),

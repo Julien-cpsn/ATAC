@@ -97,6 +97,7 @@ nest! {
             pub next_view: KeyCombination,
 
             pub send_request: KeyCombination,
+            pub cancel_request: KeyCombination,
             pub alt_send_request: KeyCombination,
             
             pub param_tabs: #[derive(Copy, Clone, Deserialize)] pub struct ParamTabs {
@@ -221,6 +222,7 @@ impl Default for KeyBindings {
                 // https://github.com/crossterm-rs/crossterm/issues/685
                 send_request: key!(space),
                 alt_send_request: key!(ctrl-enter),
+                cancel_request: key!(ctrl-c),
 
                 param_tabs: ParamTabs {
                     change_auth_method: key!(ctrl-a),

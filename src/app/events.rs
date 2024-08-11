@@ -100,6 +100,7 @@ pub enum AppEvent {
     NextView(EventKeyBinding),
 
     SendRequest(EventKeyBinding),
+    CancelRequest(EventKeyBinding),
 
     /* Param tabs */
 
@@ -465,6 +466,7 @@ impl App<'_> {
 
                 NextView(_) => self.next_request_view(),
                 SendRequest(_) => self.send_request().await,
+                CancelRequest(_) => self.cancel_request().await,
 
                 /* Param tabs */
 
@@ -826,6 +828,7 @@ impl AppEvent {
             EditSettings(event_key_bindings) |
             NextView(event_key_bindings) |
             SendRequest(event_key_bindings) |
+            CancelRequest(event_key_bindings) |
             NextParamTab(event_key_bindings) |
             ModifyRequestAuthMethod(event_key_bindings) |
             ModifyRequestBodyContentType(event_key_bindings) |
