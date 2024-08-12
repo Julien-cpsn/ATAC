@@ -5,7 +5,8 @@ pub struct RequestSettings {
     pub use_config_proxy: bool,
     pub allow_redirects: bool,
     pub store_received_cookies: bool,
-    pub pretty_print_response_content: bool
+    pub pretty_print_response_content: bool,
+    pub accept_invalid_certs: bool,
 }
 
 impl Default for RequestSettings {
@@ -15,6 +16,7 @@ impl Default for RequestSettings {
             allow_redirects: true,
             store_received_cookies: true,
             pretty_print_response_content: true,
+            accept_invalid_certs: false,
         }
     }
 }
@@ -26,6 +28,7 @@ impl RequestSettings {
             (String::from("Allow redirects"), self.allow_redirects),
             (String::from("Store received cookies"), self.store_received_cookies),
             (String::from("Pretty print response content"), self.pretty_print_response_content),
+            (String::from("Accept invalid certs"), self.accept_invalid_certs),
         ]
     }
 
@@ -36,6 +39,8 @@ impl RequestSettings {
                 "Allow redirects" => self.allow_redirects = *setting_value,
                 "Store received cookies" => self.store_received_cookies = *setting_value,
                 "Pretty print response content" => self.pretty_print_response_content = *setting_value,
+                "Accept invalid certs" => self.accept_invalid_certs = *setting_value,
+
                 _ => {}
             }
         }

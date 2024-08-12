@@ -35,6 +35,7 @@ impl App<'_> {
             }
 
             let mut client_builder = ClientBuilder::new()
+                .danger_accept_invalid_certs(selected_request.settings.accept_invalid_certs)
                 .default_headers(HeaderMap::new())
                 .referer(false);
 
