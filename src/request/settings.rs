@@ -6,7 +6,6 @@ pub struct RequestSettings {
     pub allow_redirects: bool,
     pub store_received_cookies: bool,
     pub pretty_print_response_content: bool,
-    #[serde(default)]
     pub accept_invalid_certs: bool,
 }
 
