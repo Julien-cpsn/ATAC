@@ -176,11 +176,11 @@ impl App<'_> {
             );
 
             /* CORS */
-            
+
             if self.config.is_cors_disabled() {
                 request = request.fetch_mode_no_cors();
             }
-            
+
             /* AUTH */
 
             match &modified_request.auth {
@@ -251,7 +251,8 @@ impl App<'_> {
                     }
                 },
                 ContentType::Raw(body) | ContentType::Json(body) | ContentType::Xml(body) | ContentType::Html(body) | ContentType::Javascript(body) => {
-                    request = request.body(body.to_string());
+                    let body_with_envs = self.replace_env_keys_by_value(body);
+                    request = request.body(body_with_envs);
                 }
             };
 
