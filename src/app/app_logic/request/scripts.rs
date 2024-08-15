@@ -1,10 +1,12 @@
-use boa_engine::{Context, Source};
+use boa_engine::{Context, JsString, NativeFunction, Source};
 use indexmap::IndexMap;
 use tui_textarea::TextArea;
 
 use crate::app::app::App;
 use crate::request::request::Request;
 use crate::request::response::RequestResponse;
+
+use super::script_support::generate_signed_jwt;
 
 impl App<'_> {
     pub fn refresh_pre_request_script_textarea(&mut self, text: &str) {
@@ -88,6 +90,7 @@ function pretty_print(data) {
 pub(super) fn execute_pre_request_script(user_script: &String, request: &Request, env: Option<IndexMap<String, String>>) -> (Option<Request>, Option<IndexMap<String, String>>, String) {
     // Instantiate the execution context
     let mut context = Context::default();
+    context.register_global_callable(JsString::from("generate_signed_jwt"), 0, NativeFunction::from_fn_ptr(generate_signed_jwt)).unwrap();
 
     let request_json = serde_json::to_string(request).unwrap();
     let env_json = match &env {
@@ -131,6 +134,7 @@ pub(super) fn execute_pre_request_script(user_script: &String, request: &Request
 pub(super) fn execute_post_request_script(user_script: &String, response: &RequestResponse, env: Option<IndexMap<String, String>>) -> (Option<RequestResponse>, Option<IndexMap<String, String>>, String) {
     // Instantiate the execution context
     let mut context = Context::default();
+    context.register_global_callable(JsString::from("generate_signed_jwt"), 0, NativeFunction::from_fn_ptr(generate_signed_jwt)).unwrap();
 
     let response_json = serde_json::to_string(response).unwrap();
     let env_json = match &env {
@@ -168,7 +172,7 @@ pub(super) fn execute_post_request_script(user_script: &String, response: &Reque
             // Avoid loosing those fields since they are not serialized
             response_result.duration = response.duration.clone();
             response_result.status_code = response.status_code.clone();
-            
+
             (Some(response_result), result_env_values, console_output)
         },
         Err(error) => (None, env, error.to_string())

@@ -208,7 +208,7 @@ impl App<'_> {
                     for form_data in form_data {
                         let key = self.replace_env_keys_by_value(&form_data.data.0);
                         let value = self.replace_env_keys_by_value(&form_data.data.1);
-
+                        println!("{:?}", value);
                         // If the value starts with !!, then it is supposed to be a file
                         if value.starts_with("!!") {
                             let path = PathBuf::from(&value[2..]);
@@ -275,7 +275,6 @@ impl App<'_> {
             let local_highlighted_console_output = Arc::clone(&self.syntax_highlighting.highlighted_console_output);
 
             /* SEND REQUEST */
-
             task::spawn(async move {
                 local_selected_request.write().is_pending = true;
 

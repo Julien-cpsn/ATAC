@@ -36,7 +36,7 @@ serde_json = "1.0.118"
 serde_yaml = "0.9.34"
 jsonxf = "1.1.1"
 toml = "0.8.14"
-boa_engine = { version = "0.18.0", default-features = false }
+boa_engine = { version = "0.19.0", default-features = false }
 parse_postman_collection = "0.2.3"
 curl-parser = { version = "0.3.1", default-features = false }
 clap = { version = "4.5.8", features = ["derive", "color", "suggestions"] }
@@ -52,3 +52,4 @@ snailquote = "0.3.1"
 indexmap = { version = "2.2.6", features = ["serde"] }
 base64 = "0.22.1"
 regex = "1.10.5"
+jsonwebtoken = "9.3.0"
