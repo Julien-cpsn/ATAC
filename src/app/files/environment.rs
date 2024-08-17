@@ -9,6 +9,7 @@ use indexmap::IndexMap;
 use parking_lot::RwLock;
 use snailquote::unescape;
 use tracing::{info, trace, warn};
+use rayon::prelude::*;
 
 use crate::app::app::App;
 use crate::cli::args::ARGS;
@@ -37,7 +38,7 @@ impl App<'_> {
 
         trace!("Environment file parsed!");
     }
-    
+
     pub fn save_environment_to_file(&mut self, env_index: usize) {
         let environment = self.environments[env_index].read();
 
@@ -72,7 +73,7 @@ fn parse_line(entry: &[u8]) -> Option<(String, String)> {
 
         let vline = line.as_bytes();
 
-        vline.iter().position(|&x| x == b'=').and_then(|pos| {
+        vline.par_iter().position_first(|&x| x == b'=').and_then(|pos| {
             from_utf8(&vline[..pos]).ok().and_then(|x| {
                 from_utf8(&vline[pos+1..]).ok().and_then(|right| {
                     // The right hand side value can be a quoted string
@@ -105,6 +106,7 @@ pub fn save_environment_to_file(environment: &Environment) {
 
     let mut data: String = environment.values
         .iter()
+        .par_bridge()
         .map(|(key, value)| format!("{key}={value}\n"))
         .collect();
     
@@ -115,6 +117,6 @@ pub fn save_environment_to_file(environment: &Environment) {
     temp_file.flush().unwrap();
 
     fs::rename(temp_file_path, &environment.path).expect("Could not move temp file to environment file");
-    
+
     trace!("Environment saved")
 }

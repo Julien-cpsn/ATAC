@@ -1,5 +1,7 @@
 use arboard::{Clipboard, ImageData};
 use image::EncodableLayout;
+use parking_lot::RwLock;
+use rayon::prelude::*;
 
 use crate::app::app::App;
 use crate::models::response::ResponseContent;
@@ -43,7 +45,7 @@ impl App<'_> {
             }
             RequestResultTabs::Headers => {
                 let headers_string: String = selected_request.response.headers
-                    .iter()
+                    .par_iter()
                     .map(|(header, value)| format!("{}: {}\n", header, value))
                     .collect();
 

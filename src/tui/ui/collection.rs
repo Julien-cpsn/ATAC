@@ -3,12 +3,14 @@ use ratatui::layout::Rect;
 use ratatui::prelude::{Modifier, Style};
 use ratatui::widgets::{Block, Borders};
 use tui_tree_widget::{Tree, TreeItem};
+use rayon::prelude::*;
+
 use crate::app::app::App;
 
 impl<'a> App<'a> {
     pub(super) fn render_collections(&mut self, frame: &mut Frame, rect: Rect) {
         let items: Vec<TreeItem<'a, usize>> = self.collections
-            .iter()
+            .par_iter()
             .enumerate()
             .map(|(collection_index, request)| {
                 request.to_tree_item(collection_index)

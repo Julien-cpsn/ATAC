@@ -2,6 +2,8 @@ use anyhow::anyhow;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use strum::Display;
+use rayon::prelude::*;
+
 use crate::app::business_logic::request::body::FormError::NotAForm;
 use crate::models::body::ContentType::{File, Form, Html, Javascript, Json, Multipart, NoBody, Raw, Xml};
 use crate::models::request::KeyValue;
@@ -12,28 +14,28 @@ pub enum ContentType {
     #[default]
     #[strum(to_string = "No Body")]
     NoBody,
-    
+
     #[strum(to_string = "File")]
     File(String),
-    
+
     #[strum(to_string = "Multipart")]
     Multipart(Vec<KeyValue>),
-    
+
     #[strum(to_string = "Form")]
     Form(Vec<KeyValue>),
-    
+
     #[strum(to_string = "Text")]
     Raw(String),
-    
+
     #[strum(to_string = "JSON")]
     Json(String),
-    
+
     #[strum(to_string = "XML")]
     Xml(String),
-    
+
     #[strum(to_string = "HTML")]
     Html(String),
-    
+
     #[strum(to_string = "Javascript")]
     Javascript(String)
 }
@@ -95,7 +97,7 @@ pub fn next_content_type(content_type: &ContentType) -> ContentType {
 
 /// Iter through the headers and tries to catch a file format like `application/<file_format>`
 pub fn find_file_format_in_content_type(headers: &Vec<(String, String)>) -> Option<String> {
-    if let Some((_, content_type)) = headers.iter().find(|(header, _)| *header == "content-type") {
+    if let Some((_, content_type)) = headers.par_iter().find_any(|(header, _)| *header == "content-type") {
         // Regex that likely catches the file format
         let regex = Regex::new(r"\w+/(?<file_format>\w+)").unwrap();
 

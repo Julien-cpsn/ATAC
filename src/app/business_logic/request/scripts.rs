@@ -1,6 +1,7 @@
 use boa_engine::{Context, Source};
 use indexmap::IndexMap;
 use tracing::{info, trace};
+use rayon::prelude::*;
 
 use crate::app::app::App;
 use crate::models::request::Request;
@@ -18,7 +19,7 @@ impl App<'_> {
                 ScriptType::Pre => selected_request.scripts.pre_request_script = script,
                 ScriptType::Post => selected_request.scripts.post_request_script = script,
             }
-            
+
             info!("{}-request script set", script_type);
         }
 
@@ -72,7 +73,7 @@ pub fn execute_pre_request_script(user_script: &String, request: &Request, env: 
     "#);
 
     trace!("Executing pre-request script");
-    
+
     let result = match context.eval(Source::from_bytes(&script)) {
         Ok(result) => result,
         Err(error) => {

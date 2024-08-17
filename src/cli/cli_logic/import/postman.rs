@@ -3,6 +3,8 @@ use std::sync::Arc;
 
 use anyhow::anyhow;
 use parking_lot::RwLock;
+use rayon::prelude::*;
+
 use parse_postman_collection::v2_1_0::{AuthType, Body, FormParameterSrcUnion, HeaderUnion, Host, Items, Language, Mode, RequestClass, RequestUnion, Url};
 use thiserror::Error;
 
@@ -459,7 +461,8 @@ fn retrieve_request_scripts(item: &Items) -> Option<String> {
             match script.exec? {
                 Host::String(_) => {}
                 Host::StringArray(exec) => {
-                    let script: String = exec.iter()
+                    let script: String = exec
+                        .par_iter()
                         .map(|line| line.replace("pm.", "") + "\n")
                         .collect();
 

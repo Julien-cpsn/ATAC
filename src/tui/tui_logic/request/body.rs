@@ -1,6 +1,7 @@
 use reqwest::header::CONTENT_TYPE;
 use tracing::{info};
 use tui_textarea::TextArea;
+use rayon::prelude::*;
 
 use crate::app::app::App;
 use crate::models::body::{ContentType, next_content_type};
@@ -86,7 +87,7 @@ impl App<'_> {
 
     pub fn refresh_body_textarea(&mut self, text: &String) {
         let lines: Vec<String> = text
-            .lines()
+            .par_lines()
             .map(|line| line.to_string())
             .collect();
 
@@ -115,9 +116,9 @@ impl App<'_> {
                 ContentType::Html(_) => ContentType::Html(body_string.clone()),
                 ContentType::Javascript(_) => ContentType::Javascript(body_string.clone()),
             };
-            
+
             info!("Body set to \"{}\"", new_body);
-            
+
             selected_request.body = new_body;
         }
 

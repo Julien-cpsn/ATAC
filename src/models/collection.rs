@@ -5,6 +5,8 @@ use ratatui::text::{Line, Span};
 use serde::{Deserialize, Serialize};
 use strum::Display;
 use tui_tree_widget::TreeItem;
+use rayon::prelude::*;
+
 use crate::models::request::Request;
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
@@ -40,7 +42,7 @@ impl Collection {
         ]);
 
         let items: Vec<TreeItem<usize>> = self.requests
-            .iter()
+            .par_iter()
             .enumerate()
             .map(|(request_index, request)| {
                 request.read().to_tree_item(request_index)

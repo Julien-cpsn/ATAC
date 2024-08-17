@@ -227,6 +227,7 @@ dependencies = [
  "parse_postman_collection",
  "ratatui",
  "ratatui-image",
+ "rayon",
  "regex",
  "reqwest",
  "reqwest-middleware",
@@ -1689,6 +1690,7 @@ checksum = "93ead53efc7ea8ed3cfb0c79fc8023fbb782a5432b52830b6518941cebe6505c"
 dependencies = [
  "equivalent",
  "hashbrown",
+ "rayon",
  "serde",
 ]
 

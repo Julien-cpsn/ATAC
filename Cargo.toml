@@ -58,7 +58,8 @@ lazy_static = "=1.5.0"
 nestify = "=0.3.3"
 walkdir = "=2.5.0"
 snailquote = "=0.3.1"
-indexmap = { version = "=2.4.0", features = ["serde"] }
+indexmap = { version = "=2.4.0", features = ["serde", "rayon"] }
+rayon = "=1.10.0"
 thiserror = "=1.0.63"
 anyhow = "=1.0.86"
 clap-verbosity-flag = "=2.2.1"

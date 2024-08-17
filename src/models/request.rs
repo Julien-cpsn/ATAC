@@ -4,6 +4,7 @@ use ratatui::style::Stylize;
 use serde::{Deserialize, Serialize};
 use tracing::trace;
 use tui_tree_widget::TreeItem;
+use rayon::prelude::*;
 
 use crate::app::app::App;
 use crate::models::auth::Auth;
@@ -41,7 +42,7 @@ pub struct KeyValue {
 impl App<'_> {
     pub fn key_value_vec_to_tuple_vec(&self, key_value: &Vec<KeyValue>) -> Vec<(String, String)> {
         key_value
-            .iter()
+            .par_iter()
             .filter_map(|param| {
                 if param.enabled {
                     let key = self.replace_env_keys_by_value(&param.data.0);
@@ -141,7 +142,9 @@ impl Request {
 
     pub fn find_and_delete_header(&mut self, input_header: &str) {
         trace!("Trying to find and delete header \"{}\"", input_header);
-        let index = self.headers.iter().position(|header| header.data.0 == input_header);
+        let index = self.header
+            .par_iter()
+            .position_any(|header| header.data.0 == input_header);
 
         match index {
             None => {
