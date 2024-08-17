@@ -1,9 +1,10 @@
 use std::sync::Arc;
 use anyhow::anyhow;
+use chrono::Utc;
 use parking_lot::RwLock;
 use thiserror::Error;
 use tracing::{info, trace};
-
+use uuid::Uuid;
 use crate::app::app::App;
 use crate::app::business_logic::environment::EnvironmentError::{EnvironmentNotFound, KeyAlreadyExists, KeyNotFound};
 use crate::models::environment::Environment;
@@ -164,6 +165,12 @@ impl App<'_> {
             }
         }
 
+        tmp_string = tmp_string
+            .replace("{{NOW}}", &Utc::now().to_string())
+            .replace("{{TIMESTAMP}}", &Utc::now().timestamp().to_string())
+            .replace("{{UUIDv4}}", &Uuid::new_v4().to_string())
+            .replace("{{UUIDv7}}", &Uuid::now_v7().to_string());
+        
         return tmp_string;
     }
 }

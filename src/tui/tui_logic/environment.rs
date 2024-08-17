@@ -1,8 +1,3 @@
-use chrono::Utc;
-use parking_lot::RwLock;
-use uuid::Uuid;
-use std::sync::Arc;
-
 use ratatui::style::Stylize;
 use ratatui::text::{Line, Span};
 use regex::Regex;
