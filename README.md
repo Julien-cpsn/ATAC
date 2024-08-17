@@ -54,7 +54,7 @@ The philosophy of ATAC is to be free, account-less, and offline for now and fore
 ### Install with cargo
 
 > [!IMPORTANT]
-> First, make sure your rust version is at least 1.78
+> First, make sure your rust version is at least 1.79
 
 Simply use:
 ```shell
@@ -116,7 +116,7 @@ The binaries from the latest release can be found [here](https://github.com/Juli
 ### Compile by yourself
 
 > [!IMPORTANT]
-> First, make sure your rust version is at least 1.76
+> First, make sure your rust version is at least 1.79
 
 Simply clone the repository and use:
 
@@ -206,6 +206,7 @@ cargo run -- -h
   - Auto-completion on env file variables
   - Handle "home" and "end" keys in the body editor (https://github.com/Julien-cpsn/ATAC/issues/93)
   - Manage multipart Content-type header (auto-generated for now) https://github.com/seanmonstar/reqwest/issues/2259
+  - Go from syntect to tree-siter (because syntect causes a little memory leak)
 
 - **To fix**
   - Query parameters bug
@@ -226,8 +227,9 @@ cargo run -- -h
 
 ## Documentation
 
-> [!NOTE]
-> Documentation will soon be published in the wiki section
+Here is the documentation: https://atac.julien-cpsn.com/
+
+If you think something is missing, please contribute!
 
 ## Others
 
