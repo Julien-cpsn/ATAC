@@ -194,9 +194,7 @@ cargo run -- -h
 ### TODO v1.0.0
 
 - **To add**
-  - Create a repo wiki
   - Document the whole code
-  - Reserved env variables like {{AUTO_TIMESTAMP}} or {{AUTO_UUID}} (https://github.com/Julien-cpsn/ATAC/issues/81)
   - Cancel pending request
   - Error notification in TUI
   - Request body syntax highlighting
@@ -206,6 +204,7 @@ cargo run -- -h
 - **To improve**
   - Editing cookies
   - Auto-completion on env file variables
+  - Handle "home" and "end" keys in the body editor (https://github.com/Julien-cpsn/ATAC/issues/93)
   - Manage multipart Content-type header (auto-generated for now) https://github.com/seanmonstar/reqwest/issues/2259
 
 - **To fix**
