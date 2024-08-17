@@ -19,8 +19,8 @@ use crate::models::settings::RequestSettings;
 
 #[derive(Error, Debug)]
 pub enum ImportPostmanError {
-    #[error("Could not parse Postman collection\n\t{0}")]
-    CouldNotParseCollection(String),
+    #[error("Could not parse Postman collection \"{0}\"\n\t{1}")]
+    CouldNotParseCollection(String, String),
     #[error("Collection \"{0}\" already exists")]
     CollectionAlreadyExists(String),
     #[error("Unknown method \"{0}\"")]
@@ -37,7 +37,7 @@ impl App<'_> {
         let mut postman_collection = match parse_postman_collection::from_path(path_buf) {
             Ok(postman_collection) => postman_collection,
             Err(e) => {
-                return Err(anyhow!(CouldNotParseCollection(e.to_string())));
+                return Err(anyhow!(CouldNotParseCollection(path_buf.display().to_string(), e.to_string())));
             }
         };
 

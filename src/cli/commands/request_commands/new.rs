@@ -53,7 +53,10 @@ pub struct NewRequestCommand {
 
     /// Do not pretty print response content
     #[arg(long, default_value_t = false, display_order = 20)]
-    pub no_pretty: bool
+    pub no_pretty: bool,
+
+    #[arg(long, default_value_t = false, display_order = 21)]
+    pub accept_invalid_certs: bool
 }
 
 #[derive(clap::Args, Debug, Clone)]

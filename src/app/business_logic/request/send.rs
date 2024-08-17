@@ -132,6 +132,12 @@ impl App<'_> {
             }
         };
 
+        /* INVALID CERTS */
+        
+        if request.settings.accept_invalid_certs {
+            client_builder = client_builder.danger_accept_invalid_certs(true);
+        }
+        
         /* CLIENT */
 
         let untraced_client = client_builder.build().expect("Could not build HTTP client");

@@ -30,11 +30,11 @@ impl App<'_> {
         let mut collection: Collection = match file_format {
             Json => match serde_json::from_str(&file_content) {
                 Ok(collection) => collection,
-                Err(e) => panic_error(format!("Could not parse JSON collection\n\t{e}"))
+                Err(e) => panic_error(format!("Could not parse JSON collection \"{}\"\n\t{}", path_buf.display(), e.to_string()))
             },
             Yaml => match serde_yaml::from_str(&file_content) {
                 Ok(collection) => collection,
-                Err(e) => panic_error(format!("Could not parse YAML collection\n\t{e}"))
+                Err(e) => panic_error(format!("Could not parse YAML collection \"{}\"\n\t{}", path_buf.display(), e))
             }
         };
 

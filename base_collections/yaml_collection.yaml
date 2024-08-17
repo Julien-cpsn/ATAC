@@ -35,3 +35,4 @@ requests:
     allow_redirects: true
     store_received_cookies: true
     pretty_print_response_content: true
+    accept_invalid_certs: false
