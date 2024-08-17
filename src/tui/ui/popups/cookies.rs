@@ -18,7 +18,7 @@ impl App<'_> {
             .white()
             .on_dark_gray();
 
-        let area = centered_rect(120, 25, frame.size());
+        let area = centered_rect(120, 25, frame.area());
 
         frame.render_widget(Clear, area);
         frame.render_widget(popup_block, area);

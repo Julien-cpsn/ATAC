@@ -19,7 +19,7 @@ impl App<'_> {
 
         let nb_elements = self.creation_popup.choices.len() as u16;
 
-        let area = centered_rect(nb_elements * 15, 3, frame.size());
+        let area = centered_rect(nb_elements * 15, 3, frame.area());
 
         let element_percentage = 100 / nb_elements;
         let mut constraints: Vec<Constraint> = vec![];

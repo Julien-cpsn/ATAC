@@ -15,10 +15,15 @@ pub fn generate_completions(completions_command: &CompletionsCommand) -> anyhow:
         }
     };
 
+    let path = match &completions_command.output_directory {
+        None => &ARGS.directory,
+        Some(path) => path
+    };
+    
     let mut command = Args::command();
-    generate_to(shell, &mut command, "atac", &ARGS.directory)?;
+    generate_to(shell, &mut command, "atac", path)?;
 
-    println!("Completions file generated into \"{}\"", ARGS.directory.display());
+    println!("Completions file generated into \"{}\"", path.display());
 
     Ok(())
 }

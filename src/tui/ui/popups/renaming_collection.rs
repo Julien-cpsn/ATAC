@@ -1,4 +1,5 @@
 use ratatui::Frame;
+use ratatui::layout::Position;
 use ratatui::prelude::{Color, Style};
 use ratatui::widgets::{Block, Borders, Clear, Paragraph};
 
@@ -13,7 +14,7 @@ impl App<'_> {
             .style(Style::default().bg(Color::DarkGray));
 
 
-        let area = centered_rect(50, 3, frame.size());
+        let area = centered_rect(50, 3, frame.area());
         let renaming_collection_area = popup_block.inner(area);
 
         let adjusted_input_length = renaming_collection_area.width as usize;
@@ -25,9 +26,9 @@ impl App<'_> {
         frame.render_widget(popup_block, area);
         frame.render_widget(new_request_paragraph, renaming_collection_area);
 
-        frame.set_cursor(
+        frame.set_cursor_position(Position::new(
             renaming_collection_area.x + input_cursor_position as u16,
             renaming_collection_area.y
-        )
+        ));
     }
 }

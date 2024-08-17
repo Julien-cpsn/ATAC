@@ -1,7 +1,8 @@
+use anyhow::anyhow;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use strum::Display;
-
+use crate::app::business_logic::request::body::FormError::NotAForm;
 use crate::models::body::ContentType::{File, Form, Html, Javascript, Json, Multipart, NoBody, Raw, Xml};
 use crate::models::request::KeyValue;
 
@@ -11,20 +12,28 @@ pub enum ContentType {
     #[default]
     #[strum(to_string = "No Body")]
     NoBody,
+    
     #[strum(to_string = "File")]
     File(String),
+    
     #[strum(to_string = "Multipart")]
     Multipart(Vec<KeyValue>),
+    
     #[strum(to_string = "Form")]
     Form(Vec<KeyValue>),
+    
     #[strum(to_string = "Text")]
     Raw(String),
+    
     #[strum(to_string = "JSON")]
     Json(String),
+    
     #[strum(to_string = "XML")]
     Xml(String),
+    
     #[strum(to_string = "HTML")]
     Html(String),
+    
     #[strum(to_string = "Javascript")]
     Javascript(String)
 }
@@ -55,17 +64,17 @@ impl ContentType {
         }
     }
 
-    pub fn get_form(&self) -> Option<&Vec<KeyValue>> {
+    pub fn get_form(&self) -> anyhow::Result<&Vec<KeyValue>> {
         match self {
-            Multipart(form) | Form(form) => Some(form),
-            _ => None
+            Multipart(form) | Form(form) => Ok(form),
+            _ => Err(anyhow!(NotAForm))
         }
     }
 
-    pub fn get_form_mut(&mut self) -> Option<&mut Vec<KeyValue>> {
+    pub fn get_form_mut(&mut self) -> anyhow::Result<&mut Vec<KeyValue>> {
         match self {
-            Multipart(form) | Form(form) => Some(form),
-            _ => None
+            Multipart(form) | Form(form) => Ok(form),
+            _ => Err(anyhow!(NotAForm))
         }
     }
 }

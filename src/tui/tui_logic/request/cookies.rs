@@ -1,7 +1,7 @@
 use crate::app::app::App;
 
 impl App<'_> {
-    pub fn update_cookies_table_selection(&mut self) {
+    pub fn tui_update_cookies_table_selection(&mut self) {
         match self.cookies_popup.cookies_table.rows.is_empty() {
             false => {
                 self.cookies_popup.cookies_table.selection = Some((0, 0));
@@ -20,7 +20,7 @@ impl App<'_> {
         }
     }
 
-    pub fn delete_cookie(&mut self) {
+    pub fn tui_delete_cookie(&mut self) {
         if self.cookies_popup.cookies_table.rows.is_empty() || self.cookies_popup.cookies_table.selection.is_none() {
             return;
         }
@@ -38,6 +38,6 @@ impl App<'_> {
             );
         }
 
-        self.update_cookies_table_selection();
+        self.tui_update_cookies_table_selection();
     }
 }

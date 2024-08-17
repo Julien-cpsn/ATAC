@@ -1,7 +1,7 @@
 use crate::app::app::App;
 
 impl App<'_> {
-    pub fn modify_request_settings(&mut self) {
+    pub fn tui_modify_request_settings(&mut self) {
         let selected_request_index = &self.collections_tree.selected.unwrap();
         let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
 

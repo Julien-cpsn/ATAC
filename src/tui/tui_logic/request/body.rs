@@ -1,4 +1,5 @@
 use reqwest::header::CONTENT_TYPE;
+use tracing::{info};
 use tui_textarea::TextArea;
 
 use crate::app::app::App;
@@ -6,12 +7,12 @@ use crate::models::body::{ContentType, next_content_type};
 
 impl App<'_> {
     /// Reset selection if body form data is provided, either set it to none
-    pub fn update_body_table_selection(&mut self) {
+    pub fn tui_update_body_table_selection(&mut self) {
         let local_selected_request = self.get_selected_request_as_local();
         let selected_request = local_selected_request.read();
 
         {
-            if let Some(form) = selected_request.body.get_form() {
+            if let Ok(form) = selected_request.body.get_form() {
                 match form.is_empty() {
                     false => {
                         self.body_form_table.selection = Some((0, 0));
@@ -34,7 +35,7 @@ impl App<'_> {
         let selection = self.body_form_table.selection.unwrap();
         let input_text = self.body_form_table.selection_text_input.text.clone();
 
-        if let Err(_) = self.modify_request_form_data(input_text, selection.1, selection.0, selected_request_index.0, selected_request_index.1) {
+        if let Err(_) = self.modify_request_form_data(selected_request_index.0, selected_request_index.1, input_text, selection.1, selection.0) {
             return;
         }
 
@@ -44,11 +45,11 @@ impl App<'_> {
     pub fn tui_create_new_form_data(&mut self) {
         let selected_request_index = &self.collections_tree.selected.unwrap();
 
-        if let Err(_) = self.create_new_form_data(String::from("key"), String::from("value"), selected_request_index.0, selected_request_index.1) {
+        if let Err(_) = self.create_new_form_data(selected_request_index.0, selected_request_index.1, String::from("key"), String::from("value")) {
             return;
         }
 
-        self.update_body_table_selection();
+        self.tui_update_body_table_selection();
         self.update_inputs();
     }
 
@@ -64,7 +65,7 @@ impl App<'_> {
             return;
         }
 
-        self.update_body_table_selection();
+        self.tui_update_body_table_selection();
         self.update_inputs();
     }
 
@@ -76,7 +77,7 @@ impl App<'_> {
         let selection = self.body_form_table.selection.unwrap();
         let selected_request_index = &self.collections_tree.selected.unwrap();
 
-        if let Err(_) = self.toggle_form_data(selection.0, selected_request_index.0, selected_request_index.1) {
+        if let Err(_) = self.toggle_form_data(selected_request_index.0, selected_request_index.1, None, selection.0) {
             return;
         }
 
@@ -114,7 +115,9 @@ impl App<'_> {
                 ContentType::Html(_) => ContentType::Html(body_string.clone()),
                 ContentType::Javascript(_) => ContentType::Javascript(body_string.clone()),
             };
-
+            
+            info!("Body set to \"{}\"", new_body);
+            
             selected_request.body = new_body;
         }
 
@@ -129,7 +132,11 @@ impl App<'_> {
         {
             let mut selected_request = local_selected_request.write();
 
-            selected_request.body = next_content_type(&selected_request.body);
+            let new_content_type = next_content_type(&selected_request.body);
+
+            info!("Body content-type set to \"{}\"", new_content_type);
+
+            selected_request.body = new_content_type;
 
             match &selected_request.body {
                 // Removes Content-Type header if there is no more body
@@ -147,7 +154,7 @@ impl App<'_> {
         }
 
         self.save_collection_to_file(selected_request_index.0);
-        self.update_body_table_selection();
-        self.load_request_body_param_tab();
+        self.tui_update_body_table_selection();
+        self.tui_load_request_body_param_tab();
     }
 }

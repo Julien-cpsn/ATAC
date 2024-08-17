@@ -52,7 +52,7 @@ pub enum CollectionSubcommand {
         new_collection_name: String
     },
     
-    /// Send a request
+    /// Send all the collection's requests
     Send {
         /// e.g. my_collection, "my collection"
         collection_name: String,

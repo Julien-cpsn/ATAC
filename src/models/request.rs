@@ -2,6 +2,7 @@ use lazy_static::lazy_static;
 use ratatui::prelude::{Line, Modifier, Span};
 use ratatui::style::Stylize;
 use serde::{Deserialize, Serialize};
+use tracing::trace;
 use tui_tree_widget::TreeItem;
 
 use crate::app::app::App;
@@ -139,27 +140,37 @@ impl Request {
     }
 
     pub fn find_and_delete_header(&mut self, input_header: &str) {
+        trace!("Trying to find and delete header \"{}\"", input_header);
         let index = self.headers.iter().position(|header| header.data.0 == input_header);
 
         match index {
-            None => {}
+            None => {
+                trace!("Not found")
+            }
             Some(index) => {
+                trace!("Found, deleting");
                 self.headers.remove(index);
             }
         }
     }
 
     pub fn modify_or_create_header(&mut self, input_header: &str, value: &str) {
+        trace!("Trying to modify or create header \"{}\"", input_header);
+
         let mut was_header_found = false;
 
         for header in &mut self.headers {
             if header.data.0.to_lowercase() == input_header.to_lowercase() {
+                trace!("Found, modifying");
+
                 header.data.1 = value.to_string();
                 was_header_found = true;
             }
         }
 
         if !was_header_found {
+            trace!("Not found, creating");
+
             self.headers.push(KeyValue {
                 enabled: true,
                 data: (input_header.to_string(), value.to_string()),

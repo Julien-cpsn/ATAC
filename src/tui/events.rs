@@ -2,6 +2,7 @@ use crokey::KeyCombination;
 use crokey::OneToThree::One;
 use ratatui::crossterm::event;
 use ratatui::crossterm::event::{Event, KeyCode, KeyEventKind};
+use tracing::{debug};
 use tui_textarea::CursorMove;
 
 use crate::app::app::App;
@@ -302,13 +303,11 @@ impl App<'_> {
                     return;
                 }
 
-                let previous_app_state = self.state;
                 let key = KeyCombination::from(key_event);
-
                 let is_input_missed = self.handle_key(key).await;
 
                 if !is_input_missed {
-                    self.write_to_log_file(key.to_string(), previous_app_state.to_string());
+                    debug!("Key pressed: {}", key);
                 }
             }
         }
@@ -376,10 +375,10 @@ impl App<'_> {
                 DeleteElement(_) => self.delete_element(),
                 RenameElement(_) => self.rename_element(),
 
-                MoveRequestUp(_) => self.move_request_up(),
-                MoveRequestDown(_) => self.move_request_down(),
+                MoveRequestUp(_) => self.tui_move_request_up(),
+                MoveRequestDown(_) => self.tui_move_request_down(),
 
-                NextEnvironment(_) => self.next_environment(),
+                NextEnvironment(_) => self.tui_next_environment(),
                 DisplayCookies(_) => self.display_cookies_state(),
 
                 GoBackToMainMenu(_) => self.normal_state(),
@@ -391,7 +390,7 @@ impl App<'_> {
                 CookiesMoveLeft(_) => self.cookies_popup.cookies_table.left(),
                 CookiesMoveRight(_) => self.cookies_popup.cookies_table.right(),
 
-                DeleteCookie(_) => self.delete_cookie(),
+                DeleteCookie(_) => self.tui_delete_cookie(),
 
                 /* Collections */
 
@@ -468,7 +467,7 @@ impl App<'_> {
 
                 /* Param tabs */
 
-                NextParamTab(_) => self.next_request_param_tab(),
+                NextParamTab(_) => self.tui_next_request_param_tab(),
 
                 ModifyRequestAuthMethod(_) => self.tui_next_request_auth(),
                 ModifyRequestBodyContentType(_) => self.tui_modify_request_content_type(),
@@ -485,7 +484,7 @@ impl App<'_> {
                 ToggleRequestQueryParam(_) => self.tui_toggle_query_param(),
 
                 EditRequestAuth(_) => match self.auth_text_input_selection.usable {
-                    true => self.select_request_auth_input_text(),
+                    true => self.tui_select_request_auth_input_text(),
                     false => {}
                 },
                 RequestAuthMoveUp(_) => match self.auth_text_input_selection.usable {
@@ -526,7 +525,7 @@ impl App<'_> {
 
                 /* Result tabs */
 
-                NextResultTab(_) => self.next_request_result_tab(),
+                NextResultTab(_) => self.tui_next_request_result_tab(),
 
                 ScrollResultUp(_) => self.result_vertical_scrollbar.page_up(),
                 ScrollResultDown(_) => self.result_vertical_scrollbar.page_down(),
@@ -751,7 +750,7 @@ impl App<'_> {
                 RequestSettingsMoveUp(_) => self.request_settings_popup.previous(),
                 RequestSettingsMoveDown(_) => self.request_settings_popup.next(),
                 RequestSettingsToggleSetting(_) => self.request_settings_popup.toggle_setting(),
-                ModifyRequestSettings(_) => self.modify_request_settings(),
+                ModifyRequestSettings(_) => self.tui_modify_request_settings(),
 
                 /* Others */
 

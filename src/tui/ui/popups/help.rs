@@ -1,5 +1,5 @@
 use ratatui::Frame;
-use ratatui::layout::{Constraint, Layout};
+use ratatui::layout::{Constraint, Layout, Position};
 use ratatui::layout::Direction::{Horizontal, Vertical};
 use ratatui::prelude::Line;
 use ratatui::style::Color::{DarkGray, Gray};
@@ -26,9 +26,9 @@ impl App<'_> {
             .white()
             .bg(*DARK_BLACK);
 
-        let area = centered_rect(110, 26, frame.size());
+        let area = centered_rect(110, 26, frame.area());
 
-        frame.set_cursor(0, 0);
+        frame.set_cursor_position(Position::new(0, 0));
         frame.render_widget(Clear, area);
         frame.render_widget(popup_block, area);
 

@@ -20,6 +20,7 @@ nest! {
 #[derive(clap::Args, Debug, Clone)]
 pub struct PostmanImport {
     /// Path to the file to import
+    #[clap(value_hint = clap::ValueHint::FilePath)]
     pub import_path: PathBuf,
 
     /// Max depth at which import should stop creating nested collections and only get the deeper requests
@@ -29,7 +30,8 @@ pub struct PostmanImport {
 
 #[derive(clap::Args, Debug, Clone)]
 pub struct CurlImport {
-    /// Path to the file to import
+    /// Path to the file/folder to import
+    #[clap(value_hint = clap::ValueHint::AnyPath)]
     pub import_path: PathBuf,
 
     /// Collection name to save the request to

@@ -49,7 +49,7 @@ impl App<'_> {
                     },
                     RequestParamsTabs::Auth => match request.auth {
                         NoAuth => tab.to_string(),
-                        BasicAuth(_, _) | BearerToken(_) => format!("{} ({})", tab.to_string(), request.auth.to_string())
+                        BasicAuth { .. } | BearerToken { .. } => format!("{} ({})", tab.to_string(), request.auth.to_string())
                     },
                     RequestParamsTabs::Headers => match request.headers.is_empty() {
                         true => tab.to_string(),
@@ -108,10 +108,10 @@ impl App<'_> {
 
                         frame.render_widget(auth_paragraph, request_params_layout[1]);
                     }
-                    BasicAuth(_, _) => {
+                    BasicAuth { .. } => {
                         self.render_basic_auth_tab(frame, request_params_layout[1]);
                     }
-                    BearerToken(_) => {
+                    BearerToken { .. } => {
                         self.render_bearer_token_tab(frame, request_params_layout[1]);
                     }
                 }

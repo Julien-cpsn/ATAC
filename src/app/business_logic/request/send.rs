@@ -5,11 +5,14 @@ use std::time::{Duration, Instant};
 use parking_lot::RwLock;
 
 use ratatui::prelude::Line;
-use reqwest::{ClientBuilder, Proxy, RequestBuilder, Url};
+use reqwest::{ClientBuilder, Proxy, Url};
 use reqwest::header::{CONTENT_TYPE, HeaderMap};
 use reqwest::multipart::Part;
 use reqwest::redirect::Policy;
+use reqwest_tracing::{TracingMiddleware, OtelName, DisableOtelPropagation};
+use reqwest_middleware::Extension;
 use thiserror::Error;
+use tracing::{info, trace};
 
 use crate::app::app::App;
 use crate::app::business_logic::request::scripts::{execute_post_request_script, execute_pre_request_script};
@@ -35,7 +38,11 @@ pub enum PrepareRequestError {
 }
 
 impl App<'_> {
-    pub async fn prepare_request(&self, request: &Request) -> Result<(RequestBuilder, String), PrepareRequestError> {
+    pub async fn prepare_request(&self, request: &Request) -> Result<(reqwest_middleware::RequestBuilder, String), PrepareRequestError> {
+        trace!("Preparing request");
+        
+        let env = self.get_selected_env_as_local();
+
         let mut client_builder = ClientBuilder::new()
             .default_headers(HeaderMap::new())
             .referer(false);
@@ -93,9 +100,8 @@ impl App<'_> {
                 (request.clone(), String::new())
             },
             Some(pre_request_script) => {
-                let local_env = self.get_selected_env_as_local();
 
-                let env_values = match &local_env {
+                let env_values = match &env {
                     None => None,
                     Some(local_env) => {
                         let env = local_env.read();
@@ -105,7 +111,7 @@ impl App<'_> {
 
                 let (result_request, env_variables, console_output) = execute_pre_request_script(pre_request_script, &request, env_values);
 
-                match &local_env {
+                match &env {
                     None => {},
                     Some(local_env) => match env_variables {
                         None => {},
@@ -128,7 +134,12 @@ impl App<'_> {
 
         /* CLIENT */
 
-        let client = client_builder.build().expect("Could not build HTTP client");
+        let untraced_client = client_builder.build().expect("Could not build HTTP client");
+        let client = reqwest_middleware::ClientBuilder::new(untraced_client)
+            .with(TracingMiddleware::default())
+            .with_init(Extension(OtelName(modified_request.name.into())))
+            .with_init(Extension(DisableOtelPropagation))
+            .build();
 
         /* PARAMS */
 
@@ -162,13 +173,13 @@ impl App<'_> {
 
         match &modified_request.auth {
             NoAuth => {}
-            BasicAuth(username, password) => {
+            BasicAuth { username, password} => {
                 let username = self.replace_env_keys_by_value(&username);
                 let password = self.replace_env_keys_by_value(&password);
 
                 request_builder = request_builder.basic_auth(username, Some(password));
             }
-            BearerToken(bearer_token) => {
+            BearerToken { token: bearer_token } => {
                 let bearer_token = self.replace_env_keys_by_value(&bearer_token);
 
                 request_builder = request_builder.bearer_auth(bearer_token);
@@ -226,7 +237,8 @@ impl App<'_> {
                 }
             },
             Raw(body) | Json(body) | Xml(body) | Html(body) | Javascript(body) => {
-                request_builder = request_builder.body(body.to_string());
+                let body_with_env_values = self.replace_env_keys_by_value(body);
+                request_builder = request_builder.body(body_with_env_values);
             }
         };
 
@@ -243,7 +255,9 @@ impl App<'_> {
             request_builder = request_builder.header(header_name, header_value);
         }
 
-        return Ok((request_builder, console_output));
+        trace!("Request prepared");
+
+        Ok((request_builder, console_output))
     }
 }
 
@@ -253,7 +267,9 @@ pub enum RequestResponseError {
     PostRequestScript,
 }
 
-pub async fn send_request(prepared_request: RequestBuilder, local_request: Arc<RwLock<Request>>, env: &Option<Arc<RwLock<Environment>>>) -> Result<(RequestResponse, String, Option<Vec<Line<'static>>>), RequestResponseError> {
+pub async fn send_request(prepared_request: reqwest_middleware::RequestBuilder, local_request: Arc<RwLock<Request>>, env: &Option<Arc<RwLock<Environment>>>) -> Result<(RequestResponse, String, Option<Vec<Line<'static>>>), RequestResponseError> {
+    info!("Sending request");
+
     local_request.write().is_pending = true;
 
     let request = local_request.read();
@@ -357,6 +373,8 @@ pub async fn send_request(prepared_request: RequestBuilder, local_request: Arc<R
 
     response.duration = Some(format!("{:?}", elapsed_time));
 
+    trace!("Request sent");
+
     /* POST-REQUEST SCRIPT */
 
     let (modified_response, console_output): (RequestResponse, String) = match &request.scripts.post_request_script {
@@ -399,7 +417,7 @@ pub async fn send_request(prepared_request: RequestBuilder, local_request: Arc<R
     drop(request);
 
     local_request.write().is_pending = false;
-
+    
     return Ok((modified_response, console_output, highlighted_result_body));
 }
 

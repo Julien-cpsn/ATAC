@@ -1,5 +1,5 @@
 use ratatui::Frame;
-use ratatui::layout::{Alignment, Constraint, Layout, Rect};
+use ratatui::layout::{Alignment, Constraint, Layout, Position, Rect};
 use ratatui::layout::Direction::{Horizontal, Vertical};
 use ratatui::prelude::Color::White;
 use ratatui::style::Stylize;
@@ -71,7 +71,7 @@ impl App<'_> {
         let adjusted_input_length = request_header_layout[1].width as usize - 4;
         let (padded_text, input_cursor_position) = self.url_text_input.get_padded_text_and_cursor(adjusted_input_length);
         
-        let url_line = self.add_color_to_env_keys(&padded_text);
+        let url_line = self.tui_add_color_to_env_keys(&padded_text);
         
         let url_paragraph = Paragraph::new(url_line).block(url_block);
 
@@ -79,10 +79,10 @@ impl App<'_> {
 
         match self.state {
             EditingRequestUrl => {
-                frame.set_cursor(
+                frame.set_cursor_position(Position::new(
                     request_header_layout[1].x + input_cursor_position as u16 + 2,
                     request_header_layout[1].y + 1
-                )
+                ));
             }
             _ => {}
         }

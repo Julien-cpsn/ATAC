@@ -2,7 +2,7 @@ use crate::app::app::App;
 
 impl App<'_> {
     /// Reset selection of if params are provided, either set it to none
-    pub fn update_query_params_selection(&mut self) {
+    pub fn tui_update_query_params_selection(&mut self) {
         let local_selected_request = self.get_selected_request_as_local();
         let selected_request = local_selected_request.read();
 
@@ -26,7 +26,10 @@ impl App<'_> {
 
         let selection = self.query_params_table.selection.unwrap();
 
-        self.modify_request_query_param(input_text, selection.1, selection.0, selected_request_index.0, selected_request_index.1);
+        match self.modify_request_query_param(selected_request_index.0, selected_request_index.1, input_text, selection.1, selection.0) {
+            Ok(_) => {}
+            Err(_) => return
+        }
 
         self.select_request_state();
     }
@@ -35,9 +38,12 @@ impl App<'_> {
     pub fn tui_create_new_query_param(&mut self) {
         let selected_request_index = &self.collections_tree.selected.unwrap();
 
-        self.create_new_query_param(String::from("param"), String::from("value"), selected_request_index.0, selected_request_index.1);
+        match self.create_new_query_param(selected_request_index.0, selected_request_index.1, String::from("param"), String::from("value")) {
+            Ok(_) => {}
+            Err(_) => return
+        }
 
-        self.update_query_params_selection();
+        self.tui_update_query_params_selection();
         self.update_inputs();
     }
 
@@ -49,9 +55,12 @@ impl App<'_> {
         let selection = self.query_params_table.selection.unwrap();
         let selected_request_index = &self.collections_tree.selected.unwrap();
 
-        self.delete_query_param(selection.0, selected_request_index.0, selected_request_index.1);
+        match self.delete_query_param(selection.0, selected_request_index.0, selected_request_index.1) {
+            Ok(_) => {}
+            Err(_) => return
+        }
 
-        self.update_query_params_selection();
+        self.tui_update_query_params_selection();
         self.update_inputs();
     }
 
@@ -63,7 +72,10 @@ impl App<'_> {
         let row = self.query_params_table.selection.unwrap().0;
         let selected_request_index = &self.collections_tree.selected.unwrap();
 
-        self.toggle_query_param(row, selected_request_index.0, selected_request_index.1);
+        match self.toggle_query_param(selected_request_index.0, selected_request_index.1, None, row) {
+            Ok(_) => {}
+            Err(_) => return
+        }
 
         self.update_inputs();
     }

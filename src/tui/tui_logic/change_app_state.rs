@@ -20,7 +20,7 @@ impl App<'_> {
             self.cookies_popup.cookies_table.rows.push(cookie_to_row(cookie))
         }
 
-        self.update_cookies_table_selection();
+        self.tui_update_cookies_table_selection();
         self.state = AppState::DisplayingCookies;
     }
 

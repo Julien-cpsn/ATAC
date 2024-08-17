@@ -1,70 +1,30 @@
 use boa_engine::{Context, Source};
 use indexmap::IndexMap;
-use tui_textarea::TextArea;
+use tracing::{info, trace};
 
 use crate::app::app::App;
 use crate::models::request::Request;
 use crate::models::response::RequestResponse;
+use crate::models::scripts::ScriptType;
 
 impl App<'_> {
-    pub fn refresh_pre_request_script_textarea(&mut self, text: &str) {
-        let lines: Vec<String> = text
-            .lines()
-            .map(|line| line.to_string())
-            .collect();
-
-        self.script_console.pre_request_text_area = TextArea::new(lines);
-    }
-
-    pub fn refresh_post_request_script_textarea(&mut self, text: &str) {
-        let lines: Vec<String> = text
-            .lines()
-            .map(|line| line.to_string())
-            .collect();
-
-        self.script_console.post_request_text_area = TextArea::new(lines);
-    }
-
-    pub fn modify_pre_request_script(&mut self) {
-        let selected_request_index = &self.collections_tree.selected.unwrap();
-        let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
+    pub fn modify_request_script(&mut self, collection_index: usize, request_index: usize, script_type: &ScriptType, script: Option<String>) -> anyhow::Result<()> {
+        let local_selected_request = self.get_request_as_local_from_indexes(&(collection_index, request_index));
 
         {
             let mut selected_request = local_selected_request.write();
 
-            let pre_request_script = self.script_console.pre_request_text_area.lines().join("\n");
-
-            if pre_request_script.is_empty() {
-                selected_request.scripts.pre_request_script = None;
+            match script_type {
+                ScriptType::Pre => selected_request.scripts.pre_request_script = script,
+                ScriptType::Post => selected_request.scripts.post_request_script = script,
             }
-            else {
-                selected_request.scripts.pre_request_script = Some(pre_request_script);
-            }
+            
+            info!("{}-request script set", script_type);
         }
 
-        self.save_collection_to_file(selected_request_index.0);
-        self.select_request_state();
-    }
+        self.save_collection_to_file(collection_index);
 
-    pub fn modify_post_request_script(&mut self) {
-        let selected_request_index = &self.collections_tree.selected.unwrap();
-        let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
-
-        {
-            let mut selected_request = local_selected_request.write();
-
-            let post_request_script = self.script_console.post_request_text_area.lines().join("\n");
-
-            if post_request_script.is_empty() {
-                selected_request.scripts.post_request_script = None;
-            }
-            else {
-                selected_request.scripts.post_request_script = Some(post_request_script);
-            }
-        }
-
-        self.save_collection_to_file(selected_request_index.0);
-        self.select_request_state();
+        Ok(())
     }
 }
 
@@ -85,7 +45,7 @@ function pretty_print(data) {
 }
 "#;
 
-pub(crate) fn execute_pre_request_script(user_script: &String, request: &Request, env: Option<IndexMap<String, String>>) -> (Option<Request>, Option<IndexMap<String, String>>, String) {
+pub fn execute_pre_request_script(user_script: &String, request: &Request, env: Option<IndexMap<String, String>>) -> (Option<Request>, Option<IndexMap<String, String>>, String) {
     // Instantiate the execution context
     let mut context = Context::default();
 
@@ -111,6 +71,8 @@ pub(crate) fn execute_pre_request_script(user_script: &String, request: &Request
         JSON.stringify([request, env, console_log_output])
     "#);
 
+    trace!("Executing pre-request script");
+    
     let result = match context.eval(Source::from_bytes(&script)) {
         Ok(result) => result,
         Err(error) => {
@@ -128,7 +90,7 @@ pub(crate) fn execute_pre_request_script(user_script: &String, request: &Request
     return (result_request, result_env_values, console_output);
 }
 
-pub(crate) fn execute_post_request_script(user_script: &String, response: &RequestResponse, env: Option<IndexMap<String, String>>) -> (Option<RequestResponse>, Option<IndexMap<String, String>>, String) {
+pub fn execute_post_request_script(user_script: &String, response: &RequestResponse, env: Option<IndexMap<String, String>>) -> (Option<RequestResponse>, Option<IndexMap<String, String>>, String) {
     // Instantiate the execution context
     let mut context = Context::default();
 
@@ -154,6 +116,8 @@ pub(crate) fn execute_post_request_script(user_script: &String, response: &Reque
         JSON.stringify([response, env, console_log_output])
     "#);
 
+    trace!("Executing post-request script");
+
     let result = match context.eval(Source::from_bytes(&script)) {
         Ok(result) => result,
         Err(error) => {
@@ -168,7 +132,7 @@ pub(crate) fn execute_post_request_script(user_script: &String, response: &Reque
             // Avoid loosing those fields since they are not serialized
             response_result.duration = response.duration.clone();
             response_result.status_code = response.status_code.clone();
-            
+
             (Some(response_result), result_env_values, console_output)
         },
         Err(error) => (None, env, error.to_string())

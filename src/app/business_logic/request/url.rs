@@ -1,15 +1,29 @@
+use anyhow::anyhow;
 use regex::Regex;
+use thiserror::Error;
+use tracing::{info};
+
 use crate::app::app::App;
 use crate::models::request::KeyValue;
 
+#[derive(Error, Debug)]
+pub enum UrlError {
+    #[error("The URL is empty")]
+    UrlIsEmpty,
+}
+
 impl App<'_> {
-    pub fn modify_request_url(&mut self, url: String, collection_index: usize, request_index: usize) {
+    pub fn modify_request_url(&mut self, collection_index: usize, request_index: usize, url: String) -> anyhow::Result<()> {
+        if url.trim().is_empty() {
+            return Err(anyhow!(UrlError::UrlIsEmpty));
+        }
+        
         let local_selected_request = self.get_request_as_local_from_indexes(&(collection_index, request_index));
         
         {
             let mut selected_request = local_selected_request.write();
 
-            let url_parts = url.split_once("?");
+            let url_parts = url.trim().split_once("?");
 
             let final_url: String;
             let query_params: &str;
@@ -61,9 +75,13 @@ impl App<'_> {
                 selected_request.params.push(new_param);
             }
 
+            info!("URL set to \"{}\"", &final_url);
+
             selected_request.url = final_url;
         }
-
+        
         self.save_collection_to_file(collection_index);
+        
+        Ok(())
     }
 }

@@ -1,6 +1,6 @@
 use ratatui::Frame;
 use ratatui::layout::Direction::{Horizontal, Vertical};
-use ratatui::layout::{Constraint, Layout, Rect};
+use ratatui::layout::{Constraint, Layout, Position, Rect};
 use ratatui::prelude::Color::Yellow;
 use ratatui::prelude::{Modifier, Style};
 use ratatui::style::Stylize;
@@ -59,8 +59,8 @@ impl App<'_> {
         let mut values: Vec<ListItem> = vec![];
 
         for header in request.headers.iter() {
-            let key = self.add_color_to_env_keys(&header.data.0);
-            let value = self.add_color_to_env_keys(&header.data.1);
+            let key = self.tui_add_color_to_env_keys(&header.data.0);
+            let value = self.tui_add_color_to_env_keys(&header.data.1);
 
             let mut key = ListItem::from(key);
             let mut value = ListItem::from(value);
@@ -122,10 +122,10 @@ impl App<'_> {
 
             frame.render_widget(text_input, text_rect);
 
-            frame.set_cursor(
+            frame.set_cursor_position(Position::new(
                 selection_position_x + input_cursor_position as u16,
                 selection_position_y
-            );
+            ));
         }
     }
 }

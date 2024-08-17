@@ -8,16 +8,19 @@ use std::sync::Arc;
 use indexmap::IndexMap;
 use parking_lot::RwLock;
 use snailquote::unescape;
+use tracing::{info, trace, warn};
 
 use crate::app::app::App;
 use crate::cli::args::ARGS;
-use crate::{panic_error, print_if_not_in_command};
+use crate::panic_error;
 use crate::models::environment::Environment;
 
 impl App<'_> {
     /// Add the environment file to the app environments
     pub fn add_environment_from_file(&mut self, path_buf: PathBuf) {
         let file_name = path_buf.file_name().unwrap().to_str().unwrap().to_string().replace(".env.", "");
+
+        trace!("Trying to open \"{}\" env file", path_buf.display());
 
         let env_file: File = match File::open(path_buf.clone()) {
             Ok(env_file) => env_file,
@@ -32,7 +35,13 @@ impl App<'_> {
         
         self.environments.push(Arc::new(RwLock::new(environment)));
 
-        print_if_not_in_command!("environment file parsed!");
+        trace!("Environment file parsed!");
+    }
+    
+    pub fn save_environment_to_file(&mut self, env_index: usize) {
+        let environment = self.environments[env_index].read();
+
+        save_environment_to_file(&environment);
     }
 }
 
@@ -77,8 +86,11 @@ fn parse_line(entry: &[u8]) -> Option<(String, String)> {
 /// Save app environment in a file through a temporary file
 pub fn save_environment_to_file(environment: &Environment) {
     if !ARGS.should_save {
+        warn!("Dry-run, not saving the environment");
         return;
     }
+
+    info!("Saving environment \"{}\"", environment.name);
 
     let temp_file_name = format!("{}_", environment.path.file_name().unwrap().to_str().unwrap());
 
@@ -96,10 +108,13 @@ pub fn save_environment_to_file(environment: &Environment) {
         .map(|(key, value)| format!("{key}={value}\n"))
         .collect();
     
+    // Remove trailing \n
     data.pop();
 
     temp_file.write_all(data.as_bytes()).expect("Could not write to temp file");
     temp_file.flush().unwrap();
 
     fs::rename(temp_file_path, &environment.path).expect("Could not move temp file to environment file");
+    
+    trace!("Environment saved")
 }

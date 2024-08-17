@@ -3,7 +3,7 @@ use std::path::PathBuf;
 
 use clap::{Parser, Subcommand};
 use clap::builder::Styles;
-use clap_verbosity_flag::{InfoLevel, Verbosity};
+use clap_verbosity_flag::Verbosity;
 use lazy_static::lazy_static;
 
 use crate::cli::commands::collection_commands::collection_commands::CollectionCommand;
@@ -11,80 +11,78 @@ use crate::cli::commands::completions::CompletionsCommand;
 use crate::cli::commands::import::ImportCommand;
 use crate::cli::commands::request_commands::request_commands::RequestCommand;
 use crate::app::files::utils::expand_tilde;
+use crate::cli::commands::env::EnvCommand;
+use crate::cli::commands::man::ManCommand;
+use crate::cli::commands::try_command::TryCommand;
 use crate::panic_error;
 
 #[derive(Parser, Debug)]
-#[command(version, about, long_about = None, styles = Styles::styled())]
+#[command(
+    version,
+    about,
+    long_about = r#"ATAC is Arguably a Terminal API Client.
+It is based on well-known clients such as Postman, Insomnia, or even Bruno, but inside your terminal without any specific graphical environment needed.
+The philosophy of ATAC is to be free, account-less, and offline for now and forever."#,
+    styles = Styles::styled()
+)]
 pub struct Args {
-    /// Main application directory, containing JSON collections files, the atac.toml config file and the atac.log file
-    #[arg(short, long)]
+    /// Main application directory, containing JSON/YAML collections files, the atac.toml config file and the atac.log file
+    #[arg(short, long, value_hint = clap::ValueHint::DirPath)]
     pub directory: Option<PathBuf>,
 
     #[command(subcommand)]
     pub command: Option<Command>,
 
     /// Avoid saving data to the collection and environment files
-    #[arg(global = true, long, default_value_t = false)]
+    #[arg(long, global = true, default_value_t = false, display_order = 99)]
     pub dry_run: bool,
 
+    /// Avoid using ANSI format for log file/output
+    #[arg(long, global = true, default_value_t = false)]
+    pub no_ansi_log: bool,
+    
     #[command(flatten)]
-    pub verbose: Verbosity<InfoLevel>,
+    pub verbose: Verbosity
 }
 
 /*
-* atac
-*   - collection
-*       - list (all collections)
-*       - info
-*           - "collection name"
-*       - new
-*           - "collection name"
-*       - delete
-*           - "collection name"
-*       - rename
-*           - "collection name" "new collection name"
-*       - send (all request from collection)
-*           - "collection name"
-*   - request
-*       - info
-*           - "collection/request"
-*       - new
-*           - "collection/request"
-*       - delete
-*           - "collection/request"
-*       - rename
-*           - "collection/request" "new request name"
-*       - send
-*           - "collection/request"
-*       - url
-*           - "collection/request"
-*               - get
-*               - set "new url"
-*       - method
-*           - get
-*           - set
-                - GET, POST, PUT, PATCH, DELETE, HEAD, OPTION
-*       - params
-*       - auth
-*       - headers
-*       - body
-*       - scripts
-*       - settings
-*           - "collection name/request name"
-*   - env
-*       - new
-*       - delete
-*           "env name"
-*       - key
-*           - add
-*           - set
-*           - delete
-*               "key", "value"
-*   - import
-*       - postman
-*       - curl
-*  - completions
-*       - bash, powershell, fish
+atac
+  - collection
+      - list
+      - info
+      - new
+      - delete
+      - rename
+      - send (all requests from the collection)
+  - request
+      - info
+      - new
+      - delete
+      - rename
+      - url
+      - method
+      - params
+      - auth
+      - headers
+      - body
+      - scripts
+      - send
+      - settings
+  - try
+  - env
+      - info
+      - key
+          - get
+          - add
+          - set
+          - delete
+          - rename
+  - import
+      - postman
+      - curl
+ - completions
+      - bash, powershell, fish
+ - man
 */
 
 #[derive(Subcommand, Debug, Clone)]
@@ -95,31 +93,34 @@ pub enum Command {
     /// Request commands
     Request(RequestCommand),
 
-    /// Import a collection or request from other file formats (Postman v2.1.0, cURL)
+    /// One-shot request sender
+    Try(TryCommand),
+    
+    /// Environment commands
+    Env(EnvCommand),
+
+    /// Import a collection or a request from other file formats (Postman v2.1.0, cURL)
     Import(ImportCommand),
 
     /// Create a completion file
     Completions(CompletionsCommand),
+
+    /// Generate ATAC man page
+    Man(ManCommand),
 }
 
 #[derive(Debug)]
-pub struct ParsedArgs {
+pub struct GlobalArgs {
     pub directory: PathBuf,
     pub command: Option<Command>,
-    pub should_save: bool
-}
-
-impl ParsedArgs {
-    pub fn in_command(&self) -> bool {
-        return self.command.is_some();
-    }
+    pub should_save: bool,
+    pub verbosity: Verbosity,
+    pub ansi_log: bool
 }
 
 lazy_static! {
-    pub static ref ARGS: ParsedArgs = {
+    pub static ref ARGS: GlobalArgs = {
         let args = Args::parse();
-
-        // TODO: add env log with args.verbose.log_level_filter();
         
         let directory = match args.directory {
             // If a directory was provided with a CLI argument
@@ -132,10 +133,12 @@ lazy_static! {
             }
         };
 
-        ParsedArgs {
+        GlobalArgs {
             directory,
             command: args.command,
-            should_save: !args.dry_run
+            should_save: !args.dry_run,
+            verbosity: args.verbose,
+            ansi_log: !args.no_ansi_log
         }
     };
 }

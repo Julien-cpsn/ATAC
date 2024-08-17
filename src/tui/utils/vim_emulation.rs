@@ -15,7 +15,7 @@ use crate::tui::app_states::EMPTY_KEY;
 // State of Vim emulation
 #[derive(Copy, Clone)]
 pub struct Vim {
-    pub(crate) mode: VimMode,
+    pub mode: VimMode,
     pending: KeyCombination, // Pending input to handle a sequence with two keys like gg
 }
 

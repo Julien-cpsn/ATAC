@@ -1,3 +1,4 @@
+use tracing::{info};
 use crate::app::app::App;
 use crate::models::method::next_method;
 
@@ -10,6 +11,9 @@ impl App<'_> {
             let mut selected_request = local_selected_request.write();
 
             let next_method = next_method(&selected_request.method);
+            
+            info!("Method set to \"{}\"", next_method);
+            
             selected_request.method = next_method;
         }
 

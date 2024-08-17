@@ -5,7 +5,7 @@ use regex::Regex;
 use crate::app::app::App;
 
 impl App<'_> {
-    pub fn next_environment(&mut self) {
+    pub fn tui_next_environment(&mut self) {
         if self.selected_environment + 1 < self.environments.len() {
             self.selected_environment += 1;
         }
@@ -14,7 +14,7 @@ impl App<'_> {
         }
     }
 
-    pub fn add_color_to_env_keys(&self, input: &str) -> Line {
+    pub fn tui_add_color_to_env_keys(&self, input: &str) -> Line {
         if self.environments.is_empty() || !input.contains('{') {
             return Line::raw(input.to_string());
         }

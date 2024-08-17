@@ -1,8 +1,11 @@
-use std::fs::OpenOptions;
+use std::fs::{File, OpenOptions};
+use clap_verbosity_flag::LevelFilter;
+use tracing::trace;
+use tracing_log::AsTrace;
 
 use crate::app::app::App;
 use crate::cli::args::{ARGS, Command};
-use crate::{panic_error, print_if_not_in_command};
+use crate::panic_error;
 use crate::app::startup::startup::AppMode::{CLI, TUI};
 use crate::models::collection::CollectionFileFormat;
 
@@ -14,12 +17,36 @@ pub enum AppMode<'a> {
 impl<'a> App<'a> {
     /// Method called before running the app, returns the app if the TUI should be started
     pub fn startup(&'a mut self) -> AppMode<'a> {
-        self.parse_app_directory();
+        // Logging is initialized before anything else
+        match ARGS.command.is_some() {
+            // CLI
+            true => tracing_subscriber::fmt()
+                .pretty()
+                .with_max_level(ARGS.verbosity.log_level_filter().as_trace())
+                .with_file(false)
+                .with_line_number(false)
+                .with_ansi(ARGS.ansi_log)
+                .init(),
+            // TUI
+            false => {
+                let verbosity = match ARGS.verbosity.log_level_filter() {
+                    LevelFilter::Error => LevelFilter::Debug, // Ensure that at least the debug level is always active
+                    level => level
+                };
+                
+                // Using a separate file allows to redirect the output and avoid printing to screen
+                let log_file = self.create_log_file();
+                tracing_subscriber::fmt()
+                    .with_max_level(verbosity.as_trace())
+                    .with_writer(log_file)
+                    .with_file(false)
+                    .with_line_number(false)
+                    .with_ansi(ARGS.ansi_log)
+                    .init()
+            }
+        };
 
-        // Creates the log file only if the app is allowed to save files
-        if ARGS.should_save {
-            self.create_log_file();
-        }
+        self.parse_app_directory();
 
         if let Some(command) = &ARGS.command {
             return CLI(self, command.clone());
@@ -46,7 +73,7 @@ impl<'a> App<'a> {
 
             let file_name = path.file_name().unwrap().to_str().unwrap();
 
-            print_if_not_in_command!("Checking: {}", path.display());
+            trace!("Checking file \"{}\"", path.display());
 
             if file_name.ends_with(".json") {
                 self.set_collections_from_file(path, CollectionFileFormat::Json);
@@ -61,14 +88,12 @@ impl<'a> App<'a> {
                 self.parse_config_file(path);
             }
             else if file_name == "atac.log" {
-                print_if_not_in_command!("Nothing to parse here")
+                trace!("Log file is not parsable")
             }
-
-            print_if_not_in_command!();
         }
     }
 
-    fn create_log_file(&mut self) {
+    fn create_log_file(&mut self) -> File {
         let path = ARGS.directory.join("atac.log");
 
         let log_file = match OpenOptions::new().write(true).create(true).truncate(true).open(path) {
@@ -76,6 +101,6 @@ impl<'a> App<'a> {
             Err(e) => panic_error(format!("Could not open log file\n\t{e}"))
         };
 
-        self.log_file = Some(log_file);
+        return log_file;
     }
 }

@@ -1,6 +1,6 @@
 use ratatui::Frame;
 use ratatui::layout::Direction::Vertical;
-use ratatui::layout::{Constraint, Layout, Rect};
+use ratatui::layout::{Constraint, Layout, Position, Rect};
 use ratatui::style::Stylize;
 use ratatui::widgets::{Block, Borders, Paragraph};
 
@@ -66,14 +66,14 @@ impl App<'_> {
         };
 
         if should_display_cursor {
-            frame.set_cursor(
+            frame.set_cursor_position(Position::new(
                 basic_auth_layout[input_selected].x + input_cursor_position + 1,
                 basic_auth_layout[input_selected].y + 1
-            );
+            ));
         }
 
-        let username_line = self.add_color_to_env_keys(&username_padded_text);
-        let password_line = self.add_color_to_env_keys(&password_padded_text);
+        let username_line = self.tui_add_color_to_env_keys(&username_padded_text);
+        let password_line = self.tui_add_color_to_env_keys(&password_padded_text);
 
         let username_paragraph = Paragraph::new(username_line).block(username_block);
         let password_paragraph = Paragraph::new(password_line).block(password_block);

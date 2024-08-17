@@ -1,5 +1,5 @@
 use ratatui::Frame;
-use ratatui::layout::{Constraint, Layout, Rect};
+use ratatui::layout::{Constraint, Layout, Position, Rect};
 use ratatui::layout::Direction::Vertical;
 use ratatui::style::Stylize;
 use ratatui::widgets::{Block, Borders, Paragraph};
@@ -34,13 +34,13 @@ impl App<'_> {
         let (padded_text, input_cursor_position) = self.body_file_text_input.get_padded_text_and_cursor(adjusted_input_length);
 
         if should_display_cursor {
-            frame.set_cursor(
+            frame.set_cursor_position(Position::new(
                 file_body_layout[0].x + input_cursor_position as u16 + 1,
                 file_body_layout[0].y + 1
-            );
+            ));
         }
 
-        let file_body_line = self.add_color_to_env_keys(&padded_text);
+        let file_body_line = self.tui_add_color_to_env_keys(&padded_text);
 
         let file_body_paragraph = Paragraph::new(file_body_line).block(file_body_block);
 

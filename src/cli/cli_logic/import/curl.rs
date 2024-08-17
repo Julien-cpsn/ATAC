@@ -186,15 +186,20 @@ fn parse_request(path: &PathBuf, request_name: String) -> anyhow::Result<Arc<RwL
                 .find(|(header_name, value)| header_name.as_str() == "authorization" && value.to_str().unwrap().starts_with("Bearer "));
 
             if let Some((_, bearer_token)) = bearer_token_header {
-                let bearer_token = &bearer_token.to_str().unwrap()[7..];
+                let bearer_token = bearer_token.to_str()?[7..].to_string();
 
-                Auth::BearerToken(bearer_token.to_string())
+                Auth::BearerToken { token: bearer_token }
             }
             else {
                 Auth::NoAuth
             }
         }
-        Some(capture) => Auth::BasicAuth(capture["username"].to_string(), capture["password"].to_string())
+        Some(capture) => {
+            let username = capture["username"].to_string();
+            let password = capture["password"].to_string();
+            
+            Auth::BasicAuth { username, password }
+        }
     };
 
     /* BODY */

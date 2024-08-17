@@ -35,7 +35,7 @@ impl App<'_> {
         return Err(anyhow!(RequestNotFound));
     }
 
-    pub fn find_collection_and_request(&mut self, collection_name: &str, request_name: &str) -> anyhow::Result<(usize, usize)> {
+    pub fn find_collection_slash_request(&mut self, collection_name: &str, request_name: &str) -> anyhow::Result<(usize, usize)> {
         for (collection_index, collection) in self.collections.iter().enumerate() {
             if collection.name != collection_name { 
                 continue;

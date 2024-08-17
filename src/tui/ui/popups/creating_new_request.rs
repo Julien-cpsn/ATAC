@@ -1,5 +1,5 @@
 use ratatui::Frame;
-use ratatui::layout::{Constraint, Layout};
+use ratatui::layout::{Constraint, Layout, Position};
 use ratatui::layout::Direction::Vertical;
 use ratatui::prelude::{Color, Style};
 use ratatui::widgets::{Block, Borders, Clear, Paragraph};
@@ -13,7 +13,7 @@ impl App<'_> {
             .style(Style::default().bg(Color::DarkGray));
 
 
-        let area = centered_rect(50, 6, frame.size());
+        let area = centered_rect(50, 6, frame.area());
 
         let new_request_layout = Layout::new(
             Vertical,
@@ -48,9 +48,9 @@ impl App<'_> {
         frame.render_widget(selected_collection_paragraph, new_request_layout[0]);
         frame.render_widget(new_request_name_paragraph, new_request_layout[1]);
 
-        frame.set_cursor(
+        frame.set_cursor_position(Position::new(
             new_request_layout[1].x + input_cursor_position as u16 + 1,
             new_request_layout[1].y + 1
-        )
+        ));
     }
 }

@@ -1,4 +1,3 @@
-use std::fs::File;
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -39,8 +38,6 @@ pub struct App<'a> {
     pub state: AppState,
 
     pub config: Config,
-
-    pub log_file: Option<File>,
 
     /* Help */
 
@@ -115,8 +112,6 @@ impl App<'_> {
             state: AppState::Normal,
 
             config: Config::default(),
-
-            log_file: None,
 
             /* Help */
 

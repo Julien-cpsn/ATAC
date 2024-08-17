@@ -1,4 +1,9 @@
 pub mod collection_commands;
 pub mod request_commands;
+pub mod try_command;
+pub mod env;
 pub mod import;
 pub mod completions;
+pub mod man;
+pub mod key;
+pub mod key_value;

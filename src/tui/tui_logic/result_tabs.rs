@@ -5,7 +5,7 @@ use crate::tui::ui::result_tabs::RequestResultTabs;
 use crate::models::response::ResponseContent;
 
 impl App<'_> {
-    pub fn next_request_result_tab(&mut self) {
+    pub fn tui_next_request_result_tab(&mut self) {
         self.request_result_tab = match self.request_result_tab {
             RequestResultTabs::Body => RequestResultTabs::Cookies,
             RequestResultTabs::Cookies => RequestResultTabs::Headers,
@@ -20,10 +20,10 @@ impl App<'_> {
             RequestResultTabs::Console => RequestResultTabs::Body
         };
 
-        self.refresh_result_scrollbars();
+        self.tui_refresh_result_scrollbars();
     }
 
-    pub fn refresh_result_scrollbars(&mut self) {
+    pub fn tui_refresh_result_scrollbars(&mut self) {
         // Vertical max
         let lines_count: usize;
         let horizontal_max: usize;

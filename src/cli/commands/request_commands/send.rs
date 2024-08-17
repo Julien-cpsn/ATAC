@@ -27,4 +27,8 @@ pub struct SendCommand {
     /// Show the request name
     #[arg(long, default_value_t = false)]
     pub request_name: bool,
+
+    /// Name of the environment to use, e.g. my_env (from file .env.my_env)
+    #[arg(long, value_name = "ENV_NAME", display_order = 98)]
+    pub env: Option<String>
 }

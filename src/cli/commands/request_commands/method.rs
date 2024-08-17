@@ -5,6 +5,7 @@ use crate::models::method::Method;
 pub enum MethodCommand {
     /// Print the current request method
     Get,
+    
     /// Set the request method
     Set {
         /// Method (GET, POST, PUT, PATCH, DELETE, HEAD, OPTION)

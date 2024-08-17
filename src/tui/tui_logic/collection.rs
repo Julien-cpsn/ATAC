@@ -1,6 +1,8 @@
 use crate::app::app::App;
 use crate::models::auth::Auth;
 use crate::models::body::ContentType;
+use crate::models::request::{Request, DEFAULT_HEADERS};
+use crate::models::settings::RequestSettings;
 
 impl App<'_> {
     pub fn reset_inputs(&mut self) {
@@ -41,14 +43,14 @@ impl App<'_> {
                 self.auth_text_input_selection.max_selection = 0;
                 self.auth_text_input_selection.usable = false;
             }
-            Auth::BasicAuth(username, password) => {
+            Auth::BasicAuth { username, password } => {
                 self.auth_text_input_selection.max_selection = 2;
                 self.auth_text_input_selection.usable = true;
 
                 self.auth_basic_username_text_input.enter_str(username);
                 self.auth_basic_password_text_input.enter_str(password);
             }
-            Auth::BearerToken(bearer_token) => {
+            Auth::BearerToken { token: bearer_token } => {
                 self.auth_text_input_selection.max_selection = 1;
                 self.auth_text_input_selection.usable = true;
 
@@ -109,8 +111,8 @@ impl App<'_> {
             Some(pre_request_script) => &pre_request_script
         };
         
-        self.refresh_pre_request_script_textarea(pre_request_script);
-        self.refresh_post_request_script_textarea(post_request_script);
+        self.tui_refresh_pre_request_script_textarea(pre_request_script);
+        self.tui_refresh_post_request_script_textarea(post_request_script);
     }
     
     pub fn reset_cursors(&mut self) {
@@ -127,10 +129,10 @@ impl App<'_> {
     pub fn select_request(&mut self) {
         if self.collections_tree.state.selected().len() == 2 {
             self.collections_tree.set_selected();
-            self.update_query_params_selection();
-            self.update_headers_selection();
-            self.update_body_table_selection();
-            self.refresh_result_scrollbars();
+            self.tui_update_query_params_selection();
+            self.tui_update_headers_selection();
+            self.tui_update_body_table_selection();
+            self.tui_refresh_result_scrollbars();
             
             self.select_request_state();
         }
@@ -176,9 +178,17 @@ impl App<'_> {
     }
 
     pub fn tui_new_request(&mut self) {
-        let new_request_name = self.new_request_popup.text_input.text.clone();
+        let new_request_name = self.new_request_popup.text_input.text.trim().to_string();
 
-        match self.new_request(new_request_name) {
+        let selected_collection_index = self.new_request_popup.selected_collection;
+        let new_request = Request {
+            name: new_request_name,
+            headers: DEFAULT_HEADERS.clone(),
+            settings: RequestSettings::default(),
+            ..Default::default()
+        };
+        
+        match self.new_request(selected_collection_index, new_request) {
             Ok(_) => {}
             Err(_) => {
                 return;
@@ -217,7 +227,10 @@ impl App<'_> {
         self.collections_tree.state.select(Vec::new());
         self.collections_tree.selected = None;
 
-        self.delete_request(collection_index, request_index);
+        match self.delete_request(collection_index, request_index) {
+            Ok(_) => {}
+            Err(_) => return
+        }
 
         self.normal_state();
     }
@@ -250,17 +263,15 @@ impl App<'_> {
         let new_request_name = self.rename_request_input.text.clone();
         let selected_request_index = self.collections_tree.state.selected();
 
-        match self.rename_request(new_request_name, selected_request_index[0], selected_request_index[1]) {
+        match self.rename_request(selected_request_index[0], selected_request_index[1], new_request_name) {
             Ok(_) => {}
-            Err(_) => {
-                return;
-            }
+            Err(_) => return
         }
 
         self.normal_state();
     }
 
-    pub fn move_request_up(&mut self) {
+    pub fn tui_move_request_up(&mut self) {
         if self.collections_tree.state.selected().len() != 2 {
             return;
         }
@@ -287,7 +298,7 @@ impl App<'_> {
         self.save_collection_to_file(selection[0]);
     }
 
-    pub fn move_request_down(&mut self) {
+    pub fn tui_move_request_down(&mut self) {
         if self.collections_tree.state.selected().len() != 2 {
             return;
         }

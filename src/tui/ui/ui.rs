@@ -27,7 +27,7 @@ impl App<'_> {
                 Constraint::Length(1),
             ],
         )
-            .split(frame.size());
+            .split(frame.area());
 
 
         // HEADER

@@ -6,10 +6,13 @@ impl App<'_> {
 
         let selected_request_index = &self.collections_tree.selected.unwrap();
 
-        self.modify_request_url(input_text, selected_request_index.0, selected_request_index.1);
+        match self.modify_request_url(selected_request_index.0, selected_request_index.1, input_text) {
+            Ok(_) => {}
+            Err(_) => return
+        }
 
         // In case new params were inputted or deleted
-        self.update_query_params_selection();
+        self.tui_update_query_params_selection();
         self.select_request_state();
     }
 }

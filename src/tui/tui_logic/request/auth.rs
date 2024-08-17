@@ -15,21 +15,21 @@ impl App<'_> {
         }
         
         self.save_collection_to_file(selected_request_index.0);
-        self.load_request_auth_param_tab();
+        self.tui_load_request_auth_param_tab();
     }
 
-    pub fn select_request_auth_input_text(&mut self) {
+    pub fn tui_select_request_auth_input_text(&mut self) {
         let local_selected_request = self.get_selected_request_as_local();
         let selected_request = local_selected_request.read();
 
         match selected_request.auth {
             NoAuth => {}
-            BasicAuth(_, _) => match self.auth_text_input_selection.selected {
+            BasicAuth { .. } => match self.auth_text_input_selection.selected {
                 0 => self.edit_request_auth_username_state(),
                 1 => self.edit_request_auth_password_state(),
                 _ => {}
             },
-            BearerToken(_) => match self.auth_text_input_selection.selected {
+            BearerToken { .. } => match self.auth_text_input_selection.selected {
                 0 => self.edit_request_auth_bearer_token_state(),
                 _ => {}
             }
@@ -40,7 +40,7 @@ impl App<'_> {
         let input_text = self.auth_basic_username_text_input.text.clone();
         let selected_request_index = &self.collections_tree.selected.unwrap();
         
-        self.modify_request_auth_basic_username(input_text, selected_request_index.0, selected_request_index.1);
+        self.modify_request_auth_basic_username(selected_request_index.0, selected_request_index.1, input_text);
             
         self.select_request_state();
     }
@@ -49,7 +49,7 @@ impl App<'_> {
         let input_text = self.auth_basic_password_text_input.text.clone();
         let selected_request_index = &self.collections_tree.selected.unwrap();
         
-        self.modify_request_auth_basic_password(input_text, selected_request_index.0, selected_request_index.1);
+        self.modify_request_auth_basic_password(selected_request_index.0, selected_request_index.1, input_text);
 
         self.select_request_state();
     }
@@ -58,7 +58,7 @@ impl App<'_> {
         let input_text = self.auth_bearer_token_text_input.text.clone();
         let selected_request_index = &self.collections_tree.selected.unwrap();
         
-        self.modify_request_auth_bearer_token(input_text, selected_request_index.0, selected_request_index.1);
+        self.modify_request_auth_bearer_token(selected_request_index.0, selected_request_index.1, input_text);
 
         self.select_request_state();
     }

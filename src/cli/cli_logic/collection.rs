@@ -4,7 +4,11 @@ use crate::models::collection::Collection;
 impl App<'_> {
     pub fn list_collections(&mut self, with_request_names: bool) -> anyhow::Result<()> {
         for collection in &self.collections {
-            print_collection(collection, with_request_names);
+            print_collection(collection, !with_request_names, with_request_names);
+
+            if with_request_names {
+                println!();
+            }
         }
 
         Ok(())
@@ -14,7 +18,7 @@ impl App<'_> {
         let collection_index = self.find_collection(collection_name)?;
         let collection = &self.collections[collection_index];
 
-        print_collection(&collection, !without_request_names);
+        print_collection(&collection, false, !without_request_names);
         
         Ok(())
     }
@@ -36,10 +40,16 @@ impl App<'_> {
     }
 }
 
-fn print_collection(collection: &Collection, with_request_names: bool) {
-    println!("{}", collection.name);
+fn print_collection(collection: &Collection, shortened: bool, with_request_names: bool) {
+    if shortened {
+        println!("{}", collection.name);
+    }
+    else {
+        println!("collection: {}", collection.name);
+    }
 
     if with_request_names {
+        println!("requests:");
         for request in &collection.requests {
             let local_request = request.read();
             println!("\t{}", local_request.name);

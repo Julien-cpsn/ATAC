@@ -403,7 +403,7 @@ fn retrieve_auth(request_class: &RequestClass) -> Option<Auth> {
                 }
             }
 
-            Some(Auth::BasicAuth(username, password))
+            Some(Auth::BasicAuth { username, password })
         },
         AuthType::Bearer => {
             let bearer_token_attributes = auth.bearer?;
@@ -417,7 +417,7 @@ fn retrieve_auth(request_class: &RequestClass) -> Option<Auth> {
                 }
             }
 
-            Some(Auth::BearerToken(bearer_token))
+            Some(Auth::BearerToken { token: bearer_token })
         },
         AuthType::Awsv4 => None,
         AuthType::Digest => None,

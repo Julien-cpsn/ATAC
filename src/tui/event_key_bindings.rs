@@ -13,7 +13,7 @@ pub struct EventKeyBinding {
 }
 
 impl EventKeyBinding {
-    pub(crate) fn new(keys: Vec<KeyCombination>, event_name: &str, short_name: Option<&str>) -> EventKeyBinding {
+    pub fn new(keys: Vec<KeyCombination>, event_name: &str, short_name: Option<&str>) -> EventKeyBinding {
         EventKeyBinding {
             keys,
             event_name: String::from(event_name),
