@@ -1,3 +1,4 @@
+use rayon::prelude::*;
 use tui_textarea::TextArea;
 
 use crate::app::app::App;
@@ -5,7 +6,7 @@ use crate::app::app::App;
 impl App<'_> {
     pub fn tui_refresh_pre_request_script_textarea(&mut self, text: &str) {
         let lines: Vec<String> = text
-            .lines()
+            .par_lines()
             .map(|line| line.to_string())
             .collect();
 
@@ -14,7 +15,7 @@ impl App<'_> {
 
     pub fn tui_refresh_post_request_script_textarea(&mut self, text: &str) {
         let lines: Vec<String> = text
-            .lines()
+            .par_lines()
             .map(|line| line.to_string())
             .collect();
 

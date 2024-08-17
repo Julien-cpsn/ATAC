@@ -1,10 +1,12 @@
 use std::sync::Arc;
+use rayon::prelude::*;
 use anyhow::anyhow;
 use chrono::Utc;
 use parking_lot::RwLock;
 use thiserror::Error;
 use tracing::{info, trace};
 use uuid::Uuid;
+
 use crate::app::app::App;
 use crate::app::business_logic::environment::EnvironmentError::{EnvironmentNotFound, KeyAlreadyExists, KeyNotFound};
 use crate::models::environment::Environment;
@@ -38,17 +40,19 @@ impl App<'_> {
 
     pub fn find_environment(&self, environment_name: &str) -> anyhow::Result<usize> {
         trace!("Trying to find environment \"{environment_name}\"");
-        
-        for (index, environment) in self.environments.iter().enumerate() {
-            if environment.read().name == environment_name {
+
+        let result = self.environments.par_iter().position_first(|environment| environment.read().name == environment_name );
+
+        match result {
+            None => {
+                trace!("Not found");
+                Err(anyhow!(EnvironmentNotFound))
+            }
+            Some(index) => {
                 trace!("Found");
-                return Ok(index);
+                Ok(index)
             }
         }
-
-        trace!("Not found");
-        
-        return Err(anyhow!(EnvironmentNotFound));
     }
 
     pub fn get_env_value(&mut self, env_index: usize, key: &str) -> anyhow::Result<()> {

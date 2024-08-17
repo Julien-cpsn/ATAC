@@ -1,7 +1,6 @@
 use boa_engine::{Context, Source};
 use indexmap::IndexMap;
 use tracing::{info, trace};
-use rayon::prelude::*;
 
 use crate::app::app::App;
 use crate::models::request::Request;

@@ -5,6 +5,7 @@ use std::time::{Duration, Instant};
 use parking_lot::RwLock;
 
 use ratatui::prelude::Line;
+use rayon::prelude::*;
 use reqwest::{ClientBuilder, Proxy, Url};
 use reqwest::header::{CONTENT_TYPE, HeaderMap};
 use reqwest::multipart::Part;
@@ -307,6 +308,7 @@ pub async fn send_request(prepared_request: reqwest_middleware::RequestBuilder, 
                 .collect();
 
             let cookies = response.cookies()
+                .par_bridge()
                 .map(|cookie| {
                     format!("{}: {}", cookie.name(), cookie.value())
                 })

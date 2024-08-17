@@ -1,6 +1,5 @@
 use arboard::{Clipboard, ImageData};
 use image::EncodableLayout;
-use parking_lot::RwLock;
 use rayon::prelude::*;
 
 use crate::app::app::App;

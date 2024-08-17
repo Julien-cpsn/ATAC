@@ -142,7 +142,7 @@ impl Request {
 
     pub fn find_and_delete_header(&mut self, input_header: &str) {
         trace!("Trying to find and delete header \"{}\"", input_header);
-        let index = self.header
+        let index = self.headers
             .par_iter()
             .position_any(|header| header.data.0 == input_header);
 

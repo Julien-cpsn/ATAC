@@ -1,3 +1,4 @@
+use rayon::prelude::*;
 use anyhow::anyhow;
 use ratatui::prelude::Stylize;
 use thiserror::Error;
@@ -15,15 +16,18 @@ pub enum KeyValueError {
 pub fn find_key(key_value_array: &Vec<KeyValue>, key: &str) -> anyhow::Result<usize> {
     trace!("Trying to find key \"{}\"", key);
 
-    for (index, key_value) in key_value_array.iter().enumerate() {
-        if key_value.data.0 == key {
+    let result = key_value_array.par_iter().position_first(|key_value| key_value.data.0 == key);
+
+    match result {
+        None => {
+            trace!("Not found");
+            Err(anyhow!(KeyNotFound))
+        },
+        Some(index) => {
             trace!("Found");
-            return Ok(index);
+            Ok(index)
         }
     }
-
-    trace!("Not found");
-    Err(anyhow!(KeyNotFound))
 }
 
 pub fn print_key_value_vector(array: &Vec<KeyValue>, prefix: Option<&str>) {
