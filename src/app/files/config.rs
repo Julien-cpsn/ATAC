@@ -1,10 +1,13 @@
 use std::fs::OpenOptions;
 use std::io::Read;
 use std::path::PathBuf;
+
+use tracing::trace;
 use serde::{Deserialize, Serialize};
+
 use crate::app::app::App;
 use crate::panic_error;
-use crate::request::collection::CollectionFileFormat;
+use crate::models::collection::CollectionFileFormat;
 
 #[derive(Default, Serialize, Deserialize)]
 pub struct Config {
@@ -43,16 +46,18 @@ impl Config {
     }
     
     pub fn get_preferred_collection_file_format(&self) -> CollectionFileFormat {
-        return match &self.preferred_collection_file_format {
+        match &self.preferred_collection_file_format {
             None => CollectionFileFormat::default(),
             Some(file_format) => file_format.clone()
-        };
+        }
     }
 }
 
 impl App<'_> {
     pub fn parse_config_file(&mut self, path_buf: PathBuf) {
         let mut file_content = String::new();
+
+        trace!("Trying to open or create \"atac.toml\" config file");
 
         let mut config_file = OpenOptions::new()
             .read(true)
@@ -69,6 +74,6 @@ impl App<'_> {
 
         self.config = config;
 
-        println!("Config file parsed!");
+        trace!("Config file parsed!");
     }
 }

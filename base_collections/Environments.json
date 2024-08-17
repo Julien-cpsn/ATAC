@@ -100,7 +100,9 @@
       ],
       "body": "no_body",
       "auth": {
-        "bearer_token": "bearer_{{ID}}="
+        "bearer_token": {
+          "token": "bearer_{{ID}}="
+        }
       },
       "scripts": {
         "pre_request_script": null,

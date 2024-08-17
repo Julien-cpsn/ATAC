@@ -3,6 +3,7 @@ use std::fs::OpenOptions;
 use std::io::Read;
 use std::path::PathBuf;
 
+use tracing::{trace, warn};
 use crokey::{key, KeyCombination};
 use lazy_static::lazy_static;
 use nestify::nest;
@@ -277,12 +278,12 @@ impl App<'_> {
             // If the ATAC_KEY_BINDINGS environment variable exists
             Ok(env_key_bindings) => expand_tilde(PathBuf::from(env_key_bindings)),
             Err(_) => {
-                println!("No key bindings file found\n");
+                warn!("No key bindings file found");
                 return;
             }
         };
 
-        println!("Parsing key bindings file: {}", path.display());
+        trace!("Parsing key bindings file \"{}\"", path.display());
 
         let mut key_bindings_file = match OpenOptions::new().read(true).open(path) {
             Ok(key_bindings_file) => key_bindings_file,
@@ -299,7 +300,7 @@ impl App<'_> {
 
         *KEY_BINDINGS.write() = config.keybindings;
 
-        println!("Key bindings file parsed!\n");
+        trace!("Key bindings file parsed!");
     }
 }
 
@@ -308,6 +309,6 @@ pub fn unique_key_and_help(help: Span<'static>, key: Span<'static>) -> Vec<Span<
         return vec![help];
     }
     else {
-        vec![help, Span::raw(" "), key]
+        return vec![help, Span::raw(" "), key]
     }
 }

@@ -3,16 +3,20 @@ use std::fs::OpenOptions;
 use std::io::{Read, Write};
 use std::path::PathBuf;
 
+use tracing::{info, trace, warn};
+
 use crate::app::app::App;
-use crate::app::startup::args::ARGS;
+use crate::cli::args::ARGS;
 use crate::panic_error;
-use crate::request::collection::{Collection, CollectionFileFormat};
-use crate::request::collection::CollectionFileFormat::{Json, Yaml};
+use crate::models::collection::{Collection, CollectionFileFormat};
+use crate::models::collection::CollectionFileFormat::{Json, Yaml};
 
 impl App<'_> {
     /// Set the app request to the requests found in the collection file
     pub fn set_collections_from_file(&mut self, path_buf: PathBuf, file_format: CollectionFileFormat) {
         let mut file_content = String::new();
+
+        trace!("Trying to open \"{}\" collection", path_buf.display());
 
         let mut collection_file = OpenOptions::new()
             .read(true)
@@ -39,16 +43,19 @@ impl App<'_> {
 
         self.collections.push(collection);
 
-        println!("Collection file parsed!");
+        trace!("Collection file parsed!");
     }
 
     /// Save app collection in the collection file through a temporary file
     pub fn save_collection_to_file(&mut self, collection_index: usize) {
         if !ARGS.should_save {
+            warn!("Dry-run, not saving the collection");
             return;
         }
 
         let collection = &self.collections[collection_index];
+
+        info!("Saving collection \"{}\"", collection.name);
 
         let temp_file_name = format!("{}_", collection.path.file_name().unwrap().to_str().unwrap());
 
@@ -70,6 +77,8 @@ impl App<'_> {
         temp_file.flush().unwrap();
 
         fs::rename(temp_file_path, &collection.path).expect("Could not move temp file to collection file");
+        
+        trace!("Collection saved");
     }
 
     /// Delete collection file

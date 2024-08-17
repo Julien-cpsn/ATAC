@@ -1,4 +1,3 @@
-use std::fs::File;
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -9,27 +8,27 @@ use ratatui::Terminal;
 use throbber_widgets_tui::ThrobberState;
 use tui_textarea::TextArea;
 
-use crate::app::app_logic::new_request_popup::NewRequestPopup;
-use crate::app::app_states::AppState;
 use crate::app::files::config::Config;
-use crate::app::ui::param_tabs::param_tabs::RequestParamsTabs;
-use crate::app::ui::result_tabs::RequestResultTabs;
-use crate::app::ui::views::RequestView;
-use crate::request::collection::Collection;
-use crate::request::environment::Environment;
-use crate::utils::choice_popup::ChoicePopup;
-use crate::utils::cookies_popup::CookiesPopup;
-use crate::utils::help_popup::HelpPopup;
-use crate::utils::script_console::ScriptConsole;
-use crate::utils::settings_popup::SettingsPopup;
-use crate::utils::stateful_custom_table::StatefulCustomTable;
-use crate::utils::stateful_scrollbar::StatefulScrollbar;
-use crate::utils::stateful_tree::StatefulTree;
-use crate::utils::syntax_highlighting::SyntaxHighlighting;
-use crate::utils::text_input::TextInput;
-use crate::utils::text_input_selection::TextInputSelection;
-use crate::utils::validation_popup::ValidationPopup;
-use crate::utils::vim_emulation::Vim;
+use crate::models::collection::Collection;
+use crate::models::environment::Environment;
+use crate::tui::app_states::AppState;
+use crate::tui::ui::param_tabs::param_tabs::RequestParamsTabs;
+use crate::tui::ui::result_tabs::RequestResultTabs;
+use crate::tui::ui::views::RequestView;
+use crate::tui::utils::stateful::choice_popup::ChoicePopup;
+use crate::tui::utils::stateful::cookies_popup::CookiesPopup;
+use crate::tui::utils::stateful::help_popup::HelpPopup;
+use crate::tui::utils::stateful::new_request_popup::NewRequestPopup;
+use crate::tui::utils::stateful::script_console::ScriptConsole;
+use crate::tui::utils::stateful::settings_popup::SettingsPopup;
+use crate::tui::utils::stateful::stateful_custom_table::StatefulCustomTable;
+use crate::tui::utils::stateful::stateful_scrollbar::StatefulScrollbar;
+use crate::tui::utils::stateful::stateful_tree::StatefulTree;
+use crate::tui::utils::stateful::text_input::TextInput;
+use crate::tui::utils::stateful::text_input_selection::TextInputSelection;
+use crate::tui::utils::stateful::validation_popup::ValidationPopup;
+use crate::tui::utils::syntax_highlighting::SyntaxHighlighting;
+use crate::tui::utils::vim_emulation::Vim;
 
 pub struct App<'a> {
     pub tick_rate: Duration,
@@ -39,8 +38,6 @@ pub struct App<'a> {
     pub state: AppState,
 
     pub config: Config,
-
-    pub log_file: Option<File>,
 
     /* Help */
 
@@ -115,8 +112,6 @@ impl App<'_> {
             state: AppState::Normal,
 
             config: Config::default(),
-
-            log_file: None,
 
             /* Help */
 

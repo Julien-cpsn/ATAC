@@ -1,41 +1,61 @@
-use std::fs::OpenOptions;
+use std::fs::{File, OpenOptions};
+use clap_verbosity_flag::LevelFilter;
+use tracing::trace;
+use tracing_log::AsTrace;
 
 use crate::app::app::App;
-use crate::app::startup::args::{ARGS, Command, ImportType};
+use crate::cli::args::{ARGS, Command};
 use crate::panic_error;
-use crate::request::collection::CollectionFileFormat;
+use crate::app::startup::startup::AppMode::{CLI, TUI};
+use crate::models::collection::CollectionFileFormat;
 
-impl App<'_> {
-    /// Method called before running the app
-    pub fn startup(&mut self) -> &mut Self {
-        self.parse_key_bindings_file();
+pub enum AppMode<'a> {
+    TUI(&'a mut App<'a>),
+    CLI(&'a mut App<'a>, Command),
+}
+
+impl<'a> App<'a> {
+    /// Method called before running the app, returns the app if the TUI should be started
+    pub fn startup(&'a mut self) -> AppMode<'a> {
+        // Logging is initialized before anything else
+        match ARGS.command.is_some() {
+            // CLI
+            true => tracing_subscriber::fmt()
+                .pretty()
+                .with_max_level(ARGS.verbosity.log_level_filter().as_trace())
+                .with_file(false)
+                .with_line_number(false)
+                .with_ansi(ARGS.ansi_log)
+                .init(),
+            // TUI
+            false => {
+                let verbosity = match ARGS.verbosity.log_level_filter() {
+                    LevelFilter::Error => LevelFilter::Debug, // Ensure that at least the debug level is always active
+                    level => level
+                };
+                
+                // Using a separate file allows to redirect the output and avoid printing to screen
+                let log_file = self.create_log_file();
+                tracing_subscriber::fmt()
+                    .with_max_level(verbosity.as_trace())
+                    .with_writer(log_file)
+                    .with_file(false)
+                    .with_line_number(false)
+                    .with_ansi(ARGS.ansi_log)
+                    .init()
+            }
+        };
+
         self.parse_app_directory();
 
-        // Creates the log file only if the app is allowed to save files
-        if ARGS.should_save {
-            self.create_log_file();
-        }
-
         if let Some(command) = &ARGS.command {
-            match command {
-                Command::Import { import_type} => match import_type {
-                    ImportType::Postman { 
-                        import_path,
-                        max_depth
-                    } => self.import_postman_collection(&import_path, max_depth.unwrap_or(99)),
-                    
-                    ImportType::Curl {
-                        import_path,
-                        collection_name,
-                        request_name,
-                        recursive,
-                        max_depth
-                    } => self.import_curl_file(&import_path, collection_name, request_name, recursive, max_depth.unwrap_or(99))
-                }
-            }
+            return CLI(self, command.clone());
         }
+        else {
+            self.parse_key_bindings_file();
 
-        self
+            return TUI(self);
+        }
     }
 
     fn parse_app_directory(&mut self) {
@@ -53,7 +73,7 @@ impl App<'_> {
 
             let file_name = path.file_name().unwrap().to_str().unwrap();
 
-            println!("Checking: {}", path.display());
+            trace!("Checking file \"{}\"", path.display());
 
             if file_name.ends_with(".json") {
                 self.set_collections_from_file(path, CollectionFileFormat::Json);
@@ -68,14 +88,12 @@ impl App<'_> {
                 self.parse_config_file(path);
             }
             else if file_name == "atac.log" {
-                println!("Nothing to parse here")
+                trace!("Log file is not parsable")
             }
-
-            println!();
         }
     }
 
-    fn create_log_file(&mut self) {
+    fn create_log_file(&mut self) -> File {
         let path = ARGS.directory.join("atac.log");
 
         let log_file = match OpenOptions::new().write(true).create(true).truncate(true).open(path) {
@@ -83,6 +101,6 @@ impl App<'_> {
             Err(e) => panic_error(format!("Could not open log file\n\t{e}"))
         };
 
-        self.log_file = Some(log_file);
+        return log_file;
     }
 }
