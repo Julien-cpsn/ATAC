@@ -1,3 +1,8 @@
+use chrono::Utc;
+use parking_lot::RwLock;
+use uuid::Uuid;
+use std::sync::Arc;
+
 use ratatui::style::Stylize;
 use ratatui::text::{Line, Span};
 use regex::Regex;
@@ -28,11 +33,19 @@ impl App<'_> {
 
         if let Some(local_env) = local_env {
             let env = local_env.read();
-            
+
+            let mut keys: Vec<&str> = env.values.keys().map(|key| key.as_str()).collect();
+            keys.extend(vec![
+                "NOW",
+                "TIMESTAMP",
+                "UUIDv4",
+                "UUIDv7"
+            ]);
+
             for match_ in regex.captures_iter(input) {
                 for sub_match in match_.iter() {
                     if let Some(sub_match) = sub_match {
-                        for (key, _) in &env.values {
+                        for key in &keys {
                             if sub_match.as_str() == &format!("{{{{{}}}}}", key) {
                                 let range = sub_match.range();
 
