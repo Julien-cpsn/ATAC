@@ -121,8 +121,16 @@ pub struct GlobalArgs {
 lazy_static! {
     pub static ref ARGS: GlobalArgs = {
         let args = Args::parse();
-        
-        let directory = match args.directory {
+
+        let completion_directory = if let Some(Command::Completions(ref completion_args)) = args.command {
+            completion_args.output_directory.clone().or_else(|| {
+                panic_error("No directory provided.");
+            })
+        } else {
+            None
+        };
+
+        let directory = match args.directory.or(completion_directory) {
             // If a directory was provided with a CLI argument
             Some(arg_directory) => expand_tilde(arg_directory),
             // If no directory was provided with the CLI
