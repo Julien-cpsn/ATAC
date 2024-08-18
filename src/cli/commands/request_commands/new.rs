@@ -55,6 +55,7 @@ pub struct NewRequestCommand {
     #[arg(long, default_value_t = false, display_order = 20)]
     pub no_pretty: bool,
 
+    /// Accept invalid certificates
     #[arg(long, default_value_t = false, display_order = 21)]
     pub accept_invalid_certs: bool
 }
