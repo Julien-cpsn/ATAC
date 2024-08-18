@@ -1,0 +1,17 @@
+.dockerignore
+Dockerfile
+
+.idea
+/target
+
+*.ps1
+
+.gitignore
+
+/.github
+/base_collections
+/gifs
+/import-tests
+/.typos.toml
+LICENSE
+README.md
