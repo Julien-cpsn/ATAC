@@ -33,7 +33,7 @@ crokey = "=1.1.0"
 tui-big-text = "=0.6.0"
 tui-tree-widget = "=0.22.0"
 tui-textarea = { version = "=0.6.1", features = ["ratatui"] }
-throbber-widgets-tui = { package = "throbber-widgets-tui-julien-cpsn", version = "=0.7.0" }
+throbber-widgets-tui = "=0.7.0"
 ratatui-image = { version = "=1.0.5", features = ["crossterm"] }
 image = "=0.25.2"
 

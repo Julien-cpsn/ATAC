@@ -240,7 +240,7 @@ dependencies = [
  "strum",
  "syntect",
  "thiserror",
- "throbber-widgets-tui-julien-cpsn",
+ "throbber-widgets-tui",
  "tokio",
  "toml",
  "tracing",
@@ -3523,10 +3523,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "throbber-widgets-tui-julien-cpsn"
+name = "throbber-widgets-tui"
 version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d6fae5356103c773fea347a3f43597c93a5c1fc71f6e5412891fb8239ff2f3a5"
+checksum = "fad9e055cadd9da8b4a67662b962e3e67e96af491ae9cec7e88aaff92e7c3666"
 dependencies = [
  "rand",
  "ratatui",
