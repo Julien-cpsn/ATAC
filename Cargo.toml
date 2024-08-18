@@ -13,7 +13,10 @@ repository = "https://github.com/Julien-cpsn/ATAC"
 keywords = ["API", "Client", "TUI", "Postman", "Insomnia"]
 
 exclude = [
-    ".github/*"
+    ".github",
+    "gifs",
+    "import_tests",
+    "base_collections"
 ]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
