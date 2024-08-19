@@ -5,6 +5,7 @@ use ratatui::style::Stylize;
 use ratatui::widgets::{Block, Borders, Paragraph};
 
 use crate::app::app::App;
+use crate::app::files::theme::THEME;
 use crate::tui::app_states::AppState::{SelectedRequest, EditingRequestAuthUsername, EditingRequestAuthPassword};
 
 impl App<'_> {
@@ -22,12 +23,14 @@ impl App<'_> {
 
         let mut username_block = Block::new()
             .title("Username")
-            .borders(Borders::ALL);
+            .borders(Borders::ALL)
+            .fg(THEME.read().ui.main_foreground_color);
 
 
         let mut password_block = Block::new()
             .title("Password")
-            .borders(Borders::ALL);
+            .borders(Borders::ALL)
+            .fg(THEME.read().ui.main_foreground_color);
 
 
         let mut should_color_blocks = false;
@@ -50,16 +53,28 @@ impl App<'_> {
         
         let password_adjusted_input_length = basic_auth_layout[1].width as usize - 2;
         let (password_padded_text, password_input_cursor_position) = self.auth_basic_password_text_input.get_padded_text_and_cursor(password_adjusted_input_length);
-        
+
+        let username_line = self.tui_add_color_to_env_keys(&username_padded_text);
+        let password_line = self.tui_add_color_to_env_keys(&password_padded_text);
+
+        let mut username_paragraph = Paragraph::new(username_line)
+            .fg(THEME.read().ui.font_color);
+        let mut password_paragraph = Paragraph::new(password_line)
+            .fg(THEME.read().ui.font_color);
+
         let input_selected = self.auth_text_input_selection.selected;
 
         let input_cursor_position = match input_selected {
             0 if should_color_blocks => {
-                username_block = username_block.yellow();
+                username_block = username_block.fg(THEME.read().others.selection_highlight_color);
+                username_paragraph = username_paragraph.fg(THEME.read().others.selection_highlight_color);
+                
                 username_input_cursor_position as u16
             },
             1 if should_color_blocks => {
-                password_block = password_block.yellow();
+                password_block = password_block.fg(THEME.read().others.selection_highlight_color);
+                password_paragraph = password_paragraph.fg(THEME.read().others.selection_highlight_color);
+
                 password_input_cursor_position as u16
             },
             _ => 0
@@ -72,11 +87,8 @@ impl App<'_> {
             ));
         }
 
-        let username_line = self.tui_add_color_to_env_keys(&username_padded_text);
-        let password_line = self.tui_add_color_to_env_keys(&password_padded_text);
-
-        let username_paragraph = Paragraph::new(username_line).block(username_block);
-        let password_paragraph = Paragraph::new(password_line).block(password_block);
+        username_paragraph = username_paragraph.block(username_block);
+        password_paragraph = password_paragraph.block(password_block);
 
         frame.render_widget(username_paragraph, basic_auth_layout[0]);
         frame.render_widget(password_paragraph, basic_auth_layout[1]);

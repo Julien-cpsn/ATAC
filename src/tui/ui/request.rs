@@ -1,11 +1,11 @@
 use ratatui::Frame;
 use ratatui::layout::{Alignment, Constraint, Layout, Position, Rect};
 use ratatui::layout::Direction::{Horizontal, Vertical};
-use ratatui::prelude::Color::White;
 use ratatui::style::Stylize;
 use ratatui::widgets::{Block, Borders, Padding, Paragraph};
 
 use crate::app::app::App;
+use crate::app::files::theme::THEME;
 use crate::models::request::Request;
 use crate::tui::ui::views::RequestView;
 use crate::tui::app_states::AppState::EditingRequestUrl;
@@ -27,7 +27,8 @@ impl App<'_> {
         let request_name = request.name.clone();
 
         let request_name_paragraph = Paragraph::new(request_name)
-            .centered();
+            .centered()
+            .fg(THEME.read().ui.font_color);
 
         frame.render_widget(request_name_paragraph, request_layout[0]);
 
@@ -49,13 +50,14 @@ impl App<'_> {
         let method_block = Block::new()
             .title("Method").title_alignment(Alignment::Center)
             .borders(Borders::ALL)
-            .padding(Padding::horizontal(1));
+            .padding(Padding::horizontal(1))
+            .fg(THEME.read().ui.main_foreground_color);
 
         let method_area = method_block.inner(request_header_layout[0]);
 
         let method_paragraph = Paragraph::new(method.to_string())
             .bg(method.get_color())
-            .fg(White)
+            .fg(THEME.read().ui.font_color)
             .centered();
 
         frame.render_widget(method_block, request_header_layout[0]);
@@ -66,14 +68,17 @@ impl App<'_> {
         let url_block = Block::new()
             .title("URL")
             .borders(Borders::ALL)
-            .padding(Padding::horizontal(1));
+            .padding(Padding::horizontal(1))
+            .fg(THEME.read().ui.main_foreground_color);
         
         let adjusted_input_length = request_header_layout[1].width as usize - 4;
         let (padded_text, input_cursor_position) = self.url_text_input.get_padded_text_and_cursor(adjusted_input_length);
         
         let url_line = self.tui_add_color_to_env_keys(&padded_text);
         
-        let url_paragraph = Paragraph::new(url_line).block(url_block);
+        let url_paragraph = Paragraph::new(url_line)
+            .block(url_block)
+            .fg(THEME.read().ui.font_color);
 
         frame.render_widget(url_paragraph, request_header_layout[1]);
 
@@ -120,7 +125,10 @@ impl App<'_> {
         // REQUEST PARAMS
 
         if should_render_params {
-            let params_block = Block::new().borders(Borders::RIGHT);
+            let params_block = Block::new()
+                .borders(Borders::RIGHT)
+                .fg(THEME.read().ui.main_foreground_color);
+            
             let request_params_area = params_block.inner(request_main_layout[0]);
 
             frame.render_widget(params_block, request_main_layout[0]);
@@ -130,7 +138,7 @@ impl App<'_> {
         // REQUEST RESULT LAYOUT
 
         if should_render_result {
-            let result_block = Block::new();
+            let result_block = Block::new().fg(THEME.read().ui.main_foreground_color);
             let result_block_area = result_block.inner(request_main_layout[1]);
 
             frame.render_widget(result_block, request_main_layout[1]);

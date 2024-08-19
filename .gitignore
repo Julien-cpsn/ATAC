@@ -1,7 +1,7 @@
 .idea
 /target
 
-base_collections/atac.log
-base_collections/atac.toml
+example_resources/collections/atac.log
+example_resources/collections/atac.toml
 
 *.ps1

@@ -2,11 +2,11 @@ use std::ops::Deref;
 use ratatui::Frame;
 use ratatui::layout::{Alignment, Constraint, Layout, Rect};
 use ratatui::layout::Direction::Vertical;
-use ratatui::prelude::{Color, Style};
-use ratatui::style::Color::Yellow;
+use ratatui::prelude::{Style, Stylize};
 use ratatui::widgets::{Block, Borders};
 
 use crate::app::app::App;
+use crate::app::files::theme::THEME;
 use crate::tui::app_states::AppState;
 
 impl App<'_> {
@@ -20,8 +20,8 @@ impl App<'_> {
         )
             .split(area);
 
-        self.script_console.pre_request_text_area.set_line_number_style(Style::new().fg(Color::DarkGray));
-        self.script_console.post_request_text_area.set_line_number_style(Style::new().fg(Color::DarkGray));
+        self.script_console.pre_request_text_area.set_line_number_style(Style::new().fg(THEME.read().ui.secondary_foreground_color));
+        self.script_console.post_request_text_area.set_line_number_style(Style::new().fg(THEME.read().ui.secondary_foreground_color));
 
         let pre_request_script_text_area = &mut self.script_console.pre_request_text_area;
         let post_request_script_text_area = &mut self.script_console.post_request_text_area;
@@ -35,19 +35,19 @@ impl App<'_> {
         if self.state == AppState::SelectedRequest {
             match self.script_console.script_selection {
                 0 => {
-                    pre_request_script_text_area.set_style(Style::new().fg(Yellow));
-                    post_request_script_text_area.set_style(Style::new());
+                    pre_request_script_text_area.set_style(Style::new().fg(THEME.read().others.selection_highlight_color));
+                    post_request_script_text_area.set_style(Style::new().fg(THEME.read().ui.font_color));
                 },
                 1 => {
-                    pre_request_script_text_area.set_style(Style::new());
-                    post_request_script_text_area.set_style(Style::new().fg(Yellow));
+                    pre_request_script_text_area.set_style(Style::new().fg(THEME.read().ui.font_color));
+                    post_request_script_text_area.set_style(Style::new().fg(THEME.read().others.selection_highlight_color));
                 }
                 _ => {}
             };
         }
         else {
-            pre_request_script_text_area.set_style(Style::new());
-            post_request_script_text_area.set_style(Style::new());
+            pre_request_script_text_area.set_style(Style::new().fg(THEME.read().ui.font_color));
+            post_request_script_text_area.set_style(Style::new().fg(THEME.read().ui.font_color));
         }
 
         pre_request_script_text_area.set_block(
@@ -55,6 +55,7 @@ impl App<'_> {
                 .borders(Borders::BOTTOM)
                 .title_bottom(title)
                 .title_alignment(Alignment::Center)
+                .fg(THEME.read().ui.main_foreground_color)
         );
 
         frame.render_widget(pre_request_script_text_area.deref(), scripts_layout[0]);

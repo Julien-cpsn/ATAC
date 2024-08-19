@@ -5,6 +5,7 @@ use thiserror::Error;
 use tracing::trace;
 
 use crate::app::business_logic::key_value::KeyValueError::KeyNotFound;
+use crate::app::files::theme::THEME;
 use crate::models::request::KeyValue;
 
 #[derive(Error, Debug)]
@@ -40,7 +41,7 @@ pub fn print_key_value_vector(array: &Vec<KeyValue>, prefix: Option<&str>) {
             println!("{}", text);
         }
         else {
-            println!("{}", text.dark_gray());
+            println!("{}", text.fg(THEME.read().ui.secondary_foreground_color));
         }
     }
 }

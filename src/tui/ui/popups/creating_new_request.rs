@@ -1,16 +1,18 @@
 use ratatui::Frame;
 use ratatui::layout::{Constraint, Layout, Position};
 use ratatui::layout::Direction::Vertical;
-use ratatui::prelude::{Color, Style};
+use ratatui::prelude::Stylize;
 use ratatui::widgets::{Block, Borders, Clear, Paragraph};
 
 use crate::app::app::App;
+use crate::app::files::theme::THEME;
 use crate::tui::utils::centered_rect::centered_rect;
 impl App<'_> {
     pub fn render_creating_new_request_popup(&mut self, frame: &mut Frame) {
         let popup_block = Block::default()
             .borders(Borders::ALL)
-            .style(Style::default().bg(Color::DarkGray));
+            .fg(THEME.read().ui.main_foreground_color)
+            .bg(THEME.read().ui.main_background_color);
 
 
         let area = centered_rect(50, 6, frame.area());
@@ -27,20 +29,24 @@ impl App<'_> {
 
         let selected_collection_name = self.collections[self.new_request_popup.selected_collection].name.clone();
         let selected_collection_paragraph = Paragraph::new(selected_collection_name)
+            .fg(THEME.read().ui.font_color)
             .block(
                 Block::new()
                     .title("Collection ↑ ↓")
                     .borders(Borders::ALL)
+                    .fg(THEME.read().ui.main_foreground_color)
             );
 
         let adjusted_input_length = new_request_layout[1].width as usize - 2;
         let (padded_text, input_cursor_position) = self.new_request_popup.text_input.get_padded_text_and_cursor(adjusted_input_length);
         
         let new_request_name_paragraph = Paragraph::new(padded_text)
+            .fg(THEME.read().ui.font_color)
             .block(
                 Block::new()
                     .title("Request name")
                     .borders(Borders::ALL)
+                    .fg(THEME.read().ui.main_foreground_color)
             );
 
         frame.render_widget(Clear, area);

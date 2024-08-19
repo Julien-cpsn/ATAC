@@ -5,6 +5,7 @@ use ratatui::style::Stylize;
 use ratatui::widgets::{Block, Borders, Paragraph};
 
 use crate::app::app::App;
+use crate::app::files::theme::THEME;
 use crate::tui::app_states::AppState::{EditingRequestAuthBearerToken, SelectedRequest};
 
 impl App<'_> {
@@ -21,7 +22,8 @@ impl App<'_> {
 
         let mut bearer_token_block = Block::new()
             .title("Bearer token")
-            .borders(Borders::ALL);
+            .borders(Borders::ALL)
+            .fg(THEME.read().ui.main_foreground_color);
 
         let mut should_color_blocks = false;
         let mut should_display_cursor = false;
@@ -42,10 +44,16 @@ impl App<'_> {
 
         let adjusted_input_length = bearer_token_auth_layout[0].width as usize - 2;
         let (padded_text, input_cursor_position) = self.auth_bearer_token_text_input.get_padded_text_and_cursor(adjusted_input_length);
+
+        let bearer_token_line = self.tui_add_color_to_env_keys(&padded_text);
+
+        let mut bearer_token_paragraph = Paragraph::new(bearer_token_line).fg(THEME.read().ui.font_color);
         
         let input_cursor_position = match input_selected {
             0 if should_color_blocks => {
-                bearer_token_block = bearer_token_block.yellow();
+                bearer_token_block = bearer_token_block.fg(THEME.read().others.selection_highlight_color);
+                bearer_token_paragraph = bearer_token_paragraph.fg(THEME.read().others.selection_highlight_color);
+                
                 input_cursor_position as u16
             },
             _ => 0
@@ -57,10 +65,8 @@ impl App<'_> {
                 bearer_token_auth_layout[input_selected].y + 1
             ));
         }
-
-        let bearer_token_line = self.tui_add_color_to_env_keys(&padded_text);
-
-        let bearer_token_paragraph = Paragraph::new(bearer_token_line).block(bearer_token_block);
+        
+        bearer_token_paragraph = bearer_token_paragraph.block(bearer_token_block);
 
         frame.render_widget(bearer_token_paragraph, bearer_token_auth_layout[0]);
     }

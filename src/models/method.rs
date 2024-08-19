@@ -1,6 +1,7 @@
 use ratatui::prelude::Color;
 use serde::{Deserialize, Serialize};
 use strum::{Display, EnumString};
+use crate::app::files::theme::THEME;
 
 #[derive(Default, Debug, Copy, Clone, EnumString, Display, Serialize, Deserialize)]
 pub enum Method {
@@ -23,14 +24,16 @@ pub enum Method {
 
 impl Method {
     pub fn get_color(&self) -> Color {
+        let theme = THEME.read();
+        
         match self {
-            Method::GET => Color::Green,
-            Method::POST => Color::Rgb(231, 186, 0),
-            Method::PUT => Color::LightBlue,
-            Method::PATCH => Color::LightCyan,
-            Method::DELETE => Color::LightRed,
-            Method::HEAD => Color::Green,
-            Method::OPTIONS => Color::Magenta,
+            Method::GET => theme.methods.get,
+            Method::POST => theme.methods.post,
+            Method::PUT => theme.methods.put,
+            Method::PATCH => theme.methods.patch,
+            Method::DELETE => theme.methods.delete,
+            Method::HEAD => theme.methods.head,
+            Method::OPTIONS => theme.methods.options,
         }
     }
 

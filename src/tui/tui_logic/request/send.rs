@@ -6,6 +6,7 @@ use tokio::task;
 
 use crate::app::app::App;
 use crate::app::business_logic::request::send::send_request;
+use crate::app::files::theme::THEME;
 use crate::tui::utils::syntax_highlighting::highlight;
 
 impl App<'_> {
@@ -32,8 +33,8 @@ impl App<'_> {
         let mut highlighted_console_output = highlight(&console_output, "json").unwrap();
 
         highlighted_console_output.insert(0, Line::default());
-        highlighted_console_output.insert(1, Line::raw("----- Pre-request script start -----").dark_gray().centered());
-        highlighted_console_output.push(Line::raw("----- Pre-request script end -----").dark_gray().centered());
+        highlighted_console_output.insert(1, Line::raw("----- Pre-request script start -----").fg(THEME.read().ui.secondary_foreground_color).centered());
+        highlighted_console_output.push(Line::raw("----- Pre-request script end -----").fg(THEME.read().ui.secondary_foreground_color).centered());
 
         *local_highlighted_console_output = highlighted_console_output;
 
@@ -70,8 +71,8 @@ impl App<'_> {
             let mut highlighted_console_output = highlight(&result_console_output, "json").unwrap();
 
             highlighted_console_output.insert(0, Line::default());
-            highlighted_console_output.insert(1, Line::raw("----- Post-request script start -----").dark_gray().centered());
-            highlighted_console_output.push(Line::raw("----- Post-request script end -----").dark_gray().centered());
+            highlighted_console_output.insert(1, Line::raw("----- Post-request script start -----").fg(THEME.read().ui.secondary_foreground_color).centered());
+            highlighted_console_output.push(Line::raw("----- Post-request script end -----").fg(THEME.read().ui.secondary_foreground_color).centered());
 
             *local_highlighted_body.write() = highlighted_body;
             local_highlighted_console_output.extend(highlighted_console_output);

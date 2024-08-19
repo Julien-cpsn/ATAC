@@ -1,7 +1,7 @@
 [package]
 name = "atac"
 description = "Arguably a Terminal API Client. Feature-full, free, open-source, offline and account-less."
-version = "0.17.0"
+version = "0.18.0"
 authors = ["julien-cpsn"]
 edition = "2021"
 rust-version = "1.79"
@@ -28,7 +28,7 @@ reqwest_cookie_store = "=0.8.0"
 cookie_store = "=0.21.0"
 
 # TUI
-ratatui = "=0.28.0"
+ratatui = { version = "=0.28.0", features = ["serde"] }
 crokey = "=1.1.0"
 tui-big-text = "=0.6.0"
 tui-tree-widget = "=0.22.0"
@@ -36,7 +36,6 @@ tui-textarea = { version = "=0.6.1", features = ["ratatui"] }
 throbber-widgets-tui = "=0.7.0"
 ratatui-image = { version = "=1.0.5", features = ["crossterm"] }
 image = "=0.25.2"
-
 # Main functionalities
 syntect = "=5.2.0"
 serde = { version = "=1.0.208", features = ["derive", "rc"] }

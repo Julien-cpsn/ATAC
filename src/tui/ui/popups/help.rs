@@ -2,14 +2,13 @@ use ratatui::Frame;
 use ratatui::layout::{Constraint, Layout, Position};
 use ratatui::layout::Direction::{Horizontal, Vertical};
 use ratatui::prelude::Line;
-use ratatui::style::Color::{DarkGray, Gray};
 use ratatui::style::Stylize;
 use ratatui::widgets::{Block, Borders, Clear, Paragraph};
 
 use crate::app::app::App;
+use crate::app::files::theme::THEME;
 use crate::tui::app_states::event_available_keys_to_spans;
 use crate::tui::utils::centered_rect::centered_rect;
-use crate::tui::utils::colors::DARK_BLACK;
 
 
 const NB_LINES: usize = 9;
@@ -23,8 +22,8 @@ impl App<'_> {
     pub fn render_help_popup(&mut self, frame: &mut Frame) {
         let popup_block = Block::default()
             .borders(Borders::ALL)
-            .white()
-            .bg(*DARK_BLACK);
+            .fg(THEME.read().ui.main_foreground_color)
+            .bg(THEME.read().ui.secondary_background_color);
 
         let area = centered_rect(110, 26, frame.area());
 
@@ -44,7 +43,9 @@ impl App<'_> {
             .horizontal_margin(1)
             .split(area);
 
-        let title_paragraph = Paragraph::new(self.help_popup.selection.to_string().bold().underlined()).centered();
+        let title_paragraph = Paragraph::new(self.help_popup.selection.to_string().bold().underlined())
+            .centered()
+            .fg(THEME.read().ui.font_color);
         frame.render_widget(title_paragraph, help_layout[1]);
 
         let help_keys_layout = Layout::new(
@@ -67,7 +68,12 @@ impl App<'_> {
         let right_layout = Layout::new(Vertical, lines.clone()).split(help_keys_layout[2]);
 
         let events = &self.help_popup.selection.get_available_events(self.request_view, self.request_param_tab);
-        let keys = event_available_keys_to_spans(events, Gray, DarkGray, false);
+        let keys = event_available_keys_to_spans(
+            events,
+            THEME.read().ui.font_color,
+            THEME.read().ui.main_background_color,
+            false
+        );
 
         for i in 0..3 * NB_LINES {
             if i >= keys.len() {

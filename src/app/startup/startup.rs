@@ -49,12 +49,13 @@ impl<'a> App<'a> {
         self.parse_app_directory();
 
         if let Some(command) = &ARGS.command {
-            return CLI(self, command.clone());
+            CLI(self, command.clone())
         }
         else {
             self.parse_key_bindings_file();
-
-            return TUI(self);
+            self.parse_theme_file();
+            
+            TUI(self)
         }
     }
 

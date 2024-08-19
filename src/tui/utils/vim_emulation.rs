@@ -9,7 +9,7 @@ use ratatui::style::Stylize;
 use ratatui::widgets::Block;
 use ratatui::widgets::block::Position;
 use tui_textarea::{CursorMove, Scrolling, TextArea};
-
+use crate::app::files::theme::THEME;
 use crate::tui::app_states::EMPTY_KEY;
 
 // State of Vim emulation
@@ -212,7 +212,7 @@ impl VimMode {
     pub fn block<'a>(&self) -> Block<'a> {
         let title = format!("-- {} MODE --", self);
         Block::default()
-            .title(title.dark_gray())
+            .title(title.fg(THEME.read().ui.secondary_foreground_color))
             .title_position(Position::Top)
             .title_alignment(Alignment::Center)
     }

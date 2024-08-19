@@ -1,11 +1,13 @@
 use ratatui::Frame;
 use ratatui::layout::Rect;
 use ratatui::prelude::{Modifier, Style};
+use ratatui::style::Stylize;
 use ratatui::widgets::{Block, Borders};
 use tui_tree_widget::{Tree, TreeItem};
 use rayon::prelude::*;
 
 use crate::app::app::App;
+use crate::app::files::theme::THEME;
 
 impl<'a> App<'a> {
     pub(super) fn render_collections(&mut self, frame: &mut Frame, rect: Rect) {
@@ -30,6 +32,7 @@ impl<'a> App<'a> {
                 Block::default()
                     .title("Collections")
                     .borders(Borders::ALL)
+                    .fg(THEME.read().ui.main_foreground_color)
             );
 
         self.collections_tree.items = items;
