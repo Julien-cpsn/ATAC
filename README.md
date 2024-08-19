@@ -198,6 +198,7 @@ cargo run -- -h
   - Cancel pending request
   - Error notification in TUI
   - Request body syntax highlighting
+  - Add suport for danger_accept_invalid_hostnames
   - Export a request to other code formats ([raw](https://github.com/Kong/insomnia/issues/174), curl, PHP, JS, Rust, ...)
   - OpenAPI & Insomnia import
 
