@@ -11,7 +11,7 @@ pub enum KeyFormat {
     TEXT
 }
 
-pub fn generate_jwt_token(private_key_string: &str, claims: &str, alg: Option<Algorithm>, kid: Option<String>, key_format: Option<KeyFormat>) -> Result<String, Box<dyn std::error::Error>> {
+pub fn generate_jwt_token(claims: &str, private_key_string: &str, kid: Option<String>, alg: Option<Algorithm>, key_format: Option<KeyFormat>) -> Result<String, Box<dyn std::error::Error>> {
     let algorithm = match alg {
         Some(alg) => alg,
         None => Algorithm::HS256
@@ -39,7 +39,13 @@ pub fn generate_jwt_token(private_key_string: &str, claims: &str, alg: Option<Al
                 _ => return Err("Invalid key format for EdDSA algorithm")?
             }
         },
-        _ => EncodingKey::from_secret(private_key_string.as_ref())
+        _ => {
+            match key_format {
+                Some(KeyFormat::B64) => EncodingKey::from_base64_secret(private_key_string.as_ref()).unwrap(),
+                Some(KeyFormat::TEXT) => EncodingKey::from_secret(private_key_string.as_ref()),
+                _ => return Err("Invalid key format for HMAC algorithm")?
+            }
+        }
     };
 
     let mut header = Header::new(algorithm);
