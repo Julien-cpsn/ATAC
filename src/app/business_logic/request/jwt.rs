@@ -4,17 +4,42 @@ use std::collections::HashMap;
 use jwt::{Algorithm, encode, EncodingKey, Header};
 use serde_json::Value;
 
-pub fn get_signing_key(private_key_string: &str) -> EncodingKey {
-    let private_key = private_key_string.as_bytes();
-    let signing_key = EncodingKey::from_rsa_pem(private_key).unwrap();
-    signing_key
+pub enum KeyFormat {
+    PEM,
+    DER,
+    B64,
+    TEXT
 }
 
-pub fn generate_jwt_token(private_key_string: &str, claims: &str, alg: Option<Algorithm>, kid: Option<String>) -> String {
-    let encoding_key = get_signing_key(private_key_string);
+pub fn generate_jwt_token(private_key_string: &str, claims: &str, alg: Option<Algorithm>, kid: Option<String>, key_format: Option<KeyFormat>) -> Result<String, Box<dyn std::error::Error>> {
     let algorithm = match alg {
         Some(alg) => alg,
-        None => Algorithm::RS384
+        None => Algorithm::HS256
+    };
+
+    let encoding_key = match alg {
+        Some(Algorithm::RS256 | Algorithm::RS384 | Algorithm::RS512 | Algorithm::PS256 | Algorithm::PS384 | Algorithm::PS512) => {
+            match key_format {
+                Some(KeyFormat::PEM) => EncodingKey::from_rsa_pem(private_key_string.as_ref()).unwrap(),
+                Some(KeyFormat::DER) => EncodingKey::from_rsa_der(private_key_string.as_ref()),
+                _ => return Err("Invalid key format for RSA/PS algorithm")?
+            }
+        },
+        Some(Algorithm::ES256 | Algorithm::ES384) => {
+            match key_format {
+                Some(KeyFormat::PEM) => EncodingKey::from_ec_pem(private_key_string.as_ref()).unwrap(),
+                Some(KeyFormat::DER) => EncodingKey::from_ec_der(private_key_string.as_ref()),
+                _ => return Err("Invalid key format for ES algorithm")?
+            }
+        },
+        Some(Algorithm::EdDSA) => {
+            match key_format {
+                Some(KeyFormat::PEM) => EncodingKey::from_ed_pem(private_key_string.as_ref()).unwrap(),
+                Some(KeyFormat::DER) => EncodingKey::from_ed_der(private_key_string.as_ref()),
+                _ => return Err("Invalid key format for EdDSA algorithm")?
+            }
+        },
+        _ => EncodingKey::from_secret(private_key_string.as_ref())
     };
 
     let mut header = Header::new(algorithm);
@@ -22,6 +47,9 @@ pub fn generate_jwt_token(private_key_string: &str, claims: &str, alg: Option<Al
 
     let payload: HashMap<String, Value> = serde_json::from_str(claims).unwrap();
 
-    let token = encode(&header, &payload, &encoding_key).unwrap();
-    token
+    let token = encode(&header, &payload, &encoding_key);
+    match token {
+        Ok(token) => Ok(token),
+        Err(e) => Err(Box::new(e))
+    }
 }
