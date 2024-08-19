@@ -57,7 +57,11 @@ pub struct NewRequestCommand {
 
     /// Accept invalid certificates
     #[arg(long, default_value_t = false, display_order = 21)]
-    pub accept_invalid_certs: bool
+    pub accept_invalid_certs: bool,
+
+    /// Accept invalid hostnames
+    #[arg(long, default_value_t = false, display_order = 22)]
+    pub accept_invalid_hostnames: bool
 }
 
 #[derive(clap::Args, Debug, Clone)]

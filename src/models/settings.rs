@@ -7,6 +7,7 @@ pub struct RequestSettings {
     pub store_received_cookies: bool,
     pub pretty_print_response_content: bool,
     pub accept_invalid_certs: bool,
+    pub accept_invalid_hostnames: bool
 }
 
 impl Default for RequestSettings {
@@ -17,6 +18,7 @@ impl Default for RequestSettings {
             store_received_cookies: true,
             pretty_print_response_content: true,
             accept_invalid_certs: false,
+            accept_invalid_hostnames: false,
         }
     }
 }
@@ -29,6 +31,7 @@ impl RequestSettings {
             (String::from("Store received cookies"), self.store_received_cookies),
             (String::from("Pretty print response content"), self.pretty_print_response_content),
             (String::from("Accept invalid certs"), self.accept_invalid_certs),
+            (String::from("Accept invalid hostnames"), self.accept_invalid_hostnames),
         ]
     }
 
@@ -40,6 +43,7 @@ impl RequestSettings {
                 "Store received cookies" => self.store_received_cookies = *setting_value,
                 "Pretty print response content" => self.pretty_print_response_content = *setting_value,
                 "Accept invalid certs" => self.accept_invalid_certs = *setting_value,
+                "Accept invalid hostnames" => self.accept_invalid_hostnames = *setting_value,
 
                 _ => {}
             }

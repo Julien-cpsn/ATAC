@@ -47,6 +47,7 @@ pub fn create_request_from_new_request_command(request_name: String, new_request
             store_received_cookies: !new_request_command.no_cookies,
             pretty_print_response_content: !new_request_command.no_pretty,
             accept_invalid_certs: new_request_command.accept_invalid_certs,
+            accept_invalid_hostnames: new_request_command.accept_invalid_hostnames,
         },
         response: RequestResponse::default(),
         is_pending: false,

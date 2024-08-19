@@ -138,6 +138,12 @@ impl App<'_> {
         if request.settings.accept_invalid_certs {
             client_builder = client_builder.danger_accept_invalid_certs(true);
         }
+
+        /* INVALID HOSTNAMES */
+
+        if request.settings.accept_invalid_hostnames {
+            client_builder = client_builder.danger_accept_invalid_hostnames(true);
+        }
         
         /* CLIENT */
 

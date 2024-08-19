@@ -23,7 +23,7 @@ exclude = [
 
 [dependencies]
 # Request
-reqwest = { version = "=0.12.5", default-features = false, features = ["cookies", "rustls-tls-native-roots", "multipart", "gzip", "brotli", "deflate", "stream"] }
+reqwest = { version = "=0.12.7", default-features = false, features = ["cookies", "rustls-tls-native-roots", "multipart", "gzip", "brotli", "deflate", "stream"] }
 reqwest_cookie_store = "=0.8.0"
 cookie_store = "=0.21.0"
 

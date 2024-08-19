@@ -54,7 +54,8 @@
         "allow_redirects": true,
         "store_received_cookies": true,
         "pretty_print_response_content": true,
-        "accept_invalid_certs": false
+        "accept_invalid_certs": false,
+        "accept_invalid_hostnames": false
       }
     },
     {
@@ -118,7 +119,8 @@
         "allow_redirects": true,
         "store_received_cookies": true,
         "pretty_print_response_content": true,
-        "accept_invalid_certs": false
+        "accept_invalid_certs": false,
+        "accept_invalid_hostnames": false
       }
     }
   ]
