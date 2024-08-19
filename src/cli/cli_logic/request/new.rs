@@ -1,3 +1,4 @@
+use tokio_util::sync::CancellationToken;
 use crate::app::app::App;
 use crate::cli::commands::request_commands::new::{AuthArgs, BodyArgs, NewRequestCommand};
 use crate::models::auth::Auth;
@@ -51,6 +52,7 @@ pub fn create_request_from_new_request_command(request_name: String, new_request
         },
         response: RequestResponse::default(),
         is_pending: false,
+        cancellation_token: CancellationToken::new(),
     }
 }
 

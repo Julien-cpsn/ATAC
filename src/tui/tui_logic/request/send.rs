@@ -3,7 +3,7 @@ use std::sync::Arc;
 use ratatui::style::Stylize;
 use ratatui::text::Line;
 use tokio::task;
-
+use tracing::info;
 use crate::app::app::App;
 use crate::app::business_logic::request::send::send_request;
 use crate::tui::utils::syntax_highlighting::highlight;
@@ -11,6 +11,17 @@ use crate::tui::utils::syntax_highlighting::highlight;
 impl App<'_> {
     pub async fn tui_send_request(&mut self) {
         let local_selected_request = self.get_selected_request_as_local();
+
+        {
+            let selected_request = local_selected_request.read();
+            
+            if selected_request.is_pending {
+                selected_request.cancellation_token.cancel();
+                info!("Request canceled");
+                return;
+            }
+        }
+        
         let mut selected_request = local_selected_request.write();
 
         /* PRE-REQUEST SCRIPT */

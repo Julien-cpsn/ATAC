@@ -53,6 +53,7 @@ arboard = "=3.4.0"
 
 # Async
 tokio = { version = "=1.39.3", features = ["rt", "rt-multi-thread", "macros"] }
+tokio-util = "0.7.11"
 parking_lot = { version = "=0.12.3", features = ["serde", "send_guard"] }
 
 # Utils
