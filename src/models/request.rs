@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 use tracing::trace;
 use tui_tree_widget::TreeItem;
 use rayon::prelude::*;
+use tokio_util::sync::CancellationToken;
 
 use crate::app::app::App;
 use crate::models::auth::Auth;
@@ -30,7 +31,10 @@ pub struct Request {
     pub response: RequestResponse,
 
     #[serde(skip)]
-    pub is_pending: bool
+    pub is_pending: bool,
+
+    #[serde(skip)]
+    pub cancellation_token: CancellationToken,
 }
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
