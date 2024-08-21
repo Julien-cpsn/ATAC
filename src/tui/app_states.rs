@@ -270,7 +270,9 @@ impl AppState {
                 };
 
                 let mut base_events: Vec<AppEvent> = vec![
-                    GoBackToMainMenu(EventKeyBinding::new(vec![key_bindings.generic.navigation.go_back], "Quit", Some("Quit"))),
+                    ExitApp(EventKeyBinding::new(vec![key!(ctrl-c)], "Exit app", None)),
+
+                    GoBackToMainMenu(EventKeyBinding::new(vec![key_bindings.generic.navigation.go_back], "Quit to main menu", Some("Quit"))),
                     Documentation(EventKeyBinding::new(vec![key_bindings.generic.display_help], "Display help", Some("Help"))),
 
                     EditUrl(EventKeyBinding::new(vec![key_bindings.request_selected.change_url], "Edit URL", Some("URL"))),
@@ -280,7 +282,7 @@ impl AppState {
 
                     NextView(EventKeyBinding::new(vec![key_bindings.request_selected.next_view], "Next view", None)),
 
-                    SendRequest(EventKeyBinding::new(vec![key_bindings.request_selected.send_request, key_bindings.request_selected.alt_send_request], "Send/cancel a request", Some("Send/Cancel"))),
+                    SendRequest(EventKeyBinding::new(vec![key_bindings.request_selected.send_request, key_bindings.request_selected.alt_send_request], "Send/cancel request", Some("Send/Cancel"))),
 
                     NextEnvironment(EventKeyBinding::new(vec![key_bindings.main_menu.next_environment], "Next environment", None)),
                     DisplayCookies(EventKeyBinding::new(vec![key_bindings.main_menu.display_cookies], "Display cookies", None)),

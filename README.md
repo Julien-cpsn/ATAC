@@ -195,7 +195,6 @@ cargo run -- -h
 
 - **To add**
   - Document the whole code
-  - Cancel pending request
   - Error notification in TUI
   - Request body syntax highlighting
   - Export a request to other code formats ([raw](https://github.com/Kong/insomnia/issues/174), curl, PHP, JS, Rust, ...)
