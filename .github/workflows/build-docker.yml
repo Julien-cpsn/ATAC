@@ -13,7 +13,7 @@ on:
     types: [ "published" ]
 
 env:
-  PUSH_IMAGE: false
+  PUSH_IMAGE: true
   IMAGE_NAME: Julien-cpsn/ATAC
   RUST_VERSION: "1.79"
 
