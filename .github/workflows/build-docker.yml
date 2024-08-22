@@ -16,6 +16,8 @@ env:
   PUSH_IMAGE: true
   IMAGE_NAME: Julien-cpsn/ATAC
   RUST_VERSION: "1.79"
+  DOCKER_BUILDKIT: 0
+  COMPOSE_DOCKER_CLI_BUILD: 0
 
 jobs:
   build-and-publish:
