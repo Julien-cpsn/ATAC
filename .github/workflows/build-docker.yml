@@ -61,4 +61,4 @@ jobs:
       - name: Push to GHCR
         run: |
           docker login ghcr.io -u Julien-cpsn --password ${{ secrets.GITHUB_TOKEN }}
-          docker push ghcr.io/julien-cpsn/atac:latest
+          docker push ghcr.io/Julien-cpsn/atac:latest
