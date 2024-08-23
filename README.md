@@ -15,6 +15,7 @@ ATAC ⚔📩
   * [Install with Homebrew](#install-with-homebrew)
   * [Install from Arch](#install-from-arch)
   * [Install from Fedora copr](#install-from-fedora-copr)
+  * [Docker package](#docker-package)
   * [Binary](#binary)
   * [Compile by yourself](#compile-by-yourself)
 - [Features](#features)
@@ -99,6 +100,10 @@ dnf install atac
 <a href="https://github.com/Julien-cpsn/ATAC/releases">
   <img alt="GitHub Release" src="https://img.shields.io/github/v/release/julien-cpsn/atac?label=Release&color=45c017" align="right">
 </a>
+
+### Docker package
+
+Pull the image from https://hub.docker.com/repository/docker/juliencaposiena/atac/general
 
 ### Binary
 
@@ -330,7 +335,7 @@ The binary file size goes from ~4.5 MB to ~7 MB depending on the platform. I try
 
 ### Packagers
 
-- Cargo, Brew - [@julien-cpsn](https://github.com/julien-cpsn)
+- Cargo, Brew, Docker - [@julien-cpsn](https://github.com/julien-cpsn)
 - Arch - [@orhun](https://github.com/orhun)
 - Fedora copr - [@joxcat](https://github.com/joxcat)
 
