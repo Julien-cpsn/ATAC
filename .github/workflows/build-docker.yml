@@ -58,4 +58,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-
+      - name: Push to GHCR
+        run: |
+          docker login ghcr.io -u Julien-cpsn --password ${{ secrets.GITHUB_TOKEN }}
+          docker push ghcr.io/Julien-cpsn/ATAC:latest
