@@ -16,8 +16,6 @@ env:
   PUSH_IMAGE: true
   IMAGE_NAME: Julien-cpsn/ATAC
   RUST_VERSION: "1.79"
-  DOCKER_BUILDKIT: 0
-  COMPOSE_DOCKER_CLI_BUILD: 0
 
 jobs:
   build-and-publish:
@@ -41,7 +39,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Login to Docker Hub
-        if: ${{ env.PUSH_IMAGE == true && github.event_name != 'pull_request' }}
+        if: ${{ env.PUSH_IMAGE == 'true' && github.event_name != 'pull_request' }}
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
