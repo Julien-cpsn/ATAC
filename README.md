@@ -97,13 +97,18 @@ dnf copr enable joxcat/atac
 dnf install atac
 ```
 
-<a href="https://github.com/Julien-cpsn/ATAC/releases">
-  <img alt="GitHub Release" src="https://img.shields.io/github/v/release/julien-cpsn/atac?label=Release&color=45c017" align="right">
+<a href="https://hub.docker.com/repository/docker/juliencaposiena/atac">
+ <img alt="Docker Image Version" src="https://img.shields.io/docker/v/juliencaposiena/atac?logo=docker" align="right">
 </a>
 
 ### Docker package
 
 Pull the image from https://hub.docker.com/repository/docker/juliencaposiena/atac/general
+
+
+<a href="https://github.com/Julien-cpsn/ATAC/releases">
+  <img alt="GitHub Release" src="https://img.shields.io/github/v/release/julien-cpsn/atac?label=Release&color=45c017" align="right">
+</a>
 
 ### Binary
 
