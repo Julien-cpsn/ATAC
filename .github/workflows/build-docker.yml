@@ -14,7 +14,7 @@ on:
 
 env:
   PUSH_IMAGE: true
-  IMAGE_NAME: Julien-cpsn/ATAC
+  IMAGE_NAME: juliencaposiena/ATAC
   RUST_VERSION: "1.79"
 
 jobs:
