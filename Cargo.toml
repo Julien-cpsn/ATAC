@@ -15,8 +15,7 @@ keywords = ["API", "Client", "TUI", "Postman", "Insomnia"]
 exclude = [
     ".github",
     "gifs",
-    "import_tests",
-    "base_collections"
+    "exemple_resources",
 ]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -36,6 +35,7 @@ tui-textarea = { version = "=0.6.1", features = ["ratatui"] }
 throbber-widgets-tui = "=0.7.0"
 ratatui-image = { version = "=1.0.5", features = ["crossterm"] }
 image = "=0.25.2"
+
 # Main functionalities
 syntect = "=5.2.0"
 serde = { version = "=1.0.209", features = ["derive", "rc"] }
