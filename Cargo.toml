@@ -39,8 +39,8 @@ image = "=0.25.2"
 
 # Main functionalities
 syntect = "=5.2.0"
-serde = { version = "=1.0.208", features = ["derive", "rc"] }
-serde_json = "=1.0.125"
+serde = { version = "=1.0.209", features = ["derive", "rc"] }
+serde_json = "=1.0.127"
 serde_yaml = "=0.9.34"
 jsonxf = "=1.1.1"
 toml = "=0.8.19"
@@ -67,7 +67,7 @@ rayon = "=1.10.0"
 thiserror = "=1.0.63"
 anyhow = "=1.0.86"
 clap-verbosity-flag = "=2.2.1"
-clap_complete = "=4.5.18"
+clap_complete = "=4.5.23"
 clap_mangen = "=0.2.23"
 base64 = "=0.22.1"
 regex = "=1.10.6"
