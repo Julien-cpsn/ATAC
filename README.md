@@ -330,7 +330,7 @@ https://github.com/NachoNievaG/atac.nvim
 
 ### Binary size
 
-The binary file size goes from ~4.5 MB to ~7 MB depending on the platform. I try to keep it as small as possible.
+The binary file size goes from ~5 MB to ~12 MB depending on the platform. I try to keep it as small as possible, unfortunately for me, I bundle a Javascript runtime.
 
 ## Contributors
 
