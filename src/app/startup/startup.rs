@@ -46,7 +46,9 @@ impl<'a> App<'a> {
             }
         };
 
-        self.parse_app_directory();
+        if ARGS.should_parse_directory {
+            self.parse_app_directory();
+        }
 
         if let Some(command) = &ARGS.command {
             return CLI(self, command.clone());
@@ -59,9 +61,9 @@ impl<'a> App<'a> {
     }
 
     fn parse_app_directory(&mut self) {
-        let paths = match ARGS.directory.read_dir() {
+        let paths = match ARGS.directory.as_ref().unwrap().read_dir() {
             Ok(paths) => paths,
-            Err(e) => panic_error(format!("Directory \"{}\" not found\n\t{e}", ARGS.directory.display()))
+            Err(e) => panic_error(format!("Directory \"{}\" not found\n\t{e}", ARGS.directory.as_ref().unwrap().display()))
         };
 
         for path in paths {
@@ -94,7 +96,7 @@ impl<'a> App<'a> {
     }
 
     fn create_log_file(&mut self) -> File {
-        let path = ARGS.directory.join("atac.log");
+        let path = ARGS.directory.as_ref().unwrap().join("atac.log");
 
         let log_file = match OpenOptions::new().write(true).create(true).truncate(true).open(path) {
             Ok(log_file) => log_file,

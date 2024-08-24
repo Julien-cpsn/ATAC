@@ -1,18 +1,18 @@
+use std::env;
 use std::fs;
 use clap::CommandFactory;
 
 use crate::cli::args::{Args, ARGS};
-use crate::cli::commands::man::ManCommand;
 
-pub fn generate_man_page(man_command: &ManCommand) -> anyhow::Result<()> {
+pub fn generate_man_page() -> anyhow::Result<()> {
 
     let man = clap_mangen::Man::new(Args::command());
     let mut buffer: Vec<u8> = vec![];
 
     man.render(&mut buffer)?;
 
-    let path = match &man_command.output_directory {
-        None => &ARGS.directory,
+    let path = match &ARGS.directory {
+        None => &env::current_dir()?,
         Some(path) => path
     };
     

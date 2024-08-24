@@ -1,9 +1,10 @@
-use std::env;
+use std::{env, fs};
 use std::path::PathBuf;
 
 use clap::{Parser, Subcommand};
 use clap::builder::Styles;
 use clap_verbosity_flag::Verbosity;
+use directories::ProjectDirs;
 use lazy_static::lazy_static;
 
 use crate::cli::commands::collection_commands::collection_commands::CollectionCommand;
@@ -81,7 +82,7 @@ atac
       - postman
       - curl
  - completions
-      - bash, powershell, fish
+      - bash, powershell, fish, zsh
  - man
 */
 
@@ -109,36 +110,68 @@ pub enum Command {
     Man(ManCommand),
 }
 
-#[derive(Debug)]
-pub struct GlobalArgs {
-    pub directory: PathBuf,
-    pub command: Option<Command>,
-    pub should_save: bool,
-    pub verbosity: Verbosity,
-    pub ansi_log: bool
-}
-
 lazy_static! {
     pub static ref ARGS: GlobalArgs = {
         let args = Args::parse();
         
-        let directory = match args.directory {
-            // If a directory was provided with a CLI argument
-            Some(arg_directory) => expand_tilde(arg_directory),
-            // If no directory was provided with the CLI
-            None => match env::var("ATAC_MAIN_DIR") {
-                // If the ATAC_MAIN_DIR environment variable exists
-                Ok(env_directory) => expand_tilde(PathBuf::from(env_directory)),
-                Err(_) => panic_error("No directory provided, provide one either with `--directory <dir>` or via the environment variable `ATAC_MAIN_DIR`")
-            }
+        let (directory, should_parse_directory) = match &args.command {
+            // CLI
+            Some(command) => match command.clone() {
+                // Commands that take an output dir
+                Command::Completions(CompletionsCommand { output_directory, .. }) | Command::Man(ManCommand { output_directory, .. }) => (output_directory, false),
+                // Commands that use no dir at all
+                Command::Try(_) => (None, false),
+                // Commands that use the app dir
+                _ => (Some(choose_app_directory(args.directory)), true)
+            },
+            // TUI
+            None => (Some(choose_app_directory(args.directory)), true) 
         };
 
         GlobalArgs {
             directory,
             command: args.command,
             should_save: !args.dry_run,
+            should_parse_directory,
             verbosity: args.verbose,
             ansi_log: !args.no_ansi_log
         }
     };
+}
+
+fn choose_app_directory(path_buf: Option<PathBuf>) -> PathBuf {
+    match path_buf {
+        // If a directory was provided with the CLI argument
+        Some(directory) => expand_tilde(directory),
+        
+        // If no directory was provided with the CLI
+        None => match env::var("ATAC_MAIN_DIR") {
+            // If the ATAC_MAIN_DIR environment variable exists
+            Ok(env_directory) => expand_tilde(PathBuf::from(env_directory)),
+            
+            // No ATAC_MAIN_DIR env variable
+            Err(_) => match ProjectDirs::from("com", "Julien-cpsn", "ATAC") {
+                Some(project_dir) => {
+                    let config_dir = project_dir.config_dir();
+                    
+                    if !config_dir.exists() {
+                        fs::create_dir_all(config_dir).expect(&format!("Could not recursively create folder \"{}\"", config_dir.display()));
+                    }
+                    
+                    config_dir.to_path_buf()
+                },
+                None => panic_error("No directory provided, provide one either with `--directory <dir>` or via the environment variable `ATAC_MAIN_DIR`")
+            }
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct GlobalArgs {
+    pub directory: Option<PathBuf>,
+    pub command: Option<Command>,
+    pub should_save: bool,
+    pub should_parse_directory: bool,
+    pub verbosity: Verbosity,
+    pub ansi_log: bool
 }

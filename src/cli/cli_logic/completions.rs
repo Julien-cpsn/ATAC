@@ -1,3 +1,4 @@
+use std::env;
 use std::str::FromStr;
 
 use anyhow::anyhow;
@@ -15,8 +16,8 @@ pub fn generate_completions(completions_command: &CompletionsCommand) -> anyhow:
         }
     };
 
-    let path = match &completions_command.output_directory {
-        None => &ARGS.directory,
+    let path = match &ARGS.directory {
+        None => &env::current_dir()?,
         Some(path) => path
     };
     

@@ -35,7 +35,7 @@ impl App<'_> {
 
             Completions(completions_command) => generate_completions(completions_command),
             
-            Man(man_command) => generate_man_page(man_command)
+            Man(_) => generate_man_page()
         };
 
         if let Err(error) = result {

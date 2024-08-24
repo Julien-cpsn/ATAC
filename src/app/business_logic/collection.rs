@@ -45,7 +45,7 @@ impl App<'_> {
         let new_collection = Collection {
             name: new_collection_name.clone(),
             requests: vec![],
-            path: ARGS.directory.join(format!("{}.{}", new_collection_name, file_format.to_string())),
+            path: ARGS.directory.as_ref().unwrap().join(format!("{}.{}", new_collection_name, file_format.to_string())),
             file_format,
         };
 

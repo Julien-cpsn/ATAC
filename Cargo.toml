@@ -48,7 +48,7 @@ boa_engine = { version = "=0.19.0", default-features = false }
 parse_postman_collection = "=0.2.3"
 curl-parser = { version = "=0.3.1", default-features = false }
 clap = { version = "=4.5.16", features = ["derive", "color", "suggestions"] }
-dirs = "=5.0.1"
+directories = "=5.0.1"
 arboard = "=3.4.0"
 
 # Async

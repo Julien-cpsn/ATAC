@@ -59,7 +59,7 @@ impl App<'_> {
             Collection {
                 name: collection_name.clone(),
                 requests: vec![],
-                path: ARGS.directory.join(format!("{}.{}", collection_name, file_format.to_string())),
+                path: ARGS.directory.as_ref().unwrap().join(format!("{}.{}", collection_name, file_format.to_string())),
                 file_format,
             }
         ];
@@ -151,7 +151,7 @@ fn recursive_has_requests(item: &mut Items, collections: &mut Vec<Collection>, m
             let collection = Collection {
                 name: collection_name.clone(),
                 requests,
-                path: ARGS.directory.join(format!("{}.{}", collection_name, file_format.to_string())),
+                path: ARGS.directory.as_ref().unwrap().join(format!("{}.{}", collection_name, file_format.to_string())),
                 file_format,
             };
 
