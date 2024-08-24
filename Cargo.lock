@@ -203,7 +203,7 @@ dependencies = [
 
 [[package]]
 name = "atac"
-version = "0.17.0"
+version = "0.18.0"
 dependencies = [
  "anyhow",
  "arboard",
@@ -336,6 +336,9 @@ name = "bitflags"
 version = "2.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b048fb63fd8b5923fc5aa7b340d8e156aec7ec02f0c78fa8a6ddc2613f6f71de"
+dependencies = [
+ "serde",
+]
 
 [[package]]
 name = "bitstream-io"
@@ -719,6 +722,7 @@ dependencies = [
  "itoa",
  "rustversion",
  "ryu",
+ "serde",
  "static_assertions",
 ]
 
@@ -2704,6 +2708,7 @@ dependencies = [
  "itertools 0.13.0",
  "lru",
  "paste",
+ "serde",
  "strum",
  "strum_macros",
  "unicode-segmentation",

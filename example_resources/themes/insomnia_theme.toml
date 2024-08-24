@@ -1,0 +1,29 @@
+# Base colors:
+# Black, Red, Green, Yellow, Blue, Magenta, Cyan, Gray, DarkGray
+# LightRed, LightGreen, LightYellow, LightBlue, LightMagenta, LightCyan, White
+#
+# Hex codes also work, e.g.  "#1a2b3c"
+
+[ui]
+font_color = "White"
+# This can be null to preserve orginial terminal background
+app_background = "#282828"
+
+main_foreground_color = "Magenta"
+secondary_foreground_color = "DarkGray"
+
+main_background_color = "DarkGray"
+secondary_background_color = "#252525"
+
+[others]
+selection_highlight_color = "Yellow"
+environment_variable_highlight_color = "#6dc26d"
+
+[methods]
+GET = "LightMagenta"
+POST = "LightGreen"
+PUT = "#ffa200"
+PATCH = "#ffdd00"
+DELETE = "LightRed"
+HEAD = "LightCyan"
+OPTIONS = "LightCyan"

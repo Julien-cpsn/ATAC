@@ -4,19 +4,26 @@ use ratatui::layout::{Alignment, Constraint, Layout};
 use ratatui::layout::Direction::{Horizontal, Vertical};
 use ratatui::prelude::{Modifier};
 use ratatui::style::{Stylize};
-use ratatui::style::Color::DarkGray;
 use ratatui::text::Line;
 use ratatui::widgets::{Block, Borders};
 use ratatui::widgets::block::Title;
 
 use crate::app::app::{App};
+use crate::app::files::theme::THEME;
 use crate::tui::app_states::AppState::*;
 use crate::tui::app_states::{AVAILABLE_EVENTS, event_available_keys_to_spans};
-use crate::tui::utils::colors::DARK_BLACK;
 
 
 impl App<'_> {
     fn ui(&mut self, frame: &mut Frame) {
+
+        if let Some(bg_color) = THEME.read().ui.app_background {
+            let test = Block::new().bg(bg_color);
+
+            frame.render_widget(test, frame.area());
+        }
+
+
         // MAIN LAYOUT
 
         let main_layout = Layout::new(
@@ -105,7 +112,12 @@ impl App<'_> {
 
         let state_line = self.get_state_line();
         let events = &*AVAILABLE_EVENTS.read();
-        let available_keys = Line::from(event_available_keys_to_spans(events, DarkGray, *DARK_BLACK, true).concat());
+        let available_keys = Line::from(event_available_keys_to_spans(
+            events,
+            THEME.read().ui.secondary_foreground_color,
+            THEME.read().ui.secondary_background_color,
+            true
+        ).concat());
 
         let footer = Block::new()
             .title(Title::from(state_line).alignment(Alignment::Left))

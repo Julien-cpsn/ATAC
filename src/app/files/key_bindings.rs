@@ -278,7 +278,7 @@ impl App<'_> {
             // If the ATAC_KEY_BINDINGS environment variable exists
             Ok(env_key_bindings) => expand_tilde(PathBuf::from(env_key_bindings)),
             Err(_) => {
-                warn!("No key bindings file found");
+                warn!("No key bindings file found, using default");
                 return;
             }
         };

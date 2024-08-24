@@ -1,13 +1,14 @@
 use ratatui::Frame;
 use ratatui::layout::{Constraint, Layout, Rect};
 use ratatui::layout::Direction::Vertical;
-use ratatui::prelude::{Color, Style};
+use ratatui::prelude::Style;
 use ratatui::style::Stylize;
 use ratatui::text::Line;
 use ratatui::widgets::{Block, Borders, Paragraph, Tabs};
 use strum::{Display, EnumIter, FromRepr, IntoEnumIterator};
 
 use crate::app::app::App;
+use crate::app::files::theme::THEME;
 use crate::models::auth::Auth::*;
 use crate::models::body::ContentType::*;
 use crate::models::request::Request;
@@ -42,7 +43,7 @@ impl App<'_> {
 
         let param_tabs = RequestParamsTabs::iter()
             .map(|tab| {
-                match tab {
+                let text = match tab {
                     RequestParamsTabs::QueryParams => match request.params.is_empty() {
                         true => tab.to_string(),
                         false => format!("{} ({})", tab.to_string(), request.params.len())
@@ -60,16 +61,19 @@ impl App<'_> {
                         Multipart(_) | Form(_) | File(_) | Raw(_) | Json(_) | Xml(_) | Html(_) | Javascript(_) => format!("{} ({})", tab.to_string(), request.body.to_string())
                     },
                     RequestParamsTabs::Scripts => tab.to_string(),
-                }
+                };
+
+                text.fg(THEME.read().ui.font_color)
             });
 
         let selected_param_tab_index = self.request_param_tab as usize;
 
         let params_tabs = Tabs::new(param_tabs)
-            .highlight_style(Style::default().yellow())
+            .highlight_style(THEME.read().others.selection_highlight_color)
             .select(selected_param_tab_index)
             .block(
                 Block::new().borders(Borders::BOTTOM)
+                    .fg(THEME.read().ui.main_foreground_color)
             );
 
         frame.render_widget(params_tabs, request_params_layout[0]);
@@ -82,8 +86,8 @@ impl App<'_> {
                     None => {
                         let params_lines = vec![
                             Line::default(),
-                            Line::from("No params"),
-                            Line::from("(Add one with n or via the URL)".dark_gray())
+                            Line::from("No params").fg(THEME.read().ui.font_color),
+                            Line::from("(Add one with n or via the URL)").fg(THEME.read().ui.secondary_foreground_color)
                         ];
 
                         let params_paragraph = Paragraph::new(params_lines).centered();
@@ -100,8 +104,8 @@ impl App<'_> {
                     NoAuth => {
                         let auth_lines = vec![
                             Line::default(),
-                            Line::from("No auth"),
-                            Line::from("(Change auth method with ^a)".dark_gray())
+                            Line::from("No auth").fg(THEME.read().ui.font_color),
+                            Line::from("(Change auth method with ^a)").fg(THEME.read().ui.secondary_foreground_color)
                         ];
 
                         let auth_paragraph = Paragraph::new(auth_lines).centered();
@@ -121,8 +125,8 @@ impl App<'_> {
                     None => {
                         let headers_lines = vec![
                             Line::default(),
-                            Line::from("Default headers"),
-                            Line::from("(Add one with n)".dark_gray())
+                            Line::from("Default headers").fg(THEME.read().ui.font_color),
+                            Line::from("(Add one with n)").fg(THEME.read().ui.secondary_foreground_color)
                         ];
 
                         let headers_paragraph = Paragraph::new(headers_lines).centered();
@@ -139,8 +143,8 @@ impl App<'_> {
                     NoBody => {
                         let body_lines = vec![
                             Line::default(),
-                            Line::from("No body"),
-                            Line::from("(Change body type with ^b)".dark_gray())
+                            Line::from("No body").fg(THEME.read().ui.font_color),
+                            Line::from("(Change body type with ^b)").fg(THEME.read().ui.secondary_foreground_color)
                         ];
 
                         let body_paragraph = Paragraph::new(body_lines).centered();
@@ -152,8 +156,8 @@ impl App<'_> {
                             None => {
                                 let multipart_form_lines = vec![
                                     Line::default(),
-                                    Line::from("No form data"),
-                                    Line::from("(Add one with n)".dark_gray())
+                                    Line::from("No form data").fg(THEME.read().ui.font_color),
+                                    Line::from("(Add one with n)").fg(THEME.read().ui.secondary_foreground_color)
                                 ];
 
                                 let multipart_form_paragraph = Paragraph::new(multipart_form_lines).centered();
@@ -169,7 +173,9 @@ impl App<'_> {
                       self.render_file_body_tab(frame, request_params_layout[1]);
                     },
                     Raw(_) | Json(_) | Xml(_) | Html(_) | Javascript(_) => {
-                        self.body_text_area.set_line_number_style(Style::new().fg(Color::DarkGray));
+                        self.body_text_area.set_style(Style::new().fg(THEME.read().ui.font_color));
+                        self.body_text_area.set_line_number_style(Style::new().fg(THEME.read().ui.secondary_foreground_color));
+
                         frame.render_widget(&self.body_text_area, request_params_layout[1]);
                     }
                 }

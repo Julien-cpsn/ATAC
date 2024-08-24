@@ -3,6 +3,7 @@ use ratatui::text::{Line, Span};
 use regex::Regex;
 
 use crate::app::app::App;
+use crate::app::files::theme::THEME;
 
 impl App<'_> {
     pub fn tui_next_environment(&mut self) {
@@ -45,7 +46,10 @@ impl App<'_> {
                                 let range = sub_match.range();
 
                                 spans.push(Span::raw(input[tmp_index..range.start].to_string()));
-                                spans.push(Span::raw(sub_match.as_str().to_owned()).cyan());
+                                spans.push(
+                                    Span::raw(sub_match.as_str().to_owned())
+                                        .fg(THEME.read().others.environment_variable_highlight_color)
+                                );
 
                                 tmp_index = range.end;
                             }

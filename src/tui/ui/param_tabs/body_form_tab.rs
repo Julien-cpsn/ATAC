@@ -1,12 +1,12 @@
 use ratatui::Frame;
 use ratatui::layout::Direction::{Horizontal, Vertical};
 use ratatui::layout::{Constraint, Layout, Position, Rect};
-use ratatui::prelude::Color::Yellow;
 use ratatui::prelude::{Modifier, Style};
 use ratatui::style::Stylize;
 use ratatui::widgets::{Block, Borders, List, ListItem, Paragraph};
 
 use crate::app::app::App;
+use crate::app::files::theme::THEME;
 use crate::tui::app_states::AppState::{EditingRequestBodyTable};
 use crate::models::request::{KeyValue};
 
@@ -32,13 +32,21 @@ impl App<'_> {
 
         let form_title = Paragraph::new("Key")
             .centered()
-            .block(Block::new().borders(Borders::BOTTOM | Borders::RIGHT))
-            .dark_gray();
+            .block(
+                Block::new()
+                    .borders(Borders::BOTTOM | Borders::RIGHT)
+                    .fg(THEME.read().ui.secondary_foreground_color)
+            )
+            .fg(THEME.read().ui.secondary_foreground_color);
 
         let form_value = Paragraph::new("Value")
             .centered()
-            .block(Block::new().borders(Borders::BOTTOM))
-            .dark_gray();
+            .block(
+                Block::new()
+                    .borders(Borders::BOTTOM)
+                    .fg(THEME.read().ui.secondary_foreground_color)
+            )
+            .fg(THEME.read().ui.secondary_foreground_color);
 
         frame.render_widget(form_title, inner_form_layout[0]);
         frame.render_widget(form_value, inner_form_layout[1]);
@@ -66,8 +74,8 @@ impl App<'_> {
             let mut value = ListItem::from(value);
 
             if !form_data.enabled {
-                key = key.dark_gray().dim();
-                value = value.dark_gray().dim();
+                key = key.fg(THEME.read().ui.secondary_foreground_color).dim();
+                value = value.fg(THEME.read().ui.secondary_foreground_color).dim();
             }
 
             keys.push(key);
@@ -78,14 +86,22 @@ impl App<'_> {
         let mut right_list_style = Style::default();
 
         match form_selection.1 {
-            0 => left_list_style = left_list_style.fg(Yellow).add_modifier(Modifier::BOLD),
-            1 => right_list_style = right_list_style.fg(Yellow).add_modifier(Modifier::BOLD),
+            0 => left_list_style = left_list_style
+                .add_modifier(Modifier::BOLD)
+                .fg(THEME.read().others.selection_highlight_color),
+            1 => right_list_style = right_list_style
+                .add_modifier(Modifier::BOLD)
+                .fg(THEME.read().others.selection_highlight_color),
             _ => {}
         }
 
-        let left_list = List::new(keys).highlight_style(left_list_style);
+        let left_list = List::new(keys)
+            .highlight_style(left_list_style)
+            .fg(THEME.read().ui.font_color);
 
-        let right_list = List::new(values).highlight_style(right_list_style);
+        let right_list = List::new(values)
+            .highlight_style(right_list_style)
+            .fg(THEME.read().ui.font_color);
 
         frame.render_stateful_widget(left_list, table_layout[0], &mut self.body_form_table.left_state.clone());
         frame.render_stateful_widget(right_list, table_layout[1], &mut self.body_form_table.right_state.clone());

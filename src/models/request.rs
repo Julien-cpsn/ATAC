@@ -1,6 +1,6 @@
 use lazy_static::lazy_static;
 use ratatui::prelude::{Line, Modifier, Span};
-use ratatui::style::Stylize;
+use ratatui::style::{Color, Stylize};
 use serde::{Deserialize, Serialize};
 use tracing::trace;
 use tui_tree_widget::TreeItem;
@@ -8,6 +8,7 @@ use rayon::prelude::*;
 use tokio_util::sync::CancellationToken;
 
 use crate::app::app::App;
+use crate::app::files::theme::THEME;
 use crate::models::auth::Auth;
 use crate::models::body::ContentType;
 use crate::models::method::Method;
@@ -92,6 +93,7 @@ impl Request {
 
         let prefix = Span::from(self.method.to_string())
             .style(Modifier::BOLD)
+            .fg(Color::White)
             .bg(self.method.get_color());
 
         line_elements.push(prefix);
@@ -103,7 +105,7 @@ impl Request {
             line_elements.push(Span::raw(" "));
         }
 
-        let text = Span::from(self.name.clone());
+        let text = Span::from(self.name.clone()).fg(THEME.read().ui.font_color);
 
         line_elements.push(text);
 

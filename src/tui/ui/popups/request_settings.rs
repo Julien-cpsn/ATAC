@@ -5,6 +5,7 @@ use ratatui::style::Stylize;
 use ratatui::widgets::{Block, Borders, Clear, Paragraph};
 
 use crate::app::app::App;
+use crate::app::files::theme::THEME;
 use crate::tui::utils::centered_rect::centered_rect;
 
 impl App<'_> {
@@ -12,8 +13,8 @@ impl App<'_> {
         let popup_block = Block::default()
             .title("Request settings")
             .borders(Borders::ALL)
-            .white()
-            .on_dark_gray();
+            .fg(THEME.read().ui.main_foreground_color)
+            .bg(THEME.read().ui.main_background_color);
 
         let settings_number = self.request_settings_popup.settings.len() as u16;
 
@@ -54,11 +55,11 @@ impl App<'_> {
 
         // Render settings
         for (index, (setting_name, setting_value)) in self.request_settings_popup.settings.iter().enumerate() {
-            let setting_name_paragraph = Paragraph::new(setting_name.to_string()).centered();
-            let mut setting_value_paragraph = Paragraph::new(setting_value.to_string()).centered();
+            let setting_name_paragraph = Paragraph::new(setting_name.to_string()).fg(THEME.read().ui.font_color).centered();
+            let mut setting_value_paragraph = Paragraph::new(setting_value.to_string()).fg(THEME.read().ui.font_color).centered();
 
             if index == self.request_settings_popup.selection {
-                setting_value_paragraph = setting_value_paragraph.yellow()
+                setting_value_paragraph = setting_value_paragraph.fg(THEME.read().others.selection_highlight_color)
             }
 
             frame.render_widget(setting_name_paragraph, settings_names_layout[index + 1]);

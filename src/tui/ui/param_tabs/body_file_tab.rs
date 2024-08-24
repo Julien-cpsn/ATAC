@@ -5,6 +5,7 @@ use ratatui::style::Stylize;
 use ratatui::widgets::{Block, Borders, Paragraph};
 
 use crate::app::app::App;
+use crate::app::files::theme::THEME;
 use crate::tui::app_states::AppState;
 
 impl App<'_> {
@@ -22,7 +23,7 @@ impl App<'_> {
         let file_body_block = Block::new()
             .title("File path")
             .borders(Borders::ALL)
-            .yellow();
+            .fg(THEME.read().others.selection_highlight_color);
 
         let mut should_display_cursor = false;
 
@@ -42,7 +43,9 @@ impl App<'_> {
 
         let file_body_line = self.tui_add_color_to_env_keys(&padded_text);
 
-        let file_body_paragraph = Paragraph::new(file_body_line).block(file_body_block);
+        let file_body_paragraph = Paragraph::new(file_body_line)
+            .block(file_body_block)
+            .fg(THEME.read().others.selection_highlight_color);
 
         frame.render_widget(file_body_paragraph, file_body_layout[0]);
     }

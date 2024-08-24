@@ -12,6 +12,7 @@ use throbber_widgets_tui::{BRAILLE_DOUBLE, Throbber, WhichUse};
 use rayon::prelude::*;
 
 use crate::app::app::App;
+use crate::app::files::theme::THEME;
 use crate::models::request::Request;
 use crate::models::response::ResponseContent;
 use crate::tui::utils::centered_rect::centered_rect;
@@ -46,7 +47,7 @@ impl App<'_> {
 
         let result_tabs = RequestResultTabs::iter()
             .filter_map(|tab| {
-                match tab {
+                let text = match tab {
                     RequestResultTabs::Body => {
                         if let Some(duration) = &request.response.duration {
                             Some(format!("{} ({})", tab.to_string(), duration))
@@ -64,16 +65,22 @@ impl App<'_> {
                             Some(_) => Some(tab.to_string())
                         }
                     }
+                };
+
+                match text {
+                    Some(text) => Some(text.fg(THEME.read().ui.font_color)),
+                    None => None
                 }
             });
 
         let selected_result_tab_index = self.request_result_tab as usize;
 
         let result_tabs = Tabs::new(result_tabs)
-            .highlight_style(Style::default().yellow())
+            .highlight_style(THEME.read().others.selection_highlight_color)
             .select(selected_result_tab_index)
             .block(
                 Block::new().borders(Borders::BOTTOM)
+                    .fg(THEME.read().ui.main_foreground_color)
             );
 
         frame.render_widget(result_tabs, request_result_layout[0]);
@@ -86,7 +93,7 @@ impl App<'_> {
             
             let throbber = Throbber::default()
                 .label("Pending")
-                .style(Style::new().dark_gray())
+                .style(Style::new().fg(THEME.read().ui.secondary_foreground_color))
                 .throbber_set(BRAILLE_DOUBLE)
                 .use_type(WhichUse::Spin);
 
@@ -101,7 +108,9 @@ impl App<'_> {
                 Some(status_code) => status_code
             };
 
-            let status_code_paragraph = Paragraph::new(status_code).centered().dark_gray();
+            let status_code_paragraph = Paragraph::new(status_code)
+                .centered()
+                .fg(THEME.read().ui.secondary_foreground_color);
             frame.render_widget(status_code_paragraph, request_result_layout[1]);
 
 
@@ -147,7 +156,9 @@ impl App<'_> {
                                 frame.render_widget(image, request_result_layout[2]);
                             }
                             None => {
-                                let image_error_paragraph = Paragraph::new("\nCould not decode image").centered();
+                                let image_error_paragraph = Paragraph::new("\nCould not decode image")
+                                    .centered()
+                                    .fg(THEME.read().ui.font_color);
                                 frame.render_widget(image_error_paragraph, request_result_layout[2]);
                             }
                         },
@@ -160,6 +171,7 @@ impl App<'_> {
                     };
 
                     let cookies_paragraph = Paragraph::new(result_cookies)
+                        .fg(THEME.read().ui.font_color)
                         .scroll((
                             self.result_vertical_scrollbar.scroll,
                             self.result_horizontal_scrollbar.scroll
@@ -172,7 +184,11 @@ impl App<'_> {
                         .par_iter()
                         .map(
                             |(header, value)| 
-                                Line::from(vec![Span::raw(header).bold().dark_gray(), Span::raw(": "), Span::raw(value)])
+                                Line::from(vec![
+                                    Span::raw(header).bold().fg(THEME.read().ui.secondary_foreground_color),
+                                    Span::raw(": ").fg(THEME.read().ui.secondary_foreground_color),
+                                    Span::raw(value).fg(THEME.read().ui.font_color)
+                                ])
                         )
                         .collect();
 
@@ -198,8 +214,10 @@ impl App<'_> {
             };
         }
 
-        let result_vertical_scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight);
+        let result_vertical_scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight)
+            .style(Style::new().fg(THEME.read().ui.font_color));
         let result_horizontal_scrollbar = Scrollbar::new(ScrollbarOrientation::HorizontalBottom)
+            .style(Style::new().fg(THEME.read().ui.font_color))
             .thumb_symbol("■"); // Better than the default full block
 
         frame.render_stateful_widget(

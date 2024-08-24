@@ -2,11 +2,11 @@ use ratatui::Frame;
 use ratatui::layout::{Constraint, Layout, Rect};
 use ratatui::layout::Direction::{Horizontal, Vertical};
 use ratatui::prelude::{Line, Modifier, Style};
-use ratatui::prelude::Color::Yellow;
 use ratatui::style::Stylize;
 use ratatui::widgets::{Block, Borders, Clear, List, ListItem, Paragraph};
 
 use crate::app::app::App;
+use crate::app::files::theme::THEME;
 use crate::tui::utils::centered_rect::centered_rect;
 use crate::tui::utils::stateful::cookie_table::{CookieColumns, COOKIES_COLUMNS_NUMBER};
 
@@ -15,8 +15,8 @@ impl App<'_> {
         let popup_block = Block::default()
             .title("Cookies")
             .borders(Borders::ALL)
-            .white()
-            .on_dark_gray();
+            .fg(THEME.read().ui.font_color)
+            .bg(THEME.read().ui.main_background_color);
 
         let area = centered_rect(120, 25, frame.area());
 
@@ -57,7 +57,7 @@ impl App<'_> {
             let paragraph = Paragraph::new(header_name.as_str())
                 .centered()
                 .block(Block::new().borders(Borders::BOTTOM | Borders::RIGHT))
-                .gray();
+                .fg(THEME.read().ui.font_color);
 
             frame.render_widget(paragraph, inner_cookies_layout[index]);
         }
@@ -67,7 +67,7 @@ impl App<'_> {
                 let cookies_lines = vec![
                     Line::default(),
                     Line::from("No cookies"),
-                    Line::from("(Add one by sending a request)".gray())
+                    Line::from("(Add one by sending a request)".fg(THEME.read().ui.font_color))
                 ];
 
                 let cookies_paragraph = Paragraph::new(cookies_lines).centered();
@@ -119,7 +119,7 @@ impl App<'_> {
             Style::default()
         ];
 
-        list_styles[selection.1] = list_styles[selection.1].fg(Yellow).add_modifier(Modifier::BOLD);
+        list_styles[selection.1] = list_styles[selection.1].fg(THEME.read().others.selection_highlight_color).add_modifier(Modifier::BOLD);
 
         for (index, cookie) in cookies.iter().enumerate() {
             let list = List::new(cookie.clone()).highlight_style(list_styles[index]);

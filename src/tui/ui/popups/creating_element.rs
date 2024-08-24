@@ -1,12 +1,11 @@
 use ratatui::Frame;
 use ratatui::layout::Direction::Horizontal;
 use ratatui::layout::{Constraint, Layout};
-use ratatui::prelude::{Color, Style};
-use ratatui::style::Color::Yellow;
 use ratatui::style::Stylize;
 use ratatui::widgets::{Block, Borders, Clear, Paragraph};
 
 use crate::app::app::App;
+use crate::app::files::theme::THEME;
 use crate::tui::utils::centered_rect::centered_rect;
 
 impl App<'_> {
@@ -14,7 +13,8 @@ impl App<'_> {
         let popup_block = Block::default()
             .title("Choose element to create")
             .borders(Borders::ALL)
-            .style(Style::default().bg(Color::DarkGray));
+            .fg(THEME.read().ui.main_foreground_color)
+            .bg(THEME.read().ui.main_background_color);
 
 
         let nb_elements = self.creation_popup.choices.len() as u16;
@@ -40,10 +40,10 @@ impl App<'_> {
         frame.render_widget(popup_block, area);
 
         for (index, element) in self.creation_popup.choices.iter().enumerate() {
-            let mut paragraph = Paragraph::new(element.clone()).centered();
+            let mut paragraph = Paragraph::new(element.clone()).centered().fg(THEME.read().ui.font_color);
 
             if index == self.creation_popup.selection {
-                paragraph = paragraph.fg(Yellow).bold();
+                paragraph = paragraph.fg(THEME.read().others.selection_highlight_color).bold();
             }
 
             frame.render_widget(paragraph, creating_element_layout[index]);

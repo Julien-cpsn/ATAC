@@ -9,6 +9,7 @@ use strum::Display;
 
 use crate::app::app::App;
 use crate::app::files::key_bindings::{KEY_BINDINGS, TextAreaMode};
+use crate::app::files::theme::THEME;
 use crate::tui::app_states::AppState::*;
 use crate::tui::event_key_bindings::EventKeyBinding;
 use crate::tui::events::AppEvent;
@@ -590,16 +591,16 @@ impl App<'_> {
             Normal |
             ChoosingElementToCreate |
             CreatingNewCollection | CreatingNewRequest |
-            DisplayingCookies | EditingCookies => Line::from(self.state.to_string().white().on_dark_gray()),
+            DisplayingCookies | EditingCookies => Line::from(self.state.to_string()).fg(THEME.read().ui.font_color).bg(THEME.read().ui.main_background_color),
 
             DeletingCollection | RenamingCollection => {
                 let collection_index = self.collections_tree.state.selected()[0];
                 let collection_name = &self.collections[collection_index].name;
 
                 Line::from(vec![
-                    Span::raw("Collection > ").dark_gray(),
-                    Span::raw(format!("{} > ", collection_name)).dark_gray(),
-                    Span::raw(self.state.to_string()).white().on_dark_gray()
+                    Span::raw("Collection > ").fg(THEME.read().ui.secondary_foreground_color),
+                    Span::raw(format!("{} > ", collection_name)).fg(THEME.read().ui.secondary_foreground_color),
+                    Span::raw(self.state.to_string()).fg(THEME.read().ui.font_color).bg(THEME.read().ui.main_background_color)
                 ])
             },
 
@@ -608,9 +609,9 @@ impl App<'_> {
                 let selected_request = &self.collections[selected_request_index[0]].requests[selected_request_index[1]].read();
 
                 Line::from(vec![
-                    Span::raw("Request > ").dark_gray(),
-                    Span::raw(format!("{} > ", selected_request.name)).dark_gray(),
-                    Span::raw(self.state.to_string()).white().on_dark_gray()
+                    Span::raw("Request > ").fg(THEME.read().ui.secondary_foreground_color),
+                    Span::raw(format!("{} > ", selected_request.name)).fg(THEME.read().ui.secondary_foreground_color),
+                    Span::raw(self.state.to_string()).fg(THEME.read().ui.font_color).bg(THEME.read().ui.main_background_color)
                 ])
             },
 
@@ -628,15 +629,15 @@ impl App<'_> {
 
                 if self.state == SelectedRequest {
                     Line::from(vec![
-                        Span::raw("Request > ").dark_gray(),
-                        Span::raw(selected_request.name.clone()).white().on_dark_gray()
+                        Span::raw("Request > ").fg(THEME.read().ui.secondary_foreground_color),
+                        Span::raw(selected_request.name.clone()).fg(THEME.read().ui.font_color).bg(THEME.read().ui.main_background_color)
                     ])
                 }
                 else {
                     Line::from(vec![
-                        Span::raw("Request > ").dark_gray(),
-                        Span::raw(format!("{} > ", selected_request.name)).dark_gray(),
-                        Span::raw(self.state.to_string()).white().on_dark_gray()
+                        Span::raw("Request > ").fg(THEME.read().ui.secondary_foreground_color),
+                        Span::raw(format!("{} > ", selected_request.name)).fg(THEME.read().ui.secondary_foreground_color),
+                        Span::raw(self.state.to_string()).fg(THEME.read().ui.font_color).bg(THEME.read().ui.main_background_color)
                     ])
                 }
             }

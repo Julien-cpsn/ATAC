@@ -1,12 +1,13 @@
 use std::path::PathBuf;
 use std::sync::Arc;
 use parking_lot::RwLock;
+use ratatui::style::Stylize;
 use ratatui::text::{Line, Span};
 use serde::{Deserialize, Serialize};
 use strum::Display;
 use tui_tree_widget::TreeItem;
 use rayon::prelude::*;
-
+use crate::app::files::theme::THEME;
 use crate::models::request::Request;
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
@@ -37,7 +38,7 @@ impl Collection {
         let name = self.name.clone();
 
         let line = Line::from(vec![
-            Span::raw(name),
+            Span::raw(name).fg(THEME.read().ui.font_color),
             Span::from(format!(" ({})", self.requests.len()))
         ]);
 
