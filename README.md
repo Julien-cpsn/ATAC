@@ -26,6 +26,7 @@ ATAC ⚔📩
 - [Others](#others)
   * [Vim key-bindings](#vim-key-bindings)
   * [NeoVim integration](#neovim-integration)
+  * [Themes](#themes)
 - [Technical precisions](#technical-precisions)
   * [Tested on](#tested-on)
   * [Dependencies](#dependencies)
