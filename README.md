@@ -200,6 +200,7 @@ cargo run -- -h
 | - Toggle syntax highlighting        | :white_check_mark:                                                | :x:                  | :x:                  |
 | Postman v2.1.0 import               | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
 | OpenAPI import                      | :x: :soon:                                                        | :white_check_mark:   | :white_check_mark:   |
+| **Themes**                          | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
 
 ### TODO v1.0.0
 
@@ -250,6 +251,10 @@ You can read more about it here: https://github.com/Julien-cpsn/ATAC/releases/ta
 
 Thanks to [@NachoNievaG](https://github.com/NachoNievaG) you can have an ATAC floating window inside your nvim
 https://github.com/NachoNievaG/atac.nvim
+
+### Themes
+
+You can read more about it here: https://github.com/Julien-cpsn/ATAC/releases/tag/v0.18.0
 
 ## Technical precisions
 
