@@ -60,7 +60,7 @@ The philosophy of ATAC is to be free, account-less, and offline for now and fore
 
 Simply use:
 ```shell
-cargo install atac
+cargo install atac --locked
 ```
 
 <a href="https://archlinux.org/packages/extra/x86_64/atac/">
