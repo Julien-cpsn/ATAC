@@ -25,6 +25,8 @@ delete_forward = "Backspace"
 
 move_cursor_left = "Left"
 move_cursor_right = "Right"
+move_cursor_line_start = "Home"
+move_cursor_line_end = "End"
 
 # Request body
 [keybindings.generic.text_inputs.text_area_mode.Custom]

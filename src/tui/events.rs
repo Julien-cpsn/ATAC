@@ -163,6 +163,8 @@ pub enum AppEvent {
     EditingRequestUrlDeleteCharForward(EventKeyBinding),
     EditingRequestUrlMoveCursorLeft(EventKeyBinding),
     EditingRequestUrlMoveCursorRight(EventKeyBinding),
+    EditingRequestUrlMoveCursorLineStart(EventKeyBinding),
+    EditingRequestUrlMoveCursorLineEnd(EventKeyBinding),
     EditingRequestUrlCharInput(EventKeyBinding),
 
     ModifyRequestQueryParam(EventKeyBinding),
@@ -170,6 +172,8 @@ pub enum AppEvent {
     EditingRequestQueryParamDeleteCharForward(EventKeyBinding),
     EditingRequestQueryParamMoveCursorLeft(EventKeyBinding),
     EditingRequestQueryParamMoveCursorRight(EventKeyBinding),
+    EditingRequestQueryParamMoveCursorLineStart(EventKeyBinding),
+    EditingRequestQueryParamMoveCursorLineEnd(EventKeyBinding),
     EditingRequestQueryParamCharInput(EventKeyBinding),
 
     /* Auth */
@@ -179,6 +183,8 @@ pub enum AppEvent {
     EditingRequestAuthUsernameDeleteCharForward(EventKeyBinding),
     EditingRequestAuthUsernameMoveCursorLeft(EventKeyBinding),
     EditingRequestAuthUsernameMoveCursorRight(EventKeyBinding),
+    EditingRequestAuthUsernameMoveCursorLineStart(EventKeyBinding),
+    EditingRequestAuthUsernameMoveCursorLineEnd(EventKeyBinding),
     EditingRequestAuthUsernameCharInput(EventKeyBinding),
 
     ModifyRequestAuthPassword(EventKeyBinding),
@@ -186,6 +192,8 @@ pub enum AppEvent {
     EditingRequestAuthPasswordDeleteCharForward(EventKeyBinding),
     EditingRequestAuthPasswordMoveCursorLeft(EventKeyBinding),
     EditingRequestAuthPasswordMoveCursorRight(EventKeyBinding),
+    EditingRequestAuthPasswordMoveCursorLineStart(EventKeyBinding),
+    EditingRequestAuthPasswordMoveCursorLineEnd(EventKeyBinding),
     EditingRequestAuthPasswordCharInput(EventKeyBinding),
 
     ModifyRequestAuthBearerToken(EventKeyBinding),
@@ -193,6 +201,8 @@ pub enum AppEvent {
     EditingRequestAuthBearerTokenDeleteCharForward(EventKeyBinding),
     EditingRequestAuthBearerTokenMoveCursorLeft(EventKeyBinding),
     EditingRequestAuthBearerTokenMoveCursorRight(EventKeyBinding),
+    EditingRequestAuthBearerTokenMoveCursorLineStart(EventKeyBinding),
+    EditingRequestAuthBearerTokenMoveCursorLineEnd(EventKeyBinding),
     EditingRequestAuthBearerTokenCharInput(EventKeyBinding),
 
     /* Headers */
@@ -202,6 +212,8 @@ pub enum AppEvent {
     EditingRequestHeaderDeleteCharForward(EventKeyBinding),
     EditingRequestHeaderMoveCursorLeft(EventKeyBinding),
     EditingRequestHeaderMoveCursorRight(EventKeyBinding),
+    EditingRequestHeaderMoveCursorLineStart(EventKeyBinding),
+    EditingRequestHeaderMoveCursorLineEnd(EventKeyBinding),
     EditingRequestHeaderCharInput(EventKeyBinding),
 
     /* Body */
@@ -211,6 +223,8 @@ pub enum AppEvent {
     EditingRequestBodyTableDeleteCharForward(EventKeyBinding),
     EditingRequestBodyTableMoveCursorLeft(EventKeyBinding),
     EditingRequestBodyTableMoveCursorRight(EventKeyBinding),
+    EditingRequestBodyTableMoveCursorLineStart(EventKeyBinding),
+    EditingRequestBodyTableMoveCursorLineEnd(EventKeyBinding),
     EditingRequestBodyTableCharInput(EventKeyBinding),
 
     ModifyRequestBodyFile(EventKeyBinding),
@@ -218,6 +232,8 @@ pub enum AppEvent {
     EditingRequestBodyFileDeleteCharForward(EventKeyBinding),
     EditingRequestBodyFileMoveCursorLeft(EventKeyBinding),
     EditingRequestBodyFileMoveCursorRight(EventKeyBinding),
+    EditingRequestBodyFileMoveCursorLineStart(EventKeyBinding),
+    EditingRequestBodyFileMoveCursorLineEnd(EventKeyBinding),
     EditingRequestBodyFileCharInput(EventKeyBinding),
 
     EditingRequestBodyStringVimInput(EventKeyBinding),
@@ -260,6 +276,8 @@ pub enum AppEvent {
     EditingPreRequestScriptMoveCursorDown(EventKeyBinding),
     EditingPreRequestScriptMoveCursorLeft(EventKeyBinding),
     EditingPreRequestScriptMoveCursorRight(EventKeyBinding),
+    EditingPreRequestScriptMoveCursorLineStart(EventKeyBinding),
+    EditingPreRequestScriptMoveCursorLineEnd(EventKeyBinding),
     EditingPreRequestScriptCharInput(EventKeyBinding),
 
     EditingPostRequestScriptVimInput(EventKeyBinding),
@@ -279,6 +297,8 @@ pub enum AppEvent {
     EditingPostRequestScriptMoveCursorDown(EventKeyBinding),
     EditingPostRequestScriptMoveCursorLeft(EventKeyBinding),
     EditingPostRequestScriptMoveCursorRight(EventKeyBinding),
+    EditingPostRequestScriptMoveCursorLineStart(EventKeyBinding),
+    EditingPostRequestScriptMoveCursorLineEnd(EventKeyBinding),
     EditingPostRequestScriptCharInput(EventKeyBinding),
     
     /* Settings */
@@ -545,6 +565,8 @@ impl App<'_> {
                 EditingRequestUrlDeleteCharForward(_) => self.url_text_input.delete_char_backward(),
                 EditingRequestUrlMoveCursorLeft(_) => self.url_text_input.move_cursor_left(),
                 EditingRequestUrlMoveCursorRight(_) => self.url_text_input.move_cursor_right(),
+                EditingRequestUrlMoveCursorLineStart(_) => self.url_text_input.move_cursor_line_start(),
+                EditingRequestUrlMoveCursorLineEnd(_) => self.url_text_input.move_cursor_line_end(),
                 EditingRequestUrlCharInput(_) => match key {
                     KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.url_text_input.enter_char(char),
                     _ => {}
@@ -555,6 +577,8 @@ impl App<'_> {
                 EditingRequestQueryParamDeleteCharForward(_) => self.query_params_table.selection_text_input.delete_char_backward(),
                 EditingRequestQueryParamMoveCursorLeft(_) => self.query_params_table.selection_text_input.move_cursor_left(),
                 EditingRequestQueryParamMoveCursorRight(_) => self.query_params_table.selection_text_input.move_cursor_right(),
+                EditingRequestQueryParamMoveCursorLineStart(_) => self.query_params_table.selection_text_input.move_cursor_line_start(),
+                EditingRequestQueryParamMoveCursorLineEnd(_) => self.query_params_table.selection_text_input.move_cursor_line_end(),
                 EditingRequestQueryParamCharInput(_) => match key {
                     KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.query_params_table.selection_text_input.enter_char(char),
                     _ => {}
@@ -569,6 +593,8 @@ impl App<'_> {
                 EditingRequestAuthUsernameDeleteCharForward(_) => self.auth_basic_username_text_input.delete_char_backward(),
                 EditingRequestAuthUsernameMoveCursorLeft(_) => self.auth_basic_username_text_input.move_cursor_left(),
                 EditingRequestAuthUsernameMoveCursorRight(_) => self.auth_basic_username_text_input.move_cursor_right(),
+                EditingRequestAuthUsernameMoveCursorLineStart(_) => self.auth_basic_username_text_input.move_cursor_line_start(),
+                EditingRequestAuthUsernameMoveCursorLineEnd(_) => self.auth_basic_username_text_input.move_cursor_line_end(),
                 EditingRequestAuthUsernameCharInput(_) => match key {
                     KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.auth_basic_username_text_input.enter_char(char),
                     _ => {}
@@ -579,6 +605,8 @@ impl App<'_> {
                 EditingRequestAuthPasswordDeleteCharForward(_) => self.auth_basic_password_text_input.delete_char_backward(),
                 EditingRequestAuthPasswordMoveCursorLeft(_) => self.auth_basic_password_text_input.move_cursor_left(),
                 EditingRequestAuthPasswordMoveCursorRight(_) => self.auth_basic_password_text_input.move_cursor_right(),
+                EditingRequestAuthPasswordMoveCursorLineStart(_) => self.auth_basic_password_text_input.move_cursor_line_start(),
+                EditingRequestAuthPasswordMoveCursorLineEnd(_) => self.auth_basic_password_text_input.move_cursor_line_end(),
                 EditingRequestAuthPasswordCharInput(_) => match key {
                     KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.auth_basic_password_text_input.enter_char(char),
                     _ => {}
@@ -589,6 +617,8 @@ impl App<'_> {
                 EditingRequestAuthBearerTokenDeleteCharForward(_) => self.auth_bearer_token_text_input.delete_char_backward(),
                 EditingRequestAuthBearerTokenMoveCursorLeft(_) => self.auth_bearer_token_text_input.move_cursor_left(),
                 EditingRequestAuthBearerTokenMoveCursorRight(_) => self.auth_bearer_token_text_input.move_cursor_right(),
+                EditingRequestAuthBearerTokenMoveCursorLineStart(_) => self.auth_bearer_token_text_input.move_cursor_line_start(),
+                EditingRequestAuthBearerTokenMoveCursorLineEnd(_) => self.auth_bearer_token_text_input.move_cursor_line_end(),
                 EditingRequestAuthBearerTokenCharInput(_) => match key {
                     KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.auth_bearer_token_text_input.enter_char(char),
                     _ => {}
@@ -601,6 +631,8 @@ impl App<'_> {
                 EditingRequestHeaderDeleteCharForward(_) => self.headers_table.selection_text_input.delete_char_backward(),
                 EditingRequestHeaderMoveCursorLeft(_) => self.headers_table.selection_text_input.move_cursor_left(),
                 EditingRequestHeaderMoveCursorRight(_) => self.headers_table.selection_text_input.move_cursor_right(),
+                EditingRequestHeaderMoveCursorLineStart(_) => self.headers_table.selection_text_input.move_cursor_line_start(),
+                EditingRequestHeaderMoveCursorLineEnd(_) => self.headers_table.selection_text_input.move_cursor_line_end(),
                 EditingRequestHeaderCharInput(_) => match key {
                     KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.headers_table.selection_text_input.enter_char(char),
                     _ => {}
@@ -613,6 +645,8 @@ impl App<'_> {
                 EditingRequestBodyTableDeleteCharForward(_) => self.body_form_table.selection_text_input.delete_char_backward(),
                 EditingRequestBodyTableMoveCursorLeft(_) => self.body_form_table.selection_text_input.move_cursor_left(),
                 EditingRequestBodyTableMoveCursorRight(_) => self.body_form_table.selection_text_input.move_cursor_right(),
+                EditingRequestBodyTableMoveCursorLineStart(_) => self.body_form_table.selection_text_input.move_cursor_line_start(),
+                EditingRequestBodyTableMoveCursorLineEnd(_) => self.body_form_table.selection_text_input.move_cursor_line_end(),
                 EditingRequestBodyTableCharInput(_) => match key {
                     KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.body_form_table.selection_text_input.enter_char(char),
                     _ => {}
@@ -623,6 +657,8 @@ impl App<'_> {
                 EditingRequestBodyFileDeleteCharForward(_) => self.body_file_text_input.delete_char_backward(),
                 EditingRequestBodyFileMoveCursorLeft(_) => self.body_file_text_input.move_cursor_left(),
                 EditingRequestBodyFileMoveCursorRight(_) => self.body_file_text_input.move_cursor_right(),
+                EditingRequestBodyFileMoveCursorLineStart(_) => self.body_file_text_input.move_cursor_line_start(),
+                EditingRequestBodyFileMoveCursorLineEnd(_) => self.body_file_text_input.move_cursor_line_end(),
                 EditingRequestBodyFileCharInput(_) => match key {
                     KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.body_file_text_input.enter_char(char),
                     _ => {}
@@ -706,6 +742,8 @@ impl App<'_> {
                 EditingPreRequestScriptMoveCursorDown(_) => self.script_console.pre_request_text_area.move_cursor(CursorMove::Bottom),
                 EditingPreRequestScriptMoveCursorLeft(_) => self.script_console.pre_request_text_area.move_cursor(CursorMove::Back),
                 EditingPreRequestScriptMoveCursorRight(_) => self.script_console.pre_request_text_area.move_cursor(CursorMove::Forward),
+                EditingPreRequestScriptMoveCursorLineStart(_) => self.script_console.pre_request_text_area.move_cursor(CursorMove::Head),
+                EditingPreRequestScriptMoveCursorLineEnd(_) => self.script_console.pre_request_text_area.move_cursor(CursorMove::End),
                 EditingPreRequestScriptCharInput(_) => match key {
                     KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.script_console.pre_request_text_area.insert_char(char),
                     _ => {}
@@ -745,6 +783,8 @@ impl App<'_> {
                 EditingPostRequestScriptMoveCursorDown(_) => self.script_console.post_request_text_area.move_cursor(CursorMove::Bottom),
                 EditingPostRequestScriptMoveCursorLeft(_) => self.script_console.post_request_text_area.move_cursor(CursorMove::Back),
                 EditingPostRequestScriptMoveCursorRight(_) => self.script_console.post_request_text_area.move_cursor(CursorMove::Forward),
+                EditingPostRequestScriptMoveCursorLineStart(_) => self.script_console.post_request_text_area.move_cursor(CursorMove::Head),
+                EditingPostRequestScriptMoveCursorLineEnd(_) => self.script_console.post_request_text_area.move_cursor(CursorMove::End),
                 EditingPostRequestScriptCharInput(_) => match key {
                     KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.script_console.post_request_text_area.insert_char(char),
                     _ => {}
@@ -873,48 +913,64 @@ impl AppEvent {
             EditingRequestUrlDeleteCharForward(event_key_bindings) |
             EditingRequestUrlMoveCursorLeft(event_key_bindings) |
             EditingRequestUrlMoveCursorRight(event_key_bindings) |
+            EditingRequestUrlMoveCursorLineStart(event_key_bindings) |
+            EditingRequestUrlMoveCursorLineEnd(event_key_bindings) |
             EditingRequestUrlCharInput(event_key_bindings) |
             ModifyRequestQueryParam(event_key_bindings) |
             EditingRequestQueryParamDeleteCharBackward(event_key_bindings) |
             EditingRequestQueryParamDeleteCharForward(event_key_bindings) |
             EditingRequestQueryParamMoveCursorLeft(event_key_bindings) |
             EditingRequestQueryParamMoveCursorRight(event_key_bindings) |
+            EditingRequestQueryParamMoveCursorLineStart(event_key_bindings) |
+            EditingRequestQueryParamMoveCursorLineEnd(event_key_bindings) |
             EditingRequestQueryParamCharInput(event_key_bindings) |
             ModifyRequestAuthUsername(event_key_bindings) |
             EditingRequestAuthUsernameDeleteCharBackward(event_key_bindings) |
             EditingRequestAuthUsernameDeleteCharForward(event_key_bindings) |
             EditingRequestAuthUsernameMoveCursorLeft(event_key_bindings) |
             EditingRequestAuthUsernameMoveCursorRight(event_key_bindings) |
+            EditingRequestAuthUsernameMoveCursorLineStart(event_key_bindings) |
+            EditingRequestAuthUsernameMoveCursorLineEnd(event_key_bindings) |
             EditingRequestAuthUsernameCharInput(event_key_bindings) |
             ModifyRequestAuthPassword(event_key_bindings) |
             EditingRequestAuthPasswordDeleteCharBackward(event_key_bindings) |
             EditingRequestAuthPasswordDeleteCharForward(event_key_bindings) |
             EditingRequestAuthPasswordMoveCursorLeft(event_key_bindings) |
             EditingRequestAuthPasswordMoveCursorRight(event_key_bindings) |
+            EditingRequestAuthPasswordMoveCursorLineStart(event_key_bindings) |
+            EditingRequestAuthPasswordMoveCursorLineEnd(event_key_bindings) |
             EditingRequestAuthPasswordCharInput(event_key_bindings) |
             ModifyRequestAuthBearerToken(event_key_bindings) |
             EditingRequestAuthBearerTokenDeleteCharBackward(event_key_bindings) |
             EditingRequestAuthBearerTokenDeleteCharForward(event_key_bindings) |
             EditingRequestAuthBearerTokenMoveCursorLeft(event_key_bindings) |
             EditingRequestAuthBearerTokenMoveCursorRight(event_key_bindings) |
+            EditingRequestAuthBearerTokenMoveCursorLineStart(event_key_bindings) |
+            EditingRequestAuthBearerTokenMoveCursorLineEnd(event_key_bindings) |
             EditingRequestAuthBearerTokenCharInput(event_key_bindings) |
             ModifyRequestHeader(event_key_bindings) |
             EditingRequestHeaderDeleteCharBackward(event_key_bindings) |
             EditingRequestHeaderDeleteCharForward(event_key_bindings) |
             EditingRequestHeaderMoveCursorLeft(event_key_bindings) |
             EditingRequestHeaderMoveCursorRight(event_key_bindings) |
+            EditingRequestHeaderMoveCursorLineStart(event_key_bindings) |
+            EditingRequestHeaderMoveCursorLineEnd(event_key_bindings) |
             EditingRequestHeaderCharInput(event_key_bindings) |
             ModifyRequestBodyTable(event_key_bindings) |
             EditingRequestBodyTableDeleteCharBackward(event_key_bindings) |
             EditingRequestBodyTableDeleteCharForward(event_key_bindings) |
             EditingRequestBodyTableMoveCursorLeft(event_key_bindings) |
             EditingRequestBodyTableMoveCursorRight(event_key_bindings) |
+            EditingRequestBodyTableMoveCursorLineStart(event_key_bindings) |
+            EditingRequestBodyTableMoveCursorLineEnd(event_key_bindings) |
             EditingRequestBodyTableCharInput(event_key_bindings) |
             ModifyRequestBodyFile(event_key_bindings) |
             EditingRequestBodyFileDeleteCharBackward(event_key_bindings) |
             EditingRequestBodyFileDeleteCharForward(event_key_bindings) |
             EditingRequestBodyFileMoveCursorLeft(event_key_bindings) |
             EditingRequestBodyFileMoveCursorRight(event_key_bindings) |
+            EditingRequestBodyFileMoveCursorLineStart(event_key_bindings) |
+            EditingRequestBodyFileMoveCursorLineEnd(event_key_bindings) |
             EditingRequestBodyFileCharInput(event_key_bindings) |
             EditingRequestBodyStringVimInput(event_key_bindings) |
             EditingRequestBodyStringCopy(event_key_bindings) |
@@ -951,6 +1007,8 @@ impl AppEvent {
             EditingPreRequestScriptMoveCursorDown(event_key_bindings) |
             EditingPreRequestScriptMoveCursorLeft(event_key_bindings) |
             EditingPreRequestScriptMoveCursorRight(event_key_bindings) |
+            EditingPreRequestScriptMoveCursorLineStart(event_key_bindings) |
+            EditingPreRequestScriptMoveCursorLineEnd(event_key_bindings) |
             EditingPreRequestScriptCharInput(event_key_bindings) |
             EditingPostRequestScriptVimInput(event_key_bindings) |
             EditingPostRequestScriptCopy(event_key_bindings) |
@@ -968,6 +1026,8 @@ impl AppEvent {
             EditingPostRequestScriptMoveCursorDown(event_key_bindings) |
             EditingPostRequestScriptMoveCursorLeft(event_key_bindings) |
             EditingPostRequestScriptMoveCursorRight(event_key_bindings) |
+            EditingPostRequestScriptMoveCursorLineStart(event_key_bindings) |
+            EditingPostRequestScriptMoveCursorLineEnd(event_key_bindings) |
             EditingPostRequestScriptCharInput(event_key_bindings) |
             RequestSettingsMoveUp(event_key_bindings) |
             RequestSettingsMoveDown(event_key_bindings) |

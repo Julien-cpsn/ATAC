@@ -389,6 +389,8 @@ impl AppState {
                 EditingRequestUrlDeleteCharForward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_forward], "Delete char forward", Some("Backspace"))),
                 EditingRequestUrlMoveCursorLeft(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_left], "Move cursor left", Some("Left"))),
                 EditingRequestUrlMoveCursorRight(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_right], "Move cursor right", Some("Right"))),
+                EditingRequestUrlMoveCursorLineStart(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_line_start], "Move cursor line start", Some("Home"))),
+                EditingRequestUrlMoveCursorLineEnd(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_line_end], "Move cursor line start", Some("Home"))),
                 EditingRequestUrlCharInput(EventKeyBinding::new(vec![], "Char input", None)),
             ],
             EditingRequestParam => vec![
@@ -399,6 +401,8 @@ impl AppState {
                 EditingRequestQueryParamDeleteCharForward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_forward], "Delete char forward", Some("Backspace"))),
                 EditingRequestQueryParamMoveCursorLeft(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_left], "Move cursor left", Some("Left"))),
                 EditingRequestQueryParamMoveCursorRight(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_right], "Move cursor right", Some("Right"))),
+                EditingRequestQueryParamMoveCursorLineStart(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_line_start], "Move cursor line start", Some("Home"))),
+                EditingRequestQueryParamMoveCursorLineEnd(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_line_end], "Move cursor line start", Some("Home"))),
                 EditingRequestQueryParamCharInput(EventKeyBinding::new(vec![], "Char input", None)),
             ],
             EditingRequestAuthUsername => vec![
@@ -409,6 +413,8 @@ impl AppState {
                 EditingRequestAuthUsernameDeleteCharForward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_forward], "Delete char forward", Some("Backspace"))),
                 EditingRequestAuthUsernameMoveCursorLeft(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_left], "Move cursor left", Some("Left"))),
                 EditingRequestAuthUsernameMoveCursorRight(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_right], "Move cursor right", Some("Right"))),
+                EditingRequestAuthUsernameMoveCursorLineStart(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_line_start], "Move cursor line start", Some("Home"))),
+                EditingRequestAuthUsernameMoveCursorLineEnd(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_line_end], "Move cursor line start", Some("Home"))),
                 EditingRequestAuthUsernameCharInput(EventKeyBinding::new(vec![], "Char input", None)),
             ],
             EditingRequestAuthPassword => vec![
@@ -419,6 +425,8 @@ impl AppState {
                 EditingRequestAuthPasswordDeleteCharForward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_forward], "Delete char forward", Some("Backspace"))),
                 EditingRequestAuthPasswordMoveCursorLeft(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_left], "Move cursor left", Some("Left"))),
                 EditingRequestAuthPasswordMoveCursorRight(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_right], "Move cursor right", Some("Right"))),
+                EditingRequestAuthPasswordMoveCursorLineStart(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_line_start], "Move cursor line start", Some("Home"))),
+                EditingRequestAuthPasswordMoveCursorLineEnd(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_line_end], "Move cursor line start", Some("Home"))),
                 EditingRequestAuthPasswordCharInput(EventKeyBinding::new(vec![], "Char input", None)),
             ],
             EditingRequestAuthBearerToken => vec![
@@ -429,6 +437,8 @@ impl AppState {
                 EditingRequestAuthBearerTokenDeleteCharForward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_forward], "Delete char forward", Some("Backspace"))),
                 EditingRequestAuthBearerTokenMoveCursorLeft(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_left], "Move cursor left", Some("Left"))),
                 EditingRequestAuthBearerTokenMoveCursorRight(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_right], "Move cursor right", Some("Right"))),
+                EditingRequestAuthBearerTokenMoveCursorLineStart(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_line_start], "Move cursor line start", Some("Home"))),
+                EditingRequestAuthBearerTokenMoveCursorLineEnd(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_line_end], "Move cursor line start", Some("Home"))),
                 EditingRequestAuthBearerTokenCharInput(EventKeyBinding::new(vec![], "Char input", None)),
             ],
             EditingRequestHeader => vec![
@@ -439,6 +449,8 @@ impl AppState {
                 EditingRequestHeaderDeleteCharForward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_forward], "Delete char forward", Some("Backspace"))),
                 EditingRequestHeaderMoveCursorLeft(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_left], "Move cursor left", Some("Left"))),
                 EditingRequestHeaderMoveCursorRight(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_right], "Move cursor right", Some("Right"))),
+                EditingRequestHeaderMoveCursorLineStart(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_line_start], "Move cursor line start", Some("Home"))),
+                EditingRequestHeaderMoveCursorLineEnd(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_line_end], "Move cursor line start", Some("Home"))),
                 EditingRequestHeaderCharInput(EventKeyBinding::new(vec![], "Char input", None)),
             ],
             EditingRequestBodyTable => vec![
@@ -449,6 +461,8 @@ impl AppState {
                 EditingRequestBodyTableDeleteCharForward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_forward], "Delete char forward", Some("Backspace"))),
                 EditingRequestBodyTableMoveCursorLeft(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_left], "Move cursor left", Some("Left"))),
                 EditingRequestBodyTableMoveCursorRight(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_right], "Move cursor right", Some("Right"))),
+                EditingRequestBodyTableMoveCursorLineStart(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_line_start], "Move cursor line start", Some("Home"))),
+                EditingRequestBodyTableMoveCursorLineEnd(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_line_end], "Move cursor line start", Some("Home"))),
                 EditingRequestBodyTableCharInput(EventKeyBinding::new(vec![], "Char input", None)),
             ],
             EditingRequestBodyFile => vec![
@@ -459,6 +473,8 @@ impl AppState {
                 EditingRequestBodyFileDeleteCharForward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_forward], "Delete char forward", Some("Backspace"))),
                 EditingRequestBodyFileMoveCursorLeft(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_left], "Move cursor left", Some("Left"))),
                 EditingRequestBodyFileMoveCursorRight(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_right], "Move cursor right", Some("Right"))),
+                EditingRequestBodyFileMoveCursorLineStart(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_line_start], "Move cursor line start", Some("Home"))),
+                EditingRequestBodyFileMoveCursorLineEnd(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_line_end], "Move cursor line start", Some("Home"))),
                 EditingRequestBodyFileCharInput(EventKeyBinding::new(vec![], "Char input", None)),
             ],
             EditingRequestBodyString => match key_bindings.generic.text_inputs.text_area_mode {
@@ -514,6 +530,8 @@ impl AppState {
                     EditingPreRequestScriptMoveCursorDown(EventKeyBinding::new(vec![text_area_key_bindings.move_cursor_down], "Down", Some("Down"))),
                     EditingPreRequestScriptMoveCursorLeft(EventKeyBinding::new(vec![text_area_key_bindings.move_cursor_left], "Left", Some("Left"))),
                     EditingPreRequestScriptMoveCursorRight(EventKeyBinding::new(vec![text_area_key_bindings.move_cursor_right], "Right", Some("Right"))),
+                    EditingPreRequestScriptMoveCursorLineStart(EventKeyBinding::new(vec![text_area_key_bindings.move_cursor_line_start], "Line start", None)),
+                    EditingPreRequestScriptMoveCursorLineEnd(EventKeyBinding::new(vec![text_area_key_bindings.move_cursor_line_end], "Line end", None)),
                     EditingPreRequestScriptCharInput(EventKeyBinding::new(vec![], "Char input", None)),
                 ]
             },
@@ -541,6 +559,8 @@ impl AppState {
                     EditingPostRequestScriptMoveCursorDown(EventKeyBinding::new(vec![text_area_key_bindings.move_cursor_down], "Down", Some("Down"))),
                     EditingPostRequestScriptMoveCursorLeft(EventKeyBinding::new(vec![text_area_key_bindings.move_cursor_left], "Left", Some("Left"))),
                     EditingPostRequestScriptMoveCursorRight(EventKeyBinding::new(vec![text_area_key_bindings.move_cursor_right], "Right", Some("Right"))),
+                    EditingPostRequestScriptMoveCursorLineStart(EventKeyBinding::new(vec![text_area_key_bindings.move_cursor_line_start], "Line start", None)),
+                    EditingPostRequestScriptMoveCursorLineEnd(EventKeyBinding::new(vec![text_area_key_bindings.move_cursor_line_end], "Line end", None)),
                     EditingPostRequestScriptCharInput(EventKeyBinding::new(vec![], "Char input", None)),
                 ]
             }
