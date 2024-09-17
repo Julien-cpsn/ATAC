@@ -59,10 +59,10 @@ impl App<'_> {
             return;
         }
 
-        let selection = self.body_form_table.selection.unwrap();
+        let selected_row = self.body_form_table.selection.unwrap();
         let selected_request_index = &self.collections_tree.selected.unwrap();
 
-        if let Err(_) = self.delete_form_data(selection.0, selected_request_index.0, selected_request_index.1) {
+        if let Err(_) = self.delete_form_data(selected_request_index.0, selected_request_index.1, selected_row.0) {
             return;
         }
 
