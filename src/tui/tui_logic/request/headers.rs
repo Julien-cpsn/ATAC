@@ -51,10 +51,10 @@ impl App<'_> {
             return;
         }
 
-        let selection = self.headers_table.selection.unwrap();
+        let selected_row = self.headers_table.selection.unwrap();
         let selected_request_index = &self.collections_tree.selected.unwrap();
         
-        match self.delete_header(selection.0, selected_request_index.0, selected_request_index.1) {
+        match self.delete_header(selected_request_index.0, selected_request_index.1, selected_row.0) {
             Ok(_) => {}
             Err(_) => return
         }
