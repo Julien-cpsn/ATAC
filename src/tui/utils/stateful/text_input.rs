@@ -18,6 +18,13 @@ impl TextInput {
         self.cursor_position = self.clamp_cursor(cursor_moved_right);
     }
 
+    pub fn move_cursor_line_start(&mut self) {
+        self.cursor_position = 0;
+    }
+    pub fn move_cursor_line_end(&mut self) {
+        self.cursor_position = self.text.len();
+    }
+
     pub fn enter_char(&mut self, new_char: char) {
         if !new_char.is_ascii() {
             return;

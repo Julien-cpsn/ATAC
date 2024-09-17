@@ -51,6 +51,8 @@ nest! {
 
                     pub move_cursor_left: KeyCombination,
                     pub move_cursor_right: KeyCombination,
+                    pub move_cursor_line_start: KeyCombination,
+                    pub move_cursor_line_end: KeyCombination,
                 },
 
                 /// Request body
@@ -149,6 +151,8 @@ pub struct CustomTextArea {
     pub move_cursor_down: KeyCombination,
     pub move_cursor_left: KeyCombination,
     pub move_cursor_right: KeyCombination,
+    pub move_cursor_line_start: KeyCombination,
+    pub move_cursor_line_end: KeyCombination,
 }
 
 impl Default for KeyBindings {
@@ -181,6 +185,8 @@ impl Default for KeyBindings {
 
                         move_cursor_left: key!(left),
                         move_cursor_right: key!(right),
+                        move_cursor_line_start: key!(home),
+                        move_cursor_line_end: key!(end),
                     },
                     text_area_mode: TextAreaMode::Custom(CustomTextArea::default()),
                 },
@@ -268,6 +274,8 @@ impl Default for CustomTextArea {
             move_cursor_down: key!(down),
             move_cursor_left: key!(left),
             move_cursor_right: key!(right),
+            move_cursor_line_start: key!(home),
+            move_cursor_line_end: key!(end),
         }
     }
 }
