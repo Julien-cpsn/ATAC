@@ -485,6 +485,8 @@ impl AppState {
                     EditingRequestBodyStringMoveCursorDown(EventKeyBinding::new(vec![text_area_key_bindings.move_cursor_down], "Down", Some("Down"))),
                     EditingRequestBodyStringMoveCursorLeft(EventKeyBinding::new(vec![text_area_key_bindings.move_cursor_left], "Left", Some("Left"))),
                     EditingRequestBodyStringMoveCursorRight(EventKeyBinding::new(vec![text_area_key_bindings.move_cursor_right], "Right", Some("Right"))),
+                    EditingRequestBodyStringMoveCursorLineStart(EventKeyBinding::new(vec![text_area_key_bindings.move_cursor_line_start], "Line start", None)),
+                    EditingRequestBodyStringMoveCursorLineEnd(EventKeyBinding::new(vec![text_area_key_bindings.move_cursor_line_end], "Line end", None)),
                     EditingRequestBodyStringCharInput(EventKeyBinding::new(vec![], "Char input", None)),
                 ],
             },

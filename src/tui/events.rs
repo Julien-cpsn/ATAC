@@ -237,6 +237,8 @@ pub enum AppEvent {
     EditingRequestBodyStringMoveCursorDown(EventKeyBinding),
     EditingRequestBodyStringMoveCursorLeft(EventKeyBinding),
     EditingRequestBodyStringMoveCursorRight(EventKeyBinding),
+    EditingRequestBodyStringMoveCursorLineStart(EventKeyBinding),
+    EditingRequestBodyStringMoveCursorLineEnd(EventKeyBinding),
     EditingRequestBodyStringCharInput(EventKeyBinding),
 
     /* Scripts */
@@ -660,10 +662,13 @@ impl App<'_> {
                 EditingRequestBodyStringMoveCursorDown(_) => self.body_text_area.move_cursor(CursorMove::Bottom),
                 EditingRequestBodyStringMoveCursorLeft(_) => self.body_text_area.move_cursor(CursorMove::Back),
                 EditingRequestBodyStringMoveCursorRight(_) => self.body_text_area.move_cursor(CursorMove::Forward),
+                EditingRequestBodyStringMoveCursorLineStart(_) => self.body_text_area.move_cursor(CursorMove::Head),
+                EditingRequestBodyStringMoveCursorLineEnd(_) => self.body_text_area.move_cursor(CursorMove::End),
                 EditingRequestBodyStringCharInput(_) => match key {
                     KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.body_text_area.insert_char(char),
                     _ => {}
                 },
+                
                 
                 /* Scripts */
 
@@ -927,6 +932,8 @@ impl AppEvent {
             EditingRequestBodyStringMoveCursorDown(event_key_bindings) |
             EditingRequestBodyStringMoveCursorLeft(event_key_bindings) |
             EditingRequestBodyStringMoveCursorRight(event_key_bindings) |
+            EditingRequestBodyStringMoveCursorLineStart(event_key_bindings) |
+            EditingRequestBodyStringMoveCursorLineEnd(event_key_bindings) |
             EditingRequestBodyStringCharInput(event_key_bindings) |
             EditingPreRequestScriptVimInput(event_key_bindings) |
             EditingPreRequestScriptCopy(event_key_bindings) |
