@@ -48,6 +48,8 @@ move_cursor_up = "Up"
 move_cursor_down = "Down"
 move_cursor_left = "Left"
 move_cursor_right = "Right"
+move_cursor_line_start = "Home"
+move_cursor_line_end = "End"
 
 # Navigation in tables, popups, up and down in the collections list
 [keybindings.generic.navigation]
