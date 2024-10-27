@@ -203,7 +203,7 @@ dependencies = [
 
 [[package]]
 name = "atac"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "anyhow",
  "arboard",
