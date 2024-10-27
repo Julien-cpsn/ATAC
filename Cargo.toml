@@ -22,7 +22,7 @@ exclude = [
 
 [dependencies]
 # Request
-reqwest = { version = "=0.12.7", default-features = false, features = ["cookies", "rustls-tls-native-roots", "multipart", "gzip", "brotli", "deflate", "stream"] }
+reqwest = { version = "=0.12.8", default-features = false, features = ["cookies", "rustls-tls-native-roots", "multipart", "gzip", "brotli", "deflate", "stream"] }
 reqwest_cookie_store = "=0.8.0"
 cookie_store = "=0.21.0"
 
@@ -38,20 +38,20 @@ image = "=0.25.2"
 
 # Main functionalities
 syntect = "=5.2.0"
-serde = { version = "=1.0.209", features = ["derive", "rc"] }
-serde_json = "=1.0.127"
+serde = { version = "=1.0.213", features = ["derive", "rc"] }
+serde_json = "=1.0.132"
 serde_yaml = "=0.9.34"
 jsonxf = "=1.1.1"
 toml = "=0.8.19"
-boa_engine = { version = "=0.19.0", default-features = false }
+boa_engine = { version = "=0.19.1", default-features = false }
 parse_postman_collection = "=0.2.3"
 curl-parser = { version = "=0.3.1", default-features = false }
-clap = { version = "=4.5.16", features = ["derive", "color", "suggestions"] }
+clap = { version = "=4.5.20", features = ["derive", "color", "suggestions"] }
 directories = "=5.0.1"
-arboard = "=3.4.0"
+arboard = "=3.4.1"
 
 # Async
-tokio = { version = "=1.39.3", features = ["rt", "rt-multi-thread", "macros"] }
+tokio = { version = "=1.41.0", features = ["rt", "rt-multi-thread", "macros"] }
 tokio-util = "0.7.11"
 parking_lot = { version = "=0.12.3", features = ["serde", "send_guard"] }
 
@@ -61,17 +61,17 @@ lazy_static = "=1.5.0"
 nestify = "=0.3.3"
 walkdir = "=2.5.0"
 snailquote = "=0.3.1"
-indexmap = { version = "=2.4.0", features = ["serde", "rayon"] }
+indexmap = { version = "=2.6.0", features = ["serde", "rayon"] }
 rayon = "=1.10.0"
-thiserror = "=1.0.63"
-anyhow = "=1.0.86"
-clap-verbosity-flag = "=2.2.1"
-clap_complete = "=4.5.23"
-clap_mangen = "=0.2.23"
+thiserror = "=1.0.65"
+anyhow = "=1.0.91"
+clap-verbosity-flag = "=2.2.2"
+clap_complete = "=4.5.35"
+clap_mangen = "=0.2.24"
 base64 = "=0.22.1"
-regex = "=1.10.6"
+regex = "=1.11.1"
 chrono = { version = "=0.4.38", default-features = false, features = ["now"] }
-uuid = { version = "=1.10.0", features = ["v4", "v7"] }
+uuid = { version = "=1.11.0", features = ["v4", "v7"] }
 
 # Tracing
 tracing = { version = "=0.1.40", features = ["async-await"] }
