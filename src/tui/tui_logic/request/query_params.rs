@@ -55,7 +55,7 @@ impl App<'_> {
         let selection = self.query_params_table.selection.unwrap();
         let selected_request_index = &self.collections_tree.selected.unwrap();
 
-        match self.delete_query_param(selection.0, selected_request_index.0, selected_request_index.1) {
+        match self.delete_query_param(selected_request_index.0, selected_request_index.1, selection.0) {
             Ok(_) => {}
             Err(_) => return
         }
