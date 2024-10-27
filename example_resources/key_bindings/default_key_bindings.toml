@@ -17,8 +17,8 @@ display_help = "Ctrl-h" # Take care to not overlap other inputs, the help can be
 
 # Collection name, request name, URL, Header, Query param, Basic Auth, Bearer Token
 [keybindings.generic.text_inputs.text_input]
-cancel = "Esc"
 confirm = "Enter"
+cancel = "Esc"
 
 delete_backward = "Delete"
 delete_forward = "Backspace"
