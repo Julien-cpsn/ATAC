@@ -22,37 +22,37 @@ exclude = [
 
 [dependencies]
 # Request
-reqwest = { version = "=0.12.8", default-features = false, features = ["cookies", "rustls-tls-native-roots", "multipart", "gzip", "brotli", "deflate", "stream"] }
+reqwest = { version = "=0.12.9", default-features = false, features = ["cookies", "rustls-tls-native-roots", "multipart", "gzip", "brotli", "deflate", "stream"] }
 reqwest_cookie_store = "=0.8.0"
-cookie_store = "=0.21.0"
+cookie_store = "=0.21.1"
 
 # TUI
-ratatui = { version = "=0.28.0", features = ["serde"] }
+ratatui = { version = "=0.29.0", features = ["serde"] }
 crokey = "=1.1.0"
-tui-big-text = "=0.6.0"
-tui-tree-widget = "=0.22.0"
-tui-textarea = { version = "=0.6.1", features = ["ratatui"] }
-throbber-widgets-tui = "=0.7.0"
-ratatui-image = { version = "=1.0.5", features = ["crossterm"] }
-image = "=0.25.2"
+tui-big-text = "=0.7.0"
+tui-tree-widget = "=0.23.0"
+tui-textarea = { version = "=0.7.0", features = ["ratatui"] }
+throbber-widgets-tui = "=0.8.0"
+ratatui-image = { version = "=3.0.0", features = ["crossterm"] }
+image = "=0.25.5"
 
 # Main functionalities
 syntect = "=5.2.0"
-serde = { version = "=1.0.213", features = ["derive", "rc"] }
-serde_json = "=1.0.132"
+serde = { version = "=1.0.216", features = ["derive", "rc"] }
+serde_json = "=1.0.134"
 serde_yaml = "=0.9.34"
 jsonxf = "=1.1.1"
 toml = "=0.8.19"
-boa_engine = { version = "=0.19.1", default-features = false }
+boa_engine = { version = "=0.20.0", default-features = false }
 parse_postman_collection = "=0.2.3"
 curl-parser = { version = "=0.3.1", default-features = false }
-clap = { version = "=4.5.20", features = ["derive", "color", "suggestions"] }
+clap = { version = "=4.5.23", features = ["derive", "color", "suggestions"] }
 directories = "=5.0.1"
 arboard = "=3.4.1"
 
 # Async
-tokio = { version = "=1.41.0", features = ["rt", "rt-multi-thread", "macros"] }
-tokio-util = "0.7.12"
+tokio = { version = "=1.42.0", features = ["rt", "rt-multi-thread", "macros"] }
+tokio-util = "=0.7.13"
 parking_lot = { version = "=0.12.3", features = ["serde", "send_guard"] }
 
 # Utils
@@ -61,21 +61,20 @@ lazy_static = "=1.5.0"
 nestify = "=0.3.3"
 walkdir = "=2.5.0"
 snailquote = "=0.3.1"
-indexmap = { version = "=2.6.0", features = ["serde", "rayon"] }
+indexmap = { version = "=2.7.0", features = ["serde", "rayon"] }
 rayon = "=1.10.0"
-thiserror = "=1.0.65"
-anyhow = "=1.0.91"
-clap-verbosity-flag = "=2.2.2"
-clap_complete = "=4.5.35"
+thiserror = "=2.0.9"
+anyhow = "=1.0.95"
+clap-verbosity-flag = "=3.0.2"
+clap_complete = "=4.5.40"
 clap_mangen = "=0.2.24"
-base64 = "=0.22.1"
 regex = "=1.11.1"
-chrono = { version = "=0.4.38", default-features = false, features = ["now"] }
+chrono = { version = "=0.4.39", default-features = false, features = ["now"] }
 uuid = { version = "=1.11.0", features = ["v4", "v7"] }
 
 # Tracing
-tracing = { version = "=0.1.40", features = ["async-await"] }
-tracing-subscriber = { version = "=0.3.18", features = ["parking_lot", "chrono", "regex"]}
+tracing = { version = "=0.1.41", features = ["async-await"] }
+tracing-subscriber = { version = "=0.3.19", features = ["parking_lot", "chrono", "regex"]}
 tracing-log = "=0.2.0"
-reqwest-tracing = "=0.5.3"
+reqwest-tracing = "=0.5.5"
 reqwest-middleware = { version = "=0.3.3", features = ["rustls-tls", "json", "multipart"]}

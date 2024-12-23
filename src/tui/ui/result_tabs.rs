@@ -145,14 +145,13 @@ impl App<'_> {
                                 frame.render_widget(image_disabled_paragraph, request_result_layout[2]);
                             },
                             Some(image) => {
-                                let mut picker = Picker::new((3, 6));
-                                picker.guess_protocol();
+                                let mut picker = Picker::from_fontsize((3, 6));
 
                                 let image_static = picker
                                     .new_protocol(image.clone(), request_result_layout[2], Resize::Fit(None))
                                     .unwrap();
 
-                                let image = Image::new(image_static.as_ref());
+                                let image = Image::new(&image_static);
                                 frame.render_widget(image, request_result_layout[2]);
                             }
                             None => {

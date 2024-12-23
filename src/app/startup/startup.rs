@@ -1,5 +1,5 @@
 use std::fs::{File, OpenOptions};
-use clap_verbosity_flag::LevelFilter;
+use clap_verbosity_flag::log::LevelFilter;
 use tracing::trace;
 use tracing_log::AsTrace;
 

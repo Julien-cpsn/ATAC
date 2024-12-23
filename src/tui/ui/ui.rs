@@ -119,11 +119,14 @@ impl App<'_> {
             true
         ).concat());
 
-        let footer = Block::new()
-            .title(Title::from(state_line).alignment(Alignment::Left))
-            .title(Title::from(available_keys).alignment(Alignment::Right));
+        let footer_left = Block::new()
+            .title(Title::from(state_line)).title_alignment(Alignment::Left);
+        
+        let footer_right = Block::new()
+            .title(Title::from(available_keys)).title_alignment(Alignment::Right);
 
-        frame.render_widget(footer, main_layout[2]);
+        frame.render_widget(footer_left, main_layout[2]);
+        frame.render_widget(footer_right, main_layout[2]);
 
         // POPUPS
 
