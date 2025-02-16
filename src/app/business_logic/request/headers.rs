@@ -94,4 +94,20 @@ impl App<'_> {
         self.save_collection_to_file(collection_index);
         Ok(())
     }
+
+    pub fn duplicate_header(&mut self, collection_index: usize, request_index: usize, row: usize) -> anyhow::Result<()> {
+        let local_selected_request = self.get_request_as_local_from_indexes(&(collection_index, request_index));
+
+        {
+            let mut selected_request = local_selected_request.write();
+
+            info!("Header duplicated");
+            
+            let header = selected_request.headers[row].clone();
+            selected_request.headers.insert(row, header);
+        }
+
+        self.save_collection_to_file(collection_index);
+        Ok(())
+    }
 }

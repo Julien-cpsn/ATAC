@@ -95,4 +95,20 @@ impl App<'_> {
         self.save_collection_to_file(collection_index);
         Ok(())
     }
+
+    pub fn duplicate_query_param(&mut self, collection_index: usize, request_index: usize, row: usize) -> anyhow::Result<()> {
+        let local_selected_request = self.get_request_as_local_from_indexes(&(collection_index, request_index));
+
+        {
+            let mut selected_request = local_selected_request.write();
+
+            info!("Query param duplicated");
+            
+            let query_param = selected_request.params[row].clone();
+            selected_request.params.insert(row, query_param);
+        }
+
+        self.save_collection_to_file(collection_index);
+        Ok(())
+    }
 }

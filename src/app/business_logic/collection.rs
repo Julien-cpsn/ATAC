@@ -126,4 +126,34 @@ impl App<'_> {
         
         Ok(())
     }
+
+    pub fn duplicate_collection(&mut self, collection_index: usize) -> anyhow::Result<()> {
+        let mut collection = self.collections[collection_index].clone();
+
+        info!("Collection \"{}\" duplicated", collection.name);
+
+        collection.name = format!("{} copy",  collection.name);
+        collection.path = ARGS.directory.as_ref().unwrap().join(format!("{}.{}", collection.name, collection.file_format.to_string()));
+        self.collections.insert(collection_index + 1, collection);
+        self.save_collection_to_file(collection_index + 1);
+
+        Ok(())
+    }
+
+    pub fn duplicate_request(&mut self, collection_index: usize, request_index: usize) -> anyhow::Result<()> {
+        let local_selected_request = self.get_request_as_local_from_indexes(&(collection_index, request_index));
+
+        {
+            let mut selected_request = local_selected_request.read().clone();
+
+            info!("Request \"{}\" duplicated", selected_request.name);
+
+            selected_request.name = format!("{} copy", selected_request.name);
+            self.collections[collection_index].requests.insert(request_index + 1, Arc::new(RwLock::new(selected_request)));
+        }
+
+        self.save_collection_to_file(collection_index);
+
+        Ok(())
+    }
 }

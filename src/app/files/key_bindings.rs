@@ -88,6 +88,7 @@ nest! {
                 pub rename_element: KeyCombination,
                 /// Only used in tables (Query params, headers, cookies)
                 pub toggle_element: KeyCombination,
+                pub duplicate_element: KeyCombination,
             }
         },
 
@@ -211,6 +212,7 @@ impl Default for KeyBindings {
                     edit_element: key!(enter),
                     rename_element: key!(r),
                     toggle_element: key!(t),
+                    duplicate_element: key!(Ctrl-d),
                 },
             },
 

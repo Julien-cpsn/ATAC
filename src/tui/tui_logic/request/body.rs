@@ -85,6 +85,21 @@ impl App<'_> {
         self.update_inputs();
     }
 
+    pub fn tui_duplicate_form_data(&mut self) {
+        if self.body_form_table.rows.is_empty() {
+            return;
+        }
+
+        let selection = self.body_form_table.selection.unwrap();
+        let selected_request_index = &self.collections_tree.selected.unwrap();
+
+        if let Err(_) = self.duplicate_form_data(selected_request_index.0, selected_request_index.1, selection.0) {
+            return;
+        }
+
+        self.update_inputs();
+    }
+
     pub fn refresh_body_textarea(&mut self, text: &String) {
         let lines: Vec<String> = text
             .par_lines()

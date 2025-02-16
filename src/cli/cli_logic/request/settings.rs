@@ -8,7 +8,7 @@ impl App<'_> {
         let local_selected_request = self.get_request_as_local_from_indexes(&(collection_index, request_index));
 
         {
-            let selected_request = local_selected_request.write();
+            let selected_request = local_selected_request.read();
 
             for (setting, state) in selected_request.settings.to_vec() {
                 println!("{setting}: {state}");
@@ -43,7 +43,7 @@ impl App<'_> {
         let local_selected_request = self.get_request_as_local_from_indexes(&(collection_index, request_index));
 
         {
-            let selected_request = local_selected_request.write();
+            let selected_request = local_selected_request.read();
             
             let setting = match setting_name {
                 RequestSettingName::Proxy => selected_request.settings.use_config_proxy,

@@ -138,4 +138,22 @@ impl App<'_> {
         self.save_collection_to_file(collection_index);
         Ok(())
     }
+
+    pub fn duplicate_form_data(&mut self, collection_index: usize, request_index: usize, row: usize) -> anyhow::Result<()> {
+        let local_selected_request = self.get_request_as_local_from_indexes(&(collection_index, request_index));
+
+        {
+            let mut selected_request = local_selected_request.write();
+            let form = selected_request.body.get_form_mut()?;
+            
+
+            info!("Body form key duplicated");
+
+            let form_data = form[row].clone();
+            form.insert(row, form_data);
+        }
+
+        self.save_collection_to_file(collection_index);
+        Ok(())
+    }
 }

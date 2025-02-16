@@ -271,6 +271,31 @@ impl App<'_> {
         self.normal_state();
     }
 
+    pub fn duplicate_element(&mut self) {
+        match self.collections_tree.state.selected().len() {
+            // Selection on a collection
+            1 => {
+                let selected_request_index = self.collections_tree.state.selected().to_vec();
+                let collection_index = selected_request_index[0];
+                
+                match self.duplicate_collection(collection_index) {
+                    Ok(_) => {}
+                    Err(_) => return
+                }
+            }
+            // Selection on a request
+            2 => {
+                let selected_request_index = self.collections_tree.state.selected().to_vec();
+
+                match self.duplicate_request(selected_request_index[0], selected_request_index[1]) {
+                    Ok(_) => {}
+                    Err(_) => return
+                }
+            }
+            _ => {}
+        }
+    }
+    
     pub fn tui_move_request_up(&mut self) {
         if self.collections_tree.state.selected().len() != 2 {
             return;

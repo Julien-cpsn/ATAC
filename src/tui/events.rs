@@ -28,6 +28,7 @@ pub enum AppEvent {
     CreateElement(EventKeyBinding),
     DeleteElement(EventKeyBinding),
     RenameElement(EventKeyBinding),
+    DuplicateElement(EventKeyBinding),
 
     MoveRequestUp(EventKeyBinding),
     MoveRequestDown(EventKeyBinding),
@@ -116,6 +117,7 @@ pub enum AppEvent {
     CreateRequestQueryParam(EventKeyBinding),
     DeleteRequestQueryParam(EventKeyBinding),
     ToggleRequestQueryParam(EventKeyBinding),
+    DuplicateRequestQueryParam(EventKeyBinding),
 
     EditRequestAuth(EventKeyBinding),
     RequestAuthMoveUp(EventKeyBinding),
@@ -129,6 +131,7 @@ pub enum AppEvent {
     CreateRequestHeader(EventKeyBinding),
     DeleteRequestHeader(EventKeyBinding),
     ToggleRequestHeader(EventKeyBinding),
+    DuplicateRequestHeader(EventKeyBinding),
 
     EditRequestBody(EventKeyBinding),
     RequestBodyTableMoveUp(EventKeyBinding),
@@ -138,6 +141,7 @@ pub enum AppEvent {
     CreateRequestBodyTableElement(EventKeyBinding),
     DeleteRequestBodyTableElement(EventKeyBinding),
     ToggleRequestBodyTableElement(EventKeyBinding),
+    DuplicateRequestBodyTableElement(EventKeyBinding),
 
     EditRequestScript(EventKeyBinding),
     // Move up or down
@@ -396,6 +400,7 @@ impl App<'_> {
                 CreateElement(_) => self.choose_element_to_create_state(),
                 DeleteElement(_) => self.delete_element(),
                 RenameElement(_) => self.rename_element(),
+                DuplicateElement(_) => self.duplicate_element(),
 
                 MoveRequestUp(_) => self.tui_move_request_up(),
                 MoveRequestDown(_) => self.tui_move_request_down(),
@@ -504,6 +509,7 @@ impl App<'_> {
                 CreateRequestQueryParam(_) => self.tui_create_new_query_param(),
                 DeleteRequestQueryParam(_) => self.tui_delete_query_param(),
                 ToggleRequestQueryParam(_) => self.tui_toggle_query_param(),
+                DuplicateRequestQueryParam(_) => self.tui_duplicate_query_param(),
 
                 EditRequestAuth(_) => match self.auth_text_input_selection.usable {
                     true => self.tui_select_request_auth_input_text(),
@@ -528,6 +534,7 @@ impl App<'_> {
                 CreateRequestHeader(_) => self.tui_create_new_header(),
                 DeleteRequestHeader(_) => self.tui_delete_header(),
                 ToggleRequestHeader(_) => self.tui_toggle_header(),
+                DuplicateRequestHeader(_) => self.tui_duplicate_header(),
 
                 EditRequestBody(_) => match self.body_form_table.is_selected() {
                     true => self.edit_request_body_table_state(),
@@ -539,6 +546,7 @@ impl App<'_> {
                 CreateRequestBodyTableElement(_) => self.tui_create_new_form_data(),
                 DeleteRequestBodyTableElement(_) => self.tui_delete_form_data(),
                 ToggleRequestBodyTableElement(_) => self.tui_toggle_form_data(),
+                DuplicateRequestBodyTableElement(_) => self.tui_duplicate_form_data(),
 
                 /* Scripts */
 
@@ -819,6 +827,7 @@ impl AppEvent {
             CreateElement(event_key_bindings) |
             DeleteElement(event_key_bindings) |
             RenameElement(event_key_bindings) |
+            DuplicateElement(event_key_bindings) |
             MoveRequestUp(event_key_bindings) |
             MoveRequestDown(event_key_bindings) |
             NextEnvironment(event_key_bindings) |
@@ -881,6 +890,7 @@ impl AppEvent {
             CreateRequestQueryParam(event_key_bindings) |
             DeleteRequestQueryParam(event_key_bindings) |
             ToggleRequestQueryParam(event_key_bindings) |
+            DuplicateRequestQueryParam(event_key_bindings) |
             EditRequestAuth(event_key_bindings) |
             RequestAuthMoveUp(event_key_bindings) |
             RequestAuthMoveDown(event_key_bindings) |
@@ -892,6 +902,7 @@ impl AppEvent {
             CreateRequestHeader(event_key_bindings) |
             DeleteRequestHeader(event_key_bindings) |
             ToggleRequestHeader(event_key_bindings) |
+            DuplicateRequestHeader(event_key_bindings) |
             EditRequestBody(event_key_bindings) |
             RequestBodyTableMoveUp(event_key_bindings) |
             RequestBodyTableMoveDown(event_key_bindings) |
@@ -900,6 +911,7 @@ impl AppEvent {
             CreateRequestBodyTableElement(event_key_bindings) |
             DeleteRequestBodyTableElement(event_key_bindings) |
             ToggleRequestBodyTableElement(event_key_bindings) |
+            DuplicateRequestBodyTableElement(event_key_bindings) |
             EditRequestScript(event_key_bindings) |
             RequestScriptMove(event_key_bindings) |
             NextResultTab(event_key_bindings) |

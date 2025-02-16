@@ -78,4 +78,20 @@ impl App<'_> {
         
         self.update_inputs();
     }
+
+    pub fn tui_duplicate_header(&mut self) {
+        if self.headers_table.rows.is_empty() || self.headers_table.selection.is_none() {
+            return;
+        }
+
+        let row = self.headers_table.selection.unwrap().0;
+        let selected_request_index = &self.collections_tree.selected.unwrap();
+
+        match self.duplicate_header(selected_request_index.0, selected_request_index.1, row) {
+            Ok(_) => {}
+            Err(_) => return
+        }
+
+        self.update_inputs();
+    }
 }

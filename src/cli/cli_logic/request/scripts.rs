@@ -6,7 +6,7 @@ impl App<'_> {
         let local_selected_request = self.get_request_as_local_from_indexes(&(collection_index, request_index));
 
         {
-            let selected_request = local_selected_request.write();
+            let selected_request = local_selected_request.read();
 
             let script = match script_type {
                 ScriptType::Pre => &selected_request.scripts.pre_request_script,

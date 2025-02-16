@@ -79,4 +79,20 @@ impl App<'_> {
 
         self.update_inputs();
     }
+
+    pub fn tui_duplicate_query_param(&mut self) {
+        if self.query_params_table.rows.is_empty() || self.query_params_table.selection.is_none() {
+            return;
+        }
+
+        let row = self.query_params_table.selection.unwrap().0;
+        let selected_request_index = &self.collections_tree.selected.unwrap();
+
+        match self.duplicate_query_param(selected_request_index.0, selected_request_index.1, row) {
+            Ok(_) => {}
+            Err(_) => return
+        }
+
+        self.update_inputs();
+    }
 }
