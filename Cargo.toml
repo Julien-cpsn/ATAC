@@ -1,7 +1,7 @@
 [package]
 name = "atac"
 description = "Arguably a Terminal API Client. Feature-full, free, open-source, offline and account-less."
-version = "0.18.1"
+version = "0.18.2"
 authors = ["julien-cpsn"]
 edition = "2021"
 rust-version = "1.79"
@@ -39,14 +39,14 @@ image = "=0.25.5"
 # Main functionalities
 syntect = "=5.2.0"
 serde = { version = "=1.0.217", features = ["derive", "rc"] }
-serde_json = "=1.0.138"
+serde_json = "=1.0.139"
 serde_yaml = "=0.9.34"
 jsonxf = "=1.1.1"
 toml = "=0.8.20"
 boa_engine = { version = "=0.20.0", default-features = false }
 parse_postman_collection = "=0.2.3"
 curl-parser = { version = "=0.5.0", default-features = false }
-clap = { version = "=4.5.29", features = ["derive", "color", "suggestions"] }
+clap = { version = "=4.5.30", features = ["derive", "color", "suggestions"] }
 directories = "=6.0.0"
 arboard = "=3.4.1"
 
@@ -56,7 +56,7 @@ tokio-util = "=0.7.13"
 parking_lot = { version = "=0.12.3", features = ["serde", "send_guard"] }
 
 # Utils
-strum = { version = "=0.27.0", features = ["derive"] }
+strum = { version = "=0.27.1", features = ["derive"] }
 lazy_static = "=1.5.0"
 nestify = "=0.3.3"
 walkdir = "=2.5.0"
@@ -64,13 +64,13 @@ snailquote = "=0.3.1"
 indexmap = { version = "=2.7.1", features = ["serde", "rayon"] }
 rayon = "=1.10.0"
 thiserror = "=2.0.11"
-anyhow = "=1.0.95"
+anyhow = "=1.0.96"
 clap-verbosity-flag = "=3.0.2"
-clap_complete = "=4.5.44"
+clap_complete = "=4.5.45"
 clap_mangen = "=0.2.26"
 regex = "=1.11.1"
 chrono = { version = "=0.4.39", default-features = false, features = ["now"] }
-uuid = { version = "=1.13.1", features = ["v4", "v7"] }
+uuid = { version = "=1.13.2", features = ["v4", "v7"] }
 
 # Tracing
 tracing = { version = "=0.1.41", features = ["async-await"] }
