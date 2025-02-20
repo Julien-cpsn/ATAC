@@ -13,6 +13,7 @@ ATAC ⚔📩
 - [How to install](#how-to-install)
   * [Install with cargo](#install-with-cargo)
   * [Install with Homebrew](#install-with-homebrew)
+  * [Install with Scoop](#install-with-scoop)
   * [Install from Arch](#install-from-arch)
   * [Install from Fedora copr](#install-from-fedora-copr)
   * [Docker package](#docker-package)
@@ -59,6 +60,7 @@ The philosophy of ATAC is to be free, account-less, and offline for now and fore
 > First, make sure your rust version is at least 1.79
 
 Simply use:
+
 ```shell
 cargo install atac --locked
 ```
@@ -66,7 +68,6 @@ cargo install atac --locked
 <a href="https://archlinux.org/packages/extra/x86_64/atac/">
   <img src="https://repology.org/badge/version-for-repo/arch/atac.svg" alt="Arch package" align="right">
 </a>
-
 
 ### Install from Arch
 
@@ -83,6 +84,18 @@ Simply use:
 ```bash
 brew tap julien-cpsn/atac
 brew install atac
+```
+
+<a href="https://github.com/ScoopInstaller/Main/blob/master/bucket/atac.json">
+  <img src="https://repology.org/badge/version-for-repo/scoop/atac.svg" alt="Scoop package" align="right">
+</a>
+
+### Install with Scoop
+
+Simply use:
+
+```bash
+scoop install atac
 ```
 
 <a href="https://copr.fedorainfracloud.org/coprs/joxcat/atac/">
@@ -105,7 +118,6 @@ dnf install atac
 ### Docker package
 
 Pull the image from https://hub.docker.com/repository/docker/juliencaposiena/atac/general
-
 
 <a href="https://github.com/Julien-cpsn/ATAC/releases">
   <img alt="GitHub Release" src="https://img.shields.io/github/v/release/julien-cpsn/atac?label=Release&color=45c017" align="right">
@@ -234,7 +246,6 @@ cargo run -- -h
 
 - Base URL property and authorization on collections
 - VScode plugin to see and send requests
-- Scoop installation 
 
 ## Documentation
 
