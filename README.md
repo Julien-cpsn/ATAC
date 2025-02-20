@@ -246,7 +246,6 @@ cargo run -- -h
 
 - Base URL property and authorization on collections
 - VScode plugin to see and send requests
-- ~~Scoop installation~~
 
 ## Documentation
 
