@@ -72,6 +72,8 @@ next_view = "Shift-V"
 send_request = "Space"
 alt_send_request = "Ctrl-Enter"
 
+export_request = "Ctrl-e"
+
 [keybindings.request_selected.param_tabs]
 change_auth_method = "Shift-A"
 change_body_content_type = "Shift-B"

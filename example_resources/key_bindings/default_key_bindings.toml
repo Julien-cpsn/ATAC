@@ -91,6 +91,8 @@ next_view = "v"
 send_request = "Space"
 alt_send_request = "Ctrl-Enter"
 
+export_request = "Ctrl-e"
+
 [keybindings.request_selected.param_tabs]
 change_auth_method = "Ctrl-a"
 change_body_content_type = "Ctrl-b"

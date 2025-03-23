@@ -194,7 +194,7 @@ cargo run -- -h
 | - Use proxy                         | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
 | - Allow redirects                   | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
 | - Store cookies                     | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
-| Export to other languages           | :x: :soon:                                                        | :white_check_mark:   | :x:                  |
+| Export to other languages           | :white_check_mark:                                                | :white_check_mark:   | :x:                  |
 | **WebSocket Client**                | :x: :soon:                                                        | :white_check_mark:   | :white_check_mark:   |
 | **GraphQL**                         | :x: :soon:                                                        | :white_check_mark:   | :white_check_mark:   |
 | **gRPC**                            | :x: :soon:                                                        | :white_check_mark:   | :white_check_mark:   |
@@ -204,7 +204,7 @@ cargo run -- -h
 | **Data storage**                    | Your own committable, readable and versioned files (JSON or YAML) | Tied to your account | Tied to your account |
 | **Offline**                         | :white_check_mark:                                                | :x:                  | :x:                  |
 | **Real-time collaboration**         | :x: (not planned)                                                 | :white_check_mark:   | :white_check_mark:   |
-| **Full command line usage**         | :white_check_mark:                                                | Partial              | :w:                  |
+| **Full command line usage**         | :white_check_mark:                                                | Partial              | :x:                  |
 | **Environment files and variables** | :white_check_mark: (committable, readable and versioned)          | :white_check_mark:   | :white_check_mark:   |
 | **View options**                    | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
 | **Global configuration file**       | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
@@ -221,7 +221,6 @@ cargo run -- -h
   - Document the whole code
   - Error notification in TUI
   - Request body syntax highlighting
-  - Export a request to other code formats ([raw](https://github.com/Kong/insomnia/issues/174), curl, PHP, JS, Rust, ...)
   - OpenAPI & Insomnia import
 
 - **To improve**

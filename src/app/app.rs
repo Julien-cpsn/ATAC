@@ -5,18 +5,21 @@ use ratatui::crossterm::terminal::disable_raw_mode;
 use parking_lot::RwLock;
 use ratatui::backend::Backend;
 use ratatui::Terminal;
+use strum::VariantArray;
 use throbber_widgets_tui::ThrobberState;
 use tui_textarea::TextArea;
 
 use crate::app::files::config::Config;
 use crate::models::collection::Collection;
 use crate::models::environment::Environment;
+use crate::models::export::ExportFormat;
 use crate::tui::app_states::AppState;
 use crate::tui::ui::param_tabs::param_tabs::RequestParamsTabs;
 use crate::tui::ui::result_tabs::RequestResultTabs;
 use crate::tui::ui::views::RequestView;
 use crate::tui::utils::stateful::choice_popup::ChoicePopup;
 use crate::tui::utils::stateful::cookies_popup::CookiesPopup;
+use crate::tui::utils::stateful::display_popup::DisplayPopup;
 use crate::tui::utils::stateful::help_popup::HelpPopup;
 use crate::tui::utils::stateful::new_request_popup::NewRequestPopup;
 use crate::tui::utils::stateful::script_console::ScriptConsole;
@@ -100,6 +103,9 @@ pub struct App<'a> {
     /* Others */
     
     pub syntax_highlighting: SyntaxHighlighting,
+
+    pub export_request: ChoicePopup,
+    pub display_request_export: DisplayPopup,
 }
 
 impl App<'_> {
@@ -179,6 +185,11 @@ impl App<'_> {
             /* Others */
 
             syntax_highlighting: SyntaxHighlighting::default(),
+            export_request: ChoicePopup {
+                choices: ExportFormat::VARIANTS.iter().map(|v| v.to_string()).collect(),
+                selection: 0,
+            },
+            display_request_export: DisplayPopup::default(),
         }
     }
 

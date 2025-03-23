@@ -97,6 +97,7 @@ nest! {
             pub change_url: KeyCombination,
             pub change_method: KeyCombination,
             pub request_settings: KeyCombination,
+            pub export_request: KeyCombination,
 
             pub next_view: KeyCombination,
 
@@ -223,7 +224,8 @@ impl Default for KeyBindings {
                 change_method: key!(m),
 
                 request_settings: key!(s),
-
+                export_request: key!(ctrl-e),
+                
                 next_view: key!(v),
 
                 // Used to be ctrl + enter, but it doesn't register right on many platforms

@@ -1,0 +1,65 @@
+use crate::app::files::theme::THEME;
+use crate::tui::utils::centered_rect::centered_rect;
+use crate::tui::utils::stateful::stateful_scrollbar::StatefulScrollbar;
+use ratatui::layout::Direction::Vertical;
+use ratatui::layout::{Constraint, Layout};
+use ratatui::prelude::Line;
+use ratatui::style::Stylize;
+use ratatui::widgets::{Block, Borders, Clear, Paragraph, Scrollbar, ScrollbarOrientation};
+use ratatui::Frame;
+
+#[derive(Default)]
+pub struct DisplayPopup {
+    pub title: String,
+    pub lines: Vec<Line<'static>>,
+    pub content: String,
+    pub vertical_scrollbar: StatefulScrollbar,
+    pub horizontal_scrollbar: StatefulScrollbar,
+}
+
+impl DisplayPopup {
+    pub fn render(&mut self, frame: &mut Frame) {
+        let popup_block = Block::default()
+            .title(format!("{} export", self.title))
+            .borders(Borders::ALL)
+            .white()
+            .bg(THEME.read().ui.secondary_background_color);
+
+        let area = centered_rect(100, 25, frame.area());
+
+        frame.render_widget(Clear, area);
+        frame.render_widget(popup_block, area);
+
+        let layout = Layout::new(
+            Vertical,
+            vec![
+                Constraint::Fill(1)
+            ]
+        )
+            .vertical_margin(2)
+            .horizontal_margin(2)
+            .split(area);
+
+        let content = Paragraph::new(self.lines.clone())
+            .scroll((self.vertical_scrollbar.scroll, self.horizontal_scrollbar.scroll))
+            .fg(THEME.read().ui.font_color);
+
+        frame.render_widget(content, layout[0]);
+
+        let vertical_scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight);
+        let horizontal_scrollbar = Scrollbar::new(ScrollbarOrientation::HorizontalBottom)
+            .thumb_symbol("■");
+
+        frame.render_stateful_widget(
+            vertical_scrollbar,
+            area,
+            &mut self.vertical_scrollbar.state
+        );
+
+        frame.render_stateful_widget(
+            horizontal_scrollbar,
+            area,
+            &mut self.horizontal_scrollbar.state
+        );
+    }
+}
