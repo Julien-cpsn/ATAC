@@ -218,15 +218,14 @@ cargo run -- -h
 ### TODO v1.0.0
 
 - **To add**
-  - Document the whole code
-  - Error notification in TUI
+  - Individual request documentation (markdown)
+  - Log viewer in the TUI (likely with [tui-logger](https://github.com/gin66/tui-logger))
   - Request body syntax highlighting
   - OpenAPI & Insomnia import
 
 - **To improve**
   - Editing cookies
   - Auto-completion on env file variables
-  - Handle "home" and "end" keys in the body editor (https://github.com/Julien-cpsn/ATAC/issues/93)
   - Manage multipart Content-type header (auto-generated for now) https://github.com/seanmonstar/reqwest/issues/2259
   - Go from syntect to tree-siter (because syntect causes a little memory leak)
 
