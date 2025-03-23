@@ -62,7 +62,7 @@ impl App<'_> {
     async fn handle_request_command(&mut self, request_command: &RequestCommand) -> anyhow::Result<()> {
         // Since all the request commands need the collection_slash_request argument, it's preferable to parse it from here
         let (collection_index, request_index) = match &request_command.request_subcommand {
-            RequestSubcommand::Info { collection_slash_request } | RequestSubcommand::Delete { collection_slash_request }| RequestSubcommand::Rename { collection_slash_request, .. } | RequestSubcommand::Url { collection_slash_request, .. } | RequestSubcommand::Method { collection_slash_request, .. } | RequestSubcommand::Params { collection_slash_request, .. } | RequestSubcommand::Auth { collection_slash_request, .. } | RequestSubcommand::Header { collection_slash_request, .. } | RequestSubcommand::Body { collection_slash_request, .. } | RequestSubcommand::Scripts { collection_slash_request, .. } | RequestSubcommand::Send { collection_slash_request, .. } | RequestSubcommand::Settings { collection_slash_request, .. } => self.find_collection_slash_request(&collection_slash_request.0, &collection_slash_request.1)?,
+            RequestSubcommand::Info { collection_slash_request } | RequestSubcommand::Delete { collection_slash_request }| RequestSubcommand::Rename { collection_slash_request, .. } | RequestSubcommand::Url { collection_slash_request, .. } | RequestSubcommand::Method { collection_slash_request, .. } | RequestSubcommand::Params { collection_slash_request, .. } | RequestSubcommand::Auth { collection_slash_request, .. } | RequestSubcommand::Header { collection_slash_request, .. } | RequestSubcommand::Body { collection_slash_request, .. } | RequestSubcommand::Scripts { collection_slash_request, .. } | RequestSubcommand::Send { collection_slash_request, .. } | RequestSubcommand::Settings { collection_slash_request, .. } | RequestSubcommand::Export { collection_slash_request, .. } => self.find_collection_slash_request(&collection_slash_request.0, &collection_slash_request.1)?,
             // Specific case
             RequestSubcommand::New { collection_slash_request, subcommand } => return self.cli_new_request(collection_slash_request.clone(), subcommand.clone()),
         };
@@ -175,7 +175,8 @@ impl App<'_> {
                 SettingsCommand::All => self.cli_print_request_settings(collection_index, request_index),
                 SettingsCommand::Get { setting_name } => self.cli_print_request_setting(collection_index, request_index, setting_name),
                 SettingsCommand::Set { setting_name, new_state: new_status } => self.cli_modify_request_setting(collection_index, request_index, setting_name, new_status),
-            }
+            },
+            RequestSubcommand::Export { format, ..} => self.cli_export_request(collection_index, request_index, format)
         }
     }
 

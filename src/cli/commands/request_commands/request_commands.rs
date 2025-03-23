@@ -10,6 +10,7 @@ use crate::cli::commands::request_commands::send::SendCommand;
 use crate::cli::commands::request_commands::setting::SettingsCommand;
 use crate::cli::commands::request_commands::url::UrlCommand;
 use crate::cli::utils::arguments_validators::collection_slash_request_validator;
+use crate::models::export::ExportFormat;
 
 #[derive(clap::Args, Debug, Clone)]
 pub struct RequestCommand {
@@ -142,4 +143,14 @@ pub enum RequestSubcommand {
         #[command(subcommand)]
         subcommand: SettingsCommand
     },
+    
+    /// Export a request to another programming language
+    Export {
+        /// e.g. my_collection/my_request
+        #[arg(value_parser = collection_slash_request_validator)]
+        collection_slash_request: (String, String),
+
+        /// Language to export to
+        format: ExportFormat
+    }
 }

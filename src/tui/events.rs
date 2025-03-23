@@ -586,7 +586,7 @@ impl App<'_> {
                 RequestExportFormatMoveCursorLeft(_) => self.export_request.previous(),
                 RequestExportFormatMoveCursorRight(_) => self.export_request.next(),
 
-                SelectRequestExportFormat(_) => self.export_request(),
+                SelectRequestExportFormat(_) => self.tui_export_request(),
 
                 ScrollRequestExportUp(_) => self.display_request_export.vertical_scrollbar.page_up(),
                 ScrollRequestExportDown(_) => self.display_request_export.vertical_scrollbar.page_down(),
