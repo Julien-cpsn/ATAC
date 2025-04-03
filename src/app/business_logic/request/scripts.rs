@@ -129,7 +129,7 @@ pub fn execute_post_request_script(user_script: &String, response: &RequestRespo
 
     let (response_result, result_env_values, console_output) = match serde_json::from_str::<(RequestResponse, Option<IndexMap<String, String>>, String)>(&stringed_result) {
         Ok((mut response_result, result_env_values, console_output)) => {
-            // Avoid loosing those fields since they are not serialized
+            // Avoid losing those fields since they are not serialized
             response_result.duration = response.duration.clone();
             response_result.status_code = response.status_code.clone();
 

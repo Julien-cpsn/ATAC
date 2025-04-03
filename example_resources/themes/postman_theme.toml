@@ -6,7 +6,7 @@
 
 [ui]
 font_color = "White"
-# This can be null to preserve orginial terminal background
+# This can be null to preserve original terminal background
 app_background = "#282828"
 
 main_foreground_color = "#b5563e"
