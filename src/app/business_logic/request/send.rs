@@ -163,7 +163,14 @@ impl App<'_> {
 
         let url = self.replace_env_keys_by_value(&modified_request.url);
 
-        let url = match Url::parse_with_params(&url, params) {
+        let url = if params.is_empty() {
+            Url::parse(&url)
+        } else {
+            // this adds extra "?" when params is empty
+            Url::parse_with_params(&url, params)
+        };
+
+        let url = match url {
             Ok(url) => url,
             Err(_) => {
                 return Err(PrepareRequestError::InvalidUrl);
