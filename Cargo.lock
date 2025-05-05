@@ -223,6 +223,7 @@ dependencies = [
  "jsonxf",
  "lazy_static",
  "nestify",
+ "openapiv3",
  "parking_lot",
  "parse_postman_collection",
  "ratatui",
@@ -2329,6 +2330,17 @@ checksum = "7b829e3d7e9cc74c7e315ee8edb185bf4190da5acde74afd7fc59c35b1f086e7"
 dependencies = [
  "cc",
  "pkg-config",
+]
+
+[[package]]
+name = "openapiv3"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cc02deea53ffe807708244e5914f6b099ad7015a207ee24317c22112e17d9c5c"
+dependencies = [
+ "indexmap",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]
