@@ -46,6 +46,7 @@ toml = "=0.8.20"
 boa_engine = { version = "=0.20.0", default-features = false }
 parse_postman_collection = "=0.2.3"
 curl-parser = { version = "=0.5.0", default-features = false }
+openapiv3 = "2.0.0"
 clap = { version = "=4.5.32", features = ["derive", "color", "suggestions"] }
 directories = "=6.0.0"
 arboard = "=3.4.1"

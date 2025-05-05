@@ -212,22 +212,22 @@ cargo run -- -h
 | - Disable CORS                      | :white_check_mark:                                                | :x:                  | :x:                  |
 | - Toggle syntax highlighting        | :white_check_mark:                                                | :x:                  | :x:                  |
 | Postman v2.1.0 import               | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
-| OpenAPI import                      | :x: :soon:                                                        | :white_check_mark:   | :white_check_mark:   |
+| OpenAPI import                      | :white_check_mark: (AI generated, prone to bugs)                  | :white_check_mark:   | :white_check_mark:   |
 | **Themes**                          | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
 
 ### TODO v1.0.0
 
 - **To add**
-  - Individual request documentation (markdown)
+  - Individual request documentation in the TUI (markdown)
   - Log viewer in the TUI (likely with [tui-logger](https://github.com/gin66/tui-logger))
-  - Request body syntax highlighting
-  - OpenAPI & Insomnia import
+  - Env variables editor in the TUI
+  - Handle path params
+  - Insomnia import
 
 - **To improve**
   - Editing cookies
-  - Auto-completion on env file variables
+  - Request body syntax highlighting
   - Manage multipart Content-type header (auto-generated for now) https://github.com/seanmonstar/reqwest/issues/2259
-  - Go from syntect to tree-siter (because syntect causes a little memory leak)
 
 - **To fix**
   - Query parameters bug
@@ -239,6 +239,9 @@ cargo run -- -h
   - Maybe GraphQL requests
   - Maybe MQTT requests
   - Maybe gRPC requests
+
+- **To improve**
+  - Auto-completion on env file variables
 
 ### Ideas (will think about it later)
 
@@ -313,6 +316,7 @@ You can read more about it here: https://github.com/Julien-cpsn/ATAC/releases/ta
 | [boa_engine](https://github.com/boa-dev/boa)                                                                                                     | 0.20.0                    | Create Javascript runtimes. Used for pre and post request scripts                      |
 | [My fork](https://github.com/Julien-cpsn/postman-collection-rs) of [postman_collection](https://github.com/mandrean/postman-collection-rs)       | 0.2.3                     | Deserialize Postman collection files                                                   |
 | [curl-parser](https://github.com/tyrchen/curl-parser)                                                                                            | 0.5.0                     | Parse cURL request files                                                               |
+| [openapiv3](https://github.com/glademiller/openapiv3)                                                                                            | 2.0.0                     | Parse OpenAPI spec files                                                               |
 | [clap](https://github.com/clap-rs/clap)                                                                                                          | 4.5.30                    | Command Line Argument Parser                                                           |
 | [directories](https://github.com/dirs-dev/directories-rs)                                                                                        | 6.0.0                     | Use system files                                                                       |
 | [arboard](https://github.com/1Password/arboard)                                                                                                  | 3.4.1                     | Copy response body to clipboard                                                        |

@@ -9,14 +9,14 @@ use crate::panic_error;
 use crate::app::startup::startup::AppMode::{CLI, TUI};
 use crate::models::collection::CollectionFileFormat;
 
-pub enum AppMode<'a> {
-    TUI(&'a mut App<'a>),
-    CLI(&'a mut App<'a>, Command),
+pub enum AppMode {
+    TUI,
+    CLI(Command),
 }
 
 impl<'a> App<'a> {
     /// Method called before running the app, returns the app if the TUI should be started
-    pub fn startup(&'a mut self) -> AppMode<'a> {
+    pub fn startup(&mut self) -> AppMode {
         // Logging is initialized before anything else
         match ARGS.command.is_some() {
             // CLI
@@ -51,13 +51,13 @@ impl<'a> App<'a> {
         }
 
         if let Some(command) = &ARGS.command {
-            CLI(self, command.clone())
+            CLI(command.clone())
         }
         else {
             self.parse_key_bindings_file();
             self.parse_theme_file();
             
-            TUI(self)
+            TUI
         }
     }
 

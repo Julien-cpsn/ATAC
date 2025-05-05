@@ -13,6 +13,7 @@ pub use ratatui::backend::Backend;
 
 use crate::app::app::App;
 use crate::app::startup::startup::AppMode;
+use crate::cli::args::ARGS;
 
 mod app;
 mod models;
@@ -21,28 +22,39 @@ mod tui;
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
-    
+  
     let mut app = App::new();
     let app_mode = app.startup();
 
-    match app_mode {
-        AppMode::CLI(app, command) => {
+    let should_run_tui = match app_mode {
+        AppMode::CLI(command) => {
             app
                 .handle_command(command)
                 .await;
+            
+            ARGS.should_run_tui
         },
-        AppMode::TUI(app) => {
-            app
-                .prepare_terminal()
-                .chain_hook()
-                .run(terminal).await?;
-
-            stdout().execute(LeaveAlternateScreen)?;
-            disable_raw_mode()?;
-        }
+        AppMode::TUI => true,
+    };
+    
+    if should_run_tui {
+        run_tui(&mut app).await?
     }
 
+    Ok(())
+}
+
+async fn run_tui<'a>(app: &mut App<'a>) -> Result<()> {
+    let terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
+
+    app
+        .prepare_terminal()
+        .chain_hook()
+        .run(terminal).await?;
+
+    stdout().execute(LeaveAlternateScreen)?;
+    disable_raw_mode()?;
+    
     Ok(())
 }
 

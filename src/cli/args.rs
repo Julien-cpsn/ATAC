@@ -34,6 +34,10 @@ pub struct Args {
     #[command(subcommand)]
     pub command: Option<Command>,
 
+    /// Run TUI after command
+    #[arg(long, global = true, default_value_t = false)]
+    pub tui: bool,
+
     /// Avoid saving data to the collection and environment files
     #[arg(long, global = true, default_value_t = false, display_order = 99)]
     pub dry_run: bool,
@@ -81,6 +85,7 @@ atac
   - import
       - postman
       - curl
+      - openapi
  - completions
       - bash, powershell, fish, zsh
  - man
@@ -131,6 +136,7 @@ lazy_static! {
         GlobalArgs {
             directory,
             command: args.command,
+            should_run_tui: args.tui,
             should_save: !args.dry_run,
             should_parse_directory,
             verbosity: args.verbose,
@@ -170,6 +176,7 @@ fn choose_app_directory(path_buf: Option<PathBuf>) -> PathBuf {
 pub struct GlobalArgs {
     pub directory: Option<PathBuf>,
     pub command: Option<Command>,
+    pub should_run_tui: bool,
     pub should_save: bool,
     pub should_parse_directory: bool,
     pub verbosity: Verbosity,
