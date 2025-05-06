@@ -36,43 +36,32 @@ impl App<'_> {
                 query_params = "";
             }
 
-
-            let mut new_params_to_add: Vec<KeyValue> = vec![];
-            let mut existing_params_found_indexes: Vec<usize> = vec![];
-
+            let mut found_params = vec![];
+            
+            let path_params_pattern = Regex::new(r"(\{[\w-]+})").unwrap();
+            for (_, [path_param]) in path_params_pattern.captures_iter(&final_url).map(|c| c.extract()) {
+                found_params.push(KeyValue {
+                    enabled: true,
+                    data: (path_param.to_string(), String::from("value")),
+                });
+            }
+            
             let query_params_pattern = Regex::new(r"(&?([^=]+)=([^&]+))").unwrap();
-
             for (_, [_, param_name, value]) in query_params_pattern.captures_iter(query_params).map(|c| c.extract()) {
-                let mut url_param_found = false;
-
-                for (index, existing_param) in selected_request.params.iter_mut().enumerate() {
-                    if param_name == existing_param.data.0 && existing_param.enabled {
-                        existing_param.data.1 = value.to_string();
-                        url_param_found = true;
-                        existing_params_found_indexes.push(index);
-                    }
-                }
-
-                if !url_param_found {
-                    let new_param = KeyValue {
-                        enabled: true,
-                        data: (param_name.to_string(), value.to_string()),
-                    };
-
-                    new_params_to_add.push(new_param);
-                }
+                found_params.push(KeyValue {
+                    enabled: true,
+                    data: (param_name.to_string(), value.to_string()),
+                });
             }
+            
+            selected_request.params.retain(|param|
+                found_params.iter().any(|found| found.data.0 == param.data.0)
+            );
 
-            let param_indexes = selected_request.params.len();
-
-            for param_index in 0..param_indexes {
-                if !existing_params_found_indexes.contains(&param_index) {
-                    selected_request.params.remove(param_index);
+            for found_param in found_params {
+                if !selected_request.params.iter().any(|param| param.data.0 == found_param.data.0) {
+                    selected_request.params.push(found_param);
                 }
-            }
-
-            for new_param in new_params_to_add {
-                selected_request.params.push(new_param);
             }
 
             info!("URL set to \"{}\"", &final_url);

@@ -158,16 +158,22 @@ impl App<'_> {
         /* PARAMS */
 
         let params = self.key_value_vec_to_tuple_vec(&modified_request.params);
+        let query_params = params.iter().filter(|(key, _)| !(key.starts_with("{") && key.ends_with("}")));
+        let path_params = params.iter().filter(|(key, _)| key.starts_with("{") && key.ends_with("}"));
 
         /* URL */
 
-        let url = self.replace_env_keys_by_value(&modified_request.url);
+        let mut url = self.replace_env_keys_by_value(&modified_request.url);
+
+        for (key, value) in path_params {
+            url = url.replace(key, value);
+        }
 
         let url = if params.is_empty() {
             Url::parse(&url)
         } else {
             // this adds extra "?" when params is empty
-            Url::parse_with_params(&url, params)
+            Url::parse_with_params(&url, query_params)
         };
 
         let url = match url {

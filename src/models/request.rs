@@ -120,25 +120,23 @@ impl Request {
         if !self.params.is_empty() {
             let mut enabled_params: Vec<String> = vec![];
 
-            for (index, param) in self.params.iter().enumerate() {
-                if !param.enabled {
+            for param in self.params.iter() {
+                if !param.enabled || (param.data.0.starts_with("{") && param.data.0.ends_with("}")) {
                     continue;
                 }
-
-                let mut new_param = format!("{}={}", param.data.0, param.data.1);
-
-                if index != self.params.len() - 1 {
-                    new_param += "&";
-                }
-
-                enabled_params.push(new_param);
+                
+                enabled_params.push(format!("{}={}", param.data.0, param.data.1));
             }
 
             if !enabled_params.is_empty() {
                 base_url += "?";
 
-                for enabled_param in enabled_params {
+                for (index, enabled_param) in enabled_params.iter().enumerate() {
                     base_url += &enabled_param;
+
+                    if index != enabled_params.len() - 1 {
+                        base_url += "&";
+                    }
                 }
             }
         }

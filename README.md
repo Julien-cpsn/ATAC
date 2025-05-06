@@ -221,7 +221,6 @@ cargo run -- -h
   - Individual request documentation in the TUI (markdown)
   - Log viewer in the TUI (likely with [tui-logger](https://github.com/gin66/tui-logger))
   - Env variables editor in the TUI
-  - Handle path params
   - Insomnia import
 
 - **To improve**
