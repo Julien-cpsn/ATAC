@@ -4,7 +4,7 @@ description = "Arguably a Terminal API Client. Feature-full, free, open-source, 
 version = "0.19.0"
 authors = ["julien-cpsn"]
 edition = "2021"
-rust-version = "1.79"
+rust-version = "1.82"
 license = "MIT"
 readme = "README.md"
 documentation = "https://atac.julien-cpsn.com/"
@@ -28,13 +28,13 @@ cookie_store = "=0.21.1"
 
 # TUI
 ratatui = { version = "=0.29.0", features = ["serde"] }
-crokey = "=1.1.0"
+crokey = "=1.1.2"
 tui-big-text = "=0.7.1"
 tui-tree-widget = "=0.23.0"
 tui-textarea = { version = "=0.7.0", features = ["ratatui"] }
 throbber-widgets-tui = "=0.8.0"
 ratatui-image = { version = "=5.0.0", features = ["crossterm"] }
-image = "=0.25.5"
+image = "=0.25.6"
 
 # Main functionalities
 syntect = { version = "=5.2.0", features = ["default-fancy"] }
@@ -47,13 +47,13 @@ boa_engine = { version = "=0.20.0", default-features = false }
 parse_postman_collection = "=0.2.3"
 curl-parser = { version = "=0.5.0", default-features = false }
 openapiv3 = "2.0.0"
-clap = { version = "=4.5.32", features = ["derive", "color", "suggestions"] }
+clap = { version = "=4.5.37", features = ["derive", "color", "suggestions"] }
 directories = "=6.0.0"
-arboard = "=3.4.1"
+arboard = "=3.5.0"
 
 # Async
-tokio = { version = "=1.44.1", features = ["rt", "rt-multi-thread", "macros"] }
-tokio-util = "=0.7.14"
+tokio = { version = "=1.45.0", features = ["rt", "rt-multi-thread", "macros"] }
+tokio-util = "=0.7.15"
 parking_lot = { version = "=0.12.3", features = ["serde", "send_guard"] }
 
 # Utils
@@ -62,15 +62,15 @@ lazy_static = "=1.5.0"
 nestify = "=0.3.3"
 walkdir = "=2.5.0"
 snailquote = "=0.3.1"
-indexmap = { version = "=2.8.0", features = ["serde", "rayon"] }
+indexmap = { version = "=2.9.0", features = ["serde", "rayon"] }
 rayon = "=1.10.0"
 thiserror = "=2.0.12"
-anyhow = "=1.0.97"
+anyhow = "=1.0.98"
 clap-verbosity-flag = "=3.0.2"
-clap_complete = "=4.5.47"
+clap_complete = "=4.5.50"
 clap_mangen = "=0.2.26"
 regex = "=1.11.1"
-chrono = { version = "=0.4.40", default-features = false, features = ["now"] }
+chrono = { version = "=0.4.41", default-features = false, features = ["now"] }
 uuid = { version = "=1.16.0", features = ["v4", "v7"] }
 base64 = "=0.22.1"
 
@@ -78,5 +78,5 @@ base64 = "=0.22.1"
 tracing = { version = "=0.1.41", features = ["async-await"] }
 tracing-subscriber = { version = "=0.3.19", features = ["parking_lot", "chrono", "regex"] }
 tracing-log = "=0.2.0"
-reqwest-tracing = "=0.5.6"
-reqwest-middleware = { version = "=0.4.1", features = ["rustls-tls", "json", "multipart"] }
+reqwest-tracing = "=0.5.7"
+reqwest-middleware = { version = "=0.4.2", features = ["rustls-tls", "json", "multipart"] }
