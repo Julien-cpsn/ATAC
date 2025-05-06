@@ -40,27 +40,32 @@ impl App<'_> {
             
             let path_params_pattern = Regex::new(r"(\{[\w-]+})").unwrap();
             for (_, [path_param]) in path_params_pattern.captures_iter(&final_url).map(|c| c.extract()) {
-                found_params.push(KeyValue {
-                    enabled: true,
-                    data: (path_param.to_string(), String::from("value")),
-                });
+                found_params.push((path_param.to_string(), None));
             }
             
             let query_params_pattern = Regex::new(r"(&?([^=]+)=([^&]+))").unwrap();
             for (_, [_, param_name, value]) in query_params_pattern.captures_iter(query_params).map(|c| c.extract()) {
-                found_params.push(KeyValue {
-                    enabled: true,
-                    data: (param_name.to_string(), value.to_string()),
-                });
+                found_params.push((param_name.to_string(), Some(value.to_string())));
             }
             
             selected_request.params.retain(|param|
-                found_params.iter().any(|found| found.data.0 == param.data.0)
+                found_params.iter().any(|found| found.0 == param.data.0)
             );
 
             for found_param in found_params {
-                if !selected_request.params.iter().any(|param| param.data.0 == found_param.data.0) {
-                    selected_request.params.push(found_param);
+                let param = selected_request.params.iter_mut().find(|param| param.data.0 == found_param.0);
+
+                if let Some(param) = param {
+                    if let Some(value)  = found_param.1 {
+                        param.data.1 = value;
+                    }
+                }
+                else {
+                    let value = found_param.1.unwrap_or_else(|| String::from("value"));
+                    selected_request.params.push(KeyValue {
+                        enabled: true,
+                        data: (found_param.0, value),
+                    });
                 }
             }
 
