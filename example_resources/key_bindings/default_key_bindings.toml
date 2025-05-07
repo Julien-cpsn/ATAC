@@ -11,6 +11,7 @@ move_request_down = "Ctrl-Down"
 
 next_environment = "e"
 display_cookies = "c"
+display_logs = "l"
 
 [keybindings.generic]
 display_help = "Ctrl-h" # Take care to not overlap other inputs, the help can be triggered from anywhere

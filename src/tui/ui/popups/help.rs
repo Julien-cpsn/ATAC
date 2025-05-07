@@ -11,7 +11,7 @@ use crate::tui::app_states::event_available_keys_to_spans;
 use crate::tui::utils::centered_rect::centered_rect;
 
 
-const NB_LINES: usize = 9;
+const NB_LINES: usize = 10;
 const LINE_LENGTH: usize = 2;
 const LEFT_MAX:usize = NB_LINES-1;
 const MIDDLE_MAX:usize = 2*NB_LINES-1;
@@ -25,7 +25,7 @@ impl App<'_> {
             .fg(THEME.read().ui.main_foreground_color)
             .bg(THEME.read().ui.secondary_background_color);
 
-        let area = centered_rect(110, 26, frame.area());
+        let area = centered_rect(110, 28, frame.area());
 
         frame.set_cursor_position(Position::new(0, 0));
         frame.render_widget(Clear, area);

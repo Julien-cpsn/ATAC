@@ -55,6 +55,12 @@ pub struct App<'a> {
     
     pub cookies_popup: CookiesPopup,
     
+    /* Logs */
+
+    pub logs_vertical_scrollbar: StatefulScrollbar,
+    pub logs_horizontal_scrollbar: StatefulScrollbar,
+
+
     /* Collections */
     
     pub collections: Vec<Collection>,
@@ -131,6 +137,11 @@ impl App<'_> {
             /* Cookies */
 
             cookies_popup: CookiesPopup::default(),
+            
+            /* Logs */
+
+            logs_vertical_scrollbar: StatefulScrollbar::default(),
+            logs_horizontal_scrollbar: StatefulScrollbar::default(),
             
             /* Collections */
             

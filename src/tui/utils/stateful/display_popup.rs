@@ -3,7 +3,7 @@ use crate::tui::utils::centered_rect::centered_rect;
 use crate::tui::utils::stateful::stateful_scrollbar::StatefulScrollbar;
 use ratatui::layout::Direction::Vertical;
 use ratatui::layout::{Constraint, Layout};
-use ratatui::prelude::Line;
+use ratatui::prelude::{Line, Style};
 use ratatui::style::Stylize;
 use ratatui::widgets::{Block, Borders, Clear, Paragraph, Scrollbar, ScrollbarOrientation};
 use ratatui::Frame;
@@ -22,7 +22,7 @@ impl DisplayPopup {
         let popup_block = Block::default()
             .title(format!("{} export", self.title))
             .borders(Borders::ALL)
-            .white()
+            .fg(THEME.read().ui.main_foreground_color)
             .bg(THEME.read().ui.secondary_background_color);
 
         let area = centered_rect(100, 25, frame.area());
@@ -36,18 +36,23 @@ impl DisplayPopup {
                 Constraint::Fill(1)
             ]
         )
-            .vertical_margin(2)
+            .vertical_margin(1)
             .horizontal_margin(2)
             .split(area);
 
         let content = Paragraph::new(self.lines.clone())
-            .scroll((self.vertical_scrollbar.scroll, self.horizontal_scrollbar.scroll))
+            .scroll((
+                self.vertical_scrollbar.scroll,
+                self.horizontal_scrollbar.scroll
+            ))
             .fg(THEME.read().ui.font_color);
 
         frame.render_widget(content, layout[0]);
 
-        let vertical_scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight);
+        let vertical_scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight)
+            .style(Style::new().fg(THEME.read().ui.font_color));
         let horizontal_scrollbar = Scrollbar::new(ScrollbarOrientation::HorizontalBottom)
+            .style(Style::new().fg(THEME.read().ui.font_color))
             .thumb_symbol("■");
 
         frame.render_stateful_widget(

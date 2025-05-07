@@ -32,6 +32,11 @@ pub enum AppState {
     #[allow(dead_code)]
     EditingCookies,
 
+    /* Logs */
+
+    #[strum(to_string = "Displaying logs")]
+    DisplayingLogs,
+
     /* Collections */
 
     #[strum(to_string = "Choosing an element to create")]
@@ -107,7 +112,8 @@ pub fn next_app_state(app_state: &AppState) -> AppState {
     match app_state {
         Normal => DisplayingCookies,
         DisplayingCookies => EditingCookies,
-        EditingCookies => ChoosingElementToCreate,
+        EditingCookies => DisplayingLogs,
+        DisplayingLogs => ChoosingElementToCreate,
         ChoosingElementToCreate => CreatingNewCollection,
         CreatingNewCollection => CreatingNewRequest,
         CreatingNewRequest => DeletingCollection,
@@ -138,7 +144,8 @@ pub fn previous_app_state(app_state: &AppState) -> AppState {
         Normal => EditingRequestSettings,
         DisplayingCookies => Normal,
         EditingCookies => DisplayingCookies,
-        ChoosingElementToCreate => EditingCookies,
+        DisplayingLogs => EditingCookies,
+        ChoosingElementToCreate => DisplayingLogs,
         CreatingNewCollection => ChoosingElementToCreate,
         CreatingNewRequest => CreatingNewCollection,
         DeletingCollection => CreatingNewRequest,
@@ -190,6 +197,7 @@ impl AppState {
 
                 NextEnvironment(EventKeyBinding::new(vec![key_bindings.main_menu.next_environment], "Next environment", None)),
                 DisplayCookies(EventKeyBinding::new(vec![key_bindings.main_menu.display_cookies], "Display cookies", None)),
+                DisplayLogs(EventKeyBinding::new(vec![key_bindings.main_menu.display_logs], "Display logs", None)),
             ],
             DisplayingCookies => vec![
                 GoBackToMainMenu(EventKeyBinding::new(vec![key_bindings.generic.navigation.go_back], "Quit", Some("Quit"))),
@@ -203,6 +211,13 @@ impl AppState {
             ],
             EditingCookies => vec![
                 Documentation(EventKeyBinding::new(vec![*EMPTY_KEY], "Not implemented yet", None))
+            ],
+            DisplayingLogs => vec![
+                GoBackToMainMenu(EventKeyBinding::new(vec![key_bindings.generic.navigation.go_back], "Quit", Some("Quit"))),
+                ScrollLogsUp(EventKeyBinding::new(vec![key_bindings.request_selected.result_tabs.scroll_up], "Scroll logs up", Some("Up"))),
+                ScrollLogsDown(EventKeyBinding::new(vec![key_bindings.request_selected.result_tabs.scroll_down], "Scroll logs down", Some("Down"))),
+                ScrollLogsLeft(EventKeyBinding::new(vec![key_bindings.request_selected.result_tabs.scroll_left], "Scroll logs left", Some("Left"))),
+                ScrollLogsRight(EventKeyBinding::new(vec![key_bindings.request_selected.result_tabs.scroll_right], "Scroll logs right", Some("Right"))),
             ],
             ChoosingElementToCreate => vec![
                 GoBackToMainMenu(EventKeyBinding::new(vec![key_bindings.generic.navigation.go_back], "Quit", Some("Quit"))),
@@ -298,6 +313,7 @@ impl AppState {
 
                     NextEnvironment(EventKeyBinding::new(vec![key_bindings.main_menu.next_environment], "Next environment", None)),
                     DisplayCookies(EventKeyBinding::new(vec![key_bindings.main_menu.display_cookies], "Display cookies", None)),
+                    DisplayLogs(EventKeyBinding::new(vec![key_bindings.main_menu.display_logs], "Display logs", None)),
                     ExportRequest(EventKeyBinding::new(vec![key_bindings.request_selected.export_request], "Export request", None)),
                 ];
 
@@ -646,7 +662,8 @@ impl App<'_> {
             Normal |
             ChoosingElementToCreate |
             CreatingNewCollection | CreatingNewRequest |
-            DisplayingCookies | EditingCookies => Line::from(self.state.to_string()).fg(THEME.read().ui.font_color).bg(THEME.read().ui.main_background_color),
+            DisplayingCookies | EditingCookies |
+            DisplayingLogs => Line::from(self.state.to_string()).fg(THEME.read().ui.font_color).bg(THEME.read().ui.main_background_color),
 
             DeletingCollection | RenamingCollection => {
                 let collection_index = self.collections_tree.state.selected()[0];

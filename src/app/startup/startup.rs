@@ -1,9 +1,11 @@
 use std::fs::{File, OpenOptions};
 use clap_verbosity_flag::log::LevelFilter;
-use tracing::trace;
-use tracing_log::AsTrace;
-
+use tracing::{trace};
+use tracing_log::{AsTrace};
+use tracing_subscriber::layer::{SubscriberExt};
+use tracing_subscriber::util::SubscriberInitExt;
 use crate::app::app::App;
+use crate::app::log::LogCounterLayer;
 use crate::cli::args::{ARGS, Command};
 use crate::panic_error;
 use crate::app::startup::startup::AppMode::{CLI, TUI};
@@ -36,13 +38,16 @@ impl<'a> App<'a> {
                 
                 // Using a separate file allows to redirect the output and avoid printing to screen
                 let log_file = self.create_log_file();
+
                 tracing_subscriber::fmt()
                     .with_max_level(verbosity.as_trace())
                     .with_writer(log_file)
                     .with_file(false)
                     .with_line_number(false)
                     .with_ansi(ARGS.ansi_log)
-                    .init()
+                    .finish()
+                    .with(LogCounterLayer)
+                    .init();
             }
         };
 

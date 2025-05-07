@@ -7,327 +7,338 @@ use tui_textarea::CursorMove;
 
 use crate::app::app::App;
 use crate::app::files::key_bindings::KEY_BINDINGS;
+use crate::get_key_bindings;
 use crate::tui::app_states::AVAILABLE_EVENTS;
 use crate::tui::event_key_bindings::EventKeyBinding;
 use crate::tui::events::AppEvent::*;
 use crate::tui::utils::vim_emulation::{Vim, VimTransition};
 
-#[derive(Clone)]
-pub enum AppEvent {
-    /* Main Page */
+get_key_bindings! {
+    #[derive(Clone)]
+    pub enum AppEvent {
+        /* Main Page */
 
-    ExitApp(EventKeyBinding),
+        ExitApp(EventKeyBinding),
 
-    MoveCollectionCursorUp(EventKeyBinding),
-    MoveCollectionCursorDown(EventKeyBinding),
+        MoveCollectionCursorUp(EventKeyBinding),
+        MoveCollectionCursorDown(EventKeyBinding),
 
-    SelectRequestOrExpandCollection(EventKeyBinding),
-    ExpandCollection(EventKeyBinding),
-    UnselectRequest(EventKeyBinding),
+        SelectRequestOrExpandCollection(EventKeyBinding),
+        ExpandCollection(EventKeyBinding),
+        UnselectRequest(EventKeyBinding),
 
-    CreateElement(EventKeyBinding),
-    DeleteElement(EventKeyBinding),
-    RenameElement(EventKeyBinding),
-    DuplicateElement(EventKeyBinding),
+        CreateElement(EventKeyBinding),
+        DeleteElement(EventKeyBinding),
+        RenameElement(EventKeyBinding),
+        DuplicateElement(EventKeyBinding),
 
-    MoveRequestUp(EventKeyBinding),
-    MoveRequestDown(EventKeyBinding),
+        MoveRequestUp(EventKeyBinding),
+        MoveRequestDown(EventKeyBinding),
 
-    NextEnvironment(EventKeyBinding),
-    DisplayCookies(EventKeyBinding),
+        NextEnvironment(EventKeyBinding),
+        DisplayCookies(EventKeyBinding),
+        DisplayLogs(EventKeyBinding),
 
-    GoBackToMainMenu(EventKeyBinding),
+        GoBackToMainMenu(EventKeyBinding),
 
-    /* Cookies */
+        /* Cookies */
 
-    CookiesMoveUp(EventKeyBinding),
-    CookiesMoveDown(EventKeyBinding),
-    CookiesMoveLeft(EventKeyBinding),
-    CookiesMoveRight(EventKeyBinding),
-    DeleteCookie(EventKeyBinding),
+        CookiesMoveUp(EventKeyBinding),
+        CookiesMoveDown(EventKeyBinding),
+        CookiesMoveLeft(EventKeyBinding),
+        CookiesMoveRight(EventKeyBinding),
+        DeleteCookie(EventKeyBinding),
 
-    /* Collections */
+        /* Logs */
 
-    ChooseElementToCreateMoveCursorLeft(EventKeyBinding),
-    ChooseElementToCreateMoveCursorRight(EventKeyBinding),
-    SelectElementToCreate(EventKeyBinding),
+        ScrollLogsUp(EventKeyBinding),
+        ScrollLogsDown(EventKeyBinding),
+        ScrollLogsLeft(EventKeyBinding),
+        ScrollLogsRight(EventKeyBinding),
 
-    CreateNewCollection(EventKeyBinding),
-    CreatingCollectionDeleteCharBackward(EventKeyBinding),
-    CreatingCollectionDeleteCharForward(EventKeyBinding),
-    CreatingCollectionMoveCursorLeft(EventKeyBinding),
-    CreatingCollectionMoveCursorRight(EventKeyBinding),
-    CreatingCollectionCharInput(EventKeyBinding),
+        /* Collections */
 
-    CreateNewRequest(EventKeyBinding),
-    CreatingRequestDeleteCharBackward(EventKeyBinding),
-    CreatingRequestDeleteCharForward(EventKeyBinding),
-    CreatingRequestMoveCursorLeft(EventKeyBinding),
-    CreatingRequestMoveCursorRight(EventKeyBinding),
-    CreatingRequestSelectCollectionUp(EventKeyBinding),
-    CreatingRequestSelectCollectionDown(EventKeyBinding),
-    CreatingRequestCharInput(EventKeyBinding),
+        ChooseElementToCreateMoveCursorLeft(EventKeyBinding),
+        ChooseElementToCreateMoveCursorRight(EventKeyBinding),
+        SelectElementToCreate(EventKeyBinding),
 
-    DeletingCollectionMoveCursorLeft(EventKeyBinding),
-    DeletingCollectionMoveCursorRight(EventKeyBinding),
-    DeleteCollection(EventKeyBinding),
-    
-    DeletingRequestMoveCursorLeft(EventKeyBinding),
-    DeletingRequestMoveCursorRight(EventKeyBinding),
-    DeleteRequest(EventKeyBinding),
+        CreateNewCollection(EventKeyBinding),
+        CreatingCollectionDeleteCharBackward(EventKeyBinding),
+        CreatingCollectionDeleteCharForward(EventKeyBinding),
+        CreatingCollectionMoveCursorLeft(EventKeyBinding),
+        CreatingCollectionMoveCursorRight(EventKeyBinding),
+        CreatingCollectionCharInput(EventKeyBinding),
 
-    RenameCollection(EventKeyBinding),
-    RenamingCollectionDeleteCharBackward(EventKeyBinding),
-    RenamingCollectionDeleteCharForward(EventKeyBinding),
-    RenamingCollectionMoveCursorLeft(EventKeyBinding),
-    RenamingCollectionMoveCursorRight(EventKeyBinding),
-    RenamingCollectionCharInput(EventKeyBinding),
+        CreateNewRequest(EventKeyBinding),
+        CreatingRequestDeleteCharBackward(EventKeyBinding),
+        CreatingRequestDeleteCharForward(EventKeyBinding),
+        CreatingRequestMoveCursorLeft(EventKeyBinding),
+        CreatingRequestMoveCursorRight(EventKeyBinding),
+        CreatingRequestSelectCollectionUp(EventKeyBinding),
+        CreatingRequestSelectCollectionDown(EventKeyBinding),
+        CreatingRequestCharInput(EventKeyBinding),
 
-    RenameRequest(EventKeyBinding),
-    RenamingRequestDeleteCharBackward(EventKeyBinding),
-    RenamingRequestDeleteCharForward(EventKeyBinding),
-    RenamingRequestMoveCursorLeft(EventKeyBinding),
-    RenamingRequestMoveCursorRight(EventKeyBinding),
-    RenamingRequestCharInput(EventKeyBinding),
-    
-    /* Request */
+        DeletingCollectionMoveCursorLeft(EventKeyBinding),
+        DeletingCollectionMoveCursorRight(EventKeyBinding),
+        DeleteCollection(EventKeyBinding),
 
-    GoBackToRequestMenu(EventKeyBinding),
+        DeletingRequestMoveCursorLeft(EventKeyBinding),
+        DeletingRequestMoveCursorRight(EventKeyBinding),
+        DeleteRequest(EventKeyBinding),
 
-    EditUrl(EventKeyBinding),
-    EditMethod(EventKeyBinding),
+        RenameCollection(EventKeyBinding),
+        RenamingCollectionDeleteCharBackward(EventKeyBinding),
+        RenamingCollectionDeleteCharForward(EventKeyBinding),
+        RenamingCollectionMoveCursorLeft(EventKeyBinding),
+        RenamingCollectionMoveCursorRight(EventKeyBinding),
+        RenamingCollectionCharInput(EventKeyBinding),
 
-    EditSettings(EventKeyBinding),
+        RenameRequest(EventKeyBinding),
+        RenamingRequestDeleteCharBackward(EventKeyBinding),
+        RenamingRequestDeleteCharForward(EventKeyBinding),
+        RenamingRequestMoveCursorLeft(EventKeyBinding),
+        RenamingRequestMoveCursorRight(EventKeyBinding),
+        RenamingRequestCharInput(EventKeyBinding),
 
-    NextView(EventKeyBinding),
+        /* Request */
 
-    SendRequest(EventKeyBinding),
+        GoBackToRequestMenu(EventKeyBinding),
 
-    /* Param tabs */
+        EditUrl(EventKeyBinding),
+        EditMethod(EventKeyBinding),
 
-    NextParamTab(EventKeyBinding),
-    ModifyRequestAuthMethod(EventKeyBinding),
-    ModifyRequestBodyContentType(EventKeyBinding),
+        EditSettings(EventKeyBinding),
 
-    EditRequestQueryParam(EventKeyBinding),
-    RequestQueryParamsMoveUp(EventKeyBinding),
-    RequestQueryParamsMoveDown(EventKeyBinding),
-    RequestQueryParamsMoveLeft(EventKeyBinding),
-    RequestQueryParamsMoveRight(EventKeyBinding),
-    CreateRequestQueryParam(EventKeyBinding),
-    DeleteRequestQueryParam(EventKeyBinding),
-    ToggleRequestQueryParam(EventKeyBinding),
-    DuplicateRequestQueryParam(EventKeyBinding),
+        NextView(EventKeyBinding),
 
-    EditRequestAuth(EventKeyBinding),
-    RequestAuthMoveUp(EventKeyBinding),
-    RequestAuthMoveDown(EventKeyBinding),
+        SendRequest(EventKeyBinding),
 
-    EditRequestHeader(EventKeyBinding),
-    RequestHeadersMoveUp(EventKeyBinding),
-    RequestHeadersMoveDown(EventKeyBinding),
-    RequestHeadersMoveLeft(EventKeyBinding),
-    RequestHeadersMoveRight(EventKeyBinding),
-    CreateRequestHeader(EventKeyBinding),
-    DeleteRequestHeader(EventKeyBinding),
-    ToggleRequestHeader(EventKeyBinding),
-    DuplicateRequestHeader(EventKeyBinding),
+        /* Param tabs */
 
-    EditRequestBody(EventKeyBinding),
-    RequestBodyTableMoveUp(EventKeyBinding),
-    RequestBodyTableMoveDown(EventKeyBinding),
-    RequestBodyTableMoveLeft(EventKeyBinding),
-    RequestBodyTableMoveRight(EventKeyBinding),
-    CreateRequestBodyTableElement(EventKeyBinding),
-    DeleteRequestBodyTableElement(EventKeyBinding),
-    ToggleRequestBodyTableElement(EventKeyBinding),
-    DuplicateRequestBodyTableElement(EventKeyBinding),
+        NextParamTab(EventKeyBinding),
+        ModifyRequestAuthMethod(EventKeyBinding),
+        ModifyRequestBodyContentType(EventKeyBinding),
 
-    EditRequestScript(EventKeyBinding),
-    // Move up or down
-    RequestScriptMove(EventKeyBinding),
+        EditRequestQueryParam(EventKeyBinding),
+        RequestQueryParamsMoveUp(EventKeyBinding),
+        RequestQueryParamsMoveDown(EventKeyBinding),
+        RequestQueryParamsMoveLeft(EventKeyBinding),
+        RequestQueryParamsMoveRight(EventKeyBinding),
+        CreateRequestQueryParam(EventKeyBinding),
+        DeleteRequestQueryParam(EventKeyBinding),
+        ToggleRequestQueryParam(EventKeyBinding),
+        DuplicateRequestQueryParam(EventKeyBinding),
 
-    /* Result tabs */
+        EditRequestAuth(EventKeyBinding),
+        RequestAuthMoveUp(EventKeyBinding),
+        RequestAuthMoveDown(EventKeyBinding),
 
-    NextResultTab(EventKeyBinding),
+        EditRequestHeader(EventKeyBinding),
+        RequestHeadersMoveUp(EventKeyBinding),
+        RequestHeadersMoveDown(EventKeyBinding),
+        RequestHeadersMoveLeft(EventKeyBinding),
+        RequestHeadersMoveRight(EventKeyBinding),
+        CreateRequestHeader(EventKeyBinding),
+        DeleteRequestHeader(EventKeyBinding),
+        ToggleRequestHeader(EventKeyBinding),
+        DuplicateRequestHeader(EventKeyBinding),
 
-    ScrollResultUp(EventKeyBinding),
-    ScrollResultDown(EventKeyBinding),
-    ScrollResultLeft(EventKeyBinding),
-    ScrollResultRight(EventKeyBinding),
+        EditRequestBody(EventKeyBinding),
+        RequestBodyTableMoveUp(EventKeyBinding),
+        RequestBodyTableMoveDown(EventKeyBinding),
+        RequestBodyTableMoveLeft(EventKeyBinding),
+        RequestBodyTableMoveRight(EventKeyBinding),
+        CreateRequestBodyTableElement(EventKeyBinding),
+        DeleteRequestBodyTableElement(EventKeyBinding),
+        ToggleRequestBodyTableElement(EventKeyBinding),
+        DuplicateRequestBodyTableElement(EventKeyBinding),
 
-    /* Others */
+        EditRequestScript(EventKeyBinding),
+        // Move up or down
+        RequestScriptMove(EventKeyBinding),
 
-    CopyResponsePart(EventKeyBinding),
+        /* Result tabs */
 
-    /* Request export */
+        NextResultTab(EventKeyBinding),
 
-    ExportRequest(EventKeyBinding),
-    RequestExportFormatMoveCursorLeft(EventKeyBinding),
-    RequestExportFormatMoveCursorRight(EventKeyBinding),
-    SelectRequestExportFormat(EventKeyBinding),
+        ScrollResultUp(EventKeyBinding),
+        ScrollResultDown(EventKeyBinding),
+        ScrollResultLeft(EventKeyBinding),
+        ScrollResultRight(EventKeyBinding),
 
-    ScrollRequestExportUp(EventKeyBinding),
-    ScrollRequestExportDown(EventKeyBinding),
-    ScrollRequestExportLeft(EventKeyBinding),
-    ScrollRequestExportRight(EventKeyBinding),
-    CopyRequestExport(EventKeyBinding),
+        /* Others */
 
-    /* Request Text inputs */
+        CopyResponsePart(EventKeyBinding),
 
-    ModifyRequestUrl(EventKeyBinding),
-    EditingRequestUrlDeleteCharBackward(EventKeyBinding),
-    EditingRequestUrlDeleteCharForward(EventKeyBinding),
-    EditingRequestUrlMoveCursorLeft(EventKeyBinding),
-    EditingRequestUrlMoveCursorRight(EventKeyBinding),
-    EditingRequestUrlMoveCursorLineStart(EventKeyBinding),
-    EditingRequestUrlMoveCursorLineEnd(EventKeyBinding),
-    EditingRequestUrlCharInput(EventKeyBinding),
+        /* Request export */
 
-    ModifyRequestQueryParam(EventKeyBinding),
-    EditingRequestQueryParamDeleteCharBackward(EventKeyBinding),
-    EditingRequestQueryParamDeleteCharForward(EventKeyBinding),
-    EditingRequestQueryParamMoveCursorLeft(EventKeyBinding),
-    EditingRequestQueryParamMoveCursorRight(EventKeyBinding),
-    EditingRequestQueryParamMoveCursorLineStart(EventKeyBinding),
-    EditingRequestQueryParamMoveCursorLineEnd(EventKeyBinding),
-    EditingRequestQueryParamCharInput(EventKeyBinding),
+        ExportRequest(EventKeyBinding),
+        RequestExportFormatMoveCursorLeft(EventKeyBinding),
+        RequestExportFormatMoveCursorRight(EventKeyBinding),
+        SelectRequestExportFormat(EventKeyBinding),
 
-    /* Auth */
+        ScrollRequestExportUp(EventKeyBinding),
+        ScrollRequestExportDown(EventKeyBinding),
+        ScrollRequestExportLeft(EventKeyBinding),
+        ScrollRequestExportRight(EventKeyBinding),
+        CopyRequestExport(EventKeyBinding),
 
-    ModifyRequestAuthUsername(EventKeyBinding),
-    EditingRequestAuthUsernameDeleteCharBackward(EventKeyBinding),
-    EditingRequestAuthUsernameDeleteCharForward(EventKeyBinding),
-    EditingRequestAuthUsernameMoveCursorLeft(EventKeyBinding),
-    EditingRequestAuthUsernameMoveCursorRight(EventKeyBinding),
-    EditingRequestAuthUsernameMoveCursorLineStart(EventKeyBinding),
-    EditingRequestAuthUsernameMoveCursorLineEnd(EventKeyBinding),
-    EditingRequestAuthUsernameCharInput(EventKeyBinding),
+        /* Request Text inputs */
 
-    ModifyRequestAuthPassword(EventKeyBinding),
-    EditingRequestAuthPasswordDeleteCharBackward(EventKeyBinding),
-    EditingRequestAuthPasswordDeleteCharForward(EventKeyBinding),
-    EditingRequestAuthPasswordMoveCursorLeft(EventKeyBinding),
-    EditingRequestAuthPasswordMoveCursorRight(EventKeyBinding),
-    EditingRequestAuthPasswordMoveCursorLineStart(EventKeyBinding),
-    EditingRequestAuthPasswordMoveCursorLineEnd(EventKeyBinding),
-    EditingRequestAuthPasswordCharInput(EventKeyBinding),
+        ModifyRequestUrl(EventKeyBinding),
+        EditingRequestUrlDeleteCharBackward(EventKeyBinding),
+        EditingRequestUrlDeleteCharForward(EventKeyBinding),
+        EditingRequestUrlMoveCursorLeft(EventKeyBinding),
+        EditingRequestUrlMoveCursorRight(EventKeyBinding),
+        EditingRequestUrlMoveCursorLineStart(EventKeyBinding),
+        EditingRequestUrlMoveCursorLineEnd(EventKeyBinding),
+        EditingRequestUrlCharInput(EventKeyBinding),
 
-    ModifyRequestAuthBearerToken(EventKeyBinding),
-    EditingRequestAuthBearerTokenDeleteCharBackward(EventKeyBinding),
-    EditingRequestAuthBearerTokenDeleteCharForward(EventKeyBinding),
-    EditingRequestAuthBearerTokenMoveCursorLeft(EventKeyBinding),
-    EditingRequestAuthBearerTokenMoveCursorRight(EventKeyBinding),
-    EditingRequestAuthBearerTokenMoveCursorLineStart(EventKeyBinding),
-    EditingRequestAuthBearerTokenMoveCursorLineEnd(EventKeyBinding),
-    EditingRequestAuthBearerTokenCharInput(EventKeyBinding),
+        ModifyRequestQueryParam(EventKeyBinding),
+        EditingRequestQueryParamDeleteCharBackward(EventKeyBinding),
+        EditingRequestQueryParamDeleteCharForward(EventKeyBinding),
+        EditingRequestQueryParamMoveCursorLeft(EventKeyBinding),
+        EditingRequestQueryParamMoveCursorRight(EventKeyBinding),
+        EditingRequestQueryParamMoveCursorLineStart(EventKeyBinding),
+        EditingRequestQueryParamMoveCursorLineEnd(EventKeyBinding),
+        EditingRequestQueryParamCharInput(EventKeyBinding),
 
-    /* Headers */
+        /* Auth */
 
-    ModifyRequestHeader(EventKeyBinding),
-    EditingRequestHeaderDeleteCharBackward(EventKeyBinding),
-    EditingRequestHeaderDeleteCharForward(EventKeyBinding),
-    EditingRequestHeaderMoveCursorLeft(EventKeyBinding),
-    EditingRequestHeaderMoveCursorRight(EventKeyBinding),
-    EditingRequestHeaderMoveCursorLineStart(EventKeyBinding),
-    EditingRequestHeaderMoveCursorLineEnd(EventKeyBinding),
-    EditingRequestHeaderCharInput(EventKeyBinding),
+        ModifyRequestAuthUsername(EventKeyBinding),
+        EditingRequestAuthUsernameDeleteCharBackward(EventKeyBinding),
+        EditingRequestAuthUsernameDeleteCharForward(EventKeyBinding),
+        EditingRequestAuthUsernameMoveCursorLeft(EventKeyBinding),
+        EditingRequestAuthUsernameMoveCursorRight(EventKeyBinding),
+        EditingRequestAuthUsernameMoveCursorLineStart(EventKeyBinding),
+        EditingRequestAuthUsernameMoveCursorLineEnd(EventKeyBinding),
+        EditingRequestAuthUsernameCharInput(EventKeyBinding),
 
-    /* Body */
+        ModifyRequestAuthPassword(EventKeyBinding),
+        EditingRequestAuthPasswordDeleteCharBackward(EventKeyBinding),
+        EditingRequestAuthPasswordDeleteCharForward(EventKeyBinding),
+        EditingRequestAuthPasswordMoveCursorLeft(EventKeyBinding),
+        EditingRequestAuthPasswordMoveCursorRight(EventKeyBinding),
+        EditingRequestAuthPasswordMoveCursorLineStart(EventKeyBinding),
+        EditingRequestAuthPasswordMoveCursorLineEnd(EventKeyBinding),
+        EditingRequestAuthPasswordCharInput(EventKeyBinding),
 
-    ModifyRequestBodyTable(EventKeyBinding),
-    EditingRequestBodyTableDeleteCharBackward(EventKeyBinding),
-    EditingRequestBodyTableDeleteCharForward(EventKeyBinding),
-    EditingRequestBodyTableMoveCursorLeft(EventKeyBinding),
-    EditingRequestBodyTableMoveCursorRight(EventKeyBinding),
-    EditingRequestBodyTableMoveCursorLineStart(EventKeyBinding),
-    EditingRequestBodyTableMoveCursorLineEnd(EventKeyBinding),
-    EditingRequestBodyTableCharInput(EventKeyBinding),
+        ModifyRequestAuthBearerToken(EventKeyBinding),
+        EditingRequestAuthBearerTokenDeleteCharBackward(EventKeyBinding),
+        EditingRequestAuthBearerTokenDeleteCharForward(EventKeyBinding),
+        EditingRequestAuthBearerTokenMoveCursorLeft(EventKeyBinding),
+        EditingRequestAuthBearerTokenMoveCursorRight(EventKeyBinding),
+        EditingRequestAuthBearerTokenMoveCursorLineStart(EventKeyBinding),
+        EditingRequestAuthBearerTokenMoveCursorLineEnd(EventKeyBinding),
+        EditingRequestAuthBearerTokenCharInput(EventKeyBinding),
 
-    ModifyRequestBodyFile(EventKeyBinding),
-    EditingRequestBodyFileDeleteCharBackward(EventKeyBinding),
-    EditingRequestBodyFileDeleteCharForward(EventKeyBinding),
-    EditingRequestBodyFileMoveCursorLeft(EventKeyBinding),
-    EditingRequestBodyFileMoveCursorRight(EventKeyBinding),
-    EditingRequestBodyFileMoveCursorLineStart(EventKeyBinding),
-    EditingRequestBodyFileMoveCursorLineEnd(EventKeyBinding),
-    EditingRequestBodyFileCharInput(EventKeyBinding),
+        /* Headers */
 
-    EditingRequestBodyStringVimInput(EventKeyBinding),
+        ModifyRequestHeader(EventKeyBinding),
+        EditingRequestHeaderDeleteCharBackward(EventKeyBinding),
+        EditingRequestHeaderDeleteCharForward(EventKeyBinding),
+        EditingRequestHeaderMoveCursorLeft(EventKeyBinding),
+        EditingRequestHeaderMoveCursorRight(EventKeyBinding),
+        EditingRequestHeaderMoveCursorLineStart(EventKeyBinding),
+        EditingRequestHeaderMoveCursorLineEnd(EventKeyBinding),
+        EditingRequestHeaderCharInput(EventKeyBinding),
 
-    EditingRequestBodyStringSaveAndQuit(EventKeyBinding),
-    EditingRequestBodyStringCopy(EventKeyBinding),
-    EditingRequestBodyStringPaste(EventKeyBinding),
-    EditingRequestBodyStringUndo(EventKeyBinding),
-    EditingRequestBodyStringRedo(EventKeyBinding),
-    EditingRequestBodyStringNewLine(EventKeyBinding),
-    EditingRequestBodyStringIndent(EventKeyBinding),
-    EditingRequestBodyStringDeleteCharBackward(EventKeyBinding),
-    EditingRequestBodyStringDeleteCharForward(EventKeyBinding),
-    EditingRequestBodyStringSkipWordLeft(EventKeyBinding),
-    EditingRequestBodyStringSkipWordRight(EventKeyBinding),
-    EditingRequestBodyStringMoveCursorUp(EventKeyBinding),
-    EditingRequestBodyStringMoveCursorDown(EventKeyBinding),
-    EditingRequestBodyStringMoveCursorLeft(EventKeyBinding),
-    EditingRequestBodyStringMoveCursorRight(EventKeyBinding),
-    EditingRequestBodyStringMoveCursorLineStart(EventKeyBinding),
-    EditingRequestBodyStringMoveCursorLineEnd(EventKeyBinding),
-    EditingRequestBodyStringCharInput(EventKeyBinding),
+        /* Body */
 
-    /* Scripts */
+        ModifyRequestBodyTable(EventKeyBinding),
+        EditingRequestBodyTableDeleteCharBackward(EventKeyBinding),
+        EditingRequestBodyTableDeleteCharForward(EventKeyBinding),
+        EditingRequestBodyTableMoveCursorLeft(EventKeyBinding),
+        EditingRequestBodyTableMoveCursorRight(EventKeyBinding),
+        EditingRequestBodyTableMoveCursorLineStart(EventKeyBinding),
+        EditingRequestBodyTableMoveCursorLineEnd(EventKeyBinding),
+        EditingRequestBodyTableCharInput(EventKeyBinding),
 
-    EditingPreRequestScriptVimInput(EventKeyBinding),
+        ModifyRequestBodyFile(EventKeyBinding),
+        EditingRequestBodyFileDeleteCharBackward(EventKeyBinding),
+        EditingRequestBodyFileDeleteCharForward(EventKeyBinding),
+        EditingRequestBodyFileMoveCursorLeft(EventKeyBinding),
+        EditingRequestBodyFileMoveCursorRight(EventKeyBinding),
+        EditingRequestBodyFileMoveCursorLineStart(EventKeyBinding),
+        EditingRequestBodyFileMoveCursorLineEnd(EventKeyBinding),
+        EditingRequestBodyFileCharInput(EventKeyBinding),
 
-    EditingPreRequestScriptSaveAndQuit(EventKeyBinding),
-    EditingPreRequestScriptCopy(EventKeyBinding),
-    EditingPreRequestScriptPaste(EventKeyBinding),
-    EditingPreRequestScriptUndo(EventKeyBinding),
-    EditingPreRequestScriptRedo(EventKeyBinding),
-    EditingPreRequestScriptNewLine(EventKeyBinding),
-    EditingPreRequestScriptIndent(EventKeyBinding),
-    EditingPreRequestScriptDeleteCharBackward(EventKeyBinding),
-    EditingPreRequestScriptDeleteCharForward(EventKeyBinding),
-    EditingPreRequestScriptSkipWordLeft(EventKeyBinding),
-    EditingPreRequestScriptSkipWordRight(EventKeyBinding),
-    EditingPreRequestScriptMoveCursorUp(EventKeyBinding),
-    EditingPreRequestScriptMoveCursorDown(EventKeyBinding),
-    EditingPreRequestScriptMoveCursorLeft(EventKeyBinding),
-    EditingPreRequestScriptMoveCursorRight(EventKeyBinding),
-    EditingPreRequestScriptMoveCursorLineStart(EventKeyBinding),
-    EditingPreRequestScriptMoveCursorLineEnd(EventKeyBinding),
-    EditingPreRequestScriptCharInput(EventKeyBinding),
+        EditingRequestBodyStringVimInput(EventKeyBinding),
 
-    EditingPostRequestScriptVimInput(EventKeyBinding),
+        EditingRequestBodyStringSaveAndQuit(EventKeyBinding),
+        EditingRequestBodyStringCopy(EventKeyBinding),
+        EditingRequestBodyStringPaste(EventKeyBinding),
+        EditingRequestBodyStringUndo(EventKeyBinding),
+        EditingRequestBodyStringRedo(EventKeyBinding),
+        EditingRequestBodyStringNewLine(EventKeyBinding),
+        EditingRequestBodyStringIndent(EventKeyBinding),
+        EditingRequestBodyStringDeleteCharBackward(EventKeyBinding),
+        EditingRequestBodyStringDeleteCharForward(EventKeyBinding),
+        EditingRequestBodyStringSkipWordLeft(EventKeyBinding),
+        EditingRequestBodyStringSkipWordRight(EventKeyBinding),
+        EditingRequestBodyStringMoveCursorUp(EventKeyBinding),
+        EditingRequestBodyStringMoveCursorDown(EventKeyBinding),
+        EditingRequestBodyStringMoveCursorLeft(EventKeyBinding),
+        EditingRequestBodyStringMoveCursorRight(EventKeyBinding),
+        EditingRequestBodyStringMoveCursorLineStart(EventKeyBinding),
+        EditingRequestBodyStringMoveCursorLineEnd(EventKeyBinding),
+        EditingRequestBodyStringCharInput(EventKeyBinding),
 
-    EditingPostRequestScriptSaveAndQuit(EventKeyBinding),
-    EditingPostRequestScriptCopy(EventKeyBinding),
-    EditingPostRequestScriptPaste(EventKeyBinding),
-    EditingPostRequestScriptUndo(EventKeyBinding),
-    EditingPostRequestScriptRedo(EventKeyBinding),
-    EditingPostRequestScriptNewLine(EventKeyBinding),
-    EditingPostRequestScriptIndent(EventKeyBinding),
-    EditingPostRequestScriptDeleteCharBackward(EventKeyBinding),
-    EditingPostRequestScriptDeleteCharForward(EventKeyBinding),
-    EditingPostRequestScriptSkipWordLeft(EventKeyBinding),
-    EditingPostRequestScriptSkipWordRight(EventKeyBinding),
-    EditingPostRequestScriptMoveCursorUp(EventKeyBinding),
-    EditingPostRequestScriptMoveCursorDown(EventKeyBinding),
-    EditingPostRequestScriptMoveCursorLeft(EventKeyBinding),
-    EditingPostRequestScriptMoveCursorRight(EventKeyBinding),
-    EditingPostRequestScriptMoveCursorLineStart(EventKeyBinding),
-    EditingPostRequestScriptMoveCursorLineEnd(EventKeyBinding),
-    EditingPostRequestScriptCharInput(EventKeyBinding),
-    
-    /* Settings */
+        /* Scripts */
 
-    RequestSettingsMoveUp(EventKeyBinding),
-    RequestSettingsMoveDown(EventKeyBinding),
-    RequestSettingsToggleSetting(EventKeyBinding),
-    ModifyRequestSettings(EventKeyBinding),
+        EditingPreRequestScriptVimInput(EventKeyBinding),
 
-    /* Others */
+        EditingPreRequestScriptSaveAndQuit(EventKeyBinding),
+        EditingPreRequestScriptCopy(EventKeyBinding),
+        EditingPreRequestScriptPaste(EventKeyBinding),
+        EditingPreRequestScriptUndo(EventKeyBinding),
+        EditingPreRequestScriptRedo(EventKeyBinding),
+        EditingPreRequestScriptNewLine(EventKeyBinding),
+        EditingPreRequestScriptIndent(EventKeyBinding),
+        EditingPreRequestScriptDeleteCharBackward(EventKeyBinding),
+        EditingPreRequestScriptDeleteCharForward(EventKeyBinding),
+        EditingPreRequestScriptSkipWordLeft(EventKeyBinding),
+        EditingPreRequestScriptSkipWordRight(EventKeyBinding),
+        EditingPreRequestScriptMoveCursorUp(EventKeyBinding),
+        EditingPreRequestScriptMoveCursorDown(EventKeyBinding),
+        EditingPreRequestScriptMoveCursorLeft(EventKeyBinding),
+        EditingPreRequestScriptMoveCursorRight(EventKeyBinding),
+        EditingPreRequestScriptMoveCursorLineStart(EventKeyBinding),
+        EditingPreRequestScriptMoveCursorLineEnd(EventKeyBinding),
+        EditingPreRequestScriptCharInput(EventKeyBinding),
 
-    Documentation(EventKeyBinding)
+        EditingPostRequestScriptVimInput(EventKeyBinding),
+
+        EditingPostRequestScriptSaveAndQuit(EventKeyBinding),
+        EditingPostRequestScriptCopy(EventKeyBinding),
+        EditingPostRequestScriptPaste(EventKeyBinding),
+        EditingPostRequestScriptUndo(EventKeyBinding),
+        EditingPostRequestScriptRedo(EventKeyBinding),
+        EditingPostRequestScriptNewLine(EventKeyBinding),
+        EditingPostRequestScriptIndent(EventKeyBinding),
+        EditingPostRequestScriptDeleteCharBackward(EventKeyBinding),
+        EditingPostRequestScriptDeleteCharForward(EventKeyBinding),
+        EditingPostRequestScriptSkipWordLeft(EventKeyBinding),
+        EditingPostRequestScriptSkipWordRight(EventKeyBinding),
+        EditingPostRequestScriptMoveCursorUp(EventKeyBinding),
+        EditingPostRequestScriptMoveCursorDown(EventKeyBinding),
+        EditingPostRequestScriptMoveCursorLeft(EventKeyBinding),
+        EditingPostRequestScriptMoveCursorRight(EventKeyBinding),
+        EditingPostRequestScriptMoveCursorLineStart(EventKeyBinding),
+        EditingPostRequestScriptMoveCursorLineEnd(EventKeyBinding),
+        EditingPostRequestScriptCharInput(EventKeyBinding),
+
+        /* Settings */
+
+        RequestSettingsMoveUp(EventKeyBinding),
+        RequestSettingsMoveDown(EventKeyBinding),
+        RequestSettingsToggleSetting(EventKeyBinding),
+        ModifyRequestSettings(EventKeyBinding),
+
+        /* Others */
+
+        Documentation(EventKeyBinding),
+    }
 }
 
 impl App<'_> {
@@ -420,6 +431,7 @@ impl App<'_> {
 
                 NextEnvironment(_) => self.tui_next_environment(),
                 DisplayCookies(_) => self.display_cookies_state(),
+                DisplayLogs(_) => self.display_logs_state(),
 
                 GoBackToMainMenu(_) => self.normal_state(),
 
@@ -432,6 +444,13 @@ impl App<'_> {
 
                 DeleteCookie(_) => self.tui_delete_cookie(),
 
+                /* Logs */
+                
+                ScrollLogsUp(_) => self.logs_vertical_scrollbar.page_up(),
+                ScrollLogsDown(_) => self.logs_vertical_scrollbar.page_down(),
+                ScrollLogsLeft(_) => self.logs_horizontal_scrollbar.page_up(),
+                ScrollLogsRight(_) => self.logs_horizontal_scrollbar.page_down(),
+                
                 /* Collections */
 
                 ChooseElementToCreateMoveCursorLeft(_) => self.creation_popup.previous(),
@@ -841,250 +860,5 @@ impl App<'_> {
         };
 
         return miss_input;
-    }
-}
-
-impl AppEvent {
-    pub fn get_event_key_bindings(&self) -> &EventKeyBinding {
-        match self {
-            ExitApp(event_key_bindings) |
-            MoveCollectionCursorUp(event_key_bindings) |
-            MoveCollectionCursorDown(event_key_bindings) |
-            SelectRequestOrExpandCollection(event_key_bindings) |
-            ExpandCollection(event_key_bindings) |
-            UnselectRequest(event_key_bindings) |
-            CreateElement(event_key_bindings) |
-            DeleteElement(event_key_bindings) |
-            RenameElement(event_key_bindings) |
-            DuplicateElement(event_key_bindings) |
-            MoveRequestUp(event_key_bindings) |
-            MoveRequestDown(event_key_bindings) |
-            NextEnvironment(event_key_bindings) |
-            DisplayCookies(event_key_bindings) |
-            GoBackToMainMenu(event_key_bindings) |
-            CookiesMoveUp(event_key_bindings) |
-            CookiesMoveDown(event_key_bindings) |
-            CookiesMoveLeft(event_key_bindings) |
-            CookiesMoveRight(event_key_bindings) |
-            DeleteCookie(event_key_bindings) |
-            ChooseElementToCreateMoveCursorLeft(event_key_bindings) |
-            ChooseElementToCreateMoveCursorRight(event_key_bindings) |
-            SelectElementToCreate(event_key_bindings) |
-            CreateNewCollection(event_key_bindings) |
-            CreatingCollectionDeleteCharBackward(event_key_bindings) |
-            CreatingCollectionDeleteCharForward(event_key_bindings) |
-            CreatingCollectionMoveCursorLeft(event_key_bindings) |
-            CreatingCollectionMoveCursorRight(event_key_bindings) |
-            CreatingCollectionCharInput(event_key_bindings) |
-            CreateNewRequest(event_key_bindings) |
-            CreatingRequestDeleteCharBackward(event_key_bindings) |
-            CreatingRequestDeleteCharForward(event_key_bindings) |
-            CreatingRequestMoveCursorLeft(event_key_bindings) |
-            CreatingRequestMoveCursorRight(event_key_bindings) |
-            CreatingRequestSelectCollectionUp(event_key_bindings) |
-            CreatingRequestSelectCollectionDown(event_key_bindings) |
-            CreatingRequestCharInput(event_key_bindings) |
-            DeletingCollectionMoveCursorLeft(event_key_bindings) |
-            DeletingCollectionMoveCursorRight(event_key_bindings) |
-            DeleteCollection(event_key_bindings) |
-            DeletingRequestMoveCursorLeft(event_key_bindings) |
-            DeletingRequestMoveCursorRight(event_key_bindings) |
-            DeleteRequest(event_key_bindings) |
-            RenameCollection(event_key_bindings) |
-            RenamingCollectionDeleteCharBackward(event_key_bindings) |
-            RenamingCollectionDeleteCharForward(event_key_bindings) |
-            RenamingCollectionMoveCursorLeft(event_key_bindings) |
-            RenamingCollectionMoveCursorRight(event_key_bindings) |
-            RenamingCollectionCharInput(event_key_bindings) |
-            RenameRequest(event_key_bindings) |
-            RenamingRequestDeleteCharBackward(event_key_bindings) |
-            RenamingRequestDeleteCharForward(event_key_bindings) |
-            RenamingRequestMoveCursorLeft(event_key_bindings) |
-            RenamingRequestMoveCursorRight(event_key_bindings) |
-            RenamingRequestCharInput(event_key_bindings) |
-            GoBackToRequestMenu(event_key_bindings) |
-            EditUrl(event_key_bindings) |
-            EditMethod(event_key_bindings) |
-            EditSettings(event_key_bindings) |
-            NextView(event_key_bindings) |
-            SendRequest(event_key_bindings) |
-            NextParamTab(event_key_bindings) |
-            ModifyRequestAuthMethod(event_key_bindings) |
-            ModifyRequestBodyContentType(event_key_bindings) |
-            EditRequestQueryParam(event_key_bindings) |
-            RequestQueryParamsMoveUp(event_key_bindings) |
-            RequestQueryParamsMoveDown(event_key_bindings) |
-            RequestQueryParamsMoveLeft(event_key_bindings) |
-            RequestQueryParamsMoveRight(event_key_bindings) |
-            CreateRequestQueryParam(event_key_bindings) |
-            DeleteRequestQueryParam(event_key_bindings) |
-            ToggleRequestQueryParam(event_key_bindings) |
-            DuplicateRequestQueryParam(event_key_bindings) |
-            EditRequestAuth(event_key_bindings) |
-            RequestAuthMoveUp(event_key_bindings) |
-            RequestAuthMoveDown(event_key_bindings) |
-            EditRequestHeader(event_key_bindings) |
-            RequestHeadersMoveUp(event_key_bindings) |
-            RequestHeadersMoveDown(event_key_bindings) |
-            RequestHeadersMoveLeft(event_key_bindings) |
-            RequestHeadersMoveRight(event_key_bindings) |
-            CreateRequestHeader(event_key_bindings) |
-            DeleteRequestHeader(event_key_bindings) |
-            ToggleRequestHeader(event_key_bindings) |
-            DuplicateRequestHeader(event_key_bindings) |
-            EditRequestBody(event_key_bindings) |
-            RequestBodyTableMoveUp(event_key_bindings) |
-            RequestBodyTableMoveDown(event_key_bindings) |
-            RequestBodyTableMoveLeft(event_key_bindings) |
-            RequestBodyTableMoveRight(event_key_bindings) |
-            CreateRequestBodyTableElement(event_key_bindings) |
-            DeleteRequestBodyTableElement(event_key_bindings) |
-            ToggleRequestBodyTableElement(event_key_bindings) |
-            DuplicateRequestBodyTableElement(event_key_bindings) |
-            EditRequestScript(event_key_bindings) |
-            RequestScriptMove(event_key_bindings) |
-            NextResultTab(event_key_bindings) |
-            ScrollResultUp(event_key_bindings) |
-            ScrollResultDown(event_key_bindings) |
-            ScrollResultLeft(event_key_bindings) |
-            ScrollResultRight(event_key_bindings) |
-            CopyResponsePart(event_key_bindings) |
-            ExportRequest(event_key_bindings) |
-            RequestExportFormatMoveCursorLeft(event_key_bindings) |
-            RequestExportFormatMoveCursorRight(event_key_bindings) |
-            SelectRequestExportFormat(event_key_bindings) |
-            ScrollRequestExportUp(event_key_bindings) |
-            ScrollRequestExportDown(event_key_bindings) |
-            ScrollRequestExportLeft(event_key_bindings) |
-            ScrollRequestExportRight(event_key_bindings) |
-            CopyRequestExport(event_key_bindings) |
-            ModifyRequestUrl(event_key_bindings) |
-            EditingRequestUrlDeleteCharBackward(event_key_bindings) |
-            EditingRequestUrlDeleteCharForward(event_key_bindings) |
-            EditingRequestUrlMoveCursorLeft(event_key_bindings) |
-            EditingRequestUrlMoveCursorRight(event_key_bindings) |
-            EditingRequestUrlMoveCursorLineStart(event_key_bindings) |
-            EditingRequestUrlMoveCursorLineEnd(event_key_bindings) |
-            EditingRequestUrlCharInput(event_key_bindings) |
-            ModifyRequestQueryParam(event_key_bindings) |
-            EditingRequestQueryParamDeleteCharBackward(event_key_bindings) |
-            EditingRequestQueryParamDeleteCharForward(event_key_bindings) |
-            EditingRequestQueryParamMoveCursorLeft(event_key_bindings) |
-            EditingRequestQueryParamMoveCursorRight(event_key_bindings) |
-            EditingRequestQueryParamMoveCursorLineStart(event_key_bindings) |
-            EditingRequestQueryParamMoveCursorLineEnd(event_key_bindings) |
-            EditingRequestQueryParamCharInput(event_key_bindings) |
-            ModifyRequestAuthUsername(event_key_bindings) |
-            EditingRequestAuthUsernameDeleteCharBackward(event_key_bindings) |
-            EditingRequestAuthUsernameDeleteCharForward(event_key_bindings) |
-            EditingRequestAuthUsernameMoveCursorLeft(event_key_bindings) |
-            EditingRequestAuthUsernameMoveCursorRight(event_key_bindings) |
-            EditingRequestAuthUsernameMoveCursorLineStart(event_key_bindings) |
-            EditingRequestAuthUsernameMoveCursorLineEnd(event_key_bindings) |
-            EditingRequestAuthUsernameCharInput(event_key_bindings) |
-            ModifyRequestAuthPassword(event_key_bindings) |
-            EditingRequestAuthPasswordDeleteCharBackward(event_key_bindings) |
-            EditingRequestAuthPasswordDeleteCharForward(event_key_bindings) |
-            EditingRequestAuthPasswordMoveCursorLeft(event_key_bindings) |
-            EditingRequestAuthPasswordMoveCursorRight(event_key_bindings) |
-            EditingRequestAuthPasswordMoveCursorLineStart(event_key_bindings) |
-            EditingRequestAuthPasswordMoveCursorLineEnd(event_key_bindings) |
-            EditingRequestAuthPasswordCharInput(event_key_bindings) |
-            ModifyRequestAuthBearerToken(event_key_bindings) |
-            EditingRequestAuthBearerTokenDeleteCharBackward(event_key_bindings) |
-            EditingRequestAuthBearerTokenDeleteCharForward(event_key_bindings) |
-            EditingRequestAuthBearerTokenMoveCursorLeft(event_key_bindings) |
-            EditingRequestAuthBearerTokenMoveCursorRight(event_key_bindings) |
-            EditingRequestAuthBearerTokenMoveCursorLineStart(event_key_bindings) |
-            EditingRequestAuthBearerTokenMoveCursorLineEnd(event_key_bindings) |
-            EditingRequestAuthBearerTokenCharInput(event_key_bindings) |
-            ModifyRequestHeader(event_key_bindings) |
-            EditingRequestHeaderDeleteCharBackward(event_key_bindings) |
-            EditingRequestHeaderDeleteCharForward(event_key_bindings) |
-            EditingRequestHeaderMoveCursorLeft(event_key_bindings) |
-            EditingRequestHeaderMoveCursorRight(event_key_bindings) |
-            EditingRequestHeaderMoveCursorLineStart(event_key_bindings) |
-            EditingRequestHeaderMoveCursorLineEnd(event_key_bindings) |
-            EditingRequestHeaderCharInput(event_key_bindings) |
-            ModifyRequestBodyTable(event_key_bindings) |
-            EditingRequestBodyTableDeleteCharBackward(event_key_bindings) |
-            EditingRequestBodyTableDeleteCharForward(event_key_bindings) |
-            EditingRequestBodyTableMoveCursorLeft(event_key_bindings) |
-            EditingRequestBodyTableMoveCursorRight(event_key_bindings) |
-            EditingRequestBodyTableMoveCursorLineStart(event_key_bindings) |
-            EditingRequestBodyTableMoveCursorLineEnd(event_key_bindings) |
-            EditingRequestBodyTableCharInput(event_key_bindings) |
-            ModifyRequestBodyFile(event_key_bindings) |
-            EditingRequestBodyFileDeleteCharBackward(event_key_bindings) |
-            EditingRequestBodyFileDeleteCharForward(event_key_bindings) |
-            EditingRequestBodyFileMoveCursorLeft(event_key_bindings) |
-            EditingRequestBodyFileMoveCursorRight(event_key_bindings) |
-            EditingRequestBodyFileMoveCursorLineStart(event_key_bindings) |
-            EditingRequestBodyFileMoveCursorLineEnd(event_key_bindings) |
-            EditingRequestBodyFileCharInput(event_key_bindings) |
-            EditingRequestBodyStringVimInput(event_key_bindings) |
-            EditingRequestBodyStringCopy(event_key_bindings) |
-            EditingRequestBodyStringPaste(event_key_bindings) |
-            EditingRequestBodyStringUndo(event_key_bindings) |
-            EditingRequestBodyStringRedo(event_key_bindings) |
-            EditingRequestBodyStringSaveAndQuit(event_key_bindings) |
-            EditingRequestBodyStringNewLine(event_key_bindings) |
-            EditingRequestBodyStringIndent(event_key_bindings) |
-            EditingRequestBodyStringDeleteCharBackward(event_key_bindings) |
-            EditingRequestBodyStringDeleteCharForward(event_key_bindings) |
-            EditingRequestBodyStringSkipWordLeft(event_key_bindings) |
-            EditingRequestBodyStringSkipWordRight(event_key_bindings) |
-            EditingRequestBodyStringMoveCursorUp(event_key_bindings) |
-            EditingRequestBodyStringMoveCursorDown(event_key_bindings) |
-            EditingRequestBodyStringMoveCursorLeft(event_key_bindings) |
-            EditingRequestBodyStringMoveCursorRight(event_key_bindings) |
-            EditingRequestBodyStringMoveCursorLineStart(event_key_bindings) |
-            EditingRequestBodyStringMoveCursorLineEnd(event_key_bindings) |
-            EditingRequestBodyStringCharInput(event_key_bindings) |
-            EditingPreRequestScriptVimInput(event_key_bindings) |
-            EditingPreRequestScriptCopy(event_key_bindings) |
-            EditingPreRequestScriptPaste(event_key_bindings) |
-            EditingPreRequestScriptUndo(event_key_bindings) |
-            EditingPreRequestScriptRedo(event_key_bindings) |
-            EditingPreRequestScriptSaveAndQuit(event_key_bindings) |
-            EditingPreRequestScriptNewLine(event_key_bindings) |
-            EditingPreRequestScriptIndent(event_key_bindings) |
-            EditingPreRequestScriptDeleteCharBackward(event_key_bindings) |
-            EditingPreRequestScriptDeleteCharForward(event_key_bindings) |
-            EditingPreRequestScriptSkipWordLeft(event_key_bindings) |
-            EditingPreRequestScriptSkipWordRight(event_key_bindings) |
-            EditingPreRequestScriptMoveCursorUp(event_key_bindings) |
-            EditingPreRequestScriptMoveCursorDown(event_key_bindings) |
-            EditingPreRequestScriptMoveCursorLeft(event_key_bindings) |
-            EditingPreRequestScriptMoveCursorRight(event_key_bindings) |
-            EditingPreRequestScriptMoveCursorLineStart(event_key_bindings) |
-            EditingPreRequestScriptMoveCursorLineEnd(event_key_bindings) |
-            EditingPreRequestScriptCharInput(event_key_bindings) |
-            EditingPostRequestScriptVimInput(event_key_bindings) |
-            EditingPostRequestScriptCopy(event_key_bindings) |
-            EditingPostRequestScriptPaste(event_key_bindings) |
-            EditingPostRequestScriptUndo(event_key_bindings) |
-            EditingPostRequestScriptRedo(event_key_bindings) |
-            EditingPostRequestScriptSaveAndQuit(event_key_bindings) |
-            EditingPostRequestScriptNewLine(event_key_bindings) |
-            EditingPostRequestScriptIndent(event_key_bindings) |
-            EditingPostRequestScriptDeleteCharBackward(event_key_bindings) |
-            EditingPostRequestScriptDeleteCharForward(event_key_bindings) |
-            EditingPostRequestScriptSkipWordLeft(event_key_bindings) |
-            EditingPostRequestScriptSkipWordRight(event_key_bindings) |
-            EditingPostRequestScriptMoveCursorUp(event_key_bindings) |
-            EditingPostRequestScriptMoveCursorDown(event_key_bindings) |
-            EditingPostRequestScriptMoveCursorLeft(event_key_bindings) |
-            EditingPostRequestScriptMoveCursorRight(event_key_bindings) |
-            EditingPostRequestScriptMoveCursorLineStart(event_key_bindings) |
-            EditingPostRequestScriptMoveCursorLineEnd(event_key_bindings) |
-            EditingPostRequestScriptCharInput(event_key_bindings) |
-            RequestSettingsMoveUp(event_key_bindings) |
-            RequestSettingsMoveDown(event_key_bindings) |
-            RequestSettingsToggleSetting(event_key_bindings) |
-            ModifyRequestSettings(event_key_bindings) |
-            Documentation(event_key_bindings)
-            => event_key_bindings,
-        }
     }
 }

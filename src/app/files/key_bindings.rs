@@ -35,7 +35,9 @@ nest! {
 
             pub next_environment: KeyCombination,
 
-            pub display_cookies: KeyCombination,},
+            pub display_cookies: KeyCombination,
+            pub display_logs: KeyCombination,
+        },
 
         pub generic: #[derive(Copy, Clone, Deserialize)] pub struct Generic {
             pub display_help: KeyCombination,
@@ -172,6 +174,7 @@ impl Default for KeyBindings {
                 next_environment: key!(e),
 
                 display_cookies: key!(c),
+                display_logs: key!(l),
             },
 
             generic: Generic {
