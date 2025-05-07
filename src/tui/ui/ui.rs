@@ -132,6 +132,7 @@ impl App<'_> {
 
         match self.state {
             DisplayingCookies | EditingCookies => self.render_cookies_popup(frame),
+            DisplayingLogs => self.render_logs_popup(frame),
             ChoosingElementToCreate => self.render_creating_element_popup(frame),
             CreatingNewCollection => self.render_creating_new_collection_popup(frame),
             CreatingNewRequest => self.render_creating_new_request_popup(frame),

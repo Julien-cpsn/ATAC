@@ -219,7 +219,6 @@ cargo run -- -h
 
 - **To add**
   - Individual request documentation in the TUI (markdown)
-  - Log viewer in the TUI (likely with [tui-logger](https://github.com/gin66/tui-logger))
   - Env variables editor in the TUI
   - Insomnia import
 

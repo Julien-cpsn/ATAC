@@ -1,6 +1,7 @@
 use std::sync::Arc;
-
+use std::sync::atomic::Ordering;
 use crate::app::app::App;
+use crate::app::log::{LOGS, SHOULD_RECORD_LOGS};
 use crate::models::body::ContentType;
 use crate::tui::app_states::AppState;
 use crate::tui::ui::param_tabs::param_tabs::RequestParamsTabs;
@@ -8,6 +9,7 @@ use crate::tui::utils::stateful::cookie_table::cookie_to_row;
 
 impl App<'_> {
     pub fn normal_state(&mut self) {
+        SHOULD_RECORD_LOGS.store(true, Ordering::SeqCst);
         self.state = AppState::Normal;
     }
 
@@ -35,6 +37,25 @@ impl App<'_> {
         self.cookies_popup.cookies_table.selection_text_input.cursor_position = input_text.len();
 
         self.state = AppState::EditingCookies;
+    }
+
+    pub fn display_logs_state(&mut self) {
+        SHOULD_RECORD_LOGS.store(false, Ordering::SeqCst);
+        let logs = LOGS.lock();
+
+        let mut max_log_width = 0;
+
+        for log in logs.iter() {
+            let width = log.0.len() + log.1.as_str().len() + log.2.len() + log.3.len();
+            if width > max_log_width {
+                max_log_width = width;
+            }
+        }
+
+        self.logs_vertical_scrollbar.max_scroll = logs.len().saturating_sub(1) as u16;
+        self.logs_horizontal_scrollbar.max_scroll = max_log_width as u16;
+
+        self.state = AppState::DisplayingLogs;
     }
 
     pub fn choose_element_to_create_state(&mut self) {
