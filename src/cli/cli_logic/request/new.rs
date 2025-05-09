@@ -30,9 +30,9 @@ pub fn create_request_from_new_request_command(request_name: String, new_request
         false => DEFAULT_HEADERS.clone()
     };
 
-    Request {
+    let mut request = Request {
         name: request_name,
-        url: new_request_command.url,
+        url: String::new(),
         method: new_request_command.method,
         params,
         auth,
@@ -53,7 +53,11 @@ pub fn create_request_from_new_request_command(request_name: String, new_request
         response: RequestResponse::default(),
         is_pending: false,
         cancellation_token: CancellationToken::new(),
-    }
+    };
+
+    request.update_url_and_params(new_request_command.url);
+
+    request
 }
 
 fn string_array_to_key_value_array(string_array: Vec<String>) -> Vec<KeyValue> {
