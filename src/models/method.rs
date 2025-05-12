@@ -16,10 +16,14 @@ pub enum Method {
     PATCH,
     #[strum(to_string = "DELETE")]
     DELETE,
+    #[strum(to_string = "OPTIONS")]
+    OPTIONS,
     #[strum(to_string = "HEAD")]
     HEAD,
-    #[strum(to_string = "OPTIONS")]
-    OPTIONS
+    #[strum(to_string = "TRACE")]
+    TRACE,
+    #[strum(to_string = "CONNECT")]
+    CONNECT
 }
 
 impl Method {
@@ -34,6 +38,8 @@ impl Method {
             Method::DELETE => theme.methods.delete,
             Method::HEAD => theme.methods.head,
             Method::OPTIONS => theme.methods.options,
+            Method::TRACE => theme.methods.trace,
+            Method::CONNECT => theme.methods.connect,
         }
     }
 
@@ -44,8 +50,10 @@ impl Method {
             Method::PUT => reqwest::Method::PUT,
             Method::PATCH => reqwest::Method::PATCH,
             Method::DELETE => reqwest::Method::DELETE,
+            Method::OPTIONS => reqwest::Method::OPTIONS,
             Method::HEAD => reqwest::Method::HEAD,
-            Method::OPTIONS => reqwest::Method::OPTIONS
+            Method::TRACE => reqwest::Method::TRACE,
+            Method::CONNECT => reqwest::Method::CONNECT,
         }
     }
 }
@@ -56,8 +64,10 @@ pub fn next_method(method: &Method) -> Method {
         &Method::POST => Method::PUT,
         &Method::PUT => Method::PATCH,
         &Method::PATCH => Method::DELETE,
-        &Method::DELETE => Method::HEAD,
-        &Method::HEAD => Method::OPTIONS,
-        &Method::OPTIONS => Method::GET
+        &Method::DELETE => Method::OPTIONS,
+        &Method::OPTIONS => Method::HEAD,
+        &Method::HEAD => Method::TRACE,
+        &Method::TRACE => Method::CONNECT,
+        &Method::CONNECT => Method::GET,
     }
 }

@@ -52,7 +52,11 @@ nest! {
                 #[serde(alias = "HEAD")]
                 pub head: Color,
                 #[serde(alias = "OPTIONS")]
-                pub options: Color
+                pub options: Color,
+                #[serde(alias = "TRACE")]
+                pub trace: Color,
+                #[serde(alias = "CONNECT")]
+                pub connect: Color
             },
     }
 }
@@ -76,12 +80,14 @@ impl Default for Theme {
             },
             methods: ThemeMethods {
                 get: Color::Green,
-                post: Color::Rgb(231, 186, 0),
+                post: Color::Yellow,
                 put: Color::LightBlue,
                 patch: Color::LightCyan,
                 delete: Color::LightRed,
-                head: Color::Green,
                 options: Color::Magenta,
+                head: Color::Green,
+                trace: Color::Yellow,
+                connect: Color::LightBlue
             },
         }
     }
