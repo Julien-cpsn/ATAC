@@ -99,6 +99,8 @@ impl<'a> App<'a> {
                 trace!("Log file is not parsable")
             }
         }
+        
+        self.collections.sort_by(|a,b| a.last_position.unwrap_or(usize::MAX).cmp(&b.last_position.unwrap_or(usize::MAX)));
     }
 
     fn create_log_file(&mut self) -> File {

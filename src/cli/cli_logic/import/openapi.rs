@@ -90,6 +90,7 @@ impl App<'_> {
         // Create a new collection
         let mut collection = Collection {
             name: collection_name.clone(),
+            last_position: Some(self.collections.len() - 1),
             requests: Vec::new(),
             path: ARGS.directory.as_ref().unwrap().join(format!("{}.{}", collection_name, file_format.to_string())),
             file_format,
@@ -196,7 +197,7 @@ fn create_request(name: String, method: Method, path: &str, base_url: &str, oper
     request.url = format!("{}{}", base_url, path);
 
     // Process parameters (query params, headers)
-    process_parameters(&mut request, operation, spec)?;
+    process_parameters(&mut request, operation, path, spec)?;
 
     // Process request body
     if let Some(req_body) = &operation.request_body {
@@ -213,7 +214,25 @@ fn create_request(name: String, method: Method, path: &str, base_url: &str, oper
     Ok(request)
 }
 
-fn process_parameters(request: &mut Request, operation: &Operation, spec: &OpenAPI) -> anyhow::Result<()> {
+fn process_parameters(request: &mut Request, operation: &Operation, path: &str, spec: &OpenAPI) -> anyhow::Result<()> {
+    // Process path parameters
+    let path_params: Vec<KeyValue> = path
+        .split('/')
+        .filter_map(|segment| {
+            if segment.starts_with('{') && segment.ends_with('}') {
+                let param_name = segment[1..segment.len()-1].to_string();
+                Some(KeyValue {
+                    enabled: true,
+                    data: (param_name.clone(), format!("{{{}}}", param_name)),
+                })
+            } else {
+                None
+            }
+        })
+        .collect();
+    
+    request.params.extend(path_params);
+    
     // Process operation parameters
     for param_or_ref in &operation.parameters {
         let param = resolve_parameter_reference(param_or_ref, spec)?;

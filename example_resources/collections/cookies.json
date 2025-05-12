@@ -1,5 +1,6 @@
 {
   "name": "Cookies",
+  "last_position": 8,
   "requests": [
     {
       "name": "Return cookies",

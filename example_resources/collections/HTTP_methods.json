@@ -1,5 +1,6 @@
 {
   "name": "HTTP Methods",
+  "last_position": 0,
   "requests": [
     {
       "name": "Test Get",

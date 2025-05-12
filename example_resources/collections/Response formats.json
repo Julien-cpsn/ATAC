@@ -1,5 +1,6 @@
 {
   "name": "Response formats",
+  "last_position": 4,
   "requests": [
     {
       "name": "JSON",

@@ -205,8 +205,8 @@ impl AppState {
                     RenameElement(EventKeyBinding::new(vec![key_bindings.generic.list_and_table_actions.rename_element], "Rename element", None)),
                     DuplicateElement(EventKeyBinding::new(vec![key_bindings.generic.list_and_table_actions.duplicate_element], "Duplicate element", None)),
 
-                    MoveRequestUp(EventKeyBinding::new(vec![key_bindings.main_menu.move_request_up], "Move request up", None)),
-                    MoveRequestDown(EventKeyBinding::new(vec![key_bindings.main_menu.move_request_down], "Move request down", None)),
+                    MoveElementUp(EventKeyBinding::new(vec![key_bindings.main_menu.move_request_up], "Move request up", None)),
+                    MoveElementDown(EventKeyBinding::new(vec![key_bindings.main_menu.move_request_down], "Move request down", None)),
                 ];
 
                 if is_there_any_env {

@@ -13,6 +13,7 @@ use crate::models::request::Request;
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct Collection {
     pub name: String,
+    pub last_position: Option<usize>,
     pub requests: Vec<Arc<RwLock<Request>>>,
 
     #[serde(skip)]

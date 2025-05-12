@@ -42,8 +42,10 @@ impl App<'_> {
 
         let file_format = self.config.get_preferred_collection_file_format();
         
+        let collections_len = self.collections.len();
         let new_collection = Collection {
             name: new_collection_name.clone(),
+            last_position: Some(collections_len - 1),
             requests: vec![],
             path: ARGS.directory.as_ref().unwrap().join(format!("{}.{}", new_collection_name, file_format.to_string())),
             file_format,
@@ -51,7 +53,7 @@ impl App<'_> {
 
         self.collections.push(new_collection);
 
-        let collection_index= self.collections.len() - 1;
+        let collection_index= collections_len;
 
         self.save_collection_to_file(collection_index);
 
@@ -155,5 +157,13 @@ impl App<'_> {
         self.save_collection_to_file(collection_index);
 
         Ok(())
+    }
+    
+    pub fn update_collections_last_position(&mut self) {
+        for index in 0..self.collections.len() {
+            let collection = &mut self.collections[index];
+            collection.last_position = Some(index);
+            self.save_collection_to_file(index);
+        }
     }
 }

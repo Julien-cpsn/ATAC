@@ -59,6 +59,7 @@ impl App<'_> {
 
                 let collection = Collection {
                     name: collection_name.clone(),
+                    last_position: Some(self.collections.len() - 1),
                     requests: vec![],
                     path: ARGS.directory.as_ref().unwrap().join(format!("{}.{}", collection_name.clone(), file_format.to_string())),
                     file_format,

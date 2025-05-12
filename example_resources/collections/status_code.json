@@ -1,5 +1,6 @@
 {
   "name": "Status code",
+  "last_position": 5,
   "requests": [
     {
       "name": "Test 200",

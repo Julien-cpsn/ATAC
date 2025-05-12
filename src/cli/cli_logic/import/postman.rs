@@ -58,6 +58,7 @@ impl App<'_> {
         let mut collections: Vec<Collection> = vec![
             Collection {
                 name: collection_name.clone(),
+                last_position: Some(self.collections.len() - 1),
                 requests: vec![],
                 path: ARGS.directory.as_ref().unwrap().join(format!("{}.{}", collection_name, file_format.to_string())),
                 file_format,
@@ -150,6 +151,7 @@ fn recursive_has_requests(item: &mut Items, collections: &mut Vec<Collection>, m
 
             let collection = Collection {
                 name: collection_name.clone(),
+                last_position: Some(collections.len() - 1),
                 requests,
                 path: ARGS.directory.as_ref().unwrap().join(format!("{}.{}", collection_name, file_format.to_string())),
                 file_format,

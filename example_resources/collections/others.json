@@ -1,5 +1,6 @@
 {
   "name": "Others",
+  "last_position": 7,
   "requests": [
     {
       "name": "No pretty print response",

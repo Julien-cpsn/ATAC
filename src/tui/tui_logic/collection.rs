@@ -294,13 +294,38 @@ impl App<'_> {
             }
             _ => {}
         }
+
     }
-    
-    pub fn tui_move_request_up(&mut self) {
-        if self.collections_tree.state.selected().len() != 2 {
+    pub fn tui_move_element_up(&mut self) {
+        match self.collections_tree.state.selected().len() {
+            1 => self.tui_move_collection_up(),
+            2 => self.tui_move_request_up(),
+            _ => {}
+        }
+    }
+
+    pub fn tui_move_collection_up(&mut self) {
+        let mut selection = self.collections_tree.state.selected().to_vec();
+
+        // Cannot decrement selection further
+        if selection[0] == 0 {
             return;
         }
 
+        let collection = self.collections.remove(selection[0]);
+        
+        // Decrement selection
+        selection[0] -= 1;
+
+        self.collections.insert(selection[0], collection);
+
+        // Update the selection in order to move with the element
+        self.collections_tree.state.select(selection.clone());
+        
+        self.update_collections_last_position();
+    }
+
+    pub fn tui_move_request_up(&mut self) {
         let mut selection = self.collections_tree.state.selected().to_vec();
 
         // Cannot decrement selection further
@@ -311,7 +336,7 @@ impl App<'_> {
         // Retrieve the request
         let request = self.collections[selection[0]].requests.remove(selection[1]);
 
-        // Increment selection
+        // Decrement selection
         selection[1] -= 1;
 
         // Insert the request at its new index
@@ -323,11 +348,36 @@ impl App<'_> {
         self.save_collection_to_file(selection[0]);
     }
 
-    pub fn tui_move_request_down(&mut self) {
-        if self.collections_tree.state.selected().len() != 2 {
+    pub fn tui_move_element_down(&mut self) {
+        match self.collections_tree.state.selected().len() {
+            1 => self.tui_move_collection_down(),
+            2 => self.tui_move_request_down(),
+            _ => {}
+        }
+    }
+
+    pub fn tui_move_collection_down(&mut self) {
+        let mut selection = self.collections_tree.state.selected().to_vec();
+
+        // Cannot increment selection further
+        if selection[0] == self.collections.len() - 1 {
             return;
         }
 
+        let collection = self.collections.remove(selection[0]);
+
+        // Increment selection
+        selection[0] += 1;
+
+        self.collections.insert(selection[0], collection);
+
+        // Update the selection in order to move with the element
+        self.collections_tree.state.select(selection.clone());
+
+        self.update_collections_last_position();
+    }
+
+    pub fn tui_move_request_down(&mut self) {
         let mut selection = self.collections_tree.state.selected().to_vec();
 
         // Cannot increment selection further

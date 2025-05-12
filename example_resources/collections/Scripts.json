@@ -1,5 +1,6 @@
 {
   "name": "Scripts",
+  "last_position": 6,
   "requests": [
     {
       "name": "Pre-request script",

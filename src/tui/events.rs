@@ -32,8 +32,8 @@ get_key_bindings! {
         RenameElement(EventKeyBinding),
         DuplicateElement(EventKeyBinding),
 
-        MoveRequestUp(EventKeyBinding),
-        MoveRequestDown(EventKeyBinding),
+        MoveElementUp(EventKeyBinding),
+        MoveElementDown(EventKeyBinding),
 
         NextEnvironment(EventKeyBinding),
         DisplayEnvEditor(EventKeyBinding),
@@ -446,8 +446,8 @@ impl App<'_> {
                 RenameElement(_) => self.rename_element(),
                 DuplicateElement(_) => self.duplicate_element(),
 
-                MoveRequestUp(_) => self.tui_move_request_up(),
-                MoveRequestDown(_) => self.tui_move_request_down(),
+                MoveElementUp(_) => self.tui_move_element_up(),
+                MoveElementDown(_) => self.tui_move_element_down(),
 
                 NextEnvironment(_) => self.tui_next_environment(),
                 DisplayEnvEditor(_) => self.display_env_editor_state(),

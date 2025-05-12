@@ -1,5 +1,6 @@
 {
   "name": "Request Types",
+  "last_position": 3,
   "requests": [
     {
       "name": "Check headers",
