@@ -61,8 +61,7 @@ pub struct App<'a> {
 
     pub logs_vertical_scrollbar: StatefulScrollbar,
     pub logs_horizontal_scrollbar: StatefulScrollbar,
-
-
+    
     /* Collections */
     
     pub collections: Vec<Collection>,

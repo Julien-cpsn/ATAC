@@ -4,7 +4,7 @@ use ratatui::layout::Direction::Vertical;
 use ratatui::prelude::Style;
 use ratatui::style::Stylize;
 use ratatui::text::{Line, Span};
-use ratatui::widgets::{Block, Borders, Paragraph, Scrollbar, ScrollbarOrientation, Tabs};
+use ratatui::widgets::{Block, Borders, Paragraph, Scrollbar, ScrollbarOrientation, Tabs, Wrap};
 use ratatui_image::{Image, Resize};
 use ratatui_image::picker::Picker;
 use strum::{Display, EnumIter, FromRepr, IntoEnumIterator};
@@ -17,7 +17,7 @@ use crate::models::request::Request;
 use crate::models::response::ResponseContent;
 use crate::tui::utils::centered_rect::centered_rect;
 
-#[derive(Default, Clone, Copy, Display, FromRepr, EnumIter)]
+#[derive(Default, Clone, Copy, PartialOrd, PartialEq, Display, FromRepr, EnumIter)]
 pub enum RequestResultTabs {
     #[default]
     #[strum(to_string = "Result body")]
@@ -131,11 +131,23 @@ impl App<'_> {
                                 lines = body.lines().par_bridge().map(|line| Line::raw(line)).collect();
                             }
 
-                            let body_paragraph = Paragraph::new(lines)
-                                .scroll((
-                                    self.result_vertical_scrollbar.scroll,
-                                    self.result_horizontal_scrollbar.scroll
-                                ));
+                            let mut body_paragraph = Paragraph::new(lines);
+
+                            if self.config.should_wrap_body() {
+                                body_paragraph = body_paragraph
+                                    .wrap(Wrap::default())
+                                    .scroll((
+                                        self.result_vertical_scrollbar.scroll,
+                                        0
+                                    ));
+                            }
+                            else {
+                                body_paragraph = body_paragraph
+                                    .scroll((
+                                        self.result_vertical_scrollbar.scroll,
+                                        self.result_horizontal_scrollbar.scroll
+                                    ));
+                            }
 
                             frame.render_widget(body_paragraph, request_result_layout[2]);
                         }
@@ -229,14 +241,16 @@ impl App<'_> {
             &mut self.result_vertical_scrollbar.state
         );
 
-        frame.render_stateful_widget(
-            result_horizontal_scrollbar,
-            rect.inner(Margin {
-                // using an inner vertical margin of 1 unit makes the scrollbar inside the block
-                vertical: 0,
-                horizontal: 1,
-            }),
-            &mut self.result_horizontal_scrollbar.state
-        );
+        if !(self.config.should_wrap_body() && self.request_result_tab == RequestResultTabs::Body) {
+            frame.render_stateful_widget(
+                result_horizontal_scrollbar,
+                rect.inner(Margin {
+                    // using an inner vertical margin of 1 unit makes the scrollbar inside the block
+                    vertical: 0,
+                    horizontal: 1,
+                }),
+                &mut self.result_horizontal_scrollbar.state
+            );
+        }
     }
 }

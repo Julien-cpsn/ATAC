@@ -19,7 +19,10 @@ pub struct Config {
     
     #[serde(default)]
     pub disable_images_preview: Option<bool>,
-    
+
+    #[serde(default)]
+    pub wrap_responses: Option<bool>,
+
     #[serde(default)]
     pub preferred_collection_file_format: Option<CollectionFileFormat>,
     
@@ -43,6 +46,10 @@ impl Config {
     
     pub fn is_image_preview_disabled(&self) -> bool {
         return self.disable_images_preview.unwrap_or(false)
+    }
+    
+    pub fn should_wrap_body(&self) -> bool {
+        return self.wrap_responses.unwrap_or(false)
     }
     
     pub fn get_preferred_collection_file_format(&self) -> CollectionFileFormat {
