@@ -1,9 +1,9 @@
-use ratatui::Frame;
-use ratatui::layout::{Constraint, Layout, Position};
 use ratatui::layout::Direction::{Horizontal, Vertical};
+use ratatui::layout::{Constraint, Layout, Position};
 use ratatui::prelude::Line;
 use ratatui::style::Stylize;
 use ratatui::widgets::{Block, Borders, Clear, Paragraph};
+use ratatui::Frame;
 
 use crate::app::app::App;
 use crate::app::files::theme::THEME;
@@ -67,7 +67,12 @@ impl App<'_> {
         let middle_layout = Layout::new(Vertical, lines.clone()).split(help_keys_layout[1]);
         let right_layout = Layout::new(Vertical, lines.clone()).split(help_keys_layout[2]);
 
-        let events = &self.help_popup.selection.get_available_events(self.request_view, self.request_param_tab);
+        let is_there_any_env = match self.get_selected_env_as_local() {
+            None => false,
+            Some(_) => true
+        };
+        
+        let events = &self.help_popup.selection.get_available_events(self.request_view, self.request_param_tab, is_there_any_env);
         let keys = event_available_keys_to_spans(
             events,
             THEME.read().ui.font_color,

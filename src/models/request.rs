@@ -1,6 +1,7 @@
 use lazy_static::lazy_static;
 use ratatui::prelude::{Line, Modifier, Span};
 use ratatui::style::{Color, Stylize};
+use ratatui::widgets::ListItem;
 use serde::{Deserialize, Serialize};
 use tracing::trace;
 use tui_tree_widget::TreeItem;
@@ -60,6 +61,29 @@ impl App<'_> {
                 }
             })
             .collect()
+    }
+
+    pub fn key_value_vec_to_items_list(&self, rows: &Vec<KeyValue>) -> (Vec<ListItem>, Vec<ListItem>) {
+        let mut keys: Vec<ListItem> = vec![];
+        let mut values: Vec<ListItem> = vec![];
+
+        for row in rows.iter() {
+            let key = self.tui_add_color_to_env_keys(&row.data.0);
+            let value = self.tui_add_color_to_env_keys(&row.data.1);
+
+            let mut key = ListItem::from(key);
+            let mut value = ListItem::from(value);
+
+            if !row.enabled {
+                key = key.fg(THEME.read().ui.secondary_foreground_color).dim();
+                value = value.fg(THEME.read().ui.secondary_foreground_color).dim();
+            }
+
+            keys.push(key);
+            values.push(value);
+        }
+
+        (keys, values)
     }
 }
 

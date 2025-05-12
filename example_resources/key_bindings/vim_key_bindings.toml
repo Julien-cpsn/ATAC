@@ -10,6 +10,7 @@ move_request_up = "Ctrl-k"
 move_request_down = "Ctrl-j"
 
 next_environment = "Shift-E"
+display_env_editor = "Ctrl-E"
 display_cookies = "Shift-C"
 display_logs = "Shift-L"
 

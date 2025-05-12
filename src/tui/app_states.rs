@@ -23,6 +23,14 @@ pub enum AppState {
     #[strum(to_string = "Main menu")]
     Normal,
 
+    /* Env */
+
+    #[strum(to_string = "Displaying environment editor")]
+    DisplayingEnvEditor,
+
+    #[strum(to_string = "Editing env variable")]
+    EditingEnvVariable,
+
     /* Cookies */
 
     #[strum(to_string = "Displaying cookies")]
@@ -110,7 +118,9 @@ pub enum AppState {
 
 pub fn next_app_state(app_state: &AppState) -> AppState {
     match app_state {
-        Normal => DisplayingCookies,
+        Normal => DisplayingEnvEditor,
+        DisplayingEnvEditor => EditingEnvVariable,
+        EditingEnvVariable => DisplayingCookies,
         DisplayingCookies => EditingCookies,
         EditingCookies => DisplayingLogs,
         DisplayingLogs => ChoosingElementToCreate,
@@ -142,7 +152,9 @@ pub fn next_app_state(app_state: &AppState) -> AppState {
 pub fn previous_app_state(app_state: &AppState) -> AppState {
     match app_state {
         Normal => EditingRequestSettings,
-        DisplayingCookies => Normal,
+        DisplayingEnvEditor => Normal,
+        EditingEnvVariable => DisplayingEnvEditor,
+        DisplayingCookies => EditingEnvVariable,
         EditingCookies => DisplayingCookies,
         DisplayingLogs => EditingCookies,
         ChoosingElementToCreate => DisplayingLogs,
@@ -171,36 +183,76 @@ pub fn previous_app_state(app_state: &AppState) -> AppState {
 }
 
 impl AppState {
-    pub fn get_available_events(&self, request_view: RequestView, request_param_tab: RequestParamsTabs) -> Vec<AppEvent> {
+    pub fn get_available_events(&self, request_view: RequestView, request_param_tab: RequestParamsTabs, is_there_any_env: bool) -> Vec<AppEvent> {
         let key_bindings = KEY_BINDINGS.read();
 
         match self {
-            Normal => vec![
-                ExitApp(EventKeyBinding::new(vec![key_bindings.main_menu.exit, key!(ctrl-c)], "Exit", Some("Exit"))),
+            Normal => {
+                let mut base_events = vec![
+                    ExitApp(EventKeyBinding::new(vec![key_bindings.main_menu.exit, key!(ctrl-c)], "Exit", Some("Exit"))),
 
-                Documentation(EventKeyBinding::new(vec![key_bindings.generic.display_help], "Display help", Some("Help"))),
+                    Documentation(EventKeyBinding::new(vec![key_bindings.generic.display_help], "Display help", Some("Help"))),
 
-                MoveCollectionCursorUp(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_up], "Move up", Some("Up"))),
-                MoveCollectionCursorDown(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_down], "Move down", Some("Down"))),
+                    MoveCollectionCursorUp(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_up], "Move up", Some("Up"))),
+                    MoveCollectionCursorDown(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_down], "Move down", Some("Down"))),
 
-                SelectRequestOrExpandCollection(EventKeyBinding::new(vec![key_bindings.generic.navigation.select], "Select", Some("Select"))),
-                UnselectRequest(EventKeyBinding::new(vec![key_bindings.main_menu.unselect_request], "Unselect", None)),
-                ExpandCollection(EventKeyBinding::new(vec![key_bindings.main_menu.expand_collection], "Expand", None)),
+                    SelectRequestOrExpandCollection(EventKeyBinding::new(vec![key_bindings.generic.navigation.select], "Select", Some("Select"))),
+                    UnselectRequest(EventKeyBinding::new(vec![key_bindings.main_menu.unselect_request], "Unselect", None)),
+                    ExpandCollection(EventKeyBinding::new(vec![key_bindings.main_menu.expand_collection], "Expand", None)),
 
-                CreateElement(EventKeyBinding::new(vec![key_bindings.generic.list_and_table_actions.create_element], "Create element", Some("Create"))),
-                DeleteElement(EventKeyBinding::new(vec![key_bindings.generic.list_and_table_actions.delete_element], "Delete element", None)),
-                RenameElement(EventKeyBinding::new(vec![key_bindings.generic.list_and_table_actions.rename_element], "Rename element", None)),
-                DuplicateElement(EventKeyBinding::new(vec![key_bindings.generic.list_and_table_actions.duplicate_element], "Duplicate element", None)),
+                    CreateElement(EventKeyBinding::new(vec![key_bindings.generic.list_and_table_actions.create_element], "Create element", Some("Create"))),
+                    DeleteElement(EventKeyBinding::new(vec![key_bindings.generic.list_and_table_actions.delete_element], "Delete element", None)),
+                    RenameElement(EventKeyBinding::new(vec![key_bindings.generic.list_and_table_actions.rename_element], "Rename element", None)),
+                    DuplicateElement(EventKeyBinding::new(vec![key_bindings.generic.list_and_table_actions.duplicate_element], "Duplicate element", None)),
 
-                MoveRequestUp(EventKeyBinding::new(vec![key_bindings.main_menu.move_request_up], "Move request up", None)),
-                MoveRequestDown(EventKeyBinding::new(vec![key_bindings.main_menu.move_request_down], "Move request down", None)),
+                    MoveRequestUp(EventKeyBinding::new(vec![key_bindings.main_menu.move_request_up], "Move request up", None)),
+                    MoveRequestDown(EventKeyBinding::new(vec![key_bindings.main_menu.move_request_down], "Move request down", None)),
+                ];
 
-                NextEnvironment(EventKeyBinding::new(vec![key_bindings.main_menu.next_environment], "Next environment", None)),
-                DisplayCookies(EventKeyBinding::new(vec![key_bindings.main_menu.display_cookies], "Display cookies", None)),
-                DisplayLogs(EventKeyBinding::new(vec![key_bindings.main_menu.display_logs], "Display logs", None)),
+                if is_there_any_env {
+                    let env_events = vec![
+                        NextEnvironment(EventKeyBinding::new(vec![key_bindings.main_menu.next_environment], "Next environment", None)),
+                        DisplayEnvEditor(EventKeyBinding::new(vec![key_bindings.main_menu.display_env_editor], "Environment editor", None)),
+                    ];
+                    
+                    base_events.extend(env_events);
+                }
+
+                let other_events = vec![
+                    DisplayCookies(EventKeyBinding::new(vec![key_bindings.main_menu.display_cookies], "Display cookies", None)),
+                    DisplayLogs(EventKeyBinding::new(vec![key_bindings.main_menu.display_logs], "Display logs", None)),
+                ];
+                
+                base_events.extend(other_events);
+                
+                base_events
+            },
+            DisplayingEnvEditor => vec![
+                GoBackToLastState(EventKeyBinding::new(vec![key_bindings.generic.navigation.go_back], "Quit", Some("Quit"))),
+                EditEnvVariable(EventKeyBinding::new(vec![key_bindings.generic.list_and_table_actions.edit_element], "Edit env variable", None)),
+
+                EnvVariablesMoveUp(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_up], "Move up", Some("Up"))),
+                EnvVariablesMoveDown(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_down], "Move down", Some("Down"))),
+                EnvVariablesMoveLeft(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_left], "Move left", Some("Left"))),
+                EnvVariablesMoveRight(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_right], "Move right", Some("Right"))),
+
+                CreateEnvVariable(EventKeyBinding::new(vec![key_bindings.generic.list_and_table_actions.create_element], "Create env variable", Some("Create variable"))),
+                DeleteEnvVariable(EventKeyBinding::new(vec![key_bindings.generic.list_and_table_actions.delete_element], "Delete env variable", Some("Delete variable"))),
+            ],
+            EditingEnvVariable => vec![
+                DisplayEnvEditor(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.cancel], "Cancel", Some("Cancel"))),
+                ModifyEnvVariable(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.confirm], "Confirm", Some("Confirm"))),
+
+                EditingEnvVariableDeleteCharBackward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_backward], "Delete char backward", Some("Delete"))),
+                EditingEnvVariableDeleteCharForward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_forward], "Delete char forward", Some("Backspace"))),
+                EditingEnvVariableMoveCursorLeft(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_left], "Move cursor left", Some("Left"))),
+                EditingEnvVariableMoveCursorRight(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_right], "Move cursor right", Some("Right"))),
+                EditingEnvVariableMoveCursorLineStart(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_line_start], "Move cursor line start", Some("Home"))),
+                EditingEnvVariableMoveCursorLineEnd(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_line_end], "Move cursor line start", Some("Home"))),
+                EditingEnvVariableCharInput(EventKeyBinding::new(vec![], "Char input", None)),
             ],
             DisplayingCookies => vec![
-                GoBackToMainMenu(EventKeyBinding::new(vec![key_bindings.generic.navigation.go_back], "Quit", Some("Quit"))),
+                GoBackToLastState(EventKeyBinding::new(vec![key_bindings.generic.navigation.go_back], "Quit", Some("Quit"))),
 
                 CookiesMoveUp(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_up], "Move up", Some("Up"))),
                 CookiesMoveDown(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_down], "Move down", Some("Down"))),
@@ -213,14 +265,14 @@ impl AppState {
                 Documentation(EventKeyBinding::new(vec![*EMPTY_KEY], "Not implemented yet", None))
             ],
             DisplayingLogs => vec![
-                GoBackToMainMenu(EventKeyBinding::new(vec![key_bindings.generic.navigation.go_back], "Quit", Some("Quit"))),
+                GoBackToLastState(EventKeyBinding::new(vec![key_bindings.generic.navigation.go_back], "Quit", Some("Quit"))),
                 ScrollLogsUp(EventKeyBinding::new(vec![key_bindings.request_selected.result_tabs.scroll_up], "Scroll logs up", Some("Up"))),
                 ScrollLogsDown(EventKeyBinding::new(vec![key_bindings.request_selected.result_tabs.scroll_down], "Scroll logs down", Some("Down"))),
                 ScrollLogsLeft(EventKeyBinding::new(vec![key_bindings.request_selected.result_tabs.scroll_left], "Scroll logs left", Some("Left"))),
                 ScrollLogsRight(EventKeyBinding::new(vec![key_bindings.request_selected.result_tabs.scroll_right], "Scroll logs right", Some("Right"))),
             ],
             ChoosingElementToCreate => vec![
-                GoBackToMainMenu(EventKeyBinding::new(vec![key_bindings.generic.navigation.go_back], "Quit", Some("Quit"))),
+                GoBackToLastState(EventKeyBinding::new(vec![key_bindings.generic.navigation.go_back], "Quit", Some("Quit"))),
 
                 ChooseElementToCreateMoveCursorLeft(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_left], "Move selection left", Some("Left"))),
                 ChooseElementToCreateMoveCursorRight(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_right], "Move selection right", Some("Right"))),
@@ -228,7 +280,7 @@ impl AppState {
                 SelectElementToCreate(EventKeyBinding::new(vec![key_bindings.generic.navigation.select], "Select element to create", Some("Select"))),
             ],
             CreatingNewCollection => vec![
-                GoBackToMainMenu(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.cancel], "Cancel", Some("Cancel"))),
+                GoBackToLastState(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.cancel], "Cancel", Some("Cancel"))),
                 CreateNewCollection(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.confirm], "Confirm", Some("Confirm"))),
 
                 CreatingCollectionDeleteCharBackward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_backward], "Delete char backward", Some("Delete"))),
@@ -238,7 +290,7 @@ impl AppState {
                 CreatingCollectionCharInput(EventKeyBinding::new(vec![], "Char input", None)),
             ],
             CreatingNewRequest => vec![
-                GoBackToMainMenu(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.cancel], "Cancel", Some("Cancel"))),
+                GoBackToLastState(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.cancel], "Cancel", Some("Cancel"))),
                 CreateNewRequest(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.confirm], "Confirm", Some("Confirm"))),
 
                 CreatingRequestDeleteCharBackward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_backward], "Delete char backward", Some("Delete"))),
@@ -252,7 +304,7 @@ impl AppState {
                 CreatingRequestCharInput(EventKeyBinding::new(vec![], "Char input", None)),
             ],
             DeletingCollection => vec![
-                GoBackToMainMenu(EventKeyBinding::new(vec![key_bindings.generic.navigation.go_back], "Cancel", Some("Cancel"))),
+                GoBackToLastState(EventKeyBinding::new(vec![key_bindings.generic.navigation.go_back], "Cancel", Some("Cancel"))),
 
                 DeletingCollectionMoveCursorLeft(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_left], "Move selection left", Some("Left"))),
                 DeletingCollectionMoveCursorRight(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_right], "Move selection right", Some("Right"))),
@@ -260,7 +312,7 @@ impl AppState {
                 DeleteCollection(EventKeyBinding::new(vec![key_bindings.generic.navigation.select], "Select choice", Some("Select"))),
             ],
             DeletingRequest => vec![
-                GoBackToMainMenu(EventKeyBinding::new(vec![key_bindings.generic.navigation.go_back], "Cancel", Some("Cancel"))),
+                GoBackToLastState(EventKeyBinding::new(vec![key_bindings.generic.navigation.go_back], "Cancel", Some("Cancel"))),
 
                 DeletingRequestMoveCursorLeft(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_left], "Move selection left", Some("Left"))),
                 DeletingRequestMoveCursorRight(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_right], "Move selection right", Some("Right"))),
@@ -269,7 +321,7 @@ impl AppState {
 
             ],
             RenamingCollection => vec![
-                GoBackToMainMenu(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.cancel], "Cancel", Some("Cancel"))),
+                GoBackToLastState(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.cancel], "Cancel", Some("Cancel"))),
                 RenameCollection(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.confirm], "Confirm", Some("Confirm"))),
 
                 RenamingCollectionDeleteCharBackward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_backward], "Delete char backward", Some("Delete"))),
@@ -279,7 +331,7 @@ impl AppState {
                 RenamingCollectionCharInput(EventKeyBinding::new(vec![], "Char input", None)),
             ],
             RenamingRequest => vec![
-                GoBackToMainMenu(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.cancel], "Cancel", Some("Cancel"))),
+                GoBackToLastState(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.cancel], "Cancel", Some("Cancel"))),
                 RenameRequest(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.confirm], "Confirm", Some("Confirm"))),
 
                 RenamingRequestDeleteCharBackward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_backward], "Delete char backward", Some("Delete"))),
@@ -299,7 +351,7 @@ impl AppState {
                 let mut base_events: Vec<AppEvent> = vec![
                     ExitApp(EventKeyBinding::new(vec![key!(ctrl-c)], "Exit app", None)),
 
-                    GoBackToMainMenu(EventKeyBinding::new(vec![key_bindings.generic.navigation.go_back], "Quit to main menu", Some("Quit"))),
+                    GoBackToLastState(EventKeyBinding::new(vec![key_bindings.generic.navigation.go_back], "Quit to main menu", Some("Quit"))),
                     Documentation(EventKeyBinding::new(vec![key_bindings.generic.display_help], "Display help", Some("Help"))),
 
                     EditUrl(EventKeyBinding::new(vec![key_bindings.request_selected.change_url], "Edit URL", Some("URL"))),
@@ -310,12 +362,24 @@ impl AppState {
                     NextView(EventKeyBinding::new(vec![key_bindings.request_selected.next_view], "Next view", None)),
 
                     SendRequest(EventKeyBinding::new(vec![key_bindings.request_selected.send_request, key_bindings.request_selected.alt_send_request], "Send/cancel request", Some("Send/Cancel"))),
-
-                    NextEnvironment(EventKeyBinding::new(vec![key_bindings.main_menu.next_environment], "Next environment", None)),
+                ];
+                
+                if is_there_any_env {
+                    let env_events = vec![
+                        NextEnvironment(EventKeyBinding::new(vec![key_bindings.main_menu.next_environment], "Next environment", None)),
+                        DisplayEnvEditor(EventKeyBinding::new(vec![key_bindings.main_menu.display_env_editor], "Environment editor", None)),
+                    ];
+                    
+                    base_events.extend(env_events);
+                }
+                
+                let other_events = vec![
                     DisplayCookies(EventKeyBinding::new(vec![key_bindings.main_menu.display_cookies], "Display cookies", None)),
                     DisplayLogs(EventKeyBinding::new(vec![key_bindings.main_menu.display_logs], "Display logs", None)),
                     ExportRequest(EventKeyBinding::new(vec![key_bindings.request_selected.export_request], "Export request", None)),
                 ];
+                
+                base_events.extend(other_events);
 
                 let mut base_param_tabs_events: Vec<AppEvent> = vec![];
                 let mut base_result_tabs_events: Vec<AppEvent> = vec![];
@@ -654,7 +718,12 @@ lazy_static! {
 
 impl App<'_> {
     pub fn update_current_available_events(&mut self) {
-        *AVAILABLE_EVENTS.write() = self.state.get_available_events(self.request_view, self.request_param_tab);
+        let is_there_any_env = match self.get_selected_env_as_local() {
+            None => false,
+            Some(_) => true
+        };
+        
+        *AVAILABLE_EVENTS.write() = self.state.get_available_events(self.request_view, self.request_param_tab, is_there_any_env);
     }
 
     pub fn get_state_line(&self) -> Line {
@@ -684,6 +753,16 @@ impl App<'_> {
                     Span::raw("Request > ").fg(THEME.read().ui.secondary_foreground_color),
                     Span::raw(format!("{} > ", selected_request.name)).fg(THEME.read().ui.secondary_foreground_color),
                     Span::raw(self.state.to_string()).fg(THEME.read().ui.font_color).bg(THEME.read().ui.main_background_color)
+                ])
+            },
+
+            DisplayingEnvEditor | EditingEnvVariable => {
+                let local_env = self.get_selected_env_as_local().unwrap();
+                let env = local_env.read();
+
+                Line::from(vec![
+                    Span::raw("Environment editor > ").fg(THEME.read().ui.secondary_foreground_color),
+                    Span::raw(env.name.clone()).fg(THEME.read().ui.font_color).bg(THEME.read().ui.main_background_color)
                 ])
             },
 

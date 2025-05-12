@@ -131,6 +131,7 @@ impl App<'_> {
         // POPUPS
 
         match self.state {
+            DisplayingEnvEditor | EditingEnvVariable => self.render_env_editor_popup(frame),
             DisplayingCookies | EditingCookies => self.render_cookies_popup(frame),
             DisplayingLogs => self.render_logs_popup(frame),
             ChoosingElementToCreate => self.render_creating_element_popup(frame),

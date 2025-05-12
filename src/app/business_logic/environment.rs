@@ -2,6 +2,7 @@ use std::sync::Arc;
 use rayon::prelude::*;
 use anyhow::anyhow;
 use chrono::Utc;
+use indexmap::map::MutableKeys;
 use parking_lot::RwLock;
 use thiserror::Error;
 use tracing::{info, trace};
@@ -92,11 +93,36 @@ impl App<'_> {
         Ok(())
     }
 
-    pub fn add_env_value(&mut self, env_index: usize, key: String, value: String) -> anyhow::Result<()> {
+    pub fn set_env_value_by_index(&mut self, env_index: usize, key_index: usize, value: String) -> anyhow::Result<()> {
         let local_env = self.get_env_as_local_from_index(env_index).unwrap();
 
         {
             let mut env = local_env.write();
+
+            match env.values.get_index_mut(key_index) {
+                None => return Err(anyhow!(KeyNotFound)),
+                Some((key, old_value)) => {
+                    info!("Environment key \"{key}\" value set to \"{value}\"");
+
+                    *old_value = value;
+                }
+            }
+        }
+
+        self.save_environment_to_file(env_index);
+        Ok(())
+    }
+
+    pub fn create_env_value(&mut self, env_index: usize, key: Option<String>, value: String) -> anyhow::Result<()> {
+        let local_env = self.get_env_as_local_from_index(env_index).unwrap();
+
+        {
+            let mut env = local_env.write();
+            
+            let key = match key {
+                None => format!("KEY_{}", env.values.len()),
+                Some(key) => key
+            };
             
             match env.values.insert(key.clone(), value.clone()) {
                 Some(_) => return Err(anyhow!(KeyAlreadyExists)),
@@ -124,26 +150,39 @@ impl App<'_> {
         Ok(())
     }
 
+    pub fn delete_env_index(&mut self, env_index: usize, index: usize) -> anyhow::Result<()> {
+        let local_env = self.get_env_as_local_from_index(env_index).unwrap();
+
+        {
+            let mut env = local_env.write();
+
+            match env.values.shift_remove_index(index) {
+                None => return Err(anyhow!(KeyNotFound)),
+                Some((key, _)) => info!("Key \"{key}\" deleted from environment")
+            }
+        }
+
+        self.save_environment_to_file(env_index);
+        Ok(())
+    }
+
     pub fn rename_env_key(&mut self, env_index: usize, key: &str, new_key: &str) -> anyhow::Result<()> {
         let local_env = self.get_env_as_local_from_index(env_index).unwrap();
 
         {
             let mut env = local_env.write();
 
-            match env.values.insert(key.to_string(), String::from("tmp_value")) {
-                None => {},
-                Some(_) => return Err(anyhow!(KeyAlreadyExists))
+            if env.values.get(new_key).is_some() {
+                return Err(anyhow!(KeyAlreadyExists));
             }
 
-            let value = match env.values.swap_remove(key) {
+            let old_index = match env.values.get_index_of(key) {
                 None => return Err(anyhow!(KeyNotFound)),
-                Some(value) => value
+                Some(index) => index
             };
 
-            match env.values.get_mut(new_key) {
-                None => return Err(anyhow!(KeyNotFound)),
-                Some(old_value) => *old_value = value
-            }
+            let (key, _) = env.values.get_index_mut2(old_index).unwrap();
+            *key = new_key.to_string();
 
             info!("Environment key \"{key}\" renamed to \"{new_key}\"");
         }
@@ -152,6 +191,27 @@ impl App<'_> {
         Ok(())
     }
 
+    pub fn rename_env_key_by_index(&mut self, env_index: usize, key_index: usize, new_key: String) -> anyhow::Result<()> {
+        let local_env = self.get_env_as_local_from_index(env_index).unwrap();
+
+        {
+            let mut env = local_env.write();
+
+            if env.values.get(&new_key).is_some() {
+                return Err(anyhow!(KeyAlreadyExists));
+            }
+
+            let (key, _) = env.values.get_index_mut2(key_index).unwrap();
+            let old_key = key.clone();
+            *key = new_key.clone();
+
+            info!("Environment key \"{old_key}\" renamed to \"{new_key}\"");
+        }
+
+        self.save_environment_to_file(env_index);
+        Ok(())
+    }
+    
     pub fn replace_env_keys_by_value(&self, input: &String) -> String {
         if self.environments.is_empty() {
             return input.to_string();

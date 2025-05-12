@@ -35,6 +35,7 @@ nest! {
 
             pub next_environment: KeyCombination,
 
+            pub display_env_editor: KeyCombination,
             pub display_cookies: KeyCombination,
             pub display_logs: KeyCombination,
         },
@@ -77,7 +78,7 @@ nest! {
                 pub alt_move_cursor_left: KeyCombination,
                 #[allow(dead_code)]
                 pub alt_move_cursor_right: KeyCombination,
-                
+
                 pub go_back: KeyCombination,
                 pub select: KeyCombination,
             },
@@ -105,7 +106,7 @@ nest! {
 
             pub send_request: KeyCombination,
             pub alt_send_request: KeyCombination,
-            
+
             pub param_tabs: #[derive(Copy, Clone, Deserialize)] pub struct ParamTabs {
                 pub change_auth_method: KeyCombination,
                 pub change_body_content_type: KeyCombination,
@@ -173,6 +174,7 @@ impl Default for KeyBindings {
 
                 next_environment: key!(e),
 
+                display_env_editor: key!(ctrl-e),
                 display_cookies: key!(c),
                 display_logs: key!(l),
             },
@@ -216,7 +218,7 @@ impl Default for KeyBindings {
                     edit_element: key!(enter),
                     rename_element: key!(r),
                     toggle_element: key!(t),
-                    duplicate_element: key!(Ctrl-d),
+                    duplicate_element: key!(ctrl-d),
                 },
             },
 
@@ -227,7 +229,7 @@ impl Default for KeyBindings {
                 change_method: key!(m),
 
                 request_settings: key!(s),
-                export_request: key!(ctrl-e),
+                export_request: key!(shift-E),
                 
                 next_view: key!(v),
 

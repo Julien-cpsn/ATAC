@@ -191,7 +191,7 @@ impl App<'_> {
             EnvSubcommand::Key { subcommand, .. } => match subcommand {
                 KeyCommand::Get { key } => self.get_env_value(env_index, key),
                 KeyCommand::Set { key, value } => self.set_env_value(env_index, key, value.clone()),
-                KeyCommand::Add { key, value } => self.add_env_value(env_index, key.clone(), value.clone()),
+                KeyCommand::Add { key, value } => self.create_env_value(env_index, Some(key.clone()), value.clone()),
                 KeyCommand::Delete { key } => self.delete_env_key(env_index, key),
                 KeyCommand::Rename { key, new_key } => self.rename_env_key(env_index, key, new_key),
             }

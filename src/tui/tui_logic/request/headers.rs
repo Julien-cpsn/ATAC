@@ -7,16 +7,8 @@ impl App<'_> {
         let selected_request = local_selected_request.read();
 
         match selected_request.headers.is_empty() {
-            false => {
-                self.headers_table.selection = Some((0, 0));
-                self.headers_table.left_state.select(Some(0));
-                self.headers_table.right_state.select(Some(0));
-            },
-            true => {
-                self.headers_table.selection = None;
-                self.headers_table.left_state.select(None);
-                self.headers_table.right_state.select(None);
-            }
+            false => self.headers_table.update_selection(Some((0, 0))),
+            true => self.headers_table.update_selection(None)
         }
     }
 
