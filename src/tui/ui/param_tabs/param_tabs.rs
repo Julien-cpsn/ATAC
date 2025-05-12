@@ -12,6 +12,7 @@ use crate::app::files::theme::THEME;
 use crate::models::auth::Auth::*;
 use crate::models::body::ContentType::*;
 use crate::models::request::Request;
+use crate::tui::app_states::AppState::{EditingRequestBodyTable, EditingRequestHeader, EditingRequestParam};
 
 #[derive(Default, Clone, Copy, Display, FromRepr, EnumIter)]
 pub enum RequestParamsTabs {
@@ -82,22 +83,21 @@ impl App<'_> {
 
         match self.request_param_tab {
             RequestParamsTabs::QueryParams => {
-                match self.query_params_table.selection {
-                    None => {
-                        let params_lines = vec![
-                            Line::default(),
-                            Line::from("No params").fg(THEME.read().ui.font_color),
-                            Line::from("(Add one with n or via the URL)").fg(THEME.read().ui.secondary_foreground_color)
-                        ];
+                let no_selection_lines = vec![
+                    Line::default(),
+                    Line::from("No params").fg(THEME.read().ui.font_color),
+                    Line::from("(Add one with n or via the URL)").fg(THEME.read().ui.secondary_foreground_color)
+                ];
 
-                        let params_paragraph = Paragraph::new(params_lines).centered();
-
-                        frame.render_widget(params_paragraph, request_params_layout[1]);
-                    },
-                    Some(param_selection) => {
-                        self.render_query_params_tab(frame, request_params_layout[1], request, param_selection);
-                    }
-                }
+                self.render_custom_table(
+                    frame,
+                    request_params_layout[1],
+                    &self.query_params_table,
+                    no_selection_lines,
+                    EditingRequestParam,
+                    "Param",
+                    "Value"
+                );
             }
             RequestParamsTabs::Auth => {
                 match &request.auth {
@@ -121,22 +121,21 @@ impl App<'_> {
                 }
             }
             RequestParamsTabs::Headers => {
-                match self.headers_table.selection {
-                    None => {
-                        let headers_lines = vec![
-                            Line::default(),
-                            Line::from("Default headers").fg(THEME.read().ui.font_color),
-                            Line::from("(Add one with n)").fg(THEME.read().ui.secondary_foreground_color)
-                        ];
-
-                        let headers_paragraph = Paragraph::new(headers_lines).centered();
-
-                        frame.render_widget(headers_paragraph, request_params_layout[1]);
-                    },
-                    Some(header_selection) => {
-                        self.render_headers_tab(frame, request_params_layout[1], request, header_selection);
-                    }
-                }
+                let no_selection_lines = vec![
+                    Line::default(),
+                    Line::from("Default headers").fg(THEME.read().ui.font_color),
+                    Line::from("(Add one with n)").fg(THEME.read().ui.secondary_foreground_color)
+                ];
+                
+                self.render_custom_table(
+                    frame,
+                    request_params_layout[1],
+                    &self.headers_table,
+                    no_selection_lines,
+                    EditingRequestHeader,
+                    "Header",
+                    "Value"
+                );
             }
             RequestParamsTabs::Body => {
                 match &request.body {
@@ -151,23 +150,22 @@ impl App<'_> {
 
                         frame.render_widget(body_paragraph, request_params_layout[1]);
                     }
-                    Multipart(form) | Form(form) => {
-                        match self.body_form_table.selection {
-                            None => {
-                                let multipart_form_lines = vec![
-                                    Line::default(),
-                                    Line::from("No form data").fg(THEME.read().ui.font_color),
-                                    Line::from("(Add one with n)").fg(THEME.read().ui.secondary_foreground_color)
-                                ];
+                    Multipart(_) | Form(_) => {
+                        let no_selection_lines = vec![
+                            Line::default(),
+                            Line::from("No form data").fg(THEME.read().ui.font_color),
+                            Line::from("(Add one with n)").fg(THEME.read().ui.secondary_foreground_color)
+                        ];
 
-                                let multipart_form_paragraph = Paragraph::new(multipart_form_lines).centered();
-
-                                frame.render_widget(multipart_form_paragraph, request_params_layout[1]);
-                            },
-                            Some(multipart_form_selection) => {
-                                self.render_form_body_tab(frame, request_params_layout[1], form, multipart_form_selection);
-                            }
-                        }
+                        self.render_custom_table(
+                            frame,
+                            request_params_layout[1],
+                            &self.body_form_table,
+                            no_selection_lines,
+                            EditingRequestBodyTable,
+                            "key",
+                            "value"
+                        );
                     },
                     File(_) => {
                       self.render_file_body_tab(frame, request_params_layout[1]);

@@ -219,7 +219,6 @@ cargo run -- -h
 
 - **To add**
   - Individual request documentation in the TUI (markdown)
-  - Env variables editor in the TUI
   - Insomnia import
 
 - **To improve**
@@ -362,7 +361,7 @@ The binary file size goes from ~5 MB to ~12 MB depending on the platform. I try 
 
 ## Star history
 
-<a href="https://star-history.com/#julien-cpsn/atac&Date">
+<a href="https://www.star-history.com/#julien-cpsn/atac&Date">
  <picture>
    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=julien-cpsn/atac&type=Date&theme=dark" />
    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=julien-cpsn/atac&type=Date" />

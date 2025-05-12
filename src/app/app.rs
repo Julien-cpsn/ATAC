@@ -39,6 +39,7 @@ pub struct App<'a> {
     pub should_display_help: bool,
 
     pub state: AppState,
+    pub was_last_state_selected_request: bool,
 
     pub config: Config,
 
@@ -50,6 +51,7 @@ pub struct App<'a> {
     
     pub environments: Vec<Arc<RwLock<Environment>>>,
     pub selected_environment: usize,
+    pub env_editor_table: StatefulCustomTable,
 
     /* Cookies */
     
@@ -122,6 +124,7 @@ impl App<'_> {
             should_display_help: false,
             
             state: AppState::Normal,
+            was_last_state_selected_request: true,
 
             config: Config::default(),
 
@@ -133,6 +136,7 @@ impl App<'_> {
 
             environments: vec![],
             selected_environment: 0,
+            env_editor_table: StatefulCustomTable::default(),
 
             /* Cookies */
 
@@ -183,7 +187,6 @@ impl App<'_> {
             body_form_table: StatefulCustomTable::default(),
             body_text_area: TextArea::default(),
             body_text_area_vim_emulation: Vim::default(),
-
 
             request_settings_popup: SettingsPopup::default(),
             

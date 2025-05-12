@@ -10,6 +10,7 @@ move_request_up = "Ctrl-Up"
 move_request_down = "Ctrl-Down"
 
 next_environment = "e"
+display_env_editor = "ctrl-e"
 display_cookies = "c"
 display_logs = "l"
 
@@ -92,7 +93,7 @@ next_view = "v"
 send_request = "Space"
 alt_send_request = "Ctrl-Enter"
 
-export_request = "Ctrl-e"
+export_request = "Shift-E"
 
 [keybindings.request_selected.param_tabs]
 change_auth_method = "Ctrl-a"

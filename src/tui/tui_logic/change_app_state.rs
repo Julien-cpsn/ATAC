@@ -1,18 +1,66 @@
-use std::sync::Arc;
-use std::sync::atomic::Ordering;
 use crate::app::app::App;
 use crate::app::log::{LOGS, SHOULD_RECORD_LOGS};
 use crate::models::body::ContentType;
 use crate::tui::app_states::AppState;
 use crate::tui::ui::param_tabs::param_tabs::RequestParamsTabs;
 use crate::tui::utils::stateful::cookie_table::cookie_to_row;
+use std::sync::atomic::Ordering;
+use std::sync::Arc;
 
 impl App<'_> {
-    pub fn normal_state(&mut self) {
-        SHOULD_RECORD_LOGS.store(true, Ordering::SeqCst);
-        self.state = AppState::Normal;
+    fn set_app_state(&mut self, app_state: AppState) {
+        match self.state {
+            AppState::Normal => self.was_last_state_selected_request = false,
+            AppState::SelectedRequest => self.was_last_state_selected_request = true,
+            _ => {}
+        }
+        self.state = app_state;
     }
 
+    pub fn normal_state(&mut self) {
+        SHOULD_RECORD_LOGS.store(true, Ordering::SeqCst);
+
+        if self.was_last_state_selected_request && self.state != AppState::SelectedRequest {
+            self.state = AppState::SelectedRequest;
+        }
+        else {
+            self.state = AppState::Normal;
+        }
+    }
+
+    pub fn display_env_editor_state(&mut self) {
+        if self.get_selected_env_as_local().is_none() {
+            return;
+        }
+
+        self.tui_update_env_variable_table();
+        self.set_app_state(AppState::DisplayingEnvEditor);
+    }
+
+    pub fn edit_env_variable_state(&mut self) {
+        let local_env = self.get_selected_env_as_local();
+
+        if let Some(local_env) = local_env {
+            let env = local_env.read();
+
+            if !env.values.is_empty() {
+                self.env_editor_table.selection_text_input.reset_input();
+
+                let selection = self.env_editor_table.selection.unwrap();
+
+                let pair = env.values.get_index(selection.0).unwrap();
+                let text = match selection.1 {
+                    0 => pair.0,
+                    1 => pair.1,
+                    _ => "" // Should not happen
+                };
+
+                self.env_editor_table.selection_text_input.enter_str(&text);
+                self.set_app_state(AppState::EditingEnvVariable);
+            }
+        }
+    }
+    
     pub fn display_cookies_state(&mut self) {
         let local_cookie_store = Arc::clone(&self.cookies_popup.cookie_store);
 
@@ -23,7 +71,7 @@ impl App<'_> {
         }
 
         self.tui_update_cookies_table_selection();
-        self.state = AppState::DisplayingCookies;
+        self.set_app_state(AppState::DisplayingCookies);
     }
 
     #[allow(dead_code)]
@@ -36,7 +84,7 @@ impl App<'_> {
         self.cookies_popup.cookies_table.selection_text_input.enter_str(&input_text);
         self.cookies_popup.cookies_table.selection_text_input.cursor_position = input_text.len();
 
-        self.state = AppState::EditingCookies;
+        self.set_app_state(AppState::EditingCookies);
     }
 
     pub fn display_logs_state(&mut self) {
@@ -55,7 +103,7 @@ impl App<'_> {
         self.logs_vertical_scrollbar.max_scroll = logs.len().saturating_sub(1) as u16;
         self.logs_horizontal_scrollbar.max_scroll = max_log_width as u16;
 
-        self.state = AppState::DisplayingLogs;
+        self.set_app_state(AppState::DisplayingLogs);
     }
 
     pub fn choose_element_to_create_state(&mut self) {
@@ -65,12 +113,12 @@ impl App<'_> {
             self.create_new_collection_state();
         }
         else {
-            self.state = AppState::ChoosingElementToCreate;
+            self.set_app_state(AppState::ChoosingElementToCreate);
         }
     }
     
     pub fn create_new_collection_state(&mut self) {
-        self.state = AppState::CreatingNewCollection;
+        self.set_app_state(AppState::CreatingNewCollection);
     }
 
     pub fn create_new_request_state(&mut self) {
@@ -93,17 +141,17 @@ impl App<'_> {
         
         self.new_request_popup.selected_collection = popup_selected_collection_index;
         self.new_request_popup.max_selection = collections_length;
-        self.state = AppState::CreatingNewRequest;
+        self.set_app_state(AppState::CreatingNewRequest);
     }
 
     pub fn delete_collection_state(&mut self) {
         self.delete_collection_popup.state = false;
-        self.state = AppState::DeletingCollection;
+        self.set_app_state(AppState::DeletingCollection);
     }
 
     pub fn delete_request_state(&mut self) {
         self.delete_request_popup.state = false;
-        self.state = AppState::DeletingRequest;
+        self.set_app_state(AppState::DeletingRequest);
     }
 
     pub fn rename_collection_state(&mut self) {
@@ -113,7 +161,7 @@ impl App<'_> {
         self.rename_collection_input.text = collection_name.clone();
         self.rename_collection_input.cursor_position = collection_name.len();
         
-        self.state = AppState::RenamingCollection;
+        self.set_app_state(AppState::RenamingCollection);
     }
 
     pub fn rename_request_state(&mut self) {
@@ -125,42 +173,42 @@ impl App<'_> {
             self.rename_request_input.cursor_position = selected_request.name.len();
         }
 
-        self.state = AppState::RenamingRequest;
+        self.set_app_state(AppState::RenamingRequest);
     }
     
     pub fn select_request_state(&mut self) {
-        self.state = AppState::SelectedRequest;
+        self.set_app_state(AppState::SelectedRequest);
         self.update_inputs();
         self.reset_cursors();
     }
 
     pub fn edit_request_url_state(&mut self) {
-        self.state = AppState::EditingRequestUrl;
+        self.set_app_state(AppState::EditingRequestUrl);
         self.update_inputs();
     }
 
     pub fn edit_request_param_state(&mut self) {
-        self.state = AppState::EditingRequestParam;
+        self.set_app_state(AppState::EditingRequestParam);
         self.update_inputs();
     }
 
     pub fn edit_request_auth_username_state(&mut self) {
-        self.state = AppState::EditingRequestAuthUsername;
+        self.set_app_state(AppState::EditingRequestAuthUsername);
         self.update_inputs();
     }
 
     pub fn edit_request_auth_password_state(&mut self) {
-        self.state = AppState::EditingRequestAuthPassword;
+        self.set_app_state(AppState::EditingRequestAuthPassword);
         self.update_inputs();
     }
 
     pub fn edit_request_auth_bearer_token_state(&mut self) {
-        self.state = AppState::EditingRequestAuthBearerToken;
+        self.set_app_state(AppState::EditingRequestAuthBearerToken);
         self.update_inputs();
     }
 
     pub fn edit_request_header_state(&mut self) {
-        self.state = AppState::EditingRequestHeader;
+        self.set_app_state(AppState::EditingRequestHeader);
         self.update_inputs();
     }
 
@@ -170,8 +218,10 @@ impl App<'_> {
         {
             let selected_request = local_selected_request.read();
 
-            match selected_request.body {
-                ContentType::Multipart(_) | ContentType::Form(_) => {}
+            match &selected_request.body {
+                ContentType::Multipart(form) | ContentType::Form(form) => {
+                    self.body_form_table.rows = form.clone();
+                }
                 _ => {
                     return;
                 }
@@ -179,7 +229,7 @@ impl App<'_> {
         }
 
         self.request_param_tab = RequestParamsTabs::Body;
-        self.state = AppState::EditingRequestBodyTable;
+        self.set_app_state(AppState::EditingRequestBodyTable);
         self.update_inputs();
     }
 
@@ -192,10 +242,10 @@ impl App<'_> {
 
             match selected_request.body {
                 ContentType::File(_) => {
-                    self.state = AppState::EditingRequestBodyFile;
+                    self.set_app_state(AppState::EditingRequestBodyFile);
                 }
                 ContentType::Raw(_) | ContentType::Json(_) | ContentType::Xml(_) | ContentType::Html(_) | ContentType::Javascript(_) => {
-                    self.state = AppState::EditingRequestBodyString;
+                    self.set_app_state(AppState::EditingRequestBodyString);
                 }
                 _ => {
                     return;
@@ -211,8 +261,8 @@ impl App<'_> {
         self.request_param_tab = RequestParamsTabs::Scripts;
         
         match self.script_console.script_selection {
-            0 => self.state = AppState::EditingPreRequestScript,
-            1 => self.state = AppState::EditingPostRequestScript,
+            0 => self.set_app_state(AppState::EditingPreRequestScript),
+            1 => self.set_app_state(AppState::EditingPostRequestScript),
             _ => {}
         }
         
@@ -227,15 +277,15 @@ impl App<'_> {
 
         self.request_settings_popup.settings = selected_request.settings.to_vec();
 
-        self.state = AppState::EditingRequestSettings;
+        self.set_app_state(AppState::EditingRequestSettings);
     }
 
     pub fn choose_request_export_format_state(&mut self) {
         self.export_request.selection = 0;
-        self.state = AppState::ChoosingRequestExportFormat;
+        self.set_app_state(AppState::ChoosingRequestExportFormat);
     }
 
     pub fn display_request_export_state(&mut self) {
-        self.state = AppState::DisplayingRequestExport;
+        self.set_app_state(AppState::DisplayingRequestExport);
     }
 }

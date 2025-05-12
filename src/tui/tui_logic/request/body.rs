@@ -15,16 +15,8 @@ impl App<'_> {
         {
             if let Ok(form) = selected_request.body.get_form() {
                 match form.is_empty() {
-                    false => {
-                        self.body_form_table.selection = Some((0, 0));
-                        self.body_form_table.left_state.select(Some(0));
-                        self.body_form_table.right_state.select(Some(0));
-                    },
-                    true => {
-                        self.body_form_table.selection = None;
-                        self.body_form_table.left_state.select(None);
-                        self.body_form_table.right_state.select(None);
-                    }
+                    false => self.body_form_table.update_selection(Some((0, 0))),
+                    true => self.body_form_table.update_selection(None)
                 }
             }
         }

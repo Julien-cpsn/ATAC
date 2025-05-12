@@ -36,10 +36,30 @@ get_key_bindings! {
         MoveRequestDown(EventKeyBinding),
 
         NextEnvironment(EventKeyBinding),
+        DisplayEnvEditor(EventKeyBinding),
         DisplayCookies(EventKeyBinding),
         DisplayLogs(EventKeyBinding),
 
-        GoBackToMainMenu(EventKeyBinding),
+        GoBackToLastState(EventKeyBinding),
+
+        /* Env */
+
+        EditEnvVariable(EventKeyBinding),
+        EnvVariablesMoveUp(EventKeyBinding),
+        EnvVariablesMoveDown(EventKeyBinding),
+        EnvVariablesMoveLeft(EventKeyBinding),
+        EnvVariablesMoveRight(EventKeyBinding),
+        CreateEnvVariable(EventKeyBinding),
+        DeleteEnvVariable(EventKeyBinding),
+
+        ModifyEnvVariable(EventKeyBinding),
+        EditingEnvVariableDeleteCharBackward(EventKeyBinding),
+        EditingEnvVariableDeleteCharForward(EventKeyBinding),
+        EditingEnvVariableMoveCursorLeft(EventKeyBinding),
+        EditingEnvVariableMoveCursorRight(EventKeyBinding),
+        EditingEnvVariableMoveCursorLineStart(EventKeyBinding),
+        EditingEnvVariableMoveCursorLineEnd(EventKeyBinding),
+        EditingEnvVariableCharInput(EventKeyBinding),
 
         /* Cookies */
 
@@ -430,10 +450,35 @@ impl App<'_> {
                 MoveRequestDown(_) => self.tui_move_request_down(),
 
                 NextEnvironment(_) => self.tui_next_environment(),
+                DisplayEnvEditor(_) => self.display_env_editor_state(),
                 DisplayCookies(_) => self.display_cookies_state(),
                 DisplayLogs(_) => self.display_logs_state(),
 
-                GoBackToMainMenu(_) => self.normal_state(),
+                GoBackToLastState(_) => self.normal_state(),
+
+                /* Env */
+
+                EditEnvVariable(_) => match self.env_editor_table.is_selected() {
+                    true => self.edit_env_variable_state(),
+                    false => {}
+                },
+                EnvVariablesMoveUp(_) => self.env_editor_table.up(),
+                EnvVariablesMoveDown(_) => self.env_editor_table.down(),
+                EnvVariablesMoveLeft(_) | EnvVariablesMoveRight(_) => self.env_editor_table.change_y(),
+                CreateEnvVariable(_) => self.tui_create_env_variable(),
+                DeleteEnvVariable(_) => self.tui_delete_env_variable(),
+
+                ModifyEnvVariable(_) => self.tui_modify_env_variable(),
+                EditingEnvVariableDeleteCharBackward(_) => self.env_editor_table.selection_text_input.delete_char_forward(),
+                EditingEnvVariableDeleteCharForward(_) => self.env_editor_table.selection_text_input.delete_char_backward(),
+                EditingEnvVariableMoveCursorLeft(_) => self.env_editor_table.selection_text_input.move_cursor_left(),
+                EditingEnvVariableMoveCursorRight(_) => self.env_editor_table.selection_text_input.move_cursor_right(),
+                EditingEnvVariableMoveCursorLineStart(_) => self.env_editor_table.selection_text_input.move_cursor_line_start(),
+                EditingEnvVariableMoveCursorLineEnd(_) => self.env_editor_table.selection_text_input.move_cursor_line_end(),
+                EditingEnvVariableCharInput(_) => match key {
+                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.env_editor_table.selection_text_input.enter_char(char),
+                    _ => {}
+                },
 
                 /* Cookies */
 
