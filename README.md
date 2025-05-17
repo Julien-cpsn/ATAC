@@ -57,7 +57,7 @@ The philosophy of ATAC is to be free, account-less, and offline for now and fore
 ### Install with cargo
 
 > [!IMPORTANT]
-> First, make sure your rust version is at least 1.79
+> First, make sure your rust version is at least 1.82
 
 Simply use:
 
@@ -142,7 +142,7 @@ The binaries from the latest release can be found [here](https://github.com/Juli
 ### Compile by yourself
 
 > [!IMPORTANT]
-> First, make sure your rust version is at least 1.79
+> First, make sure your rust version is at least 1.82
 
 Simply clone the repository and use:
 
