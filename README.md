@@ -77,12 +77,15 @@ You can use [pacman](https://wiki.archlinux.org/title/pacman) to install:
 pacman -S atac
 ```
 
+<a href="https://formulae.brew.sh/formula/atac">
+  <img src="https://repology.org/badge/version-for-repo/homebrew/atac.svg" alt="Homebrew package" align="right">
+</a>
+
 ### Install with Homebrew
 
 Simply use:
 
 ```bash
-brew tap julien-cpsn/atac
 brew install atac
 ```
 
