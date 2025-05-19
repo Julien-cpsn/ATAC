@@ -372,7 +372,10 @@ pub async fn send_request(prepared_request: reqwest_middleware::RequestBuilder, 
                         })
                     },
                     false => {
-                        let mut result_body = response.text().await.unwrap();
+                        let mut result_body = match response.text().await {
+                            Ok(body) => body,
+                            Err(error) => error.to_string()
+                        };
 
                         // If a file format has been found in the content-type header
                         if let Some(file_format) = find_file_format_in_content_type(&headers) {
