@@ -18,7 +18,7 @@ use tracing::{info, trace};
 
 use crate::app::app::App;
 use crate::app::business_logic::request::scripts::{execute_post_request_script, execute_pre_request_script};
-use crate::app::business_logic::request::send::RequestResponseError::PostRequestScript;
+use crate::app::business_logic::request::send::RequestResponseError::{CouldNotDecodeResponse, PostRequestScript};
 use crate::app::files::environment::save_environment_to_file;
 use crate::models::auth::Auth::{BasicAuth, BearerToken, NoAuth};
 use crate::models::body::ContentType::{File, Form, Html, Javascript, Json, Multipart, NoBody, Raw, Xml};
@@ -292,6 +292,8 @@ impl App<'_> {
 pub enum RequestResponseError {
     #[error("(CONSOLE) POST-SCRIPT ERROR")]
     PostRequestScript,
+    #[error("COULD NOT DECODE RESPONSE TEXT OR BYTES")]
+    CouldNotDecodeResponse,
 }
 
 pub async fn send_request(prepared_request: reqwest_middleware::RequestBuilder, local_request: Arc<RwLock<Request>>, env: &Option<Arc<RwLock<Environment>>>) -> Result<(RequestResponse, String, Option<Vec<Line<'static>>>), RequestResponseError> {
@@ -371,29 +373,30 @@ pub async fn send_request(prepared_request: reqwest_middleware::RequestBuilder, 
                             image: image.ok(),
                         })
                     },
-                    false => {
-                        let mut result_body = match response.text().await {
-                            Ok(body) => body,
-                            Err(error) => error.to_string()
-                        };
-
-                        // If a file format has been found in the content-type header
-                        if let Some(file_format) = find_file_format_in_content_type(&headers) {
-                            // If the request response content can be pretty printed
-                            if request.settings.pretty_print_response_content {
-                                // Match the file format
-                                match file_format.as_str() {
-                                    "json" => {
-                                        result_body = jsonxf::pretty_print(&result_body).unwrap_or(result_body);
-                                    },
-                                    _ => {}
+                    false => match response.bytes().await {
+                        Ok(bytes) => match String::from_utf8(bytes.to_vec()) {
+                            Ok(mut result_body) => {
+                                // If a file format has been found in the content-type header
+                                if let Some(file_format) = find_file_format_in_content_type(&headers) {
+                                    // If the request response content can be pretty printed
+                                    if request.settings.pretty_print_response_content {
+                                        // Match the file format
+                                        match file_format.as_str() {
+                                            "json" => {
+                                                result_body = jsonxf::pretty_print(&result_body).unwrap_or(result_body);
+                                            },
+                                            _ => {}
+                                        }
+                                    }
+    
+                                    highlighted_result_body = highlight(&result_body, &file_format);
                                 }
-                            }
-
-                            highlighted_result_body = highlight(&result_body, &file_format);
-                        }
-
-                        ResponseContent::Body(result_body)
+    
+                                ResponseContent::Body(result_body)
+                            },
+                            Err(_) => ResponseContent::Body(format!("{:#X?}", bytes))
+                        },
+                        Err(_) => return Err(CouldNotDecodeResponse)
                     }
                 };
 
