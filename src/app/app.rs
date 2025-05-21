@@ -123,7 +123,7 @@ impl App<'_> {
             should_display_help: false,
             
             state: AppState::Normal,
-            was_last_state_selected_request: true,
+            was_last_state_selected_request: false,
 
             config: Config::default(),
 
