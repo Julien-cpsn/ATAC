@@ -1,0 +1,32 @@
+# Base colors:
+# Black, Red, Green, Yellow, Blue, Magenta, Cyan, Gray, DarkGray
+# LightRed, LightGreen, LightYellow, LightBlue, LightMagenta, LightCyan, White
+#
+# Hex codes also work, e.g.  "#1a2b3c"
+
+[ui]
+font_color = "#cdd6f4"
+# Null to preserve terminal background, uncomment to apply catppuccin background
+# app_background = "#1e1e2e"
+
+main_foreground_color = "#89b4fa"
+secondary_foreground_color = "#a6e3a1"
+
+main_background_color = "#1e1e2e"
+secondary_background_color = "#313244"
+
+[others]
+selection_highlight_color = "#45475a"
+environment_variable_highlight_color = "#585b70"
+
+[methods]
+GET = "#a6e3a1"
+POST = "#f9e2af"
+PUT = "#89b4fa"
+PATCH = "#cba6f7"
+DELETE = "#f38ba8"
+OPTIONS = "#f5c2e7"
+HEAD = "#fab387"
+TRACE = "#f9e2af"
+CONNECT = "#89b4fa"
+
