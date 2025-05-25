@@ -1,7 +1,7 @@
 [package]
 name = "atac"
 description = "Arguably a Terminal API Client. Feature-full, free, open-source, offline and account-less."
-version = "0.20.0"
+version = "0.20.1"
 authors = ["julien-cpsn"]
 edition = "2021"
 rust-version = "1.82"
@@ -33,7 +33,7 @@ tui-big-text = "=0.7.1"
 tui-tree-widget = "=0.23.0"
 tui-textarea = { version = "=0.7.0", features = ["ratatui"] }
 throbber-widgets-tui = "=0.8.0"
-ratatui-image = { version = "=5.0.0", features = ["crossterm"] }
+ratatui-image = { version = "=8.0.0", features = ["crossterm"] }
 image = "=0.25.6"
 
 # Main functionalities
@@ -42,17 +42,17 @@ serde = { version = "=1.0.219", features = ["derive", "rc"] }
 serde_json = "=1.0.140"
 serde_yaml = "=0.9.34"
 jsonxf = "=1.1.1"
-toml = "=0.8.20"
+toml = "=0.8.22"
 boa_engine = { version = "=0.20.0", default-features = false }
 parse_postman_collection = "=0.2.3"
 curl-parser = { version = "=0.5.0", default-features = false }
-openapiv3 = "2.0.0"
-clap = { version = "=4.5.37", features = ["derive", "color", "suggestions"] }
+openapiv3 = "2.1.0"
+clap = { version = "=4.5.38", features = ["derive", "color", "suggestions"] }
 directories = "=6.0.0"
 arboard = "=3.5.0"
 
 # Async
-tokio = { version = "=1.45.0", features = ["rt", "rt-multi-thread", "macros"] }
+tokio = { version = "=1.45.1", features = ["rt", "rt-multi-thread", "macros"] }
 tokio-util = "=0.7.15"
 parking_lot = { version = "=0.12.3", features = ["serde", "send_guard"] }
 
@@ -66,7 +66,7 @@ indexmap = { version = "=2.9.0", features = ["serde", "rayon"] }
 rayon = "=1.10.0"
 thiserror = "=2.0.12"
 anyhow = "=1.0.98"
-clap-verbosity-flag = "=3.0.2"
+clap-verbosity-flag = "=3.0.3"
 clap_complete = "=4.5.50"
 clap_mangen = "=0.2.26"
 regex = "=1.11.1"
