@@ -1,15 +1,15 @@
-use ratatui::Frame;
-use ratatui::layout::{Constraint, Layout, Margin, Rect};
 use ratatui::layout::Direction::Vertical;
+use ratatui::layout::{Constraint, Layout, Margin, Rect};
 use ratatui::prelude::Style;
 use ratatui::style::Stylize;
 use ratatui::text::{Line, Span};
 use ratatui::widgets::{Block, Borders, Paragraph, Scrollbar, ScrollbarOrientation, Tabs, Wrap};
-use ratatui_image::{Image, Resize};
+use ratatui::Frame;
 use ratatui_image::picker::Picker;
-use strum::{Display, EnumIter, FromRepr, IntoEnumIterator};
-use throbber_widgets_tui::{BRAILLE_DOUBLE, Throbber, WhichUse};
+use ratatui_image::StatefulImage;
 use rayon::prelude::*;
+use strum::{Display, EnumIter, FromRepr, IntoEnumIterator};
+use throbber_widgets_tui::{Throbber, WhichUse, BRAILLE_DOUBLE};
 
 use crate::app::app::App;
 use crate::app::files::theme::THEME;
@@ -157,14 +157,12 @@ impl App<'_> {
                                 frame.render_widget(image_disabled_paragraph, request_result_layout[2]);
                             },
                             Some(image) => {
-                                let picker = Picker::from_fontsize((3, 6));
+                                let picker = Picker::from_query_stdio().unwrap_or(Picker::from_fontsize((7, 14)));
 
                                 let mut image_static = picker
-                                    .new_protocol(image.clone(), request_result_layout[2], Resize::Fit(None))
-                                    .unwrap();
+                                    .new_resize_protocol(image.clone());
 
-                                let image = Image::new(&mut image_static);
-                                frame.render_widget(image, request_result_layout[2]);
+                                frame.render_stateful_widget(StatefulImage::default(), request_result_layout[2], &mut image_static);
                             }
                             None => {
                                 let image_error_paragraph = Paragraph::new("\nCould not decode image")
