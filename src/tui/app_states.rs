@@ -795,4 +795,23 @@ impl App<'_> {
             }
         }
     }
+    
+    pub fn in_input(&self) -> bool {
+        match self.state {
+            EditingEnvVariable |
+            EditingCookies |
+            CreatingNewCollection |
+            CreatingNewRequest |
+            RenamingCollection |
+            RenamingRequest |
+            EditingRequestUrl |
+            EditingRequestParam |
+            EditingRequestAuthUsername | EditingRequestAuthPassword | EditingRequestAuthBearerToken |
+            EditingRequestHeader |
+            EditingRequestBodyTable | EditingRequestBodyFile | EditingRequestBodyString |
+            EditingPreRequestScript | EditingPostRequestScript |
+            EditingRequestSettings => true,
+            _ => false
+        }
+    }
 }

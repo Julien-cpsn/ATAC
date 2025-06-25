@@ -405,7 +405,7 @@ impl App<'_> {
                 return false;
             }
             // Help is not being displayed
-            else if key == key_bindings.generic.display_help {
+            else if key == key_bindings.generic.display_help && !self.in_input() {
                 self.should_display_help = true;
                 self.help_popup.selection = self.state;
                 return false;
