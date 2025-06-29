@@ -10,6 +10,7 @@ use uuid::Uuid;
 
 use crate::app::app::App;
 use crate::app::business_logic::environment::EnvironmentError::{EnvironmentNotFound, KeyAlreadyExists, KeyNotFound};
+use crate::app::files::environment::OS_ENV_VARS;
 use crate::models::environment::Environment;
 
 #[derive(Error, Debug)]
@@ -223,12 +224,15 @@ impl App<'_> {
 
         if let Some(local_env) = local_env {
             let env = local_env.read();
-
-            for (key, value) in &env.values {
+            let mut values = env.values.clone();
+            values.extend(OS_ENV_VARS.clone());
+            
+            for (key, value) in &values {
                 tmp_string = tmp_string.replace(&format!("{{{{{}}}}}", key), value);
             }
         }
 
+        
         tmp_string = tmp_string
             .replace("{{NOW}}", &Utc::now().to_string())
             .replace("{{TIMESTAMP}}", &Utc::now().timestamp().to_string())

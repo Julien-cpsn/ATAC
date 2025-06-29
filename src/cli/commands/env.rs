@@ -13,6 +13,10 @@ pub enum EnvSubcommand {
     Info {
         /// e.g. my_env (from the file .env.my_env)
         env_name: String,
+
+        /// Also displays available OS environment variables
+        #[clap(short, long, default_value_t = false)]
+        os_vars: bool
     },
 
     /// Add, get or set a key/value pair

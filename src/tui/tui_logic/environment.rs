@@ -3,6 +3,7 @@ use ratatui::text::{Line, Span};
 use regex::Regex;
 
 use crate::app::app::App;
+use crate::app::files::environment::OS_ENV_VARS;
 use crate::app::files::theme::THEME;
 use crate::models::request::KeyValue;
 
@@ -32,6 +33,7 @@ impl App<'_> {
             let env = local_env.read();
 
             let mut keys: Vec<&str> = env.values.keys().map(|key| key.as_str()).collect();
+            keys.extend(OS_ENV_VARS.keys().map(|k| k.as_str()));
             keys.extend(vec![
                 "NOW",
                 "TIMESTAMP",

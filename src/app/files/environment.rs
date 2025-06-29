@@ -1,4 +1,4 @@
-use std::fs;
+use std::{env, fs};
 use std::fs::{File, OpenOptions};
 use std::io::{BufRead, BufReader, Write};
 use std::path::PathBuf;
@@ -6,6 +6,7 @@ use std::str::from_utf8;
 use std::sync::Arc;
 
 use indexmap::IndexMap;
+use lazy_static::lazy_static;
 use parking_lot::RwLock;
 use snailquote::unescape;
 use tracing::{info, trace, warn};
@@ -15,6 +16,13 @@ use crate::app::app::App;
 use crate::cli::args::ARGS;
 use crate::panic_error;
 use crate::models::environment::Environment;
+
+lazy_static! {
+    pub static ref OS_ENV_VARS: IndexMap<String, String> = {
+        env::vars()
+            .collect()
+    };
+}
 
 impl App<'_> {
     /// Add the environment file to the app environments

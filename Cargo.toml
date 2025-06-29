@@ -22,7 +22,7 @@ exclude = [
 
 [dependencies]
 # Request
-reqwest = { version = "=0.12.15", default-features = false, features = ["cookies", "rustls-tls-native-roots", "multipart", "gzip", "brotli", "deflate", "stream"] }
+reqwest = { version = "=0.12.20", default-features = false, features = ["cookies", "rustls-tls-native-roots", "multipart", "gzip", "brotli", "deflate", "stream"] }
 reqwest_cookie_store = "=0.8.0"
 cookie_store = "=0.21.1"
 
@@ -30,10 +30,10 @@ cookie_store = "=0.21.1"
 ratatui = { version = "=0.29.0", features = ["serde"] }
 crokey = "=1.1.2"
 tui-big-text = "=0.7.1"
-tui-tree-widget = "=0.23.0"
+tui-tree-widget = "=0.23.1"
 tui-textarea = { version = "=0.7.0", features = ["ratatui"] }
 throbber-widgets-tui = "=0.8.0"
-ratatui-image = { version = "=8.0.0", features = ["crossterm"] }
+ratatui-image = { version = "=8.0.1", features = ["crossterm"] }
 image = "=0.25.6"
 
 # Main functionalities
@@ -42,19 +42,19 @@ serde = { version = "=1.0.219", features = ["derive", "rc"] }
 serde_json = "=1.0.140"
 serde_yaml = "=0.9.34"
 jsonxf = "=1.1.1"
-toml = "=0.8.22"
+toml = "=0.8.23"
 boa_engine = { version = "=0.20.0", default-features = false }
 parse_postman_collection = "=0.2.3"
 curl-parser = { version = "=0.5.0", default-features = false }
-openapiv3 = "2.1.0"
-clap = { version = "=4.5.38", features = ["derive", "color", "suggestions"] }
+openapiv3 = "2.2.0"
+clap = { version = "=4.5", features = ["derive", "color", "suggestions"] }
 directories = "=6.0.0"
-arboard = "=3.5.0"
+arboard = "=3.6.0"
 
 # Async
 tokio = { version = "=1.45.1", features = ["rt", "rt-multi-thread", "macros"] }
 tokio-util = "=0.7.15"
-parking_lot = { version = "=0.12.3", features = ["serde", "send_guard"] }
+parking_lot = { version = "=0.12.4", features = ["serde", "send_guard"] }
 
 # Utils
 strum = { version = "=0.27.1", features = ["derive"] }
@@ -62,21 +62,21 @@ lazy_static = "=1.5.0"
 nestify = "=0.3.3"
 walkdir = "=2.5.0"
 snailquote = "=0.3.1"
-indexmap = { version = "=2.9.0", features = ["serde", "rayon"] }
+indexmap = { version = "=2.10.0", features = ["serde", "rayon"] }
 rayon = "=1.10.0"
 thiserror = "=2.0.12"
 anyhow = "=1.0.98"
 clap-verbosity-flag = "=3.0.3"
-clap_complete = "=4.5.50"
-clap_mangen = "=0.2.26"
+clap_complete = "=4.5"
+clap_mangen = "=0.2"
 regex = "=1.11.1"
 chrono = { version = "=0.4.41", default-features = false, features = ["now"] }
-uuid = { version = "=1.16.0", features = ["v4", "v7"] }
+uuid = { version = "=1.17.0", features = ["v4", "v7"] }
 base64 = "=0.22.1"
 
 # Tracing
 tracing = { version = "=0.1.41", features = ["async-await"] }
 tracing-subscriber = { version = "=0.3.19", features = ["parking_lot", "chrono", "regex"] }
 tracing-log = "=0.2.0"
-reqwest-tracing = "=0.5.7"
+reqwest-tracing = "=0.5.8"
 reqwest-middleware = { version = "=0.4.2", features = ["rustls-tls", "json", "multipart"] }

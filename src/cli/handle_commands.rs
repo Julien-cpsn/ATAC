@@ -183,11 +183,11 @@ impl App<'_> {
 
     fn handle_env_commands(&mut self, env_command: &EnvCommand) -> anyhow::Result<()> {
         let env_index = match &env_command.env_subcommand {
-            EnvSubcommand::Info { env_name } | EnvSubcommand::Key { env_name, .. }=> self.find_environment(env_name)?
+            EnvSubcommand::Info { env_name, .. } | EnvSubcommand::Key { env_name, .. }=> self.find_environment(env_name)?
         };
 
         match &env_command.env_subcommand {
-            EnvSubcommand::Info { .. } => self.cli_describe_env(env_index),
+            EnvSubcommand::Info { os_vars, .. } => self.cli_describe_env(env_index, *os_vars),
             EnvSubcommand::Key { subcommand, .. } => match subcommand {
                 KeyCommand::Get { key } => self.get_env_value(env_index, key),
                 KeyCommand::Set { key, value } => self.set_env_value(env_index, key, value.clone()),
