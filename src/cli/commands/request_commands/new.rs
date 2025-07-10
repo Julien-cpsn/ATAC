@@ -47,20 +47,24 @@ pub struct NewRequestCommand {
     #[arg(long, default_value_t = false, display_order = 18)]
     pub no_redirects: bool,
 
+    /// Timeout (ms)
+    #[arg(long, default_value_t = 30000, display_order = 19)]
+    pub timeout: u32,
+
     /// Do not store received cookies
-    #[arg(long, default_value_t = false, display_order = 19)]
+    #[arg(long, default_value_t = false, display_order = 20)]
     pub no_cookies: bool,
 
     /// Do not pretty print response content
-    #[arg(long, default_value_t = false, display_order = 20)]
+    #[arg(long, default_value_t = false, display_order = 21)]
     pub no_pretty: bool,
 
     /// Accept invalid certificates
-    #[arg(long, default_value_t = false, display_order = 21)]
+    #[arg(long, default_value_t = false, display_order = 22)]
     pub accept_invalid_certs: bool,
 
     /// Accept invalid hostnames
-    #[arg(long, default_value_t = false, display_order = 22)]
+    #[arg(long, default_value_t = false, display_order = 23)]
     pub accept_invalid_hostnames: bool
 }
 

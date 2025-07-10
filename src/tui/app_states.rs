@@ -664,7 +664,8 @@ impl AppState {
 
                 RequestSettingsMoveUp(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_up], "Move up", Some("Up"))),
                 RequestSettingsMoveDown(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_down], "Move down", Some("Down"))),
-                RequestSettingsToggleSetting(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_left, key_bindings.generic.navigation.move_cursor_right], "Toggle setting", Some("Toggle"))),
+                RequestSettingsToggleSettingLeft(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_left], "Toggle setting", Some("Toggle left"))),
+                RequestSettingsToggleSettingRight(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_right], "Toggle setting", Some("Toggle right"))),
 
                 ModifyRequestSettings(EventKeyBinding::new(vec![key_bindings.generic.navigation.select], "Confirm", Some("Confirm"))),
             ],

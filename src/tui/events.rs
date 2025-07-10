@@ -352,7 +352,8 @@ get_key_bindings! {
 
         RequestSettingsMoveUp(EventKeyBinding),
         RequestSettingsMoveDown(EventKeyBinding),
-        RequestSettingsToggleSetting(EventKeyBinding),
+        RequestSettingsToggleSettingLeft(EventKeyBinding),
+        RequestSettingsToggleSettingRight(EventKeyBinding),
         ModifyRequestSettings(EventKeyBinding),
 
         /* Others */
@@ -895,7 +896,8 @@ impl App<'_> {
 
                 RequestSettingsMoveUp(_) => self.request_settings_popup.previous(),
                 RequestSettingsMoveDown(_) => self.request_settings_popup.next(),
-                RequestSettingsToggleSetting(_) => self.request_settings_popup.toggle_setting(),
+                RequestSettingsToggleSettingLeft(_) => self.request_settings_popup.toggle_setting_left(),
+                RequestSettingsToggleSettingRight(_) => self.request_settings_popup.toggle_setting_right(),
                 ModifyRequestSettings(_) => self.tui_modify_request_settings(),
 
                 /* Others */

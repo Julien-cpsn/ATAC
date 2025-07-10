@@ -1,6 +1,7 @@
 use clap::{Subcommand, ValueEnum};
 use serde::{Deserialize, Serialize};
 use strum::Display;
+use crate::models::settings::Setting;
 
 #[derive(Subcommand, Debug, Clone)]
 pub enum SettingsCommand {
@@ -16,9 +17,8 @@ pub enum SettingsCommand {
         /// Setting name to set status
         setting_name: RequestSettingName,
 
-        /// New state to apply to the setting
-        #[clap(action = clap::ArgAction::Set)]
-        new_state: bool
+        /// New value to apply to the setting
+        new_value: Setting
     }
 }
 
@@ -28,6 +28,8 @@ pub enum RequestSettingName {
     Proxy,
     /// Allow redirects
     Redirects,
+    /// Timeout (ms)
+    Timeout,
     /// Store received cookies
     Cookies,
     /// Pretty print response content

@@ -53,6 +53,7 @@
       "settings": {
         "use_config_proxy": true,
         "allow_redirects": true,
+        "timeout": 30000,
         "store_received_cookies": true,
         "pretty_print_response_content": true,
         "accept_invalid_certs": false,
@@ -110,6 +111,7 @@
       "settings": {
         "use_config_proxy": true,
         "allow_redirects": true,
+        "timeout": 30000,
         "store_received_cookies": true,
         "pretty_print_response_content": true,
         "accept_invalid_certs": false,
@@ -167,6 +169,7 @@
       "settings": {
         "use_config_proxy": true,
         "allow_redirects": true,
+        "timeout": 30000,
         "store_received_cookies": true,
         "pretty_print_response_content": true,
         "accept_invalid_certs": false,

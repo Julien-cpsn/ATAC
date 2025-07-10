@@ -51,19 +51,19 @@ impl App<'_> {
 
         /* REDIRECTS */
 
-        if !request.settings.allow_redirects {
+        if !request.settings.allow_redirects.as_bool() {
             client_builder = client_builder.redirect(Policy::none());
         }
 
         /* STORE COOKIES */
 
-        let should_store_cookies = request.settings.store_received_cookies;
+        let should_store_cookies = request.settings.store_received_cookies.as_bool();
 
         client_builder = client_builder.cookie_store(should_store_cookies);
 
         /* PROXY */
 
-        if request.settings.use_config_proxy {
+        if request.settings.use_config_proxy.as_bool() {
             match &self.config.proxy {
                 None => {}
                 Some(proxy) => {
@@ -136,13 +136,13 @@ impl App<'_> {
 
         /* INVALID CERTS */
         
-        if request.settings.accept_invalid_certs {
+        if request.settings.accept_invalid_certs.as_bool() {
             client_builder = client_builder.danger_accept_invalid_certs(true);
         }
 
         /* INVALID HOSTNAMES */
 
-        if request.settings.accept_invalid_hostnames {
+        if request.settings.accept_invalid_hostnames.as_bool() {
             client_builder = client_builder.danger_accept_invalid_hostnames(true);
         }
         
@@ -304,7 +304,7 @@ pub async fn send_request(prepared_request: reqwest_middleware::RequestBuilder, 
     let request = local_request.read();
 
     let cancellation_token = request.cancellation_token.clone();
-    let timeout = tokio::time::sleep(Duration::from_secs(30));
+    let timeout = tokio::time::sleep(Duration::from_millis(request.settings.timeout.as_u32() as u64));
 
     let request_start = Instant::now();
     let elapsed_time: Duration;
@@ -379,7 +379,7 @@ pub async fn send_request(prepared_request: reqwest_middleware::RequestBuilder, 
                                 // If a file format has been found in the content-type header
                                 if let Some(file_format) = find_file_format_in_content_type(&headers) {
                                     // If the request response content can be pretty printed
-                                    if request.settings.pretty_print_response_content {
+                                    if request.settings.pretty_print_response_content.as_bool() {
                                         // Match the file format
                                         match file_format.as_str() {
                                             "json" => {

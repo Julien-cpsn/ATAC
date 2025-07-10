@@ -1,3 +1,4 @@
+use std::process::exit;
 use std::sync::Arc;
 use parking_lot::RwLock;
 
@@ -56,7 +57,7 @@ impl App<'_> {
         console_output = format!("{console_output}{result_console_output}");
 
         if send_command.status_code {
-            println!("{}", response.status_code.unwrap());
+            println!("{}", response.status_code.as_ref().unwrap());
         }
 
         if send_command.duration {
@@ -76,9 +77,12 @@ impl App<'_> {
         }
 
         if !send_command.hide_content {
-            match response.content.unwrap() {
-                ResponseContent::Body(body) => println!("{}", body),
-                ResponseContent::Image(image) => println!("{:?}", image.data)
+            match &response.content {
+                None => exit(1),
+                Some(content) => match content {
+                    ResponseContent::Body(body) => println!("{}", body),
+                    ResponseContent::Image(image) => println!("{:?}", image.data)
+                }
             };
         }
 

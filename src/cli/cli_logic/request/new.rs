@@ -6,7 +6,7 @@ use crate::models::body::ContentType;
 use crate::models::request::{KeyValue, Request, DEFAULT_HEADERS};
 use crate::models::response::RequestResponse;
 use crate::models::scripts::RequestScripts;
-use crate::models::settings::RequestSettings;
+use crate::models::settings::{RequestSettings, Setting};
 
 impl App<'_> {
     pub fn cli_new_request(&mut self, collection_slash_request: (String, String), new_request_command: NewRequestCommand) -> anyhow::Result<()> {
@@ -43,12 +43,13 @@ pub fn create_request_from_new_request_command(request_name: String, new_request
             post_request_script: new_request_command.post_request_script,
         },
         settings: RequestSettings {
-            use_config_proxy: !new_request_command.no_proxy,
-            allow_redirects: !new_request_command.no_redirects,
-            store_received_cookies: !new_request_command.no_cookies,
-            pretty_print_response_content: !new_request_command.no_pretty,
-            accept_invalid_certs: new_request_command.accept_invalid_certs,
-            accept_invalid_hostnames: new_request_command.accept_invalid_hostnames,
+            use_config_proxy: Setting::Bool(!new_request_command.no_proxy),
+            allow_redirects: Setting::Bool(!new_request_command.no_redirects),
+            timeout: Setting::U32(new_request_command.timeout),
+            store_received_cookies: Setting::Bool(!new_request_command.no_cookies),
+            pretty_print_response_content: Setting::Bool(!new_request_command.no_pretty),
+            accept_invalid_certs: Setting::Bool(new_request_command.accept_invalid_certs),
+            accept_invalid_hostnames: Setting::Bool(new_request_command.accept_invalid_hostnames),
         },
         response: RequestResponse::default(),
         is_pending: false,

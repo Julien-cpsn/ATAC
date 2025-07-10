@@ -175,7 +175,7 @@ impl App<'_> {
             RequestSubcommand::Settings { subcommand, .. } => match subcommand {
                 SettingsCommand::All => self.cli_print_request_settings(collection_index, request_index),
                 SettingsCommand::Get { setting_name } => self.cli_print_request_setting(collection_index, request_index, setting_name),
-                SettingsCommand::Set { setting_name, new_state: new_status } => self.cli_modify_request_setting(collection_index, request_index, setting_name, new_status),
+                SettingsCommand::Set { setting_name, new_value } => self.cli_modify_request_setting(collection_index, request_index, setting_name, new_value),
             },
             RequestSubcommand::Export { format, ..} => self.cli_export_request(collection_index, request_index, format)
         }

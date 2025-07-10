@@ -17,7 +17,7 @@ use crate::models::body::ContentType;
 use crate::models::collection::{Collection, CollectionFileFormat};
 use crate::models::method::Method;
 use crate::models::request::{DEFAULT_HEADERS, KeyValue, Request};
-use crate::models::settings::RequestSettings;
+use crate::models::settings::{RequestSettings, Setting};
 
 #[derive(Error, Debug)]
 pub enum ImportPostmanError {
@@ -483,11 +483,11 @@ fn retrieve_settings(item: &Items) -> Option<RequestSettings> {
     let mut settings = RequestSettings::default();
 
     if let Some(follow_redirects) = protocol_profile_behavior.follow_redirects {
-        settings.allow_redirects = follow_redirects;
+        settings.allow_redirects = Setting::Bool(follow_redirects);
     }
     
     if let Some(disable_cookies) = protocol_profile_behavior.disable_cookies {
-        settings.store_received_cookies = !disable_cookies;
+        settings.store_received_cookies = Setting::Bool(!disable_cookies);
     }
     
     Some(settings)
