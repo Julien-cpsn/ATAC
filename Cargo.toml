@@ -22,61 +22,104 @@ exclude = [
 
 [dependencies]
 # Request
+## Send requests
 reqwest = { version = "=0.12.20", default-features = false, features = ["cookies", "rustls-tls-native-roots", "multipart", "gzip", "brotli", "deflate", "stream"] }
 reqwest_cookie_store = "=0.8.0"
 cookie_store = "=0.21.1"
 
 # TUI
+## Terminal UI framework
 ratatui = { version = "=0.29.0", features = ["serde"] }
+## Used to parse, use key bindings files and some utilities
 crokey = "=1.1.2"
+## Display big texts. Only used for displaying ATAC in the homepage.
 tui-big-text = "=0.7.1"
+## Display tree-like lists. Used for displaying the collections.
 tui-tree-widget = "=0.23.1"
+## Text area that handle a lot of features. Used for editing request body.
 tui-textarea = { version = "=0.7.0", features = ["ratatui"] }
+## Display loading UI elements. Used when request is pending.
 throbber-widgets-tui = "=0.8.0"
+## Display response images.
 ratatui-image = { version = "=8.0.1", features = ["crossterm"] }
+## Decode images.
 image = "=0.25.6"
 
 # Main functionalities
+## Syntax highlighting
 syntect = { version = "=5.2.0", features = ["default-fancy"] }
+## Serialize & Deserialize application data into files
 serde = { version = "=1.0.219", features = ["derive", "rc"] }
 serde_json = "=1.0.140"
 serde_yaml = "=0.9.34"
+## Pretty print JSON
 jsonxf = "=1.1.1"
-toml = "=0.8.23"
+## Serialize & Deserialize application config files
+toml = "=0.9.1"
+## Create Javascript runtimes. Used for pre and post request scripts
 boa_engine = { version = "=0.20.0", default-features = false }
+## Deserialize Postman collection files
 parse_postman_collection = "=0.2.3"
+## Parse cURL request files
 curl-parser = { version = "=0.5.0", default-features = false }
+## Parse OpenAPI spec files
 openapiv3 = "2.2.0"
+## Command Line Argument Parser
 clap = { version = "=4.5", features = ["derive", "color", "suggestions"] }
+## Use system files
 directories = "=6.0.0"
+## Copy response body to clipboard
 arboard = "=3.6.0"
 
 # Async
-tokio = { version = "=1.45.1", features = ["rt", "rt-multi-thread", "macros"] }
+## Handle asynchronous requests
+tokio = { version = "=1.46.1", features = ["rt", "rt-multi-thread", "macros"] }
 tokio-util = "=0.7.15"
+## Smaller, faster and more flexible implementation of RwLock and Mutex. Used everywhere.
 parking_lot = { version = "=0.12.4", features = ["serde", "send_guard"] }
 
 # Utils
+## Enum facilities
 strum = { version = "=0.27.1", features = ["derive"] }
+## Allows for more flexible constants. Mainly used for accessing CLI arguments everywhere
 lazy_static = "=1.5.0"
+## Used to nest struct definitions
 nestify = "=0.3.3"
+## Recursively retrieve files
 walkdir = "=2.5.0"
+## Unescape string
 snailquote = "=0.3.1"
+## Ordered hashmap. Used in environments to preserve files' values order
 indexmap = { version = "=2.10.0", features = ["serde", "rayon"] }
+## Allows the usage of multiple threads in for loops
 rayon = "=1.10.0"
+## Create custom errors
 thiserror = "=2.0.12"
+## Result that can contain any error
 anyhow = "=1.0.98"
+## Add verbosity flag to the CLI
 clap-verbosity-flag = "=3.0.3"
+## Generate completion file
 clap_complete = "=4.5"
+## Generate man pages
 clap_mangen = "=0.2"
+## Regex. Using for parsing requests URL
 regex = "=1.11.1"
+## Time utils
 chrono = { version = "=0.4.41", default-features = false, features = ["now"] }
+## UUID generator
 uuid = { version = "=1.17.0", features = ["v4", "v7"] }
+## Decode base64 strings
 base64 = "=0.22.1"
 
 # Tracing
+## Log events
 tracing = { version = "=0.1.41", features = ["async-await"] }
+## Utilities for implementing and composing tracing subscribers
 tracing-subscriber = { version = "=0.3.19", features = ["parking_lot", "chrono", "regex"] }
+## Log crate compatibility for tracing
 tracing-log = "=0.2.0"
+## Opentracing middleware implementation for reqwest-middleware
 reqwest-tracing = "=0.5.8"
+## Wrapper around reqwest to allow for client middleware chains
 reqwest-middleware = { version = "=0.4.2", features = ["rustls-tls", "json", "multipart"] }
