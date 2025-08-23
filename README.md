@@ -14,6 +14,7 @@ ATAC ⚔📩
   * [Install with cargo](#install-with-cargo)
   * [Install with Homebrew](#install-with-homebrew)
   * [Install with Scoop](#install-with-scoop)
+  * [Install with X-CMD](#install-with-x-cmd)
   * [Install from Arch](#install-from-arch)
   * [Install from Fedora copr](#install-from-fedora-copr)
   * [Docker package](#docker-package)
@@ -104,6 +105,14 @@ scoop install atac
 <a href="https://copr.fedorainfracloud.org/coprs/joxcat/atac/">
   <img alt="Fedora copr Release" src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fcopr.fedorainfracloud.org%2Fapi_3%2Fpackage%3Fownername%3Djoxcat%26projectname%3Datac%26packagename%3Datac%26with_latest_build%3DTrue&query=%24.builds.latest.source_package.version&style=flat&logo=fedora&logoColor=white&label=Fedora%20copr&color=limegreen" align="right">
 </a>
+
+### Install with X-CMD
+
+If you're an [x-cmd](https://x-cmd.com/install/atac) user, you can install it with the following command:
+
+```bash
+x install atac
+```
 
 ### Install from Fedora copr
 
