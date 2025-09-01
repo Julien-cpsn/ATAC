@@ -84,13 +84,16 @@ impl<'a> App<'a> {
             trace!("Checking file \"{}\"", path.display());
 
             if file_name.starts_with(".env.") {
-                self.add_environment_from_file(&path)
+                self.add_environment_from_file(&path);
+                continue;
             }
             else if file_name == "atac.toml" {
                 self.parse_config_file(&path);
+                continue;
             }
             else if file_name == "atac.log" {
-                trace!("Log file is not parsable")
+                trace!("Log file is not parsable");
+                continue;
             }
 
             if let Some(filter) = &ARGS.collection_filter {
