@@ -34,7 +34,7 @@ impl App<'_> {
         let local_selected_request = self.get_selected_request_as_local();
         let local_env = self.get_selected_env_as_local();
 
-        let local_should_refresh_scrollbars = Arc::clone(&self.should_refresh_scrollbars_and_highlight_response);
+        let local_should_refresh_scrollbars = Arc::clone(&self.received_response);
 
         /* SEND REQUEST */
 

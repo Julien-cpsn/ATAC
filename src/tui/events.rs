@@ -382,6 +382,21 @@ impl App<'_> {
                 }
             }
         }
+
+        let received_response = *self.received_response.lock();
+        if received_response {
+            self.tui_highlight_response_body_and_console();
+            self.tui_refresh_result_scrollbars();
+
+            if self.config.should_save_requests_reponse() {
+                let selection = self.collections_tree.state.selected().to_vec();
+                if selection.len() > 0 {
+                    self.save_collection_to_file(selection[0]);
+                }
+            }
+
+            *self.received_response.lock() = false;
+        }
     }
 
     async fn handle_key(&mut self, key: KeyCombination) -> bool {

@@ -1,7 +1,7 @@
 use std::fs::OpenOptions;
 use std::io::Read;
 use std::path::PathBuf;
-
+use std::sync::OnceLock;
 use tracing::trace;
 use serde::{Deserialize, Serialize};
 
@@ -9,10 +9,15 @@ use crate::app::app::App;
 use crate::panic_error;
 use crate::models::collection::CollectionFileFormat;
 
+pub static SKIP_SAVE_REQUESTS_RESPONSE: OnceLock<bool> = OnceLock::new();
+
 #[derive(Default, Serialize, Deserialize)]
 pub struct Config {
     #[serde(default)]
     pub disable_syntax_highlighting: Option<bool>,
+
+    #[serde(default)]
+    pub save_requests_response: Option<bool>,
     
     #[serde(default)]
     pub disable_cors: Option<bool>,
@@ -25,7 +30,8 @@ pub struct Config {
 
     #[serde(default)]
     pub preferred_collection_file_format: Option<CollectionFileFormat>,
-    
+
+    #[serde(default)]
     pub proxy: Option<Proxy>
 }
 
@@ -38,6 +44,16 @@ pub struct Proxy {
 impl Config {
     pub fn is_syntax_highlighting_disabled(&self) -> bool {
         return self.disable_syntax_highlighting.unwrap_or(false)
+    }
+
+    pub fn should_save_requests_reponse(&self) -> bool {
+        self.save_requests_response.unwrap_or(false)
+    }
+    pub fn set_should_skip_requests_reponse(&self) {
+        SKIP_SAVE_REQUESTS_RESPONSE.get_or_init(|| match self.save_requests_response {
+            None => true,
+            Some(save_requests_response) => !save_requests_response
+        });
     }
     
     pub fn is_cors_disabled(&self) -> bool {
@@ -78,6 +94,8 @@ impl App<'_> {
             Ok(config) => config,
             Err(e) => panic_error(format!("Could not parse config file\n\t{e}"))
         };
+
+        config.set_should_skip_requests_reponse();
 
         self.config = config;
 

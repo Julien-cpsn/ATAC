@@ -10,6 +10,7 @@ use regex::Regex;
 use tokio_util::sync::CancellationToken;
 
 use crate::app::app::App;
+use crate::app::files::config::SKIP_SAVE_REQUESTS_RESPONSE;
 use crate::app::files::theme::THEME;
 use crate::models::auth::Auth;
 use crate::models::body::ContentType;
@@ -30,7 +31,7 @@ pub struct Request {
     pub scripts: RequestScripts,
     pub settings: RequestSettings,
 
-    #[serde(skip)]
+    #[serde(skip_serializing_if = "should_skip_requests_response", default = "RequestResponse::default")]
     pub response: RequestResponse,
 
     #[serde(skip)]
@@ -53,6 +54,10 @@ pub struct KeyValue {
 pub struct ConsoleOutput {
     pub pre_request_output: Option<String>,
     pub post_request_output: Option<String>,
+}
+
+fn should_skip_requests_response(_: &RequestResponse) -> bool {
+    *SKIP_SAVE_REQUESTS_RESPONSE.get().unwrap_or(&true)
 }
 
 impl App<'_> {

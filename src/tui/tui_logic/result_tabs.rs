@@ -24,7 +24,7 @@ impl App<'_> {
             RequestResultTabs::Console => RequestResultTabs::Body
         };
 
-        *self.should_refresh_scrollbars_and_highlight_response.lock() = true;
+        *self.received_response.lock() = true;
     }
 
     pub fn tui_update_request_result_tab(&mut self) {

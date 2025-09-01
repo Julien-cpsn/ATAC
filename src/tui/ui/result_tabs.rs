@@ -115,13 +115,6 @@ impl App<'_> {
 
             // REQUEST RESULT CONTENT
 
-            let should_refresh_scrollbars_and_highlight_response = *self.should_refresh_scrollbars_and_highlight_response.lock();
-            if should_refresh_scrollbars_and_highlight_response {
-                self.tui_highlight_response_body_and_console();
-                self.tui_refresh_result_scrollbars();
-                *self.should_refresh_scrollbars_and_highlight_response.lock() = false;
-            }
-
             match self.request_result_tab {
                 RequestResultTabs::Body => match &request.response.content {
                     None => {},

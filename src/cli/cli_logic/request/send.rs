@@ -21,6 +21,10 @@ impl App<'_> {
 
         self.local_send_request(&send_command, local_request).await?;
 
+        if self.config.should_save_requests_reponse() {
+            self.save_collection_to_file(collection_index);
+        }
+
         Ok(())
     }
 
@@ -36,7 +40,11 @@ impl App<'_> {
         }
 
         for request in requests {
-            self.local_send_request(&send_command, request).await?
+            self.local_send_request(&send_command, request).await?;
+
+            if self.config.should_save_requests_reponse() {
+                self.save_collection_to_file(collection_index);
+            }
         }
 
         Ok(())

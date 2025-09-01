@@ -133,7 +133,7 @@ impl App<'_> {
             self.tui_update_query_params_selection();
             self.tui_update_headers_selection();
             self.tui_update_body_table_selection();
-            *self.should_refresh_scrollbars_and_highlight_response.lock() = true;
+            *self.received_response.lock() = true;
             
             self.select_request_state();
         }
