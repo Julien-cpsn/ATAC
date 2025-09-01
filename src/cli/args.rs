@@ -6,7 +6,7 @@ use clap::builder::Styles;
 use clap_verbosity_flag::Verbosity;
 use directories::ProjectDirs;
 use lazy_static::lazy_static;
-
+use regex::Regex;
 use crate::cli::commands::collection_commands::collection_commands::CollectionCommand;
 use crate::cli::commands::completions::CompletionsCommand;
 use crate::cli::commands::import::ImportCommand;
@@ -33,6 +33,10 @@ pub struct Args {
 
     #[command(subcommand)]
     pub command: Option<Command>,
+
+    /// Will only allow collection files that matches the regex filter
+    #[arg(long, global = true)]
+    pub filter: Option<Regex>,
 
     /// Run TUI after command
     #[arg(long, global = true, default_value_t = false)]
@@ -136,6 +140,7 @@ lazy_static! {
         GlobalArgs {
             directory,
             command: args.command,
+            collection_filter: args.filter,
             should_run_tui: args.tui,
             should_save: !args.dry_run,
             should_parse_directory,
@@ -176,6 +181,7 @@ fn choose_app_directory(path_buf: Option<PathBuf>) -> PathBuf {
 pub struct GlobalArgs {
     pub directory: Option<PathBuf>,
     pub command: Option<Command>,
+    pub collection_filter: Option<Regex>,
     pub should_run_tui: bool,
     pub should_save: bool,
     pub should_parse_directory: bool,

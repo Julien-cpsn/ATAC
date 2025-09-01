@@ -26,7 +26,7 @@ lazy_static! {
 
 impl App<'_> {
     /// Add the environment file to the app environments
-    pub fn add_environment_from_file(&mut self, path_buf: PathBuf) {
+    pub fn add_environment_from_file(&mut self, path_buf: &PathBuf) {
         let file_name = path_buf.file_name().unwrap().to_str().unwrap().to_string().replace(".env.", "");
 
         trace!("Trying to open \"{}\" env file", path_buf.display());
@@ -39,7 +39,7 @@ impl App<'_> {
         let environment = Environment {
             name: file_name,
             values: read_environment_from_file(env_file),
-            path: path_buf,
+            path: path_buf.clone(),
         };
         
         self.environments.push(Arc::new(RwLock::new(environment)));

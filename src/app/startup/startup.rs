@@ -83,20 +83,28 @@ impl<'a> App<'a> {
 
             trace!("Checking file \"{}\"", path.display());
 
+            if file_name.starts_with(".env.") {
+                self.add_environment_from_file(&path)
+            }
+            else if file_name == "atac.toml" {
+                self.parse_config_file(&path);
+            }
+            else if file_name == "atac.log" {
+                trace!("Log file is not parsable")
+            }
+
+            if let Some(filter) = &ARGS.collection_filter {
+                if !filter.is_match(file_name) {
+                    trace!("File \"{file_name}\" does not match filter");
+                    continue;
+                }
+            }
+
             if file_name.ends_with(".json") {
                 self.set_collections_from_file(path, CollectionFileFormat::Json);
             }
             else if file_name.ends_with(".yaml") {
                 self.set_collections_from_file(path, CollectionFileFormat::Yaml);
-            }
-            else if file_name.starts_with(".env.") {
-                self.add_environment_from_file(path)
-            }
-            else if file_name == "atac.toml" {
-                self.parse_config_file(path);
-            }
-            else if file_name == "atac.log" {
-                trace!("Log file is not parsable")
             }
         }
         
