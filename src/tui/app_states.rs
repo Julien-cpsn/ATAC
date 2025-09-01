@@ -691,7 +691,7 @@ impl AppState {
     }
 }
 
-pub fn event_available_keys_to_spans(events: &Vec<AppEvent>, fg_color: Color, bg_color: Color, short_only: bool) -> Vec<Vec<Span>> {
+pub fn event_available_keys_to_spans(events: &Vec<AppEvent>, fg_color: Color, bg_color: Color, short_only: bool) -> Vec<Vec<Span<'_>>> {
     let mut spans: Vec<Vec<Span>> = vec![];
 
     for event in events.iter() {
@@ -727,7 +727,7 @@ impl App<'_> {
         *AVAILABLE_EVENTS.write() = self.state.get_available_events(self.request_view, self.request_param_tab, is_there_any_env);
     }
 
-    pub fn get_state_line(&self) -> Line {
+    pub fn get_state_line(&self) -> Line<'_> {
         match self.state {
             Normal |
             ChoosingElementToCreate |

@@ -17,7 +17,7 @@ impl App<'_> {
         }
     }
 
-    pub fn tui_add_color_to_env_keys(&self, input: &str) -> Line {
+    pub fn tui_add_color_to_env_keys(&self, input: &str) -> Line<'_> {
         if self.environments.is_empty() || !input.contains('{') {
             return Line::raw(input.to_string());
         }

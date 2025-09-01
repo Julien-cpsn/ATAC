@@ -63,7 +63,7 @@ impl App<'_> {
             .collect()
     }
 
-    pub fn key_value_vec_to_items_list(&self, rows: &Vec<KeyValue>) -> (Vec<ListItem>, Vec<ListItem>) {
+    pub fn key_value_vec_to_items_list(&self, rows: &Vec<KeyValue>) -> (Vec<ListItem<'_>>, Vec<ListItem<'_>>) {
         let mut keys: Vec<ListItem> = vec![];
         let mut values: Vec<ListItem> = vec![];
 
