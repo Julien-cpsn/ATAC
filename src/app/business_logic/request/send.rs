@@ -4,7 +4,6 @@ use std::sync::Arc;
 use std::time::{Duration, Instant};
 use parking_lot::RwLock;
 
-use ratatui::prelude::Line;
 use rayon::prelude::*;
 use reqwest::{ClientBuilder, Proxy, Url};
 use reqwest::header::{CONTENT_TYPE, HeaderMap};
@@ -27,7 +26,6 @@ use crate::models::environment::Environment;
 use crate::models::request::Request;
 use crate::models::response::{ImageResponse, RequestResponse, ResponseContent};
 use crate::panic_error;
-use crate::tui::utils::syntax_highlighting::highlight;
 
 #[derive(Error, Debug)]
 pub enum PrepareRequestError {
@@ -40,7 +38,7 @@ pub enum PrepareRequestError {
 }
 
 impl App<'_> {
-    pub async fn prepare_request(&self, request: &Request) -> Result<(reqwest_middleware::RequestBuilder, String), PrepareRequestError> {
+    pub async fn prepare_request(&self, request: &mut Request) -> Result<reqwest_middleware::RequestBuilder, PrepareRequestError> {
         trace!("Preparing request");
         
         let env = self.get_selected_env_as_local();
@@ -97,12 +95,14 @@ impl App<'_> {
         let local_cookie_store = Arc::clone(&self.cookies_popup.cookie_store);
         client_builder = client_builder.cookie_provider(local_cookie_store);
 
-        let (modified_request, console_output): (Request, String) = match &request.scripts.pre_request_script {
+        /* PRE-REQUEST SCRIPT */
+
+        let modified_request = match &request.scripts.pre_request_script {
             None => {
-                (request.clone(), String::new())
+                request.console_output.pre_request_output = None;
+                request.clone()
             },
             Some(pre_request_script) => {
-
                 let env_values = match &env {
                     None => None,
                     Some(local_env) => {
@@ -125,11 +125,13 @@ impl App<'_> {
                     }
                 }
 
+                request.console_output.pre_request_output = Some(console_output);
+
                 match result_request {
                     None => {
                         return Err(PrepareRequestError::PreRequestScript);
                     }
-                    Some(request) => (request, console_output)
+                    Some(request) => request
                 }
             }
         };
@@ -284,7 +286,7 @@ impl App<'_> {
 
         trace!("Request prepared");
 
-        Ok((request_builder, console_output))
+        Ok(request_builder)
     }
 }
 
@@ -296,7 +298,7 @@ pub enum RequestResponseError {
     CouldNotDecodeResponse,
 }
 
-pub async fn send_request(prepared_request: reqwest_middleware::RequestBuilder, local_request: Arc<RwLock<Request>>, env: &Option<Arc<RwLock<Environment>>>) -> Result<(RequestResponse, String, Option<Vec<Line<'static>>>), RequestResponseError> {
+pub async fn send_request(prepared_request: reqwest_middleware::RequestBuilder, local_request: Arc<RwLock<Request>>, env: &Option<Arc<RwLock<Environment>>>) -> Result<RequestResponse, RequestResponseError> {
     info!("Sending request");
 
     local_request.write().is_pending = true;
@@ -309,8 +311,6 @@ pub async fn send_request(prepared_request: reqwest_middleware::RequestBuilder, 
     let request_start = Instant::now();
     let elapsed_time: Duration;
 
-    let mut highlighted_result_body: Option<Vec<Line>> = None;
-
     let mut response = tokio::select! {
         _ = cancellation_token.cancelled() => {
             elapsed_time = request_start.elapsed();
@@ -320,7 +320,7 @@ pub async fn send_request(prepared_request: reqwest_middleware::RequestBuilder, 
                 status_code: Some(String::from("CANCELED")),
                 content: None,
                 cookies: None,
-                headers: vec![],
+                headers: vec![]
             }
         },
         _ = timeout => {
@@ -331,7 +331,7 @@ pub async fn send_request(prepared_request: reqwest_middleware::RequestBuilder, 
                 status_code: Some(String::from("TIMEOUT")),
                 content: None,
                 cookies: None,
-                headers: vec![],
+                headers: vec![]
             }
         },
         response = prepared_request.send() => match response {
@@ -388,8 +388,6 @@ pub async fn send_request(prepared_request: reqwest_middleware::RequestBuilder, 
                                             _ => {}
                                         }
                                     }
-    
-                                    highlighted_result_body = highlight(&result_body, &file_format);
                                 }
     
                                 ResponseContent::Body(result_body)
@@ -405,7 +403,7 @@ pub async fn send_request(prepared_request: reqwest_middleware::RequestBuilder, 
                     status_code: Some(status_code),
                     content: Some(response_content),
                     cookies: Some(cookies),
-                    headers,
+                    headers
                 }
             },
             Err(error) => {
@@ -426,7 +424,7 @@ pub async fn send_request(prepared_request: reqwest_middleware::RequestBuilder, 
                     status_code: response_status_code,
                     content: Some(result_body),
                     cookies: None,
-                    headers: vec![],
+                    headers: vec![]
                 }
             }
         }
@@ -438,9 +436,9 @@ pub async fn send_request(prepared_request: reqwest_middleware::RequestBuilder, 
 
     /* POST-REQUEST SCRIPT */
 
-    let (modified_response, console_output): (RequestResponse, String) = match &request.scripts.post_request_script {
+    let (modified_response, post_request_output): (RequestResponse, Option<String>) = match &request.scripts.post_request_script {
         None => {
-            (response, String::new())
+            (response, None)
         },
         Some(post_request_script) => {
             let env_values = match &env {
@@ -469,22 +467,22 @@ pub async fn send_request(prepared_request: reqwest_middleware::RequestBuilder, 
                 None => {
                     return Err(PostRequestScript)
                 }
-                Some(result_response) => (result_response, result_console_output)
+                Some(result_response) => (result_response, Some(result_console_output))
             }
         }
     };
-
 
     drop(request);
 
     {
         let mut request = local_request.write();
 
+        request.console_output.post_request_output = post_request_output;
         request.is_pending = false;
         request.cancellation_token = CancellationToken::new();
     }
         
-    return Ok((modified_response, console_output, highlighted_result_body));
+    return Ok(modified_response);
 }
 
 pub fn get_file_content_with_name(path: PathBuf) -> std::io::Result<(Vec<u8>, String)> {

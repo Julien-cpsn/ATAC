@@ -3,7 +3,7 @@ use crate::app::app::App;
 use crate::cli::commands::request_commands::new::{AuthArgs, BodyArgs, NewRequestCommand};
 use crate::models::auth::Auth;
 use crate::models::body::ContentType;
-use crate::models::request::{KeyValue, Request, DEFAULT_HEADERS};
+use crate::models::request::{ConsoleOutput, KeyValue, Request, DEFAULT_HEADERS};
 use crate::models::response::RequestResponse;
 use crate::models::scripts::RequestScripts;
 use crate::models::settings::{RequestSettings, Setting};
@@ -52,6 +52,7 @@ pub fn create_request_from_new_request_command(request_name: String, new_request
             accept_invalid_hostnames: Setting::Bool(new_request_command.accept_invalid_hostnames),
         },
         response: RequestResponse::default(),
+        console_output: ConsoleOutput::default(),
         is_pending: false,
         cancellation_token: CancellationToken::new(),
     };

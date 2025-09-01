@@ -1,7 +1,4 @@
-use std::sync::Arc;
-
 use lazy_static::lazy_static;
-use parking_lot::RwLock;
 use ratatui::prelude::Color;
 use ratatui::style::Stylize;
 use ratatui::text::{Line, Span};
@@ -11,8 +8,8 @@ use syntect::parsing::SyntaxSet;
 
 #[derive(Default)]
 pub struct SyntaxHighlighting {
-    pub highlighted_body: Arc<RwLock<Option<Vec<Line<'static>>>>>,
-    pub highlighted_console_output: Arc<RwLock<Vec<Line<'static>>>>,
+    pub highlighted_body: Option<Vec<Line<'static>>>,
+    pub highlighted_console_output: Vec<Line<'static>>,
 }
 
 lazy_static! {

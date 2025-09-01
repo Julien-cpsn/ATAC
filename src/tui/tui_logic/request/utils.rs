@@ -51,11 +51,14 @@ impl App<'_> {
                 clipboard.set_text(headers_string).expect("Could not copy headers to clipboard")
             }
             RequestResultTabs::Console => {
-                let local_console_output = self.script_console.console_output.read();
 
-                match local_console_output.as_ref() {
-                    None => {}
-                    Some(console_output) => clipboard.set_text(console_output).expect("Could not copy console output to clipboard")
+                match (&selected_request.console_output.pre_request_output, &selected_request.console_output.post_request_output) {
+                    (None, None) => {}
+                    (Some(pre_request_console_output), None) => clipboard.set_text(pre_request_console_output).expect("Could not copy console output to clipboard"),
+                    (None, Some(post_request_console_output)) => clipboard.set_text(post_request_console_output).expect("Could not copy console output to clipboard"),
+                    (Some(pre_request_console_output), Some(post_request_console_output)) => clipboard
+                        .set_text(format!("{}\n{}", pre_request_console_output, post_request_console_output))
+                        .expect("Could not copy console output to clipboard"),
                 }
             }
         }

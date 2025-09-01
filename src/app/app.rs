@@ -2,7 +2,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use ratatui::crossterm::terminal::disable_raw_mode;
-use parking_lot::RwLock;
+use parking_lot::{Mutex, RwLock};
 use ratatui::backend::Backend;
 use ratatui::Terminal;
 use strum::VariantArray;
@@ -102,6 +102,7 @@ pub struct App<'a> {
     pub request_settings_popup: SettingsPopup,
 
     pub result_throbber_state: ThrobberState,
+    pub should_refresh_scrollbars_and_highlight_response: Arc<Mutex<bool>>,
     pub result_vertical_scrollbar: StatefulScrollbar,
     pub result_horizontal_scrollbar: StatefulScrollbar,
 
@@ -190,6 +191,7 @@ impl App<'_> {
             request_settings_popup: SettingsPopup::default(),
             
             result_throbber_state: ThrobberState::default(),
+            should_refresh_scrollbars_and_highlight_response: Arc::new(Mutex::new(false)),
             result_vertical_scrollbar: StatefulScrollbar::default(),
             result_horizontal_scrollbar: StatefulScrollbar::default(),
 

@@ -1,11 +1,8 @@
-use std::sync::Arc;
-use parking_lot::RwLock;
 use tui_textarea::TextArea;
 use crate::tui::utils::vim_emulation::Vim;
 
 #[derive(Default)]
 pub struct ScriptConsole<'a> {
-    pub console_output: Arc<RwLock<Option<String>>>,
     pub pre_request_text_area: TextArea<'a>,
     pub post_request_text_area: TextArea<'a>,
     pub script_selection: u16,

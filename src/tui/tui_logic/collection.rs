@@ -129,10 +129,11 @@ impl App<'_> {
     pub fn select_request(&mut self) {
         if self.collections_tree.state.selected().len() == 2 {
             self.collections_tree.set_selected();
+            self.tui_update_request_result_tab();
             self.tui_update_query_params_selection();
             self.tui_update_headers_selection();
             self.tui_update_body_table_selection();
-            self.tui_refresh_result_scrollbars();
+            *self.should_refresh_scrollbars_and_highlight_response.lock() = true;
             
             self.select_request_state();
         }

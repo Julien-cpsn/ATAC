@@ -34,6 +34,9 @@ pub struct Request {
     pub response: RequestResponse,
 
     #[serde(skip)]
+    pub console_output: ConsoleOutput,
+
+    #[serde(skip)]
     pub is_pending: bool,
 
     #[serde(skip)]
@@ -44,6 +47,12 @@ pub struct Request {
 pub struct KeyValue {
     pub enabled: bool,
     pub data: (String, String),
+}
+
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
+pub struct ConsoleOutput {
+    pub pre_request_output: Option<String>,
+    pub post_request_output: Option<String>,
 }
 
 impl App<'_> {

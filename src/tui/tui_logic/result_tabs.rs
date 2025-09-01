@@ -1,8 +1,11 @@
 use std::str::Lines;
-
+use ratatui::prelude::{Line, Stylize};
 use crate::app::app::App;
+use crate::app::files::theme::THEME;
+use crate::models::body::find_file_format_in_content_type;
 use crate::tui::ui::result_tabs::RequestResultTabs;
 use crate::models::response::ResponseContent;
+use crate::tui::utils::syntax_highlighting::highlight;
 
 impl App<'_> {
     pub fn tui_next_request_result_tab(&mut self) {
@@ -10,17 +13,63 @@ impl App<'_> {
             RequestResultTabs::Body => RequestResultTabs::Cookies,
             RequestResultTabs::Cookies => RequestResultTabs::Headers,
             RequestResultTabs::Headers => {
-                let local_console_output = self.script_console.console_output.read();
+                let local_selected_request = self.get_selected_request_as_local();
+                let selected_request = local_selected_request.read();
 
-                match local_console_output.as_ref() {
-                    None => RequestResultTabs::Body,
-                    Some(_) => RequestResultTabs::Console
+                match (&selected_request.console_output.pre_request_output, &selected_request.console_output.post_request_output) {
+                    (None, None) => RequestResultTabs::Body,
+                    (_, _) => RequestResultTabs::Console
                 }
             }
             RequestResultTabs::Console => RequestResultTabs::Body
         };
 
-        self.tui_refresh_result_scrollbars();
+        *self.should_refresh_scrollbars_and_highlight_response.lock() = true;
+    }
+
+    pub fn tui_update_request_result_tab(&mut self) {
+        if self.request_result_tab == RequestResultTabs::Console {
+            let local_selected_request = self.get_selected_request_as_local();
+            let selected_request = local_selected_request.read();
+
+            if selected_request.console_output.pre_request_output.is_none() && selected_request.console_output.post_request_output.is_none() {
+                self.request_result_tab = RequestResultTabs::Body;
+            }
+        }
+    }
+
+    pub fn tui_highlight_response_body_and_console(&mut self) {
+        let local_selected_request = self.get_selected_request_as_local();
+        let selected_request = local_selected_request.write();
+
+        self.syntax_highlighting.highlighted_body = None;
+        self.syntax_highlighting.highlighted_console_output = vec![];
+
+        if let Some(file_format) = find_file_format_in_content_type(&selected_request.response.headers) {
+            if let Some(ResponseContent::Body(response_content)) = &selected_request.response.content.as_ref() {
+                self.syntax_highlighting.highlighted_body = highlight(response_content, &file_format);
+            }
+        }
+
+        if let Some(pre_request_console_output) = &selected_request.console_output.pre_request_output {
+            let mut highlighted_console_output = highlight(pre_request_console_output, "json").unwrap();
+
+            highlighted_console_output.insert(0, Line::default());
+            highlighted_console_output.insert(1, Line::raw("----- Pre-request script start -----").fg(THEME.read().ui.secondary_foreground_color).centered());
+            highlighted_console_output.push(Line::raw("----- Pre-request script end -----").fg(THEME.read().ui.secondary_foreground_color).centered());
+
+            self.syntax_highlighting.highlighted_console_output.extend(highlighted_console_output);
+        }
+
+        if let Some(post_request_console_output) = &selected_request.console_output.post_request_output {
+            let mut highlighted_console_output = highlight(post_request_console_output, "json").unwrap();
+
+            highlighted_console_output.insert(0, Line::default());
+            highlighted_console_output.insert(1, Line::raw("----- Post-request script start -----").fg(THEME.read().ui.secondary_foreground_color).centered());
+            highlighted_console_output.push(Line::raw("----- Post-request script end -----").fg(THEME.read().ui.secondary_foreground_color).centered());
+
+            self.syntax_highlighting.highlighted_console_output.extend(highlighted_console_output);
+        }
     }
 
     pub fn tui_refresh_result_scrollbars(&mut self) {
@@ -77,9 +126,14 @@ impl App<'_> {
                 horizontal_max = max_tmp;
             }
             RequestResultTabs::Console => {
-                let local_console_output = self.script_console.console_output.read();
+                let console_output = match (&selected_request.console_output.pre_request_output, &selected_request.console_output.post_request_output) {
+                    (None, None) => None,
+                    (Some(pre_request_output), None) => Some(pre_request_output),
+                    (None, Some(post_request_output)) => Some(post_request_output),
+                    (Some(pre_request_output), Some(post_request_output)) => Some(&format!("{}\n{}", pre_request_output, post_request_output)),
+                };
 
-                match local_console_output.as_ref() {
+                match console_output {
                     None => {
                         lines_count = 0;
                         horizontal_max = 0;

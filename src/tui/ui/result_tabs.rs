@@ -45,7 +45,7 @@ impl App<'_> {
 
         // REQUEST RESULT TABS
 
-        let result_tabs = RequestResultTabs::iter()
+        let result_tabs: Vec<Span> = RequestResultTabs::iter()
             .filter_map(|tab| {
                 let text = match tab {
                     RequestResultTabs::Body => {
@@ -58,20 +58,19 @@ impl App<'_> {
                     },
                     RequestResultTabs::Cookies | RequestResultTabs::Headers => Some(tab.to_string()),
                     RequestResultTabs::Console => {
-                        let local_console_output = self.script_console.console_output.read();
-
-                        match local_console_output.as_ref() {
-                            None => None,
-                            Some(_) => Some(tab.to_string())
+                        match (&request.console_output.pre_request_output, &request.console_output.post_request_output) {
+                            (None, None) => None,
+                            (_, _) => Some(tab.to_string())
                         }
                     }
                 };
 
                 match text {
-                    Some(text) => Some(text.fg(THEME.read().ui.font_color)),
+                    Some(text) => Some(Span::raw(text).fg(THEME.read().ui.font_color)),
                     None => None
                 }
-            });
+            })
+            .collect();
 
         let selected_result_tab_index = self.request_result_tab as usize;
 
@@ -116,16 +115,21 @@ impl App<'_> {
 
             // REQUEST RESULT CONTENT
 
+            let should_refresh_scrollbars_and_highlight_response = *self.should_refresh_scrollbars_and_highlight_response.lock();
+            if should_refresh_scrollbars_and_highlight_response {
+                self.tui_highlight_response_body_and_console();
+                self.tui_refresh_result_scrollbars();
+                *self.should_refresh_scrollbars_and_highlight_response.lock() = false;
+            }
+
             match self.request_result_tab {
                 RequestResultTabs::Body => match &request.response.content {
                     None => {},
                     Some(content) => match content {
                         ResponseContent::Body(body) => {
                             let lines: Vec<Line>;
-                            let last_highlighted = self.syntax_highlighting.highlighted_body.read();
-
-                            if !self.config.is_syntax_highlighting_disabled() && last_highlighted.is_some() {
-                                lines = last_highlighted.clone().unwrap();
+                            if !self.config.is_syntax_highlighting_disabled() && self.syntax_highlighting.highlighted_body.is_some() {
+                                lines = self.syntax_highlighting.highlighted_body.clone().unwrap();
                             }
                             else {
                                 lines = body.lines().par_bridge().map(|line| Line::raw(line)).collect();
@@ -210,9 +214,7 @@ impl App<'_> {
                     frame.render_widget(headers_paragraph, request_result_layout[2]);
                 },
                 RequestResultTabs::Console => {
-                    let highlighted_console_output = self.syntax_highlighting.highlighted_console_output.read().clone();
-                    
-                    let console_paragraph = Paragraph::new(highlighted_console_output)
+                    let console_paragraph = Paragraph::new(self.syntax_highlighting.highlighted_console_output.clone())
                         .scroll((
                             self.result_vertical_scrollbar.scroll,
                             self.result_horizontal_scrollbar.scroll
