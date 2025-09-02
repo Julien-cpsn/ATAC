@@ -15,7 +15,7 @@ on:
 env:
   PUSH_IMAGE: true
   IMAGE_NAME: juliencaposiena/ATAC
-  RUST_VERSION: "1.86"
+  RUST_VERSION: "1.89"
 
 jobs:
   build-and-publish:
