@@ -1,4 +1,3 @@
-use arboard::Clipboard;
 use base64::prelude::BASE64_STANDARD;
 use base64::write::EncoderWriter;
 use reqwest::Url;
@@ -41,9 +40,8 @@ impl App<'_> {
     }
 
     pub fn copy_request_export_to_clipboard(&mut self) {
-        let mut clipboard = Clipboard::new().unwrap();
         let content = &self.display_request_export.content;
-        clipboard.set_text(content).expect("Could not copy request export to clipboard")
+        self.clipboard.set_text(content).expect("Could not copy request export to clipboard")
     }
 
     fn raw_html(&self, mut output: String, request: &Request, url: Url, method: String, headers: Vec<(String, String)>) -> String {
