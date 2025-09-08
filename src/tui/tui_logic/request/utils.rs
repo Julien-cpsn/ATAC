@@ -1,4 +1,4 @@
-use arboard::{Clipboard, ImageData};
+use arboard::ImageData;
 use image::EncodableLayout;
 use rayon::prelude::*;
 
@@ -9,11 +9,11 @@ use crate::tui::ui::result_tabs::RequestResultTabs;
 impl App<'_> {
 
     /// Copy the response's body content to the clipboard if it's present, otherwise does nothing
-    pub fn copy_response_body_content_to_clipboard(&self) {
+    pub fn copy_response_body_content_to_clipboard(&mut self) {
         let local_selected_request = self.get_selected_request_as_local();
         let selected_request = local_selected_request.read();
 
-        let mut clipboard = Clipboard::new().unwrap();
+        let clipboard = &mut self.clipboard;
 
         match self.request_result_tab {
             RequestResultTabs::Body => match &selected_request.response.content {
