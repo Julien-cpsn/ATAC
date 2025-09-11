@@ -2,17 +2,30 @@ use base64::prelude::BASE64_STANDARD;
 use base64::write::EncoderWriter;
 use reqwest::Url;
 use std::path::PathBuf;
-
+use anyhow::anyhow;
+use thiserror::Error;
 use crate::app::app::App;
+use crate::app::business_logic::request::export::ExportError::{CouldNotParseUrl, ExportFormatNotSupported};
 use crate::app::business_logic::request::send::get_file_content_with_name;
 use crate::models::auth::Auth;
-use crate::models::body::ContentType::{File, Form, Html, Javascript, Json, Multipart, NoBody, Raw, Xml};
+use crate::models::protocol::http::body::ContentType::{File, Form, Html, Javascript, Json, Multipart, NoBody, Raw, Xml};
 use crate::models::export::ExportFormat;
 use crate::models::export::ExportFormat::{Curl, NodeJsAxios, PhpGuzzle, RustReqwest, HTTP};
+use crate::models::protocol::http::method::Method;
+use crate::models::protocol::protocol::Protocol;
 use crate::models::request::Request;
 
+#[derive(Error, Debug)]
+enum ExportError {
+    #[error("Could not parse URL")]
+    CouldNotParseUrl,
+
+    #[error("Export format not supported for protocol {0}")]
+    ExportFormatNotSupported(String),
+}
+
 impl App<'_> {
-    pub fn export_request_to_string_with_format(&self, export_format: &ExportFormat, request: &Request) -> String {
+    pub fn export_request_to_string_with_format(&self, export_format: &ExportFormat, request: &Request) -> anyhow::Result<String> {
         let output = String::new();
 
         let params = self.key_value_vec_to_tuple_vec(&request.params);
@@ -20,23 +33,26 @@ impl App<'_> {
 
         let url = match Url::parse_with_params(&url, &params) {
             Ok(url) => url,
-            Err(_) => {
-                return String::from("Could not parse URL");
-            }
+            Err(_) => return Err(anyhow!(CouldNotParseUrl))
         };
-
-        let method = request.method.to_string();
 
         let headers = self.key_value_vec_to_tuple_vec(&request.headers);
 
-        match export_format {
-            /* ===== HTTP ===== */
-            HTTP => self.raw_html(output, request, url, method, headers),
-            Curl => self.curl(output, request, url, method, headers),
-            PhpGuzzle => self.php_guzzle(output, request, url, method, headers),
-            NodeJsAxios => self.node_axios(output, request, url, method, headers),
-            RustReqwest => self.rust_request(output, request, url, method, headers),
-        }
+        let export = match request.protocol {
+            Protocol::HttpRequest(_) => match export_format {
+                HTTP => self.raw_html(output, request, url, headers),
+                Curl => self.curl(output, request, url, headers),
+                PhpGuzzle => self.php_guzzle(output, request, url, headers),
+                NodeJsAxios => self.node_axios(output, request, url, headers),
+                RustReqwest => self.rust_request(output, request, url, headers),
+            }
+            Protocol::WsRequest(_) => match export_format {
+                RustReqwest => self.rust_request(output, request, url, headers),
+                PhpGuzzle | NodeJsAxios | HTTP | Curl => return Err(anyhow!(ExportFormatNotSupported(request.protocol.to_string())))
+            }
+        };
+
+        Ok(export)
     }
 
     pub fn copy_request_export_to_clipboard(&mut self) {
@@ -44,12 +60,14 @@ impl App<'_> {
         self.clipboard.set_text(content).expect("Could not copy request export to clipboard")
     }
 
-    fn raw_html(&self, mut output: String, request: &Request, url: Url, method: String, headers: Vec<(String, String)>) -> String {
+    fn raw_html(&self, mut output: String, request: &Request, url: Url, headers: Vec<(String, String)>) -> String {
+        let http_request = request.get_http_request().unwrap();
+
         /* URL & Query params */
 
         output += &format!(
             "{} {}{} HTTP/1.1",
-            method,
+            http_request.method.to_string(),
             url.path(),
             match url.query() {
                 None => String::new(),
@@ -84,7 +102,7 @@ impl App<'_> {
 
         /* Body */
 
-        output += &match &request.body {
+        output += &match &http_request.body {
             NoBody => String::new(),
             File(file_path) => {
                 let file_path_with_env_values = self.replace_env_keys_by_value(file_path);
@@ -100,7 +118,7 @@ impl App<'_> {
             },
             Multipart(multipart) => {
                 let boundary = "WebKitFormBoundaryTODO"; // TODO user proper boundary
-                let mut multipart_output = format!("\nContent-Type: {}; boundary={}\n", &request.body.to_content_type(), boundary);
+                let mut multipart_output = format!("\nContent-Type: {}; boundary={}\n", &http_request.body.to_content_type(), boundary);
 
                 for key_value in multipart {
                     if !key_value.enabled {
@@ -123,7 +141,7 @@ impl App<'_> {
                             }
                         };
 
-                        value = format!("; filename=\"{file_name}\"\nContent-Type: {}\n\n{}", &request.body.to_content_type(), String::from_utf8_lossy(&file_content));
+                        value = format!("; filename=\"{file_name}\"\nContent-Type: {}\n\n{}", &http_request.body.to_content_type(), String::from_utf8_lossy(&file_content));
                     }
                     else {
                         value = format!("\n\n{}", &value);
@@ -149,7 +167,7 @@ impl App<'_> {
 
                 let form_output = format!(
                     "\nContent-Type: {}\nContent-Length: {}\n\n{}",
-                    &request.body.to_content_type(),
+                    &http_request.body.to_content_type(),
                     form_str.len(),
                     form_str
                 );
@@ -159,7 +177,7 @@ impl App<'_> {
             Raw(body) | Json(body) | Xml(body) | Html(body) | Javascript(body) => {
                 format!(
                     "\nContent-Type: {}\nContent-Length: {}\n\n{}",
-                    &request.body.to_content_type(),
+                    &http_request.body.to_content_type(),
                     body.len(),
                     body
                 )
@@ -169,12 +187,15 @@ impl App<'_> {
         output
     }
     
-    fn curl(&self, mut output: String, request: &Request, url: Url, method: String, headers: Vec<(String, String)>) -> String {
+    fn curl(&self, mut output: String, request: &Request, url: Url, headers: Vec<(String, String)>) -> String {
+        let http_request = request.get_http_request().unwrap();
+
         /* URL & Query params */
 
-        output += &format!("curl --location --request {} '{}' \\",
-                           method,
-                           url
+        output += &format!(
+            "curl --location --request {} '{}' \\",
+            http_request.method.to_string(),
+            url
         );
 
         /* Auth */
@@ -202,12 +223,12 @@ impl App<'_> {
 
         /* Body */
 
-        output += &match &request.body {
+        output += &match &http_request.body {
             NoBody => String::new(),
             File(file_path) => {
                 let file_path_with_env_values = self.replace_env_keys_by_value(file_path);
 
-                format!("\n--header 'Content-Type: {}' \\\n--data '@/{}' \\", &request.body.to_content_type(), file_path_with_env_values)
+                format!("\n--header 'Content-Type: {}' \\\n--data '@/{}' \\", &http_request.body.to_content_type(), file_path_with_env_values)
             },
             Multipart(multipart) => {
                 let mut multipart_output = String::new();
@@ -234,7 +255,7 @@ impl App<'_> {
                 multipart_output
             }
             Form(form_data) => {
-                let mut form_output = format!("\n--header 'Content-Type: {}' \\", &request.body.to_content_type());
+                let mut form_output = format!("\n--header 'Content-Type: {}' \\", &http_request.body.to_content_type());
 
                 let form = self.key_value_vec_to_tuple_vec(form_data);
 
@@ -245,7 +266,7 @@ impl App<'_> {
                 form_output
             }
             Raw(body) | Json(body) | Xml(body) | Html(body) | Javascript(body) => {
-                format!("\n--header 'Content-Type: {}' \\\n--data '{}' \\", &request.body.to_content_type(), body)
+                format!("\n--header 'Content-Type: {}' \\\n--data '{}' \\", &http_request.body.to_content_type(), body)
             }
         };
 
@@ -270,7 +291,9 @@ impl App<'_> {
         output
     }
     
-    fn php_guzzle(&self, mut output: String, request: &Request, url: Url, method: String, headers: Vec<(String, String)>) -> String {
+    fn php_guzzle(&self, mut output: String, request: &Request, url: Url, headers: Vec<(String, String)>) -> String {
+        let http_request = request.get_http_request().unwrap();
+
         output += "<?php\n$client = new GuzzleHttp\\Client();\n";
 
         let mut headers_str = String::from("\n$headers = [");
@@ -324,7 +347,7 @@ impl App<'_> {
         let mut has_body = false;
         let mut options_str: Option<String> = None;
 
-        match &request.body {
+        match &http_request.body {
             NoBody => {},
             File(file_path) => {
                 let file_path_with_env_values = self.replace_env_keys_by_value(file_path);
@@ -383,18 +406,18 @@ impl App<'_> {
                 has_body = true;
                 output += &format!("\n$body = '{}';\n", body);
 
-                if matches!(request.body, Json(_)) {
+                if matches!(http_request.body, Json(_)) {
                     options_str = Some("\n$options = [\n    'json' => json_decode($body, true)\n];\n".to_string());
                     has_body = false;
                 } else {
-                    output += &format!("\n$headers['Content-Type'] = '{}';\n", request.body.to_content_type());
+                    output += &format!("\n$headers['Content-Type'] = '{}';\n", http_request.body.to_content_type());
                 }
             }
         };
 
         if let Some(options) = options_str {
             output += &options;
-            output += &format!("\n$response = $client->request('{}', '{}', [", method, url);
+            output += &format!("\n$response = $client->request('{}', '{}', [", http_request.method, url);
             output += "\n    'headers' => $headers,";
             if has_body {
                 output += "\n    'body' => $body,";
@@ -402,7 +425,7 @@ impl App<'_> {
             output += "\n    ...$options";
             output += "\n]);";
         } else {
-            output += &format!("\n$request = new GuzzleHttp\\Psr7\\Request('{}', '{}', $headers", method, url);
+            output += &format!("\n$request = new GuzzleHttp\\Psr7\\Request('{}', '{}', $headers", http_request.method, url);
             if has_body {
                 output += ", $body";
             }
@@ -414,12 +437,14 @@ impl App<'_> {
         output
     }
     
-    fn node_axios(&self, mut output: String, request: &Request, url: Url, method: String, headers: Vec<(String, String)>) -> String {
+    fn node_axios(&self, mut output: String, request: &Request, url: Url, headers: Vec<(String, String)>) -> String {
+        let http_request = request.get_http_request().unwrap();
+
         output += "const axios = require('axios');\n";
 
         /* Headers and Config */
         output += "const config = {\n";
-        output += &format!("  method: '{}',\n", method.to_lowercase());
+        output += &format!("  method: '{}',\n", http_request.method.to_string().to_lowercase());
         output += &format!("  url: '{}',\n", url);
 
         /* Headers */
@@ -447,7 +472,7 @@ impl App<'_> {
         output += "  }";
 
         /* Body */
-        match &request.body {
+        match &http_request.body {
             NoBody => {},
             File(file_path) => {
                 let file_path_with_env_values = self.replace_env_keys_by_value(file_path);
@@ -541,7 +566,12 @@ impl App<'_> {
         output
     }
     
-    fn rust_request(&self, mut output: String, request: &Request, url: Url, method: String, headers: Vec<(String, String)>) -> String {
+    fn rust_request(&self, mut output: String, request: &Request, url: Url, headers: Vec<(String, String)>) -> String {
+        let method = match &request.protocol {
+            Protocol::HttpRequest(http_request) => http_request.method.to_string(),
+            Protocol::WsRequest(_) => Method::GET.to_string()
+        };
+
         /* Headers */
         let mut has_headers = false;
         let mut headers_str = String::new();
@@ -568,27 +598,32 @@ impl App<'_> {
         };
 
         /* Imports */
-        output += "use reqwest::Client;\n";
-        output += "use std::error::Error;\n";
 
-        /* Body-specific imports */
-        match &request.body {
-            NoBody => {},
-            File(_) => {
-                output += "use std::fs;\n";
-            },
-            Multipart(_) => {
-                output += "use reqwest::multipart::{Form, Part};\n";
-                output += "use std::fs;\n";
-                output += "use std::path::Path;\n";
-            },
-            Form(_) => {
-                output += "use std::collections::HashMap;\n";
-            },
-            Json(_) => {
-                output += "use serde_json::json;\n";
-            },
-            _ => {}
+        output += "use std::error::Error;\n";
+        output += "use reqwest::Client;\n";
+
+        match &request.protocol {
+            Protocol::HttpRequest(http_request) => match &http_request.body {
+                NoBody => {},
+                File(_) => {
+                    output += "use std::fs;\n";
+                },
+                Multipart(_) => {
+                    output += "use reqwest::multipart::{Form, Part};\n";
+                    output += "use std::fs;\n";
+                    output += "use std::path::Path;\n";
+                },
+                Form(_) => {
+                    output += "use std::collections::HashMap;\n";
+                },
+                Json(_) => {
+                    output += "use serde_json::json;\n";
+                },
+                _ => {}
+            }
+            Protocol::WsRequest(_) => {
+                output += "use reqwest_websocket::{Error, Message, RequestBuilderExt};\nuse futures_util::{SinkExt, StreamExt, TryStreamExt};\n";
+            }
         }
 
         /* Main function */
@@ -598,58 +633,61 @@ impl App<'_> {
         /* Body preparation */
         let mut body_str = String::new();
 
-        match &request.body {
-            NoBody => {},
-            File(file_path) => {
-                let file_path_with_env_values = self.replace_env_keys_by_value(file_path);
-                output += &format!("    let body = fs::read_to_string(\"{}\")?;\n\n", file_path_with_env_values);
-                body_str += "    .body(body)\n";
-            },
-            Multipart(multipart) => {
-                output += "    let form = Form::new()";
+        match &request.protocol {
+            Protocol::HttpRequest(http_request) => match &http_request.body {
+                NoBody => {},
+                File(file_path) => {
+                    let file_path_with_env_values = self.replace_env_keys_by_value(file_path);
+                    output += &format!("    let body = fs::read_to_string(\"{}\")?;\n\n", file_path_with_env_values);
+                    body_str += "    .body(body)\n";
+                },
+                Multipart(multipart) => {
+                    output += "    let form = Form::new()";
 
-                for key_value in multipart {
-                    if !key_value.enabled {
-                        continue;
+                    for key_value in multipart {
+                        if !key_value.enabled {
+                            continue;
+                        }
+
+                        let key = self.replace_env_keys_by_value(&key_value.data.0);
+                        let value = self.replace_env_keys_by_value(&key_value.data.1);
+
+                        if value.starts_with("!!") {
+                            let file_path = &value[2..];
+                            output += &format!("\n        .part(\"{}\", Part::file(\"{}\")?)", key, file_path);
+                        } else {
+                            output += &format!("\n        .text(\"{}\", \"{}\")", key, value);
+                        }
                     }
 
-                    let key = self.replace_env_keys_by_value(&key_value.data.0);
-                    let value = self.replace_env_keys_by_value(&key_value.data.1);
+                    output += ";\n\n";
+                    body_str += "    .multipart(form)\n";
+                },
+                Form(form_data) => {
+                    output += "    let mut form = HashMap::new();\n";
 
-                    if value.starts_with("!!") {
-                        let file_path = &value[2..];
-                        output += &format!("\n        .part(\"{}\", Part::file(\"{}\")?)", key, file_path);
-                    } else {
-                        output += &format!("\n        .text(\"{}\", \"{}\")", key, value);
+                    let form = self.key_value_vec_to_tuple_vec(form_data);
+                    for (key, value) in form {
+                        output += &format!("    form.insert(\"{}\", \"{}\");\n", key, value);
                     }
+
+                    output += "\n";
+                    body_str += "        .form(&form)\n";
+                },
+                Raw(body) => {
+                    body_str += &format!("        .body(\"{}\")\n", body);
+                },
+                Json(body) => {
+                    body_str += &format!("        .json(&{})\n", body);
+                },
+                Xml(body) | Html(body) | Javascript(body) => {
+                    has_headers = true;
+                    headers_str += &format!("            .header(\"Content-Type\", \"{}\")\n", http_request.body.to_content_type());
+                    body_str += &format!("        .body(\"{}\")\n", body);
                 }
-
-                output += ";\n\n";
-                body_str += "    .multipart(form)\n";
-            },
-            Form(form_data) => {
-                output += "    let mut form = HashMap::new();\n";
-
-                let form = self.key_value_vec_to_tuple_vec(form_data);
-                for (key, value) in form {
-                    output += &format!("    form.insert(\"{}\", \"{}\");\n", key, value);
-                }
-
-                output += "\n";
-                body_str += "        .form(&form)\n";
-            },
-            Raw(body) => {
-                body_str += &format!("        .body(\"{}\")\n", body);
-            },
-            Json(body) => {
-                body_str += &format!("        .json(&{})\n", body);
-            },
-            Xml(body) | Html(body) | Javascript(body) => {
-                has_headers = true;
-                headers_str += &format!("            .header(\"Content-Type\", \"{}\")\n", request.body.to_content_type());
-                body_str += &format!("        .body(\"{}\")\n", body);
             }
-        };
+            Protocol::WsRequest(_) => {}
+        }
 
         /* Request and response */
         output += &format!("    let response = client.{}(\"{}\")\n", method.to_lowercase(), url);
@@ -659,19 +697,50 @@ impl App<'_> {
         }
 
         output += &body_str;
+
+        if matches!(request.protocol, Protocol::WsRequest(_)) {
+            output += "        .upgrade()\n";
+        }
+
         output += "        .send()\n";
         output += "        .await?;\n\n";
 
-        output += "    let status = response.status();\n";
-        output += "    let body = response.text().await?;\n\n";
+        match request.protocol {
+            Protocol::HttpRequest(_) => {
+                output += "    let status = response.status();\n";
+                output += "    let body = response.text().await?;\n\n";
 
-        if request.settings.use_config_proxy.as_bool() && self.config.proxy.is_some() {
-            output += "    // Use reqwest::ClientBuilder with reqwest::Proxy\n";
-            output += "    // https://docs.rs/reqwest/latest/reqwest/struct.Proxy.html\n\n";
+                if request.settings.use_config_proxy.as_bool() && self.config.proxy.is_some() {
+                    output += "    // Use reqwest::ClientBuilder with reqwest::Proxy\n";
+                    output += "    // https://docs.rs/reqwest/latest/reqwest/struct.Proxy.html\n\n";
+                }
+
+                output += "    println!(\"Status: {}\", status);\n";
+                output += "    println!(\"Body: {}\", body);\n\n";
+
+            }
+            Protocol::WsRequest(_) => {
+                output += r#"    let websocket = response.into_websocket().await?;
+    let (mut tx, mut rx) = websocket.split();
+
+    futures_util::future::join(
+        async move {
+            tx.send(Message::Text("Hello, World!")).await.unwrap();
+        },
+        async move {
+            while let Some(message) = rx.try_next().await.unwrap() {
+                if let Message::Text(text) = message {
+                    println!("received: {text}");
+                }
+            }
+        },
+    )
+    .await;
+
+"#;
+
+            }
         }
-        
-        output += "    println!(\"Status: {}\", status);\n";
-        output += "    println!(\"Body: {}\", body);\n\n";
 
         output += "    Ok(())\n";
         output += "}";

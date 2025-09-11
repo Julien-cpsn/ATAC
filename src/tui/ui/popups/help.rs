@@ -71,8 +71,17 @@ impl App<'_> {
             None => false,
             Some(_) => true
         };
-        
-        let events = &self.help_popup.selection.get_available_events(self.request_view, self.request_param_tab, is_there_any_env);
+
+        let protocol = match &self.collections_tree.selected {
+            Some(selected_request_index) => {
+                let local_selected_request = self.collections[selected_request_index.0].requests[selected_request_index.1].clone();
+                let selected_request = local_selected_request.read();
+                Some(selected_request.protocol.clone())
+            },
+            None => None
+        };
+
+        let events = &self.help_popup.selection.get_available_events(self.request_view, self.request_param_tab, protocol, is_there_any_env);
         let keys = event_available_keys_to_spans(
             events,
             THEME.read().ui.font_color,

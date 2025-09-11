@@ -46,10 +46,10 @@ impl Config {
         return self.disable_syntax_highlighting.unwrap_or(false)
     }
 
-    pub fn should_save_requests_reponse(&self) -> bool {
+    pub fn should_save_requests_response(&self) -> bool {
         self.save_requests_response.unwrap_or(false)
     }
-    pub fn set_should_skip_requests_reponse(&self) {
+    pub fn set_should_skip_requests_response(&self) {
         SKIP_SAVE_REQUESTS_RESPONSE.get_or_init(|| match self.save_requests_response {
             None => true,
             Some(save_requests_response) => !save_requests_response
@@ -95,7 +95,7 @@ impl App<'_> {
             Err(e) => panic_error(format!("Could not parse config file\n\t{e}"))
         };
 
-        config.set_should_skip_requests_reponse();
+        config.set_should_skip_requests_response();
 
         self.config = config;
 

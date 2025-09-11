@@ -79,6 +79,7 @@ export_request = "Ctrl-e"
 [keybindings.request_selected.param_tabs]
 change_auth_method = "Shift-A"
 change_body_content_type = "Shift-B"
+change_message_type = "Shift-M"
 
 [keybindings.request_selected.result_tabs]
 scroll_up = "Ctrl-k"

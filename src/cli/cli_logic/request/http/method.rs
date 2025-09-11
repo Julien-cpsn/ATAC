@@ -6,7 +6,8 @@ impl App<'_> {
 
         {
             let selected_request = local_selected_request.read();
-            println!("{}", selected_request.method.to_string())
+            let selected_http_request = selected_request.get_http_request()?;
+            println!("{}", selected_http_request.method.to_string())
         }
         
         Ok(())

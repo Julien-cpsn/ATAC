@@ -1,6 +1,8 @@
 use crate::app::app::App;
 use crate::models::auth::Auth;
-use crate::models::body::ContentType;
+use crate::models::protocol::http::body::ContentType;
+use crate::models::protocol::protocol::Protocol;
+use crate::models::protocol::ws::message_type::MessageType;
 use crate::models::request::{Request, DEFAULT_HEADERS};
 use crate::models::settings::RequestSettings;
 
@@ -32,7 +34,7 @@ impl App<'_> {
             let param_text = match selection {
                 (x, 0) => selected_request.params[x].data.0.clone(),
                 (x, 1) => selected_request.params[x].data.1.clone(),
-                _ => String::new() // Should not happen
+                _ => unreachable!()
             };
 
             self.query_params_table.selection_text_input.enter_str(&param_text);
@@ -64,40 +66,50 @@ impl App<'_> {
             let header_text = match selection {
                 (x, 0) => selected_request.headers[x].data.0.clone(),
                 (x, 1) => selected_request.headers[x].data.1.clone(),
-                _ => String::new() // Should not happen
+                _ => unreachable!()
             };
 
             self.headers_table.selection_text_input.enter_str(&header_text);
         }
 
-        match &selected_request.body {
-            ContentType::NoBody => {
-                self.body_form_table.rows = Vec::new();
-                self.refresh_body_textarea(&String::new());
-            }
-            ContentType::Multipart(form) | ContentType::Form(form) => {
-                self.body_form_table.rows = form.clone();
-
-                if !form.is_empty() {
-                    let selection = self.body_form_table.selection.unwrap();
-
-                    let form_text = match selection {
-                        (x, 0) => form[x].data.0.clone(),
-                        (x, 1) => form[x].data.1.clone(),
-                        _ => String::new() // Should not happen
-                    };
-
-                    self.body_form_table.selection_text_input.enter_str(&form_text);
+        match &selected_request.protocol {
+            Protocol::HttpRequest(http_request) => match &http_request.body {
+                ContentType::NoBody => {
+                    self.body_form_table.rows = Vec::new();
+                    self.refresh_body_textarea(&String::new());
                 }
+                ContentType::Multipart(form) | ContentType::Form(form) => {
+                    self.body_form_table.rows = form.clone();
 
-                self.refresh_body_textarea(&String::new());
+                    if !form.is_empty() {
+                        let selection = self.body_form_table.selection.unwrap();
+
+                        let form_text = match selection {
+                            (x, 0) => form[x].data.0.clone(),
+                            (x, 1) => form[x].data.1.clone(),
+                            _ => unreachable!()
+                        };
+
+                        self.body_form_table.selection_text_input.enter_str(&form_text);
+                    }
+
+                    self.refresh_body_textarea(&String::new());
+                }
+                ContentType::File(file_path) =>  {
+                    self.body_file_text_input.enter_str(file_path);
+                },
+                ContentType::Raw(body) | ContentType::Json(body) | ContentType::Xml(body) | ContentType::Html(body) | ContentType::Javascript(body) => {
+                    self.body_form_table.rows = Vec::new();
+                    self.refresh_body_textarea(body);
+                }
             }
-            ContentType::File(file_path) =>  {
-                self.body_file_text_input.enter_str(file_path);
-            },
-            ContentType::Raw(body) | ContentType::Json(body) | ContentType::Xml(body) | ContentType::Html(body) | ContentType::Javascript(body) => {
-                self.body_form_table.rows = Vec::new();
-                self.refresh_body_textarea(body);
+            Protocol::WsRequest(ws_request) => {
+                let content = match &ws_request.message_type {
+                    MessageType::Text(text) | MessageType::Close(text) => text.clone(),
+                    MessageType::Binary(bytes) | MessageType::Ping(bytes) | MessageType::Pong(bytes) => String::from_utf8_lossy(bytes.as_ref()).to_string()
+                };
+
+                self.refresh_message_textarea(&content);
             }
         }
         
@@ -129,10 +141,21 @@ impl App<'_> {
     pub fn select_request(&mut self) {
         if self.collections_tree.state.selected().len() == 2 {
             self.collections_tree.set_selected();
+            self.tui_update_request_param_tab();
             self.tui_update_request_result_tab();
             self.tui_update_query_params_selection();
             self.tui_update_headers_selection();
-            self.tui_update_body_table_selection();
+
+            let local_selected_request = self.get_selected_request_as_local();
+            let selected_request = local_selected_request.read();
+
+            match selected_request.protocol {
+                Protocol::HttpRequest(_) => {
+                    self.tui_update_body_table_selection();
+                }
+                Protocol::WsRequest(_) => {}
+            }
+
             *self.received_response.lock() = true;
             
             self.select_request_state();
@@ -182,8 +205,11 @@ impl App<'_> {
         let new_request_name = self.new_request_popup.text_input.text.trim().to_string();
 
         let selected_collection_index = self.new_request_popup.selected_collection;
+        let protocol = self.new_request_popup.protocol.clone();
+
         let new_request = Request {
             name: new_request_name,
+            protocol,
             headers: DEFAULT_HEADERS.clone(),
             settings: RequestSettings::default(),
             ..Default::default()

@@ -31,15 +31,15 @@ impl Method {
         let theme = THEME.read();
         
         match self {
-            Method::GET => theme.methods.get,
-            Method::POST => theme.methods.post,
-            Method::PUT => theme.methods.put,
-            Method::PATCH => theme.methods.patch,
-            Method::DELETE => theme.methods.delete,
-            Method::HEAD => theme.methods.head,
-            Method::OPTIONS => theme.methods.options,
-            Method::TRACE => theme.methods.trace,
-            Method::CONNECT => theme.methods.connect,
+            Method::GET => theme.http.methods.get,
+            Method::POST => theme.http.methods.post,
+            Method::PUT => theme.http.methods.put,
+            Method::PATCH => theme.http.methods.patch,
+            Method::DELETE => theme.http.methods.delete,
+            Method::HEAD => theme.http.methods.head,
+            Method::OPTIONS => theme.http.methods.options,
+            Method::TRACE => theme.http.methods.trace,
+            Method::CONNECT => theme.http.methods.connect,
         }
     }
 

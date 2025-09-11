@@ -1,11 +1,14 @@
 use crate::app::app::App;
 use crate::app::log::{LOGS, SHOULD_RECORD_LOGS};
-use crate::models::body::ContentType;
+use crate::models::protocol::http::body::ContentType;
 use crate::tui::app_states::AppState;
 use crate::tui::ui::param_tabs::param_tabs::RequestParamsTabs;
 use crate::tui::utils::stateful::cookie_table::cookie_to_row;
 use std::sync::atomic::Ordering;
 use std::sync::Arc;
+use strum::VariantArray;
+use crate::models::export::ExportFormat;
+use crate::models::protocol::protocol::Protocol;
 
 impl App<'_> {
     fn set_app_state(&mut self, app_state: AppState) {
@@ -52,7 +55,7 @@ impl App<'_> {
                 let text = match selection.1 {
                     0 => pair.0,
                     1 => pair.1,
-                    _ => "" // Should not happen
+                    _ => unreachable!()
                 };
 
                 self.env_editor_table.selection_text_input.enter_str(&text);
@@ -140,7 +143,7 @@ impl App<'_> {
         };
         
         self.new_request_popup.selected_collection = popup_selected_collection_index;
-        self.new_request_popup.max_selection = collections_length;
+        self.new_request_popup.max_collection_selection = collections_length;
         self.set_app_state(AppState::CreatingNewRequest);
     }
 
@@ -217,8 +220,9 @@ impl App<'_> {
 
         {
             let selected_request = local_selected_request.read();
+            let selected_http_request = selected_request.get_http_request().unwrap();
 
-            match &selected_request.body {
+            match &selected_http_request.body {
                 ContentType::Multipart(form) | ContentType::Form(form) => {
                     self.body_form_table.rows = form.clone();
                 }
@@ -239,8 +243,9 @@ impl App<'_> {
 
         {
             let selected_request = local_selected_request.read();
+            let selected_http_request = selected_request.get_http_request().unwrap();
 
-            match selected_request.body {
+            match selected_http_request.body {
                 ContentType::File(_) => {
                     self.set_app_state(AppState::EditingRequestBodyFile);
                 }
@@ -255,6 +260,10 @@ impl App<'_> {
 
         self.request_param_tab = RequestParamsTabs::Body;
         self.update_inputs();
+    }
+
+    pub fn edit_request_message_state(&mut self) {
+        self.set_app_state(AppState::EditingRequestMessage);
     }
 
     pub fn edit_request_script_state(&mut self) {
@@ -282,6 +291,15 @@ impl App<'_> {
 
     pub fn choose_request_export_format_state(&mut self) {
         self.export_request.selection = 0;
+
+        let local_selected_request = self.get_selected_request_as_local();
+        let selected_request = local_selected_request.read();
+
+        self.export_request.choices = match selected_request.protocol {
+            Protocol::HttpRequest(_) => ExportFormat::VARIANTS.to_vec(),
+            Protocol::WsRequest(_) => vec![ExportFormat::RustReqwest]
+        };
+
         self.set_app_state(AppState::ChoosingRequestExportFormat);
     }
 

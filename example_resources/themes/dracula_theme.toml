@@ -20,7 +20,8 @@ secondary_background_color = "#282a36"
 selection_highlight_color = "#44475a"
 environment_variable_highlight_color = "#6272a4"
 
-[methods]
+[HTTP]
+[HTTP.methods]
 GET = "#50fa7b"
 POST = "#ffb86c"
 PUT = "#8be9fd"
@@ -30,3 +31,14 @@ OPTIONS = "#ff79c6"
 HEAD = "#f1fa8c"
 TRACE = "#ffb86c"
 CONNECT = "#8be9fd"
+
+[websocket]
+[websocket.connection_status]
+connected = "#50fa7b"
+disconnected = "#ff5555"
+
+[websocket.messages]
+server_foreground_color = "#bd93f9"
+server_background_color = "#282a36"
+you_background_color = "#282a36"
+details_color = "DarkGray"

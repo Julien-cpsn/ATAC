@@ -22,17 +22,20 @@ impl StatefulScrollbar {
         self.state.next();
     }
 
-    pub fn set_scroll(&mut self, lines: usize) {
-        if lines > 0 {
-            self.max_scroll = lines as u16 - 1;
-        }
-        else {
-            self.max_scroll = 0;
-        }
+    pub fn set_max_scroll(&mut self, max_scroll: u16) {
+        self.max_scroll = max_scroll;
+        self.state = self.state.content_length(max_scroll as usize);
+    }
 
+    #[allow(unused)]
+    pub fn top(&mut self) {
         self.scroll = 0;
-        self.state.first();
+        self.state.first()
+    }
 
-        self.state = self.state.content_length(lines);
+    #[allow(unused)]
+    pub fn bottom(&mut self) {
+        self.scroll = self.max_scroll;
+        self.state.last();
     }
 }

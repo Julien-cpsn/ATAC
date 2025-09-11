@@ -5,7 +5,6 @@
     {
       "name": "Test 200",
       "url": "https://httpbin.org/status/200",
-      "method": "GET",
       "params": [],
       "headers": [
         {
@@ -44,7 +43,6 @@
           ]
         }
       ],
-      "body": "no_body",
       "auth": "no_auth",
       "scripts": {
         "pre_request_script": null,
@@ -58,12 +56,16 @@
         "pretty_print_response_content": true,
         "accept_invalid_certs": false,
         "accept_invalid_hostnames": false
+      },
+      "protocol": {
+        "type": "http",
+        "method": "GET",
+        "body": "no_body"
       }
     },
     {
       "name": "Test 401",
       "url": "https://httpbin.org/status/401",
-      "method": "POST",
       "params": [],
       "headers": [
         {
@@ -102,7 +104,6 @@
           ]
         }
       ],
-      "body": "no_body",
       "auth": "no_auth",
       "scripts": {
         "pre_request_script": null,
@@ -116,12 +117,16 @@
         "pretty_print_response_content": true,
         "accept_invalid_certs": false,
         "accept_invalid_hostnames": false
+      },
+      "protocol": {
+        "type": "http",
+        "method": "POST",
+        "body": "no_body"
       }
     },
     {
       "name": "Test 500",
       "url": "https://httpbin.org/status/500",
-      "method": "PUT",
       "params": [],
       "headers": [
         {
@@ -160,7 +165,6 @@
           ]
         }
       ],
-      "body": "no_body",
       "auth": "no_auth",
       "scripts": {
         "pre_request_script": null,
@@ -174,6 +178,11 @@
         "pretty_print_response_content": true,
         "accept_invalid_certs": false,
         "accept_invalid_hostnames": false
+      },
+      "protocol": {
+        "type": "http",
+        "method": "PUT",
+        "body": "no_body"
       }
     }
   ]

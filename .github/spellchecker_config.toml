@@ -1,5 +1,7 @@
 [files]
 extend-exclude = [
-    "import_tests/*",
-    "base_collections/*",
+    ".cargo/*",
+    ".github/*",
+    "gifs/*",
+    "example_resources/*",
 ]

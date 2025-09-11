@@ -110,7 +110,14 @@ impl<'a> App<'a> {
                 self.set_collections_from_file(path, CollectionFileFormat::Yaml);
             }
         }
-        
+
+        // Ensures that legacy collections and requests gets save as their new version
+        if ARGS.should_save {
+            for index in 0..self.collections.len() {
+                self.save_collection_to_file(index);
+            }
+        }
+
         self.collections.sort_by(|a,b| a.last_position.unwrap_or(usize::MAX).cmp(&b.last_position.unwrap_or(usize::MAX)));
     }
 

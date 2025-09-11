@@ -1,9 +1,12 @@
 use std::sync::Arc;
-
+use futures_util::SinkExt;
+use reqwest_websocket::CloseCode;
 use tokio::task;
 use tracing::info;
 use crate::app::app::App;
-use crate::app::business_logic::request::send::send_request;
+use crate::app::business_logic::request::http::send::send_http_request;
+use crate::app::business_logic::request::ws::send::send_ws_request;
+use crate::models::protocol::protocol::Protocol;
 
 impl App<'_> {
     pub async fn tui_send_request(&mut self) {
@@ -21,6 +24,31 @@ impl App<'_> {
         
         let mut selected_request = local_selected_request.write();
 
+        match &mut selected_request.protocol {
+            Protocol::HttpRequest(_) => {}
+            Protocol::WsRequest(ws_request) => if ws_request.is_connected {
+                if let Some(websocket) = ws_request.websocket.clone() {
+                    drop(websocket.rx);
+
+                    // Lock each time to avoid potential deadlock if the user is spamming "send request"
+                    websocket.tx
+                        .lock()
+                        .send(reqwest_websocket::Message::Close {
+                            code: CloseCode::Normal,
+                            reason: String::new(),
+                        })
+                        .await
+                        .unwrap();
+
+                    websocket.tx.lock().close().await.unwrap();
+
+                    ws_request.websocket = None;
+                    ws_request.is_connected = false;
+                    return;
+                }
+            }
+        }
+
         /* PRE-REQUEST SCRIPT */
 
         let prepared_request = match self.prepare_request(&mut selected_request).await {
@@ -31,6 +59,7 @@ impl App<'_> {
             }
         };
 
+        let protocol = selected_request.protocol.clone();
         let local_selected_request = self.get_selected_request_as_local();
         let local_env = self.get_selected_env_as_local();
 
@@ -39,7 +68,12 @@ impl App<'_> {
         /* SEND REQUEST */
 
         task::spawn(async move {
-            let response = match send_request(prepared_request, local_selected_request.clone(), &local_env).await {
+            let response = match protocol {
+                Protocol::HttpRequest(_) => send_http_request(prepared_request, local_selected_request.clone(), &local_env).await,
+                Protocol::WsRequest(_) => send_ws_request(prepared_request, local_selected_request.clone(), &local_env, local_should_refresh_scrollbars.clone()).await
+            };
+
+            let response = match response {
                 Ok(response) => response,
                 Err(response_error) => {
                     let mut selected_request = local_selected_request.write();
@@ -47,7 +81,6 @@ impl App<'_> {
                     return;
                 }
             };
-
 
             let mut selected_request = local_selected_request.write();
             selected_request.response = response;

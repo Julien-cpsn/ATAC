@@ -1,6 +1,6 @@
 use crate::app::app::App;
 use crate::app::business_logic::key_value::print_key_value_vector;
-use crate::models::body::ContentType;
+use crate::models::protocol::http::body::ContentType;
 
 impl App<'_> {
     pub fn cli_print_request_body(&mut self, collection_index: usize, request_index: usize) -> anyhow::Result<()> {
@@ -8,10 +8,11 @@ impl App<'_> {
 
         {
             let selected_request = local_selected_request.read();
+            let selected_http_request = selected_request.get_http_request()?;
 
-            println!("{}", selected_request.body);
+            println!("{}", selected_http_request.body);
 
-            match &selected_request.body {
+            match &selected_http_request.body {
                 ContentType::NoBody => {},
                 ContentType::Multipart(form) | ContentType::Form(form) => {
                     for key_value in form {
@@ -32,7 +33,10 @@ impl App<'_> {
 
         {
             let selected_request = local_selected_request.read();
-            let form = selected_request.body.get_form()?;
+            let selected_http_request = selected_request.get_http_request()?;
+            
+            let form = selected_http_request.body.get_form()?;
+            
             print_key_value_vector(form, None);
         }
 

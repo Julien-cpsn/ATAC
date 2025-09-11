@@ -1,4 +1,5 @@
-use crate::models::method::Method;
+use crate::models::protocol::http::method::Method;
+use crate::models::protocol::protocol::Protocol;
 
 #[derive(clap::Args, Debug, Clone)]
 pub struct NewRequestCommand {
@@ -6,13 +7,17 @@ pub struct NewRequestCommand {
     #[arg(short, long, value_hint = clap::ValueHint::Url, default_value_t = String::new(), display_order = 0)]
     pub url: String,
 
+    #[arg(short, long, default_value_t = Protocol::default(), display_order = 1)]
+    /// Request communication protocol
+    pub protocol: Protocol,
+
     /// Request method
-    #[arg(short, long, default_value_t = Method::GET, display_order = 1)]
+    #[arg(short, long, default_value_t = Method::GET, display_order = 2)]
     pub method: Method,
 
     /// Add a query param
     /// (can be used multiple times)
-    #[arg(long, action = clap::ArgAction::Append, num_args = 2, value_names = ["KEY", "VALUE"], display_order = 2)]
+    #[arg(long, action = clap::ArgAction::Append, num_args = 2, value_names = ["KEY", "VALUE"], display_order = 3)]
     pub add_param: Vec<String>,
 
     #[command(flatten)]
@@ -20,51 +25,51 @@ pub struct NewRequestCommand {
 
     /// Do not use base headers
     /// (cache-control, user-agent, accept, accept-encoding, connection)
-    #[arg(long, default_value_t = false, display_order = 5)]
+    #[arg(long, default_value_t = false, display_order = 6)]
     pub no_base_headers: bool,
 
     /// Add a header
     /// (can be used multiple times)
-    #[arg(long, action = clap::ArgAction::Append, num_args = 2, value_names = ["KEY", "VALUE"], display_order = 6)]
+    #[arg(long, action = clap::ArgAction::Append, num_args = 2, value_names = ["KEY", "VALUE"], display_order = 7)]
     pub add_header: Vec<String>,
 
     #[command(flatten)]
     pub body: BodyArgs,
 
     /// Set a pre-request script
-    #[arg(long, display_order = 15)]
+    #[arg(long, display_order = 16)]
     pub pre_request_script: Option<String>,
 
     /// Set a post-request script
-    #[arg(long, display_order = 16)]
+    #[arg(long, display_order = 17)]
     pub post_request_script: Option<String>,
 
     /// Do not use config proxy
-    #[arg(long, default_value_t = false, display_order = 17)]
+    #[arg(long, default_value_t = false, display_order = 18)]
     pub no_proxy: bool,
 
     /// Do not allow redirects
-    #[arg(long, default_value_t = false, display_order = 18)]
+    #[arg(long, default_value_t = false, display_order = 19)]
     pub no_redirects: bool,
 
     /// Timeout (ms)
-    #[arg(long, default_value_t = 30000, display_order = 19)]
+    #[arg(long, default_value_t = 30000, display_order = 20)]
     pub timeout: u32,
 
     /// Do not store received cookies
-    #[arg(long, default_value_t = false, display_order = 20)]
+    #[arg(long, default_value_t = false, display_order = 21)]
     pub no_cookies: bool,
 
     /// Do not pretty print response content
-    #[arg(long, default_value_t = false, display_order = 21)]
+    #[arg(long, default_value_t = false, display_order = 22)]
     pub no_pretty: bool,
 
     /// Accept invalid certificates
-    #[arg(long, default_value_t = false, display_order = 22)]
+    #[arg(long, default_value_t = false, display_order = 23)]
     pub accept_invalid_certs: bool,
 
     /// Accept invalid hostnames
-    #[arg(long, default_value_t = false, display_order = 23)]
+    #[arg(long, default_value_t = false, display_order = 24)]
     pub accept_invalid_hostnames: bool
 }
 

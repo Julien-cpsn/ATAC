@@ -19,7 +19,8 @@ secondary_background_color = "#333333"
 selection_highlight_color = "Yellow"
 environment_variable_highlight_color = "#57a64a" # "#723172"
 
-[methods]
+[HTTP]
+[HTTP.methods]
 GET = "Green"
 POST = "#E7BA00"
 PUT = "LightBlue"
@@ -29,3 +30,14 @@ OPTIONS = "Magenta"
 HEAD = "Green"
 TRACE = "#E7BA00"
 CONNECT = "LightBlue"
+
+[websocket]
+[websocket.connection_status]
+connected = "Green"
+disconnected = "LightRed"
+
+[websocket.messages]
+server_foreground_color = "#007acc"
+server_background_color = "#3c3c3c"
+you_background_color = "#3c3c3c"
+details_color = "DarkGray"

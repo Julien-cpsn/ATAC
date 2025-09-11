@@ -1,11 +1,10 @@
 {
-  "name": "Response formats",
-  "last_position": 4,
+  "name": "Scripts",
+  "last_position": 6,
   "requests": [
     {
-      "name": "JSON",
-      "url": "https://httpbin.org/json",
-      "method": "GET",
+      "name": "Pre-request script",
+      "url": "https://httpbin.org/get",
       "params": [],
       "headers": [
         {
@@ -19,7 +18,7 @@
           "enabled": true,
           "data": [
             "user-agent",
-            "ATAC/v0.8.1"
+            "ATAC/v0.14.0"
           ]
         },
         {
@@ -44,10 +43,9 @@
           ]
         }
       ],
-      "body": "no_body",
       "auth": "no_auth",
       "scripts": {
-        "pre_request_script": null,
+        "pre_request_script": "console.log(\"Hello\")\npretty_print(request)",
         "post_request_script": null
       },
       "settings": {
@@ -58,12 +56,16 @@
         "pretty_print_response_content": true,
         "accept_invalid_certs": false,
         "accept_invalid_hostnames": false
+      },
+      "protocol": {
+        "type": "http",
+        "method": "GET",
+        "body": "no_body"
       }
     },
     {
-      "name": "HTML",
-      "url": "https://httpbin.org/html",
-      "method": "GET",
+      "name": "Post-request script",
+      "url": "https://httpbin.org/get",
       "params": [],
       "headers": [
         {
@@ -77,7 +79,7 @@
           "enabled": true,
           "data": [
             "user-agent",
-            "ATAC/v0.8.1"
+            "ATAC/v0.14.0"
           ]
         },
         {
@@ -102,11 +104,10 @@
           ]
         }
       ],
-      "body": "no_body",
       "auth": "no_auth",
       "scripts": {
         "pre_request_script": null,
-        "post_request_script": null
+        "post_request_script": "console.log(\" World!\")\npretty_print(response)"
       },
       "settings": {
         "use_config_proxy": true,
@@ -116,12 +117,16 @@
         "pretty_print_response_content": true,
         "accept_invalid_certs": false,
         "accept_invalid_hostnames": false
+      },
+      "protocol": {
+        "type": "http",
+        "method": "GET",
+        "body": "no_body"
       }
     },
     {
-      "name": "XML",
-      "url": "https://httpbin.org/xml",
-      "method": "GET",
+      "name": "Both",
+      "url": "https://httpbin.org/get",
       "params": [],
       "headers": [
         {
@@ -135,7 +140,7 @@
           "enabled": true,
           "data": [
             "user-agent",
-            "ATAC/v0.8.1"
+            "ATAC/v0.14.0"
           ]
         },
         {
@@ -160,11 +165,10 @@
           ]
         }
       ],
-      "body": "no_body",
       "auth": "no_auth",
       "scripts": {
-        "pre_request_script": null,
-        "post_request_script": null
+        "pre_request_script": "console.log(\"Hello\")\n\nrequest.url = \"https://google.com\"\n\npretty_print(request)",
+        "post_request_script": "console.log(\" World!\")\n\nenv.ID = \"3\"\n\npretty_print(env)\npretty_print(response)"
       },
       "settings": {
         "use_config_proxy": true,
@@ -174,6 +178,11 @@
         "pretty_print_response_content": true,
         "accept_invalid_certs": false,
         "accept_invalid_hostnames": false
+      },
+      "protocol": {
+        "type": "http",
+        "method": "GET",
+        "body": "no_body"
       }
     }
   ]

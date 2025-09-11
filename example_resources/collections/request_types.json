@@ -5,7 +5,6 @@
     {
       "name": "Check headers",
       "url": "https://httpbin.org/headers",
-      "method": "GET",
       "params": [],
       "headers": [
         {
@@ -44,7 +43,6 @@
           ]
         }
       ],
-      "body": "no_body",
       "auth": "no_auth",
       "scripts": {
         "pre_request_script": null,
@@ -58,12 +56,16 @@
         "pretty_print_response_content": true,
         "accept_invalid_certs": false,
         "accept_invalid_hostnames": false
+      },
+      "protocol": {
+        "type": "http",
+        "method": "GET",
+        "body": "no_body"
       }
     },
     {
       "name": "Test Query Params",
       "url": "https://httpbin.org/get",
-      "method": "GET",
       "params": [
         {
           "enabled": true,
@@ -110,7 +112,6 @@
           ]
         }
       ],
-      "body": "no_body",
       "auth": "no_auth",
       "scripts": {
         "pre_request_script": null,
@@ -124,12 +125,16 @@
         "pretty_print_response_content": true,
         "accept_invalid_certs": false,
         "accept_invalid_hostnames": false
+      },
+      "protocol": {
+        "type": "http",
+        "method": "GET",
+        "body": "no_body"
       }
     },
     {
       "name": "Form",
       "url": "https://httpbin.org/post",
-      "method": "POST",
       "params": [],
       "headers": [
         {
@@ -175,17 +180,6 @@
           ]
         }
       ],
-      "body": {
-        "form": [
-          {
-            "enabled": true,
-            "data": [
-              "custname",
-              "John"
-            ]
-          }
-        ]
-      },
       "auth": "no_auth",
       "scripts": {
         "pre_request_script": null,
@@ -199,12 +193,26 @@
         "pretty_print_response_content": true,
         "accept_invalid_certs": false,
         "accept_invalid_hostnames": false
+      },
+      "protocol": {
+        "type": "http",
+        "method": "POST",
+        "body": {
+          "form": [
+            {
+              "enabled": true,
+              "data": [
+                "custname",
+                "John"
+              ]
+            }
+          ]
+        }
       }
     },
     {
       "name": "Multipart",
       "url": "https://httpbin.org/post",
-      "method": "POST",
       "params": [],
       "headers": [
         {
@@ -243,24 +251,6 @@
           ]
         }
       ],
-      "body": {
-        "multipart": [
-          {
-            "enabled": true,
-            "data": [
-              "key",
-              "value"
-            ]
-          },
-          {
-            "enabled": true,
-            "data": [
-              "file",
-              "!!Cargo.toml"
-            ]
-          }
-        ]
-      },
       "auth": "no_auth",
       "scripts": {
         "pre_request_script": null,
@@ -274,6 +264,28 @@
         "pretty_print_response_content": true,
         "accept_invalid_certs": false,
         "accept_invalid_hostnames": false
+      },
+      "protocol": {
+        "type": "http",
+        "method": "POST",
+        "body": {
+          "multipart": [
+            {
+              "enabled": true,
+              "data": [
+                "key",
+                "value"
+              ]
+            },
+            {
+              "enabled": true,
+              "data": [
+                "file",
+                "!!Cargo.toml"
+              ]
+            }
+          ]
+        }
       }
     }
   ]

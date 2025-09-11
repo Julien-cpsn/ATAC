@@ -10,6 +10,7 @@ use ratatui::widgets::block::Title;
 
 use crate::app::app::{App};
 use crate::app::files::theme::THEME;
+use crate::models::protocol::protocol::Protocol;
 use crate::tui::app_states::AppState::*;
 use crate::tui::app_states::{AVAILABLE_EVENTS, event_available_keys_to_spans};
 
@@ -104,7 +105,10 @@ impl App<'_> {
             Some(selection) => {
                 let selected_request = self.get_request_as_local_from_indexes(&selection).read().clone();
 
-                self.render_request(frame, inner_layout[1], selected_request);
+                match selected_request.protocol {
+                    Protocol::HttpRequest(_) => self.render_http_request(frame, inner_layout[1], selected_request),
+                    Protocol::WsRequest(_) => self.render_ws_request(frame, inner_layout[1], selected_request),
+                }
             }
         }
 

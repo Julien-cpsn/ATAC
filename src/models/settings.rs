@@ -24,13 +24,13 @@ impl Setting {
     pub fn as_bool(&self) -> bool {
         match self {
             Setting::Bool(bool) => *bool,
-            Setting::U32(_) => panic!("Should not happen")
+            Setting::U32(_) => unreachable!()
         }
     }
 
     pub fn as_u32(&self) -> u32 {
         match self {
-            Setting::Bool(_) => panic!("Should not happen"),
+            Setting::Bool(_) => unreachable!(),
             Setting::U32(u32) => *u32
         }
     }

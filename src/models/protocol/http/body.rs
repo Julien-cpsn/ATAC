@@ -4,8 +4,8 @@ use serde::{Deserialize, Serialize};
 use strum::Display;
 use rayon::prelude::*;
 
-use crate::app::business_logic::request::body::FormError::NotAForm;
-use crate::models::body::ContentType::{File, Form, Html, Javascript, Json, Multipart, NoBody, Raw, Xml};
+use crate::app::business_logic::request::http::body::FormError::NotAForm;
+use crate::models::protocol::http::body::ContentType::{NoBody, Multipart, Form, Raw, File, Json, Xml, Html, Javascript};
 use crate::models::request::KeyValue;
 
 #[derive(Default, Debug, Clone, Display, Serialize, Deserialize)]

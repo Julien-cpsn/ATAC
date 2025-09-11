@@ -1,6 +1,6 @@
 use clap::Subcommand;
 use crate::cli::commands::key_value::KeyValueCommand;
-use crate::models::body::ContentType;
+use crate::models::protocol::http::body::ContentType;
 
 #[derive(Subcommand, Debug, Clone)]
 pub enum BodySubcommand {

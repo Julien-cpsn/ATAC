@@ -5,7 +5,6 @@
     {
       "name": "No pretty print response",
       "url": "https://dummyjson.com/products",
-      "method": "GET",
       "params": [],
       "headers": [
         {
@@ -44,7 +43,6 @@
           ]
         }
       ],
-      "body": "no_body",
       "auth": "no_auth",
       "scripts": {
         "pre_request_script": null,
@@ -58,12 +56,16 @@
         "pretty_print_response_content": false,
         "accept_invalid_certs": false,
         "accept_invalid_hostnames": false
+      },
+      "protocol": {
+        "type": "http",
+        "method": "GET",
+        "body": "no_body"
       }
     },
     {
       "name": "Long request",
       "url": "https://httpbin.org/delay/5",
-      "method": "GET",
       "params": [],
       "headers": [
         {
@@ -102,7 +104,6 @@
           ]
         }
       ],
-      "body": "no_body",
       "auth": "no_auth",
       "scripts": {
         "pre_request_script": null,
@@ -116,12 +117,16 @@
         "pretty_print_response_content": true,
         "accept_invalid_certs": false,
         "accept_invalid_hostnames": false
+      },
+      "protocol": {
+        "type": "http",
+        "method": "GET",
+        "body": "no_body"
       }
     },
     {
       "name": "Redirect to",
       "url": "https://httpbin.org/redirect-to",
-      "method": "GET",
       "params": [
         {
           "enabled": true,
@@ -168,7 +173,6 @@
           ]
         }
       ],
-      "body": "no_body",
       "auth": "no_auth",
       "scripts": {
         "pre_request_script": null,
@@ -182,12 +186,16 @@
         "pretty_print_response_content": true,
         "accept_invalid_certs": false,
         "accept_invalid_hostnames": false
+      },
+      "protocol": {
+        "type": "http",
+        "method": "GET",
+        "body": "no_body"
       }
     },
     {
       "name": "PNG Image",
       "url": "https://httpbin.org/image/png",
-      "method": "GET",
       "params": [],
       "headers": [
         {
@@ -226,7 +234,6 @@
           ]
         }
       ],
-      "body": "no_body",
       "auth": "no_auth",
       "scripts": {
         "pre_request_script": null,
@@ -240,12 +247,16 @@
         "pretty_print_response_content": true,
         "accept_invalid_certs": false,
         "accept_invalid_hostnames": false
+      },
+      "protocol": {
+        "type": "http",
+        "method": "GET",
+        "body": "no_body"
       }
     },
     {
       "name": "Large image",
       "url": "https://images.unsplash.com/1/type-away.jpg",
-      "method": "GET",
       "params": [
         {
           "enabled": true,
@@ -313,7 +324,6 @@
           ]
         }
       ],
-      "body": "no_body",
       "auth": "no_auth",
       "scripts": {
         "pre_request_script": null,
@@ -327,12 +337,16 @@
         "pretty_print_response_content": true,
         "accept_invalid_certs": false,
         "accept_invalid_hostnames": false
+      },
+      "protocol": {
+        "type": "http",
+        "method": "GET",
+        "body": "no_body"
       }
     },
     {
       "name": "Rust Homepage",
       "url": "https://www.rust-lang.org",
-      "method": "GET",
       "params": [],
       "headers": [
         {
@@ -371,7 +385,6 @@
           ]
         }
       ],
-      "body": "no_body",
       "auth": "no_auth",
       "scripts": {
         "pre_request_script": null,
@@ -385,12 +398,16 @@
         "pretty_print_response_content": true,
         "accept_invalid_certs": false,
         "accept_invalid_hostnames": false
+      },
+      "protocol": {
+        "type": "http",
+        "method": "GET",
+        "body": "no_body"
       }
     },
     {
       "name": "Google fr",
       "url": "https://www.google.fr/",
-      "method": "GET",
       "params": [],
       "headers": [
         {
@@ -429,7 +446,6 @@
           ]
         }
       ],
-      "body": "no_body",
       "auth": "no_auth",
       "scripts": {
         "pre_request_script": null,
@@ -443,12 +459,16 @@
         "pretty_print_response_content": true,
         "accept_invalid_certs": false,
         "accept_invalid_hostnames": false
+      },
+      "protocol": {
+        "type": "http",
+        "method": "GET",
+        "body": "no_body"
       }
     },
     {
       "name": "Send file",
       "url": "https://httpbin.org/post",
-      "method": "POST",
       "params": [],
       "headers": [
         {
@@ -494,9 +514,6 @@
           ]
         }
       ],
-      "body": {
-        "file": "src/main.rs"
-      },
       "auth": "no_auth",
       "scripts": {
         "pre_request_script": null,
@@ -510,12 +527,18 @@
         "pretty_print_response_content": true,
         "accept_invalid_certs": false,
         "accept_invalid_hostnames": false
+      },
+      "protocol": {
+        "type": "http",
+        "method": "POST",
+        "body": {
+          "file": "src/main.rs"
+        }
       }
     },
     {
       "name": "Path params",
       "url": "https://httpbin.org/{some_param}",
-      "method": "GET",
       "params": [
         {
           "enabled": true,
@@ -562,7 +585,6 @@
           ]
         }
       ],
-      "body": "no_body",
       "auth": "no_auth",
       "scripts": {
         "pre_request_script": null,
@@ -576,12 +598,16 @@
         "pretty_print_response_content": true,
         "accept_invalid_certs": false,
         "accept_invalid_hostnames": false
+      },
+      "protocol": {
+        "type": "http",
+        "method": "GET",
+        "body": "no_body"
       }
     },
     {
       "name": "Short timeout",
       "url": "https://httpbin.org/delay/1",
-      "method": "GET",
       "params": [],
       "headers": [
         {
@@ -620,7 +646,6 @@
           ]
         }
       ],
-      "body": "no_body",
       "auth": "no_auth",
       "scripts": {
         "pre_request_script": null,
@@ -634,6 +659,11 @@
         "pretty_print_response_content": true,
         "accept_invalid_certs": false,
         "accept_invalid_hostnames": false
+      },
+      "protocol": {
+        "type": "http",
+        "method": "GET",
+        "body": "no_body"
       }
     }
   ]

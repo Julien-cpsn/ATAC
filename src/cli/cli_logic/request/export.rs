@@ -8,7 +8,7 @@ impl App<'_> {
         {
             let selected_request = local_selected_request.read();
 
-            let export_result = self.export_request_to_string_with_format(export_format, &selected_request);
+            let export_result = self.export_request_to_string_with_format(export_format, &selected_request)?;
 
             println!("{export_result}");
         }

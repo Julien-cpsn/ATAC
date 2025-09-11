@@ -1,7 +1,8 @@
 use crate::app::app::App;
 use crate::app::business_logic::key_value::print_key_value_vector;
 use crate::models::auth::Auth;
-use crate::models::body::ContentType;
+use crate::models::protocol::http::body::ContentType;
+use crate::models::protocol::protocol::Protocol;
 
 impl App<'_> {
     pub fn cli_describe_request(&mut self, collection_index: usize, request_index: usize) -> anyhow::Result<()> {
@@ -9,7 +10,12 @@ impl App<'_> {
         let request = local_request.read();
 
         println!("name: {}", request.name);
-        println!("method: {}", request.method);
+        println!("protocol: {}", request.protocol.to_string());
+
+        if let Protocol::HttpRequest(request) = &request.protocol {
+            println!("method: {}", request.method);
+        }
+
         println!("url: {}", request.url_with_params_to_string());
 
         if !request.headers.is_empty() {
@@ -23,15 +29,17 @@ impl App<'_> {
             Auth::BearerToken { token: bearer_token } => println!("auth: Bearer token\n\t{bearer_token}"),
         }
 
-        match &request.body {
-            ContentType::NoBody => {}
-            ContentType::File(file) => println!("body: {}\n{file}", &request.body.to_string()),
-            ContentType::Multipart(form) | ContentType::Form(form) => {
-                println!("body: {}", &request.body.to_string());
-                print_key_value_vector(form, Some("\t"));
-            },
-            ContentType::Raw(body) | ContentType::Json(body) | ContentType::Xml(body) | ContentType::Html(body) | ContentType::Javascript(body) => {
-                println!("body: {}{body}", &request.body.to_string());
+        if let Protocol::HttpRequest(http_request) = &request.protocol {
+            match &http_request.body {
+                ContentType::NoBody => {}
+                ContentType::File(file) => println!("body: {}\n{file}", &http_request.body.to_string()),
+                ContentType::Multipart(form) | ContentType::Form(form) => {
+                    println!("body: {}", &http_request.body.to_string());
+                    print_key_value_vector(form, Some("\t"));
+                },
+                ContentType::Raw(body) | ContentType::Json(body) | ContentType::Xml(body) | ContentType::Html(body) | ContentType::Javascript(body) => {
+                    println!("body: {}{body}", &http_request.body.to_string());
+                }
             }
         }
         

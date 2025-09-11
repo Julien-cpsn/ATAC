@@ -1,35 +1,41 @@
+use anyhow::anyhow;
 use lazy_static::lazy_static;
 use ratatui::prelude::{Line, Modifier, Span};
 use ratatui::style::{Color, Stylize};
 use ratatui::widgets::ListItem;
-use serde::{Deserialize, Serialize};
 use tracing::trace;
 use tui_tree_widget::TreeItem;
 use rayon::prelude::*;
 use regex::Regex;
+use serde::Serialize;
+use serde_versioning::Deserialize;
 use tokio_util::sync::CancellationToken;
 
 use crate::app::app::App;
 use crate::app::files::config::SKIP_SAVE_REQUESTS_RESPONSE;
 use crate::app::files::theme::THEME;
 use crate::models::auth::Auth;
-use crate::models::body::ContentType;
-use crate::models::method::Method;
+use crate::models::legacy::request::RequestV0_20_2;
+use crate::models::protocol::http::http::HttpRequest;
+use crate::models::protocol::protocol::Protocol;
+use crate::models::protocol::protocol::ProtocolTypeError::{NotAWsRequest, NotAnHttpRequest};
+use crate::models::protocol::ws::ws::WsRequest;
 use crate::models::response::RequestResponse;
 use crate::models::scripts::RequestScripts;
 use crate::models::settings::RequestSettings;
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
+#[versioning(previous_version = RequestV0_20_2)]
 pub struct Request {
     pub name: String,
     pub url: String,
-    pub method: Method,
     pub params: Vec<KeyValue>,
     pub headers: Vec<KeyValue>,
-    pub body: ContentType,
     pub auth: Auth,
     pub scripts: RequestScripts,
     pub settings: RequestSettings,
+
+    pub protocol: Protocol,
 
     #[serde(skip_serializing_if = "should_skip_requests_response", default = "RequestResponse::default")]
     pub response: RequestResponse,
@@ -127,13 +133,54 @@ lazy_static! {
 }
 
 impl Request {
+    pub fn get_http_request(&self) -> anyhow::Result<&HttpRequest> {
+        match &self.protocol {
+            Protocol::HttpRequest(request) => Ok(request),
+            Protocol::WsRequest(_) => Err(anyhow!(NotAnHttpRequest))
+        }
+    }
+
+    pub fn get_http_request_mut(&mut self) -> anyhow::Result<&mut HttpRequest> {
+        match &mut self.protocol {
+            Protocol::HttpRequest(request) => Ok(request),
+            Protocol::WsRequest(_) => Err(anyhow!(NotAnHttpRequest))
+        }
+    }
+
+    pub fn get_ws_request(&self) -> anyhow::Result<&WsRequest> {
+        match &self.protocol {
+            Protocol::HttpRequest(_) => Err(anyhow!(NotAWsRequest)),
+            Protocol::WsRequest(request) => Ok(request)
+        }
+    }
+
+    pub fn get_ws_request_mut(&mut self) -> anyhow::Result<&mut WsRequest> {
+        match &mut self.protocol {
+            Protocol::HttpRequest(_) => Err(anyhow!(NotAWsRequest)),
+            Protocol::WsRequest(request) => Ok(request)
+        }
+    }
+
     pub fn to_tree_item<'a>(&self, identifier: usize) -> TreeItem<'a, usize> {
         let mut line_elements: Vec<Span> = vec![];
 
-        let prefix = Span::from(self.method.to_string())
-            .style(Modifier::BOLD)
-            .fg(Color::White)
-            .bg(self.method.get_color());
+        let prefix = match &self.protocol {
+            Protocol::HttpRequest(http_request) => Span::from(http_request.method.to_string())
+                .style(Modifier::BOLD)
+                .fg(Color::White)
+                .bg(http_request.method.get_color()),
+            Protocol::WsRequest(ws_request) => {
+                let color = match ws_request.is_connected {
+                    true => THEME.read().websocket.connection_status.connected,
+                    false => THEME.read().websocket.connection_status.disconnected,
+                };
+
+                Span::from("WS")
+                    .style(Modifier::BOLD)
+                    .fg(Color::White)
+                    .bg(color)
+            }
+        };
 
         line_elements.push(prefix);
 

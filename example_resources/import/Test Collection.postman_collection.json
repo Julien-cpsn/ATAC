@@ -9,7 +9,10 @@
 		{
 			"name": "Test GET",
 			"request": {
-				"method": "GET",
+				      "protocol": {
+        "method": "GET",
+        "body": "no_body"
+      },
 				"header": [],
 				"url": {
 					"raw": "https://httpbin.org/get",
@@ -28,7 +31,10 @@
 		{
 			"name": "Test POST plain text",
 			"request": {
-				"method": "POST",
+				      "protocol": {
+        "method": "POST",
+        "body": "no_body"
+      },
 				"header": [],
 				"body": {
 					"mode": "raw",
@@ -56,7 +62,10 @@
 		{
 			"name": "Test POST JSON",
 			"request": {
-				"method": "POST",
+				      "protocol": {
+        "method": "POST",
+        "body": "no_body"
+      },
 				"header": [],
 				"body": {
 					"mode": "raw",
@@ -84,7 +93,10 @@
 		{
 			"name": "Test PUT",
 			"request": {
-				"method": "PUT",
+				      "protocol": {
+        "method": "PUT",
+        "body": "no_body"
+      },
 				"header": [],
 				"url": {
 					"raw": "https://httpbin.org/put",
@@ -103,7 +115,10 @@
 		{
 			"name": "Test DELETE",
 			"request": {
-				"method": "DELETE",
+				      "protocol": {
+        "method": "DELETE",
+        "body": "no_body"
+      },
 				"header": [],
 				"url": {
 					"raw": "https://httpbin.org/delete",
@@ -122,7 +137,10 @@
 		{
 			"name": "Test OPTIONS",
 			"request": {
-				"method": "OPTIONS",
+				      "protocol": {
+        "method": "OPTIONS",
+        "body": "no_body"
+      },
 				"header": [],
 				"url": {
 					"raw": "https://test.com",
@@ -153,7 +171,10 @@
 						}
 					]
 				},
-				"method": "GET",
+				      "protocol": {
+        "method": "GET",
+        "body": "no_body"
+      },
 				"header": [],
 				"url": {
 					"raw": "https://httpbin.org/basic-auth/username/pwd",
@@ -184,7 +205,10 @@
 						}
 					]
 				},
-				"method": "GET",
+				      "protocol": {
+        "method": "GET",
+        "body": "no_body"
+      },
 				"header": [],
 				"url": {
 					"raw": "https://httpbin.org/bearer",
@@ -203,7 +227,10 @@
 		{
 			"name": "Check Headers",
 			"request": {
-				"method": "GET",
+				      "protocol": {
+        "method": "GET",
+        "body": "no_body"
+      },
 				"header": [],
 				"url": {
 					"raw": "https://httpbin.org/headers",
@@ -222,7 +249,10 @@
 		{
 			"name": "Test Query Params",
 			"request": {
-				"method": "GET",
+				      "protocol": {
+        "method": "GET",
+        "body": "no_body"
+      },
 				"header": [],
 				"url": {
 					"raw": "https://httpbin.org/get?my_param=42",
@@ -251,7 +281,10 @@
 				"disableCookies": true
 			},
 			"request": {
-				"method": "POST",
+				      "protocol": {
+        "method": "POST",
+        "body": "no_body"
+      },
 				"header": [],
 				"body": {
 					"mode": "formdata",
@@ -305,7 +338,10 @@
 		{
 			"name": "Test URL encoded form",
 			"request": {
-				"method": "POST",
+				      "protocol": {
+        "method": "POST",
+        "body": "no_body"
+      },
 				"header": [],
 				"body": {
 					"mode": "urlencoded",
@@ -334,7 +370,10 @@
 		{
 			"name": "Test File",
 			"request": {
-				"method": "POST",
+				      "protocol": {
+        "method": "POST",
+        "body": "no_body"
+      },
 				"header": [],
 				"body": {
 					"mode": "file",
@@ -359,7 +398,10 @@
 		{
 			"name": "Test Javascript",
 			"request": {
-				"method": "POST",
+				      "protocol": {
+        "method": "POST",
+        "body": "no_body"
+      },
 				"header": [],
 				"body": {
 					"mode": "raw",
@@ -400,7 +442,10 @@
 				}
 			],
 			"request": {
-				"method": "GET",
+				      "protocol": {
+        "method": "GET",
+        "body": "no_body"
+      },
 				"header": [],
 				"url": {
 					"raw": "https://httpbin.org/post",
