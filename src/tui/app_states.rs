@@ -632,7 +632,7 @@ impl AppState {
                 ],
                 TextAreaMode::Custom(text_area_key_bindings) => vec![
                     GoBackToRequestMenu(EventKeyBinding::new(vec![key_bindings.generic.navigation.go_back], "Quit without saving", Some("Quit"))),
-                    EditingRequestMessageSaveAndQuit(EventKeyBinding::new(vec![text_area_key_bindings.save_and_quit], "Save and quit", Some("Save"))),
+                    EditingRequestMessageSaveAndQuit(EventKeyBinding::new(vec![text_area_key_bindings.save_and_quit], "Save and quit", Some("Send"))),
                     EditingRequestMessageCopy(EventKeyBinding::new(vec![text_area_key_bindings.copy], "Copy", Some("Copy"))),
                     EditingRequestMessagePaste(EventKeyBinding::new(vec![text_area_key_bindings.paste], "Paste", Some("Paste"))),
                     EditingRequestMessageUndo(EventKeyBinding::new(vec![text_area_key_bindings.undo], "Undo", Some("Undo"))),

@@ -57,11 +57,11 @@ impl App<'_> {
 
         let connection_status_paragraph = match ws_request.is_connected {
             true => Paragraph::new("Connected")
-                .bg(THEME.read().websocket.connection_statuses.connected)
+                .bg(THEME.read().websocket.connection_status.connected)
                 .fg(THEME.read().ui.font_color)
                 .centered(),
             false => Paragraph::new("Disconnected")
-                .bg(THEME.read().websocket.connection_statuses.disconnected)
+                .bg(THEME.read().websocket.connection_status.disconnected)
                 .fg(THEME.read().ui.font_color)
                 .centered()
         };

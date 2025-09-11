@@ -171,8 +171,8 @@ impl Request {
                 .bg(http_request.method.get_color()),
             Protocol::WsRequest(ws_request) => {
                 let color = match ws_request.is_connected {
-                    true => THEME.read().websocket.connection_statuses.connected,
-                    false => THEME.read().websocket.connection_statuses.disconnected,
+                    true => THEME.read().websocket.connection_status.connected,
+                    false => THEME.read().websocket.connection_status.disconnected,
                 };
 
                 Span::from("WS")

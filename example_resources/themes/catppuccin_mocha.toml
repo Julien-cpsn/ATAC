@@ -5,7 +5,7 @@
 # Hex codes also work, e.g.  "#1a2b3c"
 
 [ui]
-font_color = "#cdd6f4"
+font_color = "#d8dded"
 # Null to preserve terminal background, uncomment to apply catppuccin background
 # app_background = "#1e1e2e"
 
@@ -19,7 +19,8 @@ secondary_background_color = "#313244"
 selection_highlight_color = "#45475a"
 environment_variable_highlight_color = "#585b70"
 
-[methods]
+[HTTP]
+[HTTP.methods]
 GET = "#a6e3a1"
 POST = "#f9e2af"
 PUT = "#89b4fa"
@@ -30,3 +31,13 @@ HEAD = "#fab387"
 TRACE = "#f9e2af"
 CONNECT = "#89b4fa"
 
+[websocket]
+[websocket.connection_status]
+connected = "#a6e3a1"
+disconnected = "#f38ba8"
+
+[websocket.messages]
+server_foreground_color = "#89b4fa"
+server_background_color = "#313244"
+you_background_color = "#313244"
+details_color = "DarkGray"

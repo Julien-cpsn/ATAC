@@ -241,7 +241,7 @@ impl App<'_> {
 
                                     messages.push(
                                         Line::raw(line)
-                                            .white()
+                                            .fg(THEME.read().ui.font_color)
                                             .bg(THEME.read().websocket.messages.you_background_color)
                                             .alignment(alignment)
                                     );
@@ -268,7 +268,7 @@ impl App<'_> {
 
                                     messages.push(
                                         Line::raw(line)
-                                            .white()
+                                            .fg(THEME.read().ui.font_color)
                                             .bg(THEME.read().websocket.messages.server_background_color)
                                             .alignment(alignment)
                                     );
@@ -285,8 +285,7 @@ impl App<'_> {
 
                         messages.push(
                             Line::raw(format!("{} {}", message.content.to_string(), timestamp))
-                                .dark_gray()
-                                .dim()
+                                .fg(THEME.read().websocket.messages.details_color)
                                 .alignment(alignment)
                         );
 
