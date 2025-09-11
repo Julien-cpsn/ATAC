@@ -414,7 +414,7 @@ impl App<'_> {
             self.tui_highlight_response_body_and_console();
             self.tui_refresh_result_scrollbars();
 
-            if self.config.should_save_requests_reponse() {
+            if self.config.should_save_requests_response() {
                 let selection = self.collections_tree.state.selected().to_vec();
                 if selection.len() > 0 {
                     self.save_collection_to_file(selection[0]);

@@ -46,7 +46,7 @@ impl Config {
         return self.disable_syntax_highlighting.unwrap_or(false)
     }
 
-    pub fn should_save_requests_reponse(&self) -> bool {
+    pub fn should_save_requests_response(&self) -> bool {
         self.save_requests_response.unwrap_or(false)
     }
     pub fn set_should_skip_requests_response(&self) {
