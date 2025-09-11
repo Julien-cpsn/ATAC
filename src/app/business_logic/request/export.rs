@@ -20,7 +20,7 @@ enum ExportError {
     #[error("Could not parse URL")]
     CouldNotParseUrl,
 
-    #[error("Export format not supported for protocol {0}")]
+    #[error("Export format not supported for the {0} protocol")]
     ExportFormatNotSupported(String),
 }
 
