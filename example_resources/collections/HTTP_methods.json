@@ -5,7 +5,6 @@
     {
       "name": "Test Get",
       "url": "https://httpbin.org/get",
-      "method": "GET",
       "params": [],
       "headers": [
         {
@@ -44,7 +43,6 @@
           ]
         }
       ],
-      "body": "no_body",
       "auth": "no_auth",
       "scripts": {
         "pre_request_script": null,
@@ -58,12 +56,16 @@
         "pretty_print_response_content": true,
         "accept_invalid_certs": false,
         "accept_invalid_hostnames": false
+      },
+      "protocol": {
+        "type": "http",
+        "method": "GET",
+        "body": "no_body"
       }
     },
     {
       "name": "Test Post",
       "url": "https://httpbin.org/post",
-      "method": "POST",
       "params": [],
       "headers": [
         {
@@ -109,9 +111,6 @@
           ]
         }
       ],
-      "body": {
-        "json": "{\n\t\"my_json\": 42\n}"
-      },
       "auth": "no_auth",
       "scripts": {
         "pre_request_script": null,
@@ -125,12 +124,18 @@
         "pretty_print_response_content": true,
         "accept_invalid_certs": false,
         "accept_invalid_hostnames": false
+      },
+      "protocol": {
+        "type": "http",
+        "method": "POST",
+        "body": {
+          "json": "{\n\t\"my_json\": 42\n}"
+        }
       }
     },
     {
       "name": "Test Put",
       "url": "https://httpbin.org/put",
-      "method": "PUT",
       "params": [],
       "headers": [
         {
@@ -169,7 +174,6 @@
           ]
         }
       ],
-      "body": "no_body",
       "auth": "no_auth",
       "scripts": {
         "pre_request_script": null,
@@ -183,12 +187,16 @@
         "pretty_print_response_content": true,
         "accept_invalid_certs": false,
         "accept_invalid_hostnames": false
+      },
+      "protocol": {
+        "type": "http",
+        "method": "PUT",
+        "body": "no_body"
       }
     },
     {
       "name": "Test Delete",
       "url": "https://httpbin.org/delete",
-      "method": "DELETE",
       "params": [],
       "headers": [
         {
@@ -227,7 +235,6 @@
           ]
         }
       ],
-      "body": "no_body",
       "auth": "no_auth",
       "scripts": {
         "pre_request_script": null,
@@ -241,12 +248,16 @@
         "pretty_print_response_content": true,
         "accept_invalid_certs": false,
         "accept_invalid_hostnames": false
+      },
+      "protocol": {
+        "type": "http",
+        "method": "DELETE",
+        "body": "no_body"
       }
     },
     {
       "name": "Test Patch",
       "url": "https://httpbin.org/patch",
-      "method": "PATCH",
       "params": [],
       "headers": [
         {
@@ -285,7 +296,6 @@
           ]
         }
       ],
-      "body": "no_body",
       "auth": "no_auth",
       "scripts": {
         "pre_request_script": null,
@@ -299,12 +309,16 @@
         "pretty_print_response_content": true,
         "accept_invalid_certs": false,
         "accept_invalid_hostnames": false
+      },
+      "protocol": {
+        "type": "http",
+        "method": "PATCH",
+        "body": "no_body"
       }
     },
     {
       "name": "Test Option",
       "url": "https://httpbin.org",
-      "method": "OPTIONS",
       "params": [],
       "headers": [
         {
@@ -343,7 +357,6 @@
           ]
         }
       ],
-      "body": "no_body",
       "auth": "no_auth",
       "scripts": {
         "pre_request_script": null,
@@ -357,12 +370,16 @@
         "pretty_print_response_content": true,
         "accept_invalid_certs": false,
         "accept_invalid_hostnames": false
+      },
+      "protocol": {
+        "type": "http",
+        "method": "OPTIONS",
+        "body": "no_body"
       }
     },
     {
       "name": "Test Head",
       "url": "https://httpbin.org/get",
-      "method": "HEAD",
       "params": [],
       "headers": [
         {
@@ -401,7 +418,6 @@
           ]
         }
       ],
-      "body": "no_body",
       "auth": "no_auth",
       "scripts": {
         "pre_request_script": null,
@@ -415,12 +431,16 @@
         "pretty_print_response_content": true,
         "accept_invalid_certs": false,
         "accept_invalid_hostnames": false
+      },
+      "protocol": {
+        "type": "http",
+        "method": "HEAD",
+        "body": "no_body"
       }
     },
     {
       "name": "Test Trace",
       "url": "",
-      "method": "TRACE",
       "params": [],
       "headers": [
         {
@@ -459,7 +479,6 @@
           ]
         }
       ],
-      "body": "no_body",
       "auth": "no_auth",
       "scripts": {
         "pre_request_script": null,
@@ -473,12 +492,16 @@
         "pretty_print_response_content": true,
         "accept_invalid_certs": false,
         "accept_invalid_hostnames": false
+      },
+      "protocol": {
+        "type": "http",
+        "method": "TRACE",
+        "body": "no_body"
       }
     },
     {
       "name": "Test Connect",
       "url": "",
-      "method": "CONNECT",
       "params": [],
       "headers": [
         {
@@ -517,7 +540,6 @@
           ]
         }
       ],
-      "body": "no_body",
       "auth": "no_auth",
       "scripts": {
         "pre_request_script": null,
@@ -531,6 +553,11 @@
         "pretty_print_response_content": true,
         "accept_invalid_certs": false,
         "accept_invalid_hostnames": false
+      },
+      "protocol": {
+        "type": "http",
+        "method": "CONNECT",
+        "body": "no_body"
       }
     }
   ]

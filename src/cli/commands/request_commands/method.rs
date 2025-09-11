@@ -1,5 +1,5 @@
 use clap::Subcommand;
-use crate::models::method::Method;
+use crate::models::protocol::http::method::Method;
 
 #[derive(Subcommand, Debug, Clone)]
 pub enum MethodCommand {

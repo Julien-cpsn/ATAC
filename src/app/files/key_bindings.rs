@@ -110,6 +110,7 @@ nest! {
             pub param_tabs: #[derive(Copy, Clone, Deserialize)] pub struct ParamTabs {
                 pub change_auth_method: KeyCombination,
                 pub change_body_content_type: KeyCombination,
+                pub change_message_type: KeyCombination,
             },
 
             pub result_tabs: #[derive(Copy, Clone, Deserialize)] pub struct ResultTabs {
@@ -241,6 +242,7 @@ impl Default for KeyBindings {
                 param_tabs: ParamTabs {
                     change_auth_method: key!(ctrl-a),
                     change_body_content_type: key!(ctrl-b),
+                    change_message_type: key!(ctrl-m),
                 },
                 result_tabs: ResultTabs {
                     scroll_up: key!(ctrl-up),

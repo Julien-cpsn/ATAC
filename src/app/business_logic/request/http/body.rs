@@ -4,7 +4,7 @@ use tracing::{info};
 
 use crate::app::app::App;
 use crate::app::business_logic::key_value::find_key;
-use crate::models::body::ContentType;
+use crate::models::protocol::http::body::ContentType;
 use crate::models::request::KeyValue;
 
 #[derive(Error, Debug)]
@@ -19,12 +19,13 @@ impl App<'_> {
 
         {
             let mut selected_request = local_selected_request.write();
+            let selected_http_request = selected_request.get_http_request_mut()?;
 
             info!("Body content-type set to \"{}\"", content_type);
-            
-            selected_request.body = content_type;
 
-            match &selected_request.body {
+            selected_http_request.body = content_type;
+
+            match &selected_http_request.body {
                 // Removes Content-Type header if there is no more body
                 ContentType::NoBody => {
                     selected_request.find_and_delete_header(CONTENT_TYPE.as_str())
@@ -33,7 +34,7 @@ impl App<'_> {
                 ContentType::Multipart(_) => {},
                 // Create or replace Content-Type header with new body content type
                 ContentType::File(_) | ContentType::Form(_) | ContentType::Raw(_) | ContentType::Json(_) | ContentType::Xml(_) | ContentType::Html(_) | ContentType::Javascript(_) => {
-                    let content_type = &selected_request.body.to_content_type();
+                    let content_type = &selected_http_request.body.to_content_type();
                     selected_request.modify_or_create_header(CONTENT_TYPE.as_str(), content_type)
                 }
             }
@@ -47,8 +48,9 @@ impl App<'_> {
     pub fn find_form_data(&mut self, collection_index: usize, request_index: usize, key: &str) -> anyhow::Result<usize> {
         let local_selected_request = self.get_request_as_local_from_indexes(&(collection_index, request_index));
         let selected_request = local_selected_request.read();
-        
-        let form = selected_request.body.get_form()?;
+        let selected_http_request = selected_request.get_http_request()?;
+
+        let form = selected_http_request.body.get_form()?;
         find_key(form, key)
     }
     
@@ -57,7 +59,8 @@ impl App<'_> {
 
         {
             let mut selected_request = local_selected_request.write();
-            let form = selected_request.body.get_form_mut()?;
+            let selected_http_request = selected_request.get_http_request_mut()?;
+            let form = selected_http_request.body.get_form_mut()?;
 
             let form_data_type = match column {
                 0 => "key",
@@ -83,7 +86,8 @@ impl App<'_> {
 
         {
             let mut selected_request = local_selected_request.write();
-            let form = selected_request.body.get_form_mut()?;
+            let selected_http_request = selected_request.get_http_request_mut()?;
+            let form = selected_http_request.body.get_form_mut()?;
 
             info!("Key \"{key}\" with value \"{value}\" added to the body form");
 
@@ -102,7 +106,8 @@ impl App<'_> {
 
         {
             let mut selected_request = local_selected_request.write();
-            let form = selected_request.body.get_form_mut()?;
+            let selected_http_request = selected_request.get_http_request_mut()?;
+            let form = selected_http_request.body.get_form_mut()?;
 
             info!("Form key deleted");
 
@@ -118,7 +123,8 @@ impl App<'_> {
 
         {
             let mut selected_request = local_selected_request.write();
-            let form = selected_request.body.get_form_mut()?;
+            let selected_http_request = selected_request.get_http_request_mut()?;
+            let form = selected_http_request.body.get_form_mut()?;
 
             let new_state = match state {
                 None => {
@@ -144,7 +150,8 @@ impl App<'_> {
 
         {
             let mut selected_request = local_selected_request.write();
-            let form = selected_request.body.get_form_mut()?;
+            let selected_http_request = selected_request.get_http_request_mut()?;
+            let form = selected_http_request.body.get_form_mut()?;
             
 
             info!("Body form key duplicated");

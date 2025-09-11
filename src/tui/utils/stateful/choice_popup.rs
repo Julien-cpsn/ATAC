@@ -1,10 +1,10 @@
 #[derive(Default)]
-pub struct ChoicePopup {
-    pub choices: Vec<String>,
+pub struct ChoicePopup<T> {
+    pub choices: Vec<T>,
     pub selection: usize
 }
 
-impl ChoicePopup {
+impl<T> ChoicePopup<T> {
     pub fn next(&mut self) {
         if self.selection + 1 < self.choices.len() {
             self.selection += 1;
@@ -21,5 +21,9 @@ impl ChoicePopup {
         else {
             self.selection = self.choices.len() - 1;
         }
+    }
+
+    pub fn get_selection(&self) -> &T {
+        &self.choices[self.selection]
     }
 }

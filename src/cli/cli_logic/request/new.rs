@@ -1,8 +1,11 @@
+use anyhow::anyhow;
 use tokio_util::sync::CancellationToken;
 use crate::app::app::App;
 use crate::cli::commands::request_commands::new::{AuthArgs, BodyArgs, NewRequestCommand};
 use crate::models::auth::Auth;
-use crate::models::body::ContentType;
+use crate::models::protocol::http::body::ContentType;
+use crate::models::protocol::http::method::Method;
+use crate::models::protocol::protocol::Protocol;
 use crate::models::request::{ConsoleOutput, KeyValue, Request, DEFAULT_HEADERS};
 use crate::models::response::RequestResponse;
 use crate::models::scripts::RequestScripts;
@@ -11,7 +14,7 @@ use crate::models::settings::{RequestSettings, Setting};
 impl App<'_> {
     pub fn cli_new_request(&mut self, collection_slash_request: (String, String), new_request_command: NewRequestCommand) -> anyhow::Result<()> {
         let collection_index = self.find_collection(&collection_slash_request.0)?;
-        let new_request = create_request_from_new_request_command(collection_slash_request.1.trim().to_string(), new_request_command);
+        let new_request = create_request_from_new_request_command(collection_slash_request.1.trim().to_string(), new_request_command)?;
         
         self.new_request(collection_index, new_request)?;
         
@@ -19,7 +22,7 @@ impl App<'_> {
     }
 }
 
-pub fn create_request_from_new_request_command(request_name: String, new_request_command: NewRequestCommand) -> Request {
+pub fn create_request_from_new_request_command(request_name: String, new_request_command: NewRequestCommand) -> anyhow::Result<Request> {
     let params = string_array_to_key_value_array(new_request_command.add_param);
     let auth = get_auth_from_auth_args(new_request_command.auth);
     let headers = string_array_to_key_value_array(new_request_command.add_header);
@@ -30,14 +33,35 @@ pub fn create_request_from_new_request_command(request_name: String, new_request
         false => DEFAULT_HEADERS.clone()
     };
 
+    let mut protocol = new_request_command.protocol.clone();
+
+    match &mut protocol {
+        Protocol::HttpRequest(http_request) => {
+            http_request.method = new_request_command.method;
+            http_request.body = body;
+        }
+        Protocol::WsRequest(_) => {
+            match new_request_command.method {
+                Method::GET => {}
+                _ => return Err(anyhow!("Setting a method with a websocket request is incompatible"))
+            }
+            
+            match body {
+                ContentType::NoBody => {}
+                _ => return Err(anyhow!("Setting a body with a websocket request body is incompatible"))
+            }
+        }
+    };
+
+    // TODO
+
     let mut request = Request {
         name: request_name,
         url: String::new(),
-        method: new_request_command.method,
+        protocol,
         params,
         auth,
         headers: vec![base_headers, headers].concat(),
-        body,
         scripts: RequestScripts {
             pre_request_script: new_request_command.pre_request_script,
             post_request_script: new_request_command.post_request_script,
@@ -59,7 +83,7 @@ pub fn create_request_from_new_request_command(request_name: String, new_request
 
     request.update_url_and_params(new_request_command.url);
 
-    request
+    Ok(request)
 }
 
 fn string_array_to_key_value_array(string_array: Vec<String>) -> Vec<KeyValue> {

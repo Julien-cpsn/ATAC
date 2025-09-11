@@ -5,7 +5,6 @@
     {
       "name": "Return cookies",
       "url": "https://httpbin.org/cookies",
-      "method": "GET",
       "params": [],
       "headers": [
         {
@@ -44,7 +43,6 @@
           ]
         }
       ],
-      "body": "no_body",
       "auth": "no_auth",
       "scripts": {
         "pre_request_script": null,
@@ -58,12 +56,16 @@
         "pretty_print_response_content": true,
         "accept_invalid_certs": false,
         "accept_invalid_hostnames": false
+      },
+      "protocol": {
+        "type": "http",
+        "method": "GET",
+        "body": "no_body"
       }
     },
     {
       "name": "Set cookie",
       "url": "https://httpbin.org/cookies/set",
-      "method": "GET",
       "params": [
         {
           "enabled": true,
@@ -110,7 +112,6 @@
           ]
         }
       ],
-      "body": "no_body",
       "auth": "no_auth",
       "scripts": {
         "pre_request_script": null,
@@ -124,6 +125,11 @@
         "pretty_print_response_content": true,
         "accept_invalid_certs": false,
         "accept_invalid_hostnames": false
+      },
+      "protocol": {
+        "type": "http",
+        "method": "GET",
+        "body": "no_body"
       }
     }
   ]

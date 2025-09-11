@@ -17,10 +17,12 @@ use crate::cli::args::ARGS;
 use crate::cli::cli_logic::import::curl::ImportCurlError::{CouldNotParseCurl, CouldNotParseUrl, CouldNotReadFile, UnknownMethod};
 use crate::cli::commands::import::CurlImport;
 use crate::models::auth::Auth;
-use crate::models::body::ContentType;
-use crate::models::body::ContentType::NoBody;
+use crate::models::protocol::http::body::ContentType;
+use crate::models::protocol::http::body::ContentType::NoBody;
 use crate::models::collection::Collection;
-use crate::models::method::Method;
+use crate::models::protocol::http::http::HttpRequest;
+use crate::models::protocol::http::method::Method;
+use crate::models::protocol::protocol::Protocol;
 use crate::models::request::{KeyValue, Request};
 
 #[derive(Error, Debug)]
@@ -234,11 +236,13 @@ fn parse_request(path: &PathBuf, request_name: String) -> anyhow::Result<Arc<RwL
     let request = Request {
         name: request_name,
         url,
-        method,
         params,
         headers,
-        body,
         auth,
+        protocol: Protocol::HttpRequest(HttpRequest {
+            method,
+            body
+        }),
         ..Default::default()
     };
 

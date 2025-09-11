@@ -71,7 +71,7 @@ pub struct App<'a> {
     pub request_param_tab: RequestParamsTabs,
     pub request_result_tab: RequestResultTabs,
 
-    pub creation_popup: ChoicePopup,
+    pub creation_popup: ChoicePopup<String>,
 
     pub new_collection_input: TextInput,
     pub rename_collection_input: TextInput,
@@ -99,6 +99,9 @@ pub struct App<'a> {
     pub body_text_area: TextArea<'a>,
     pub body_text_area_vim_emulation: Vim,
 
+    pub message_text_area: TextArea<'a>,
+    pub message_text_area_vim_emulation: Vim,
+
     pub request_settings_popup: SettingsPopup,
 
     pub received_response: Arc<Mutex<bool>>,
@@ -107,13 +110,15 @@ pub struct App<'a> {
     pub result_vertical_scrollbar: StatefulScrollbar,
     pub result_horizontal_scrollbar: StatefulScrollbar,
 
+    pub last_messages_area_size: (u16, u16),
+
     pub script_console: ScriptConsole<'a>,
 
     /* Others */
     
     pub syntax_highlighting: SyntaxHighlighting,
 
-    pub export_request: ChoicePopup,
+    pub export_request: ChoicePopup<ExportFormat>,
     pub display_request_export: DisplayPopup,
 }
 
@@ -189,6 +194,9 @@ impl App<'_> {
             body_text_area: TextArea::default(),
             body_text_area_vim_emulation: Vim::default(),
 
+            message_text_area: TextArea::default(),
+            message_text_area_vim_emulation: Vim::default(),
+
             request_settings_popup: SettingsPopup::default(),
             
             result_throbber_state: ThrobberState::default(),
@@ -196,13 +204,14 @@ impl App<'_> {
             result_vertical_scrollbar: StatefulScrollbar::default(),
             result_horizontal_scrollbar: StatefulScrollbar::default(),
 
+            last_messages_area_size: (0, 0),
             script_console: ScriptConsole::default(),
 
             /* Others */
 
             syntax_highlighting: SyntaxHighlighting::default(),
             export_request: ChoicePopup {
-                choices: ExportFormat::VARIANTS.iter().map(|v| v.to_string()).collect(),
+                choices: ExportFormat::VARIANTS.to_vec(),
                 selection: 0,
             },
             display_request_export: DisplayPopup::default(),

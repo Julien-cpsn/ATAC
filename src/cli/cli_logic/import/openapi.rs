@@ -15,9 +15,11 @@ use crate::cli::args::ARGS;
 use crate::cli::cli_logic::import::openapi::ImportOpenApiError::InvalidUrl;
 use crate::cli::commands::import::OpenApiImport;
 use crate::models::auth::Auth;
-use crate::models::body::ContentType;
+use crate::models::protocol::http::body::ContentType;
 use crate::models::collection::Collection;
-use crate::models::method::Method;
+use crate::models::protocol::http::http::HttpRequest;
+use crate::models::protocol::http::method::Method;
+use crate::models::protocol::protocol::Protocol;
 use crate::models::request::{KeyValue, Request};
 
 #[derive(Error, Debug)]
@@ -189,12 +191,15 @@ fn process_path_operations(collection: &mut Collection, path_item: &PathItem, pa
 fn create_request(name: String, method: Method, path: &str, base_url: &str, operation: &Operation, spec: &OpenAPI) -> anyhow::Result<Request> {
     println!("\tFound request \"{}\"", name);
 
-    let mut request = Request::default();
-    request.name = name;
-    request.method = method;
-
-    // Construct URL - combine base URL with path
-    request.url = format!("{}{}", base_url, path);
+    let mut request = Request {
+        name,
+        url: format!("{}{}", base_url, path),
+        protocol: Protocol::HttpRequest(HttpRequest {
+            method,
+            body: ContentType::NoBody,
+        }),
+        ..Default::default()
+    };
 
     // Process parameters (query params, headers)
     process_parameters(&mut request, operation, path, spec)?;
@@ -348,6 +353,7 @@ fn process_request_body(request: &mut Request, req_body_or_ref: &ReferenceOr<Req
     if let Some((content_type, media_type)) = req_body.content.iter().next() {
         // Set the appropriate Content-Type header
         request.modify_or_create_header("content-type", content_type);
+        let http_request = request.get_http_request_mut()?;
 
         // Create a sample request body based on the media type
         match content_type.as_str() {
@@ -355,13 +361,13 @@ fn process_request_body(request: &mut Request, req_body_or_ref: &ReferenceOr<Req
                 if let Some(schema) = &media_type.schema {
                     // Generate a sample JSON body
                     let sample_json = generate_sample_json(schema, spec)?;
-                    request.body = ContentType::Json(sample_json);
+                    http_request.body = ContentType::Json(sample_json);
                 } else {
-                    request.body = ContentType::Json("{}".to_string());
+                    http_request.body = ContentType::Json("{}".to_string());
                 }
             },
             "application/xml" => {
-                request.body = ContentType::Xml("<root></root>".to_string());
+                http_request.body = ContentType::Xml("<root></root>".to_string());
             },
             form @ "application/x-www-form-urlencoded" | form @ "multipart/form-data" => {
                 let mut form_data = Vec::new();
@@ -379,20 +385,20 @@ fn process_request_body(request: &mut Request, req_body_or_ref: &ReferenceOr<Req
                     }
                 }
 
-                request.body = match form {
+                http_request.body = match form {
                     "application/x-www-form-urlencoded" => ContentType::Form(form_data),
                     "multipart/form-data" =>  ContentType::Multipart(form_data),
-                    _ => panic!("Should not happen")
+                    _ => unreachable!()
                 };
             },
             "text/plain" => {
-                request.body = ContentType::Raw("Sample text".to_string());
+                http_request.body = ContentType::Raw("Sample text".to_string());
             },
             "text/html" => {
-                request.body = ContentType::Html("<html><body>Sample HTML</body></html>".to_string());
+                http_request.body = ContentType::Html("<html><body>Sample HTML</body></html>".to_string());
             },
             "application/javascript" => {
-                request.body = ContentType::Javascript("console.log('Sample JavaScript');".to_string());
+                http_request.body = ContentType::Javascript("console.log('Sample JavaScript');".to_string());
             },
             _ => {
                 return Err(anyhow!(ImportOpenApiError::UnknownContentType(content_type.clone())));
@@ -475,7 +481,7 @@ fn generate_sample_json(schema_or_ref: &ReferenceOr<Schema>, spec: &OpenAPI) -> 
                 SchemaKind::OneOf { one_of, .. } => one_of,
                 SchemaKind::AllOf { all_of, .. } => all_of,
                 SchemaKind::AnyOf { any_of, .. } => any_of,
-                _ => panic!("Should not happen")
+                _ => unreachable!()
             };
 
             // Just take the first schema for a sample

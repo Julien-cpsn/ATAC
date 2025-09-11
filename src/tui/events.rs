@@ -90,12 +90,12 @@ get_key_bindings! {
         CreatingCollectionCharInput(EventKeyBinding),
 
         CreateNewRequest(EventKeyBinding),
+        CreatingRequestSelectInputUp(EventKeyBinding),
+        CreatingRequestSelectInputDown(EventKeyBinding),
+        CreatingRequestInputLeft(EventKeyBinding),
+        CreatingRequestInputRight(EventKeyBinding),
         CreatingRequestDeleteCharBackward(EventKeyBinding),
         CreatingRequestDeleteCharForward(EventKeyBinding),
-        CreatingRequestMoveCursorLeft(EventKeyBinding),
-        CreatingRequestMoveCursorRight(EventKeyBinding),
-        CreatingRequestSelectCollectionUp(EventKeyBinding),
-        CreatingRequestSelectCollectionDown(EventKeyBinding),
         CreatingRequestCharInput(EventKeyBinding),
 
         DeletingCollectionMoveCursorLeft(EventKeyBinding),
@@ -138,6 +138,7 @@ get_key_bindings! {
         NextParamTab(EventKeyBinding),
         ModifyRequestAuthMethod(EventKeyBinding),
         ModifyRequestBodyContentType(EventKeyBinding),
+        ModifyRequestMessageType(EventKeyBinding),
 
         EditRequestQueryParam(EventKeyBinding),
         RequestQueryParamsMoveUp(EventKeyBinding),
@@ -172,6 +173,8 @@ get_key_bindings! {
         DeleteRequestBodyTableElement(EventKeyBinding),
         ToggleRequestBodyTableElement(EventKeyBinding),
         DuplicateRequestBodyTableElement(EventKeyBinding),
+
+        EditRequestMessage(EventKeyBinding),
 
         EditRequestScript(EventKeyBinding),
         // Move up or down
@@ -303,6 +306,29 @@ get_key_bindings! {
         EditingRequestBodyStringMoveCursorLineStart(EventKeyBinding),
         EditingRequestBodyStringMoveCursorLineEnd(EventKeyBinding),
         EditingRequestBodyStringCharInput(EventKeyBinding),
+
+        /* Websocket */
+
+        EditingRequestMessageVimInput(EventKeyBinding),
+
+        EditingRequestMessageSaveAndQuit(EventKeyBinding),
+        EditingRequestMessageCopy(EventKeyBinding),
+        EditingRequestMessagePaste(EventKeyBinding),
+        EditingRequestMessageUndo(EventKeyBinding),
+        EditingRequestMessageRedo(EventKeyBinding),
+        EditingRequestMessageNewLine(EventKeyBinding),
+        EditingRequestMessageIndent(EventKeyBinding),
+        EditingRequestMessageDeleteCharBackward(EventKeyBinding),
+        EditingRequestMessageDeleteCharForward(EventKeyBinding),
+        EditingRequestMessageSkipWordLeft(EventKeyBinding),
+        EditingRequestMessageSkipWordRight(EventKeyBinding),
+        EditingRequestMessageMoveCursorUp(EventKeyBinding),
+        EditingRequestMessageMoveCursorDown(EventKeyBinding),
+        EditingRequestMessageMoveCursorLeft(EventKeyBinding),
+        EditingRequestMessageMoveCursorRight(EventKeyBinding),
+        EditingRequestMessageMoveCursorLineStart(EventKeyBinding),
+        EditingRequestMessageMoveCursorLineEnd(EventKeyBinding),
+        EditingRequestMessageCharInput(EventKeyBinding),
 
         /* Scripts */
 
@@ -529,12 +555,12 @@ impl App<'_> {
                 },
 
                 CreateNewRequest(_) => self.tui_new_request(),
+                CreatingRequestSelectInputUp(_) => self.new_request_popup.previous_input(),
+                CreatingRequestSelectInputDown(_) => self.new_request_popup.next_input(),
+                CreatingRequestInputLeft(_) => self.new_request_popup.input_left(),
+                CreatingRequestInputRight(_) => self.new_request_popup.input_right(),
                 CreatingRequestDeleteCharBackward(_) => self.new_request_popup.text_input.delete_char_forward(),
                 CreatingRequestDeleteCharForward(_) => self.new_request_popup.text_input.delete_char_backward(),
-                CreatingRequestMoveCursorLeft(_) => self.new_request_popup.text_input.move_cursor_left(),
-                CreatingRequestMoveCursorRight(_) => self.new_request_popup.text_input.move_cursor_right(),
-                CreatingRequestSelectCollectionUp(_) => self.new_request_popup.previous_collection(),
-                CreatingRequestSelectCollectionDown(_) => self.new_request_popup.next_collection(),
                 CreatingRequestCharInput(_) => match key {
                     KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.new_request_popup.text_input.enter_char(char),
                     _ => {}
@@ -590,7 +616,8 @@ impl App<'_> {
                 NextParamTab(_) => self.tui_next_request_param_tab(),
 
                 ModifyRequestAuthMethod(_) => self.tui_next_request_auth(),
-                ModifyRequestBodyContentType(_) => self.tui_modify_request_content_type(),
+                ModifyRequestBodyContentType(_) => self.tui_next_request_content_type(),
+                ModifyRequestMessageType(_) => self.tui_next_request_message_type(),
 
                 EditRequestQueryParam(_) => match self.query_params_table.is_selected() {
                     true => self.edit_request_param_state(),
@@ -633,6 +660,9 @@ impl App<'_> {
                     true => self.edit_request_body_table_state(),
                     false => self.edit_request_body_file_or_string_state(),
                 },
+
+                EditRequestMessage(_) => self.edit_request_message_state(),
+
                 RequestBodyTableMoveUp(_) => self.body_form_table.up(),
                 RequestBodyTableMoveDown(_) => self.body_form_table.down(),
                 RequestBodyTableMoveLeft(_) | RequestBodyTableMoveRight(_) => self.body_form_table.change_y(),
@@ -769,7 +799,7 @@ impl App<'_> {
                     _ => {}
                 },
                 
-                ModifyRequestBodyFile(_) => self.tui_next_request_body(),
+                ModifyRequestBodyFile(_) => self.tui_modify_request_body(),
                 EditingRequestBodyFileDeleteCharBackward(_) => self.body_file_text_input.delete_char_forward(),
                 EditingRequestBodyFileDeleteCharForward(_) => self.body_file_text_input.delete_char_backward(),
                 EditingRequestBodyFileMoveCursorLeft(_) => self.body_file_text_input.move_cursor_left(),
@@ -794,10 +824,10 @@ impl App<'_> {
                         self.body_text_area_vim_emulation = self.body_text_area_vim_emulation.clone().with_pending(input);
                     },
                     VimTransition::Quit => self.select_request_state(),
-                    VimTransition::SaveAndQuit => self.tui_next_request_body(),
+                    VimTransition::SaveAndQuit => self.tui_modify_request_body(),
                 },
 
-                EditingRequestBodyStringSaveAndQuit(_) => self.tui_next_request_body(),
+                EditingRequestBodyStringSaveAndQuit(_) => self.tui_modify_request_body(),
                 EditingRequestBodyStringCopy(_) => self.body_text_area.copy(),
                 EditingRequestBodyStringPaste(_) => {self.body_text_area.paste();},
                 EditingRequestBodyStringUndo(_) => {self.body_text_area.undo();},
@@ -821,7 +851,49 @@ impl App<'_> {
                     KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.body_text_area.insert_char(char),
                     _ => {}
                 },
-                
+
+                /* Websocket */
+
+                EditingRequestMessageVimInput(_) => match self.message_text_area_vim_emulation.transition(key, &mut self.message_text_area) {
+                    VimTransition::Mode(mode) if self.message_text_area_vim_emulation.mode != mode => {
+                        self.message_text_area.set_block(mode.block());
+                        self.message_text_area.set_cursor_style(mode.cursor_style());
+                        self.message_text_area_vim_emulation = Vim::new(mode);
+                    }
+                    VimTransition::Nop | VimTransition::Mode(_) => {
+                        self.message_text_area_vim_emulation = self.message_text_area_vim_emulation.clone();
+                    },
+                    VimTransition::Pending(input) => {
+                        self.message_text_area_vim_emulation = self.message_text_area_vim_emulation.clone().with_pending(input);
+                    },
+                    VimTransition::Quit => self.select_request_state(),
+                    VimTransition::SaveAndQuit => self.tui_send_request_message().await,
+                },
+
+                EditingRequestMessageSaveAndQuit(_) => self.tui_send_request_message().await,
+                EditingRequestMessageCopy(_) => self.message_text_area.copy(),
+                EditingRequestMessagePaste(_) => {self.message_text_area.paste();},
+                EditingRequestMessageUndo(_) => {self.message_text_area.undo();},
+                EditingRequestMessageRedo(_) => {self.message_text_area.redo();},
+                EditingRequestMessageNewLine(_) => self.message_text_area.insert_newline(),
+                EditingRequestMessageIndent(_) => {
+                    self.message_text_area.set_hard_tab_indent(true);
+                    self.message_text_area.insert_tab();
+                },
+                EditingRequestMessageDeleteCharBackward(_) => {self.message_text_area.delete_next_char();},
+                EditingRequestMessageDeleteCharForward(_) => {self.message_text_area.delete_char();},
+                EditingRequestMessageSkipWordLeft(_) => self.message_text_area.move_cursor(CursorMove::WordBack),
+                EditingRequestMessageSkipWordRight(_) => self.message_text_area.move_cursor(CursorMove::WordForward),
+                EditingRequestMessageMoveCursorUp(_) => self.message_text_area.move_cursor(CursorMove::Up),
+                EditingRequestMessageMoveCursorDown(_) => self.message_text_area.move_cursor(CursorMove::Bottom),
+                EditingRequestMessageMoveCursorLeft(_) => self.message_text_area.move_cursor(CursorMove::Back),
+                EditingRequestMessageMoveCursorRight(_) => self.message_text_area.move_cursor(CursorMove::Forward),
+                EditingRequestMessageMoveCursorLineStart(_) => self.message_text_area.move_cursor(CursorMove::Head),
+                EditingRequestMessageMoveCursorLineEnd(_) => self.message_text_area.move_cursor(CursorMove::End),
+                EditingRequestMessageCharInput(_) => match key {
+                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.message_text_area.insert_char(char),
+                    _ => {}
+                },
                 
                 /* Scripts */
 

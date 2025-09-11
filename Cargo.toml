@@ -1,7 +1,7 @@
 [package]
 name = "atac"
 description = "Arguably a Terminal API Client. Feature-full, free, open-source, offline and account-less."
-version = "0.20.2"
+version = "0.21.0"
 authors = ["julien-cpsn"]
 edition = "2021"
 rust-version = "1.82"
@@ -24,6 +24,10 @@ exclude = [
 # Request
 ## Send requests
 reqwest = { version = "=0.12.23", default-features = false, features = ["cookies", "rustls-tls-native-roots", "multipart", "gzip", "brotli", "deflate", "stream"] }
+## Wrapper around reqwest to allow for client middleware chains
+reqwest-middleware = { version = "=0.4.2", features = ["rustls-tls", "json", "multipart"] }
+## Wrapper around reqwest to handle web-socket requests
+reqwest-websocket = { version = "=0.6.0", features = ["json", "middleware"], package = "reqwest-websocket-julien-cpsn" }
 reqwest_cookie_store = "=0.9.0"
 cookie_store = "=0.22.0"
 
@@ -43,7 +47,7 @@ throbber-widgets-tui = "=0.8.0"
 ## Display response images.
 ratatui-image = { version = "=8.0.1", features = ["crossterm"] }
 ## Decode images.
-image = "=0.25.7"
+image = "=0.25.8"
 
 # Main functionalities
 ## Syntax highlighting
@@ -52,6 +56,7 @@ syntect = { version = "=5.2.0", features = ["default-fancy"] }
 serde = { version = "=1.0.219", features = ["derive", "rc"] }
 serde_json = "=1.0.143"
 serde_yaml = "=0.9.34"
+serde-versioning = "1.0.219"
 ## Pretty print JSON
 jsonxf = "=1.1.1"
 ## Serialize & Deserialize application config files
@@ -73,8 +78,9 @@ arboard = "=3.6.1"
 
 # Async
 ## Handle asynchronous requests
-tokio = { version = "=1.47.1", features = ["rt", "rt-multi-thread", "macros"] }
-tokio-util = "=0.7.16"
+tokio = { version = "=1.47.1", features = ["rt", "rt-multi-thread", "macros", "io-std", "io-util"] }
+tokio-util = { version = "=0.7.16", features = ["compat"] }
+futures-util = { version = "0.3.31", features = ["sink", "alloc"] }
 ## Smaller, faster and more flexible implementation of RwLock and Mutex. Used everywhere.
 parking_lot = { version = "=0.12.4", features = ["serde", "send_guard"] }
 
@@ -106,11 +112,13 @@ clap_mangen = "=0.2"
 ## Regex. Using for parsing requests URL
 regex = "=1.11.2"
 ## Time utils
-chrono = { version = "=0.4.41", default-features = false, features = ["now"] }
+chrono = { version = "=0.4.42", default-features = false, features = ["now", "serde"] }
 ## UUID generator
-uuid = { version = "=1.18.0", features = ["v4", "v7"] }
+uuid = { version = "=1.18.1", features = ["v4", "v7"] }
 ## Decode base64 strings
 base64 = "=0.22.1"
+## Wrap text to max length
+textwrap = "0.16.2"
 
 # Tracing
 ## Log events
@@ -121,5 +129,3 @@ tracing-subscriber = { version = "=0.3.20", features = ["parking_lot", "chrono",
 tracing-log = "=0.2.0"
 ## Opentracing middleware implementation for reqwest-middleware
 reqwest-tracing = "=0.5.8"
-## Wrapper around reqwest to allow for client middleware chains
-reqwest-middleware = { version = "=0.4.2", features = ["rustls-tls", "json", "multipart"] }

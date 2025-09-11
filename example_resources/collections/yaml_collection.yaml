@@ -3,7 +3,6 @@ last_position: 9
 requests:
 - name: Test Get
   url: https://httpbin.org/get
-  method: GET
   params: []
   headers:
   - enabled: true
@@ -26,7 +25,6 @@ requests:
     data:
     - connection
     - keep-alive
-  body: no_body
   auth: no_auth
   scripts:
     pre_request_script: null
@@ -39,3 +37,7 @@ requests:
     pretty_print_response_content: true
     accept_invalid_certs: false
     accept_invalid_hostnames: false
+  protocol:
+    type: http
+    method: GET
+    body: no_body

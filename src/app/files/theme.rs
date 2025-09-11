@@ -17,7 +17,8 @@ nest! {
     #[derive(Serialize, Deserialize)]
     pub struct Theme {
         #[serde(alias = "UI")]
-        pub ui: #[derive(Serialize, Deserialize)]
+        pub ui:
+            #[derive(Serialize, Deserialize)]
             pub struct ThemeUI {
                 pub font_color: Color,
                 pub app_background: Option<Color>,
@@ -30,34 +31,67 @@ nest! {
             },
 
         #[serde(alias = "Others")]
-        pub others: #[derive(Serialize, Deserialize)]
+        pub others:
+            #[derive(Serialize, Deserialize)]
             pub struct ThemeOthers {
                 pub selection_highlight_color: Color,
                 pub environment_variable_highlight_color: Color,
             },
 
-        #[serde(alias = "Methods")]
-        pub methods: #[derive(Serialize, Deserialize)]
-            pub struct ThemeMethods {
-                #[serde(alias = "GET")]
-                pub get: Color,
-                #[serde(alias = "POST")]
-                pub post: Color,
-                #[serde(alias = "PUT")]
-                pub put: Color,
-                #[serde(alias = "PATCH")]
-                pub patch: Color,
-                #[serde(alias = "DELETE")]
-                pub delete: Color,
-                #[serde(alias = "HEAD")]
-                pub head: Color,
-                #[serde(alias = "OPTIONS")]
-                pub options: Color,
-                #[serde(alias = "TRACE")]
-                pub trace: Color,
-                #[serde(alias = "CONNECT")]
-                pub connect: Color
-            },
+        #[serde(alias = "HTTP")]
+        pub http: #[derive(Serialize, Deserialize)]
+            pub struct ThemeHttp {
+            #[serde(alias = "Methods")]
+            pub methods:
+                #[derive(Serialize, Deserialize)]
+                pub struct ThemeMethods {
+                    #[serde(alias = "GET")]
+                    pub get: Color,
+                    #[serde(alias = "POST")]
+                    pub post: Color,
+                    #[serde(alias = "PUT")]
+                    pub put: Color,
+                    #[serde(alias = "PATCH")]
+                    pub patch: Color,
+                    #[serde(alias = "DELETE")]
+                    pub delete: Color,
+                    #[serde(alias = "HEAD")]
+                    pub head: Color,
+                    #[serde(alias = "OPTIONS")]
+                    pub options: Color,
+                    #[serde(alias = "TRACE")]
+                    pub trace: Color,
+                    #[serde(alias = "CONNECT")]
+                    pub connect: Color
+                },
+        },
+
+        #[serde(alias = "Websocket")]
+        pub websocket:
+            #[derive(Serialize, Deserialize)]
+            pub struct ThemeWebsocket {
+                #[serde(alias = "Connection Statuses")]
+                pub connection_statuses:
+                    #[derive(Serialize, Deserialize)]
+                    pub struct ThemeConnectionStatuses {
+                        #[serde(alias = "Connected")]
+                        pub connected: Color,
+                        #[serde(alias = "Disconnected")]
+                        pub disconnected: Color,
+                    },
+
+                #[serde(alias = "Messages")]
+                pub messages:
+                    #[derive(Serialize, Deserialize)]
+                    pub struct ThemeMessages {
+                        #[serde(alias = "server_foreground_color")]
+                        pub server_foreground_color: Color,
+                        #[serde(alias = "server_background_color")]
+                        pub server_background_color: Color,
+                        #[serde(alias = "you_background_color")]
+                        pub you_background_color: Color,
+                    }
+            }
     }
 }
 
@@ -78,17 +112,31 @@ impl Default for Theme {
                 selection_highlight_color: Color::Yellow,
                 environment_variable_highlight_color: Color::Cyan,
             },
-            methods: ThemeMethods {
-                get: Color::Green,
-                post: Color::Yellow,
-                put: Color::LightBlue,
-                patch: Color::LightCyan,
-                delete: Color::LightRed,
-                options: Color::Magenta,
-                head: Color::Green,
-                trace: Color::Yellow,
-                connect: Color::LightBlue
+            http: ThemeHttp {
+                methods: ThemeMethods {
+                    get: Color::Green,
+                    post: Color::Yellow,
+                    put: Color::LightBlue,
+                    patch: Color::LightCyan,
+                    delete: Color::LightRed,
+                    options: Color::Magenta,
+                    head: Color::Green,
+                    trace: Color::Yellow,
+                    connect: Color::LightBlue
+                },
             },
+            websocket: ThemeWebsocket {
+                connection_statuses: ThemeConnectionStatuses {
+                    connected: Color::Green,
+                    disconnected: Color::Red
+                },
+
+                messages: ThemeMessages {
+                    server_foreground_color: Color::Blue,
+                    server_background_color: Color::DarkGray,
+                    you_background_color: Color::Blue,
+                }
+            }
         }
     }
 }

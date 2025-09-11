@@ -198,7 +198,7 @@ cargo run -- -h
 | - Allow redirects                   | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
 | - Store cookies                     | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
 | Export to other languages           | :white_check_mark:                                                | :white_check_mark:   | :x:                  |
-| **WebSocket Client**                | :x: :soon:                                                        | :white_check_mark:   | :white_check_mark:   |
+| **WebSocket Client**                | :white_check_mark:                                                | :white_check_mark:   | :white_check_mark:   |
 | **GraphQL**                         | :x: :soon:                                                        | :white_check_mark:   | :white_check_mark:   |
 | **gRPC**                            | :x: :soon:                                                        | :white_check_mark:   | :white_check_mark:   |
 | **MQTT**                            | :x: :soon:                                                        | :white_check_mark:   | :x:                  |
@@ -235,7 +235,6 @@ cargo run -- -h
 ### TODO v2.0.0
 
 - **To add**
-  - WebSocket requests
   - Maybe GraphQL requests
   - Maybe MQTT requests
   - Maybe gRPC requests
@@ -299,6 +298,8 @@ You can read more about it here: https://github.com/Julien-cpsn/ATAC/releases/ta
 |----------------------------------------------------------------------------------|-------------|----------------------------------------------------------------------------------------|
 | **Request**                                                                      |             |                                                                                        |
 | [reqwest](https://github.com/seanmonstar/reqwest)                                | 0.12.23     | Send requests                                                                          |
+| [reqwest-middleware](https://github.com/TrueLayer/reqwest-middleware)            | 0.4.2       | Wrapper around reqwest to allow for client middleware chains                           |
+| reqwest-websocket                                                                | 0.5.1       | Wrapper around reqwest to handle web-socket requests                                   |
 | **TUI**                                                                          |             |                                                                                        |
 | [ratatui](https://github.com/ratatui/ratatui)                                    | 0.29.0      | Terminal UI framework                                                                  |
 | [crokey](https://github.com/Canop/crokey)                                        | 1.1.2       | Used to parse, use key bindings files and some utilities                               |
@@ -307,7 +308,7 @@ You can read more about it here: https://github.com/Julien-cpsn/ATAC/releases/ta
 | [tui-textarea](https://github.com/rhysd/tui-textarea)                            | 0.7.0       | Text area that handle a lot of features. Used for editing request body.                |
 | [throbber-widgets-tui](https://github.com/arkbig/throbber-widgets-tui)           | 0.8.0       | Display loading UI elements. Used when request is pending.                             |
 | [ratatui-image](https://github.com/benjajaja/ratatui-image)                      | 8.0.1       | Display response images.                                                               |
-| [image](https://github.com/image-rs/image)                                       | 0.25.7      | Decode images.                                                                         |
+| [image](https://github.com/image-rs/image)                                       | 0.25.8      | Decode images.                                                                         |
 | **Main functionalities**                                                         |             |                                                                                        |
 | [syntect](https://github.com/trishume/syntect)                                   | 5.2.0       | Syntax highlighting                                                                    |
 | [serde](https://github.com/serde-rs/serde)                                       | 1.0.219     | Serialize & Deserialize application data into files                                    |
@@ -340,16 +341,16 @@ You can read more about it here: https://github.com/Julien-cpsn/ATAC/releases/ta
 | [chrono](https://github.com/chronotope/chrono)                                   | 0.4.41      | Time utils                                                                             |
 | [uuid](https://github.com/uuid-rs/uuid)                                          | 1.18.0      | UUID generator                                                                         |
 | [base64](https://github.com/marshallpierce/rust-base64)                          | 0.22.1      | Decode base64 strings                                                                  |
+| [textwrap](https://github.com/mgeisler/textwrap)                                 | 0.16.2      | Wrap text to max length                                                                |
 | **Tracing**                                                                      |             |                                                                                        |
 | [tracing](https://github.com/tokio-rs/tracing)                                   | 0.1.41      | Log events                                                                             |
 | [tracing-subscriber](https://github.com/tokio-rs/tracing)                        | 0.3.20      | Utilities for implementing and composing tracing subscribers                           |
 | [tracing-log](https://github.com/tokio-rs/tracing)                               | 0.2.0       | Log crate compatibility for tracing                                                    |
 | [reqwest-tracing](https://github.com/TrueLayer/reqwest-middleware)               | 0.5.8       | Opentracing middleware implementation for reqwest-middleware                           |
-| [reqwest-middleware](https://github.com/TrueLayer/reqwest-middleware)            | 0.4.2       | Wrapper around reqwest to allow for client middleware chains                           |
 
 ### Binary size
 
-The binary file size goes from ~5 MB to ~12 MB depending on the platform. I try to keep it as small as possible, unfortunately for me, I bundle a Javascript runtime.
+The binary file size goes from ~5 MB to ~15 MB depending on the platform. I try to keep it as small as possible, unfortunately for me, I bundle a Javascript runtime.
 
 ## Contributors
 

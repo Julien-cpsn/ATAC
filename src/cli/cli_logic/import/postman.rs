@@ -13,9 +13,11 @@ use crate::cli::args::ARGS;
 use crate::cli::cli_logic::import::postman::ImportPostmanError::{CollectionAlreadyExists, CouldNotParseCollection, UnknownMethod};
 use crate::cli::commands::import::PostmanImport;
 use crate::models::auth::Auth;
-use crate::models::body::ContentType;
+use crate::models::protocol::http::body::ContentType;
 use crate::models::collection::{Collection, CollectionFileFormat};
-use crate::models::method::Method;
+use crate::models::protocol::http::http::HttpRequest;
+use crate::models::protocol::http::method::Method;
+use crate::models::protocol::protocol::Protocol;
 use crate::models::request::{DEFAULT_HEADERS, KeyValue, Request};
 use crate::models::settings::{RequestSettings, Setting};
 
@@ -190,9 +192,11 @@ fn parse_request(item: Items) -> anyhow::Result<Request> {
 
     println!("\t\tFound request \"{}\"", item_name);
 
-    let mut request = Request::default();
-
-    request.name = item_name;
+    let mut request = Request {
+        name: item_name,
+        protocol: Protocol::HttpRequest(HttpRequest::default()),
+        ..Default::default()
+    };
 
     request.scripts.pre_request_script = retrieve_request_scripts(&item);
 
@@ -229,7 +233,8 @@ fn parse_request(item: Items) -> anyhow::Result<Request> {
             /* METHOD */
 
             if let Some(method) = &request_class.method {
-                request.method = match Method::from_str(method) {
+                let http_request = request.get_http_request_mut()?;
+                http_request.method = match Method::from_str(method) {
                     Ok(method) => method,
                     Err(_) => {
                         return Err(anyhow!(UnknownMethod(method.clone())))
@@ -264,7 +269,8 @@ fn parse_request(item: Items) -> anyhow::Result<Request> {
                         }
                     }
 
-                    request.body = body;
+                    let http_request = request.get_http_request_mut()?;
+                    http_request.body = body;
                 }
             }
         }

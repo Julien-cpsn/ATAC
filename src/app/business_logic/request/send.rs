@@ -1,30 +1,25 @@
 use std::io::Read;
 use std::path::PathBuf;
 use std::sync::Arc;
-use std::time::{Duration, Instant};
 use parking_lot::RwLock;
-
-use rayon::prelude::*;
-use reqwest::{ClientBuilder, Proxy, Url};
-use reqwest::header::{CONTENT_TYPE, HeaderMap};
 use reqwest::multipart::Part;
+use reqwest::{ClientBuilder, Proxy, Url};
+use reqwest::header::HeaderMap;
 use reqwest::redirect::Policy;
-use reqwest_tracing::{TracingMiddleware, OtelName, DisableOtelPropagation};
 use reqwest_middleware::Extension;
+use reqwest_tracing::{DisableOtelPropagation, OtelName, TracingMiddleware};
 use thiserror::Error;
-use tokio_util::sync::CancellationToken;
-use tracing::{info, trace};
-
+use tracing_log::log::trace;
 use crate::app::app::App;
 use crate::app::business_logic::request::scripts::{execute_post_request_script, execute_pre_request_script};
-use crate::app::business_logic::request::send::RequestResponseError::{CouldNotDecodeResponse, PostRequestScript};
+use crate::app::business_logic::request::send::RequestResponseError::PostRequestScript;
 use crate::app::files::environment::save_environment_to_file;
-use crate::models::auth::Auth::{BasicAuth, BearerToken, NoAuth};
-use crate::models::body::ContentType::{File, Form, Html, Javascript, Json, Multipart, NoBody, Raw, Xml};
-use crate::models::body::find_file_format_in_content_type;
+use crate::models::auth::Auth::{NoAuth, BasicAuth, BearerToken};
+use crate::models::protocol::http::body::ContentType::{NoBody, File, Form, Html, Javascript, Json, Multipart, Raw, Xml};
 use crate::models::environment::Environment;
+use crate::models::protocol::protocol::Protocol;
 use crate::models::request::Request;
-use crate::models::response::{ImageResponse, RequestResponse, ResponseContent};
+use crate::models::response::RequestResponse;
 use crate::panic_error;
 
 #[derive(Error, Debug)]
@@ -37,10 +32,21 @@ pub enum PrepareRequestError {
     CouldNotOpenFile
 }
 
+#[derive(Error, Debug)]
+pub enum RequestResponseError {
+    #[error("(CONSOLE) POST-SCRIPT ERROR")]
+    PostRequestScript,
+    #[error("COULD NOT DECODE RESPONSE TEXT OR BYTES")]
+    CouldNotDecodeResponse,
+    #[error(transparent)]
+    WebsocketError(#[from] anyhow::Error),
+}
+
 impl App<'_> {
+    #[allow(deprecated)]
     pub async fn prepare_request(&self, request: &mut Request) -> Result<reqwest_middleware::RequestBuilder, PrepareRequestError> {
         trace!("Preparing request");
-        
+
         let env = self.get_selected_env_as_local();
 
         let mut client_builder = ClientBuilder::new()
@@ -97,47 +103,10 @@ impl App<'_> {
 
         /* PRE-REQUEST SCRIPT */
 
-        let modified_request = match &request.scripts.pre_request_script {
-            None => {
-                request.console_output.pre_request_output = None;
-                request.clone()
-            },
-            Some(pre_request_script) => {
-                let env_values = match &env {
-                    None => None,
-                    Some(local_env) => {
-                        let env = local_env.read();
-                        Some(env.values.clone())
-                    }
-                };
-
-                let (result_request, env_variables, console_output) = execute_pre_request_script(pre_request_script, &request, env_values);
-
-                match &env {
-                    None => {},
-                    Some(local_env) => match env_variables {
-                        None => {},
-                        Some(env_variables) => {
-                            let mut env = local_env.write();
-                            env.values = env_variables;
-                            save_environment_to_file(&*env);
-                        }
-                    }
-                }
-
-                request.console_output.pre_request_output = Some(console_output);
-
-                match result_request {
-                    None => {
-                        return Err(PrepareRequestError::PreRequestScript);
-                    }
-                    Some(request) => request
-                }
-            }
-        };
+        let modified_request = self.handle_pre_request_script(request, env)?;
 
         /* INVALID CERTS */
-        
+
         if request.settings.accept_invalid_certs.as_bool() {
             client_builder = client_builder.danger_accept_invalid_certs(true);
         }
@@ -147,7 +116,7 @@ impl App<'_> {
         if request.settings.accept_invalid_hostnames.as_bool() {
             client_builder = client_builder.danger_accept_invalid_hostnames(true);
         }
-        
+
         /* CLIENT */
 
         let untraced_client = client_builder.build().expect("Could not build HTTP client");
@@ -187,8 +156,13 @@ impl App<'_> {
 
         /* REQUEST */
 
+        let method = match &modified_request.protocol {
+            Protocol::HttpRequest(http_request) => http_request.method.to_reqwest(),
+            Protocol::WsRequest(_) => reqwest::Method::GET,
+        };
+
         let mut request_builder = client.request(
-            modified_request.method.to_reqwest(),
+            method,
             url
         );
 
@@ -217,59 +191,61 @@ impl App<'_> {
 
         /* BODY */
 
-        match &modified_request.body {
-            NoBody => {},
-            Multipart(form_data) => {
-                let mut multipart = reqwest::multipart::Form::new();
+        if let Protocol::HttpRequest(http_request) = &modified_request.protocol {
+            match &http_request.body {
+                NoBody => {},
+                Multipart(form_data) => {
+                    let mut multipart = reqwest::multipart::Form::new();
 
-                for form_data in form_data {
-                    let key = self.replace_env_keys_by_value(&form_data.data.0);
-                    let value = self.replace_env_keys_by_value(&form_data.data.1);
+                    for form_data in form_data {
+                        let key = self.replace_env_keys_by_value(&form_data.data.0);
+                        let value = self.replace_env_keys_by_value(&form_data.data.1);
 
-                    // If the value starts with !!, then it is supposed to be a file
-                    if value.starts_with("!!") {
-                        let path = PathBuf::from(&value[2..]);
+                        // If the value starts with !!, then it is supposed to be a file
+                        if value.starts_with("!!") {
+                            let path = PathBuf::from(&value[2..]);
 
-                        match get_file_content_with_name(path) {
-                            Ok((file_content, file_name)) => {
-                                let part = Part::bytes(file_content).file_name(file_name);
-                                multipart = multipart.part(key, part);
-                            }
-                            Err(_) => {
-                                return Err(PrepareRequestError::CouldNotOpenFile);
+                            match get_file_content_with_name(path) {
+                                Ok((file_content, file_name)) => {
+                                    let part = Part::bytes(file_content).file_name(file_name);
+                                    multipart = multipart.part(key, part);
+                                }
+                                Err(_) => {
+                                    return Err(PrepareRequestError::CouldNotOpenFile);
+                                }
                             }
                         }
+                        else {
+                            multipart = multipart.text(key, value);
+                        }
                     }
-                    else {
-                        multipart = multipart.text(key, value);
+
+                    request_builder = request_builder.multipart(multipart);
+                },
+                Form(form_data) => {
+                    let form = self.key_value_vec_to_tuple_vec(&form_data);
+
+                    request_builder = request_builder.form(&form);
+                },
+                File(file_path) => {
+                    let file_path_with_env_values = self.replace_env_keys_by_value(&file_path);
+                    let path = PathBuf::from(file_path_with_env_values);
+
+                    match tokio::fs::File::open(path).await {
+                        Ok(file) => {
+                            request_builder = request_builder.body(file);
+                        }
+                        Err(_) => {
+                            return Err(PrepareRequestError::CouldNotOpenFile);
+                        }
                     }
+                },
+                Raw(body) | Json(body) | Xml(body) | Html(body) | Javascript(body) => {
+                    let body_with_env_values = self.replace_env_keys_by_value(body);
+                    request_builder = request_builder.body(body_with_env_values);
                 }
-
-                request_builder = request_builder.multipart(multipart);
-            },
-            Form(form_data) => {
-                let form = self.key_value_vec_to_tuple_vec(&form_data);
-
-                request_builder = request_builder.form(&form);
-            },
-            File(file_path) => {
-                let file_path_with_env_values = self.replace_env_keys_by_value(&file_path);
-                let path = PathBuf::from(file_path_with_env_values);
-
-                match tokio::fs::File::open(path).await {
-                    Ok(file) => {
-                        request_builder = request_builder.body(file);
-                    }
-                    Err(_) => {
-                        return Err(PrepareRequestError::CouldNotOpenFile);
-                    }
-                }
-            },
-            Raw(body) | Json(body) | Xml(body) | Html(body) | Javascript(body) => {
-                let body_with_env_values = self.replace_env_keys_by_value(body);
-                request_builder = request_builder.body(body_with_env_values);
-            }
-        };
+            };
+        }
 
         /* HEADERS */
 
@@ -288,201 +264,83 @@ impl App<'_> {
 
         Ok(request_builder)
     }
-}
 
-#[derive(Error, Debug)]
-pub enum RequestResponseError {
-    #[error("(CONSOLE) POST-SCRIPT ERROR")]
-    PostRequestScript,
-    #[error("COULD NOT DECODE RESPONSE TEXT OR BYTES")]
-    CouldNotDecodeResponse,
-}
-
-pub async fn send_request(prepared_request: reqwest_middleware::RequestBuilder, local_request: Arc<RwLock<Request>>, env: &Option<Arc<RwLock<Environment>>>) -> Result<RequestResponse, RequestResponseError> {
-    info!("Sending request");
-
-    local_request.write().is_pending = true;
-
-    let request = local_request.read();
-
-    let cancellation_token = request.cancellation_token.clone();
-    let timeout = tokio::time::sleep(Duration::from_millis(request.settings.timeout.as_u32() as u64));
-
-    let request_start = Instant::now();
-    let elapsed_time: Duration;
-
-    let mut response = tokio::select! {
-        _ = cancellation_token.cancelled() => {
-            elapsed_time = request_start.elapsed();
-            
-            RequestResponse {
-                duration: None,
-                status_code: Some(String::from("CANCELED")),
-                content: None,
-                cookies: None,
-                headers: vec![]
-            }
-        },
-        _ = timeout => {
-            elapsed_time = request_start.elapsed();
-
-            RequestResponse {
-                duration: None,
-                status_code: Some(String::from("TIMEOUT")),
-                content: None,
-                cookies: None,
-                headers: vec![]
-            }
-        },
-        response = prepared_request.send() => match response {
-            Ok(response) => {
-                elapsed_time = request_start.elapsed();
-
-                let status_code = response.status().to_string();
-
-                let mut is_image = false;
-
-                let headers: Vec<(String, String)> = response.headers().clone()
-                    .iter()
-                    .map(|(header_name, header_value)| {
-                        let value = header_value.to_str().unwrap_or("").to_string();
-
-                        if header_name == CONTENT_TYPE && value.starts_with("image/") {
-                            is_image = true;
-                        }
-
-                        (header_name.to_string(), value)
-                    })
-                    .collect();
-
-                let cookies = response.cookies()
-                    .par_bridge()
-                    .map(|cookie| {
-                        format!("{}: {}", cookie.name(), cookie.value())
-                    })
-                    .collect::<Vec<String>>()
-                    .join("\n");
-
-                let response_content = match is_image {
-                    true => {
-                        let content = response.bytes().await.unwrap();
-                        let image = image::load_from_memory(content.as_ref());
-
-                        ResponseContent::Image(ImageResponse {
-                            data: content.to_vec(),
-                            image: image.ok(),
-                        })
-                    },
-                    false => match response.bytes().await {
-                        Ok(bytes) => match String::from_utf8(bytes.to_vec()) {
-                            Ok(mut result_body) => {
-                                // If a file format has been found in the content-type header
-                                if let Some(file_format) = find_file_format_in_content_type(&headers) {
-                                    // If the request response content can be pretty printed
-                                    if request.settings.pretty_print_response_content.as_bool() {
-                                        // Match the file format
-                                        match file_format.as_str() {
-                                            "json" => {
-                                                result_body = jsonxf::pretty_print(&result_body).unwrap_or(result_body);
-                                            },
-                                            _ => {}
-                                        }
-                                    }
-                                }
-    
-                                ResponseContent::Body(result_body)
-                            },
-                            Err(_) => ResponseContent::Body(format!("{:#X?}", bytes))
-                        },
-                        Err(_) => return Err(CouldNotDecodeResponse)
+    pub fn handle_pre_request_script(&self, request: &mut Request, env: Option<Arc<RwLock<Environment>>>) -> anyhow::Result<Request, PrepareRequestError> {
+        match &request.scripts.pre_request_script {
+            None => {
+                request.console_output.pre_request_output = None;
+                Ok(request.clone())
+            },
+            Some(pre_request_script) => {
+                let env_values = match &env {
+                    None => None,
+                    Some(local_env) => {
+                        let env = local_env.read();
+                        Some(env.values.clone())
                     }
                 };
 
-                RequestResponse {
-                    duration: None,
-                    status_code: Some(status_code),
-                    content: Some(response_content),
-                    cookies: Some(cookies),
-                    headers
-                }
-            },
-            Err(error) => {
-                elapsed_time = request_start.elapsed();
+                let (result_request, env_variables, console_output) = execute_pre_request_script(pre_request_script, &request, env_values);
 
-                let response_status_code;
-
-                if let Some(status_code) = error.status() {
-                    response_status_code = Some(status_code.to_string());
-                } else {
-                    response_status_code = None;
-                }
-
-                let result_body = ResponseContent::Body(error.to_string());
-
-                RequestResponse {
-                    duration: None,
-                    status_code: response_status_code,
-                    content: Some(result_body),
-                    cookies: None,
-                    headers: vec![]
-                }
-            }
-        }
-    };
-
-    response.duration = Some(format!("{:?}", elapsed_time));
-
-    trace!("Request sent");
-
-    /* POST-REQUEST SCRIPT */
-
-    let (modified_response, post_request_output): (RequestResponse, Option<String>) = match &request.scripts.post_request_script {
-        None => {
-            (response, None)
-        },
-        Some(post_request_script) => {
-            let env_values = match &env {
-                None => None,
-                Some(env) => {
-                    let env = env.read();
-                    Some(env.values.clone())
-                }
-            };
-
-            let (result_response, env_variables, result_console_output) = execute_post_request_script(post_request_script, &response, env_values);
-
-            match env {
-                None => {},
-                Some(env) => match env_variables {
+                match &env {
                     None => {},
-                    Some(env_variables) => {
-                        let mut env = env.write();
-                        env.values = env_variables;
-                        save_environment_to_file(&*env);
+                    Some(local_env) => match env_variables {
+                        None => {},
+                        Some(env_variables) => {
+                            let mut env = local_env.write();
+                            env.values = env_variables;
+                            save_environment_to_file(&*env);
+                        }
                     }
                 }
-            }
 
-            match result_response {
-                None => {
-                    return Err(PostRequestScript)
+                request.console_output.pre_request_output = Some(console_output);
+
+                match result_request {
+                    None => {
+                        return Err(PrepareRequestError::PreRequestScript);
+                    }
+                    Some(request) => Ok(request)
                 }
-                Some(result_response) => (result_response, Some(result_console_output))
             }
         }
-    };
-
-    drop(request);
-
-    {
-        let mut request = local_request.write();
-
-        request.console_output.post_request_output = post_request_output;
-        request.is_pending = false;
-        request.cancellation_token = CancellationToken::new();
     }
-        
-    return Ok(modified_response);
+
+    pub fn handle_post_request_script(request: &Request, response: RequestResponse, env: &Option<Arc<RwLock<Environment>>>) -> anyhow::Result<(RequestResponse, Option<String>), RequestResponseError> {
+        match &request.scripts.post_request_script {
+            None => {
+                Ok((response, None))
+            },
+            Some(post_request_script) => {
+                let env_values = match &env {
+                    None => None,
+                    Some(env) => {
+                        let env = env.read();
+                        Some(env.values.clone())
+                    }
+                };
+
+                let (result_response, env_variables, result_console_output) = execute_post_request_script(post_request_script, &response, env_values);
+
+                match env {
+                    None => {},
+                    Some(env) => match env_variables {
+                        None => {},
+                        Some(env_variables) => {
+                            let mut env = env.write();
+                            env.values = env_variables;
+                            save_environment_to_file(&*env);
+                        }
+                    }
+                }
+
+                match result_response {
+                    None => Err(PostRequestScript),
+                    Some(result_response) => Ok((result_response, Some(result_console_output)))
+                }
+            }
+        }
+    }
 }
 
 pub fn get_file_content_with_name(path: PathBuf) -> std::io::Result<(Vec<u8>, String)> {

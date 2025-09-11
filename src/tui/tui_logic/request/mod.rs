@@ -1,7 +1,5 @@
 pub mod auth;
-pub mod body;
 pub mod headers;
-pub mod method;
 pub mod query_params;
 pub mod send;
 pub mod settings;
@@ -10,3 +8,5 @@ pub(super) mod utils;
 mod cookies;
 pub mod scripts;
 mod export;
+pub mod http;
+pub mod ws;

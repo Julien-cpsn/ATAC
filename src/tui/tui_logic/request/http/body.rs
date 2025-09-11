@@ -4,16 +4,17 @@ use tui_textarea::TextArea;
 use rayon::prelude::*;
 
 use crate::app::app::App;
-use crate::models::body::{ContentType, next_content_type};
+use crate::models::protocol::http::body::{ContentType, next_content_type};
 
 impl App<'_> {
     /// Reset selection if body form data is provided, either set it to none
     pub fn tui_update_body_table_selection(&mut self) {
         let local_selected_request = self.get_selected_request_as_local();
         let selected_request = local_selected_request.read();
+        let selected_http_request = selected_request.get_http_request().unwrap();
 
         {
-            if let Ok(form) = selected_request.body.get_form() {
+            if let Ok(form) = selected_http_request.body.get_form() {
                 match form.is_empty() {
                     false => self.body_form_table.update_selection(Some((0, 0))),
                     true => self.body_form_table.update_selection(None)
@@ -101,18 +102,19 @@ impl App<'_> {
         self.body_text_area = TextArea::new(lines);
     }
 
-    pub fn tui_next_request_body(&mut self) {
+    pub fn tui_modify_request_body(&mut self) {
         let selected_request_index = &self.collections_tree.selected.unwrap();
         let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
 
         {
             let mut selected_request = local_selected_request.write();
+            let selected_http_request = selected_request.get_http_request_mut().unwrap();
 
             let body_form = &self.body_form_table.rows;
             let body_file = &self.body_file_text_input.text;
             let body_string = self.body_text_area.lines().join("\n");
 
-            let new_body = match selected_request.body {
+            let new_body = match selected_http_request.body {
                 ContentType::NoBody => ContentType::NoBody,
                 ContentType::Multipart(_) => ContentType::Multipart(body_form.clone()),
                 ContentType::Form(_) => ContentType::Form(body_form.clone()),
@@ -126,27 +128,28 @@ impl App<'_> {
 
             info!("Body set to \"{}\"", new_body);
 
-            selected_request.body = new_body;
+            selected_http_request.body = new_body;
         }
 
         self.save_collection_to_file(selected_request_index.0);
         self.select_request_state();
     }
 
-    pub fn tui_modify_request_content_type(&mut self) {
+    pub fn tui_next_request_content_type(&mut self) {
         let selected_request_index = &self.collections_tree.selected.unwrap();
         let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
 
         {
             let mut selected_request = local_selected_request.write();
+            let selected_http_request = selected_request.get_http_request_mut().unwrap();
 
-            let new_content_type = next_content_type(&selected_request.body);
+            let new_content_type = next_content_type(&selected_http_request.body);
 
             info!("Body content-type set to \"{}\"", new_content_type);
 
-            selected_request.body = new_content_type;
+            selected_http_request.body = new_content_type;
 
-            match &selected_request.body {
+            match &selected_http_request.body {
                 // Removes Content-Type header if there is no more body
                 ContentType::NoBody => {
                     selected_request.find_and_delete_header(CONTENT_TYPE.as_str())
@@ -155,7 +158,7 @@ impl App<'_> {
                 ContentType::Multipart(_) => {},
                 // Create or replace Content-Type header with new body content type
                 ContentType::File(_) | ContentType::Form(_) | ContentType::Raw(_) | ContentType::Json(_) | ContentType::Xml(_) | ContentType::Html(_) | ContentType::Javascript(_) => {
-                    let content_type = &selected_request.body.to_content_type();
+                    let content_type = &selected_http_request.body.to_content_type();
                     selected_request.modify_or_create_header(CONTENT_TYPE.as_str(), content_type)
                 }
             }

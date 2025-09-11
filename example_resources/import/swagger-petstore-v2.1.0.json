@@ -12,7 +12,10 @@
 				{
 					"name": "Update an existing pet",
 					"request": {
-						"method": "PUT",
+						      "protocol": {
+        "method": "PUT",
+        "body": "no_body"
+      },
 						"header": [
 							{
 								"key": "Accept",
@@ -51,7 +54,10 @@
 				{
 					"name": "Add a new pet to the store",
 					"request": {
-						"method": "POST",
+						      "protocol": {
+        "method": "POST",
+        "body": "no_body"
+      },
 						"header": [
 							{
 								"key": "Accept",
@@ -85,7 +91,10 @@
 				{
 					"name": "Finds Pets by status",
 					"request": {
-						"method": "GET",
+						      "protocol": {
+        "method": "GET",
+        "body": "no_body"
+      },
 						"header": [
 							{
 								"key": "Accept",
@@ -123,7 +132,10 @@
 				{
 					"name": "Finds Pets by tags",
 					"request": {
-						"method": "GET",
+						      "protocol": {
+        "method": "GET",
+        "body": "no_body"
+      },
 						"header": [
 							{
 								"key": "Accept",
@@ -161,7 +173,10 @@
 				{
 					"name": "Find pet by ID",
 					"request": {
-						"method": "GET",
+						      "protocol": {
+        "method": "GET",
+        "body": "no_body"
+      },
 						"header": [
 							{
 								"key": "Accept",
@@ -199,7 +214,10 @@
 				{
 					"name": "Updates a pet in the store with form data",
 					"request": {
-						"method": "POST",
+						      "protocol": {
+        "method": "POST",
+        "body": "no_body"
+      },
 						"header": [
 							{
 								"key": "Accept",
@@ -251,7 +269,10 @@
 				{
 					"name": "Deletes a pet",
 					"request": {
-						"method": "DELETE",
+						      "protocol": {
+        "method": "DELETE",
+        "body": "no_body"
+      },
 						"header": [
 							{
 								"key": "Accept",
@@ -289,7 +310,10 @@
 				{
 					"name": "uploads an image",
 					"request": {
-						"method": "POST",
+						      "protocol": {
+        "method": "POST",
+        "body": "no_body"
+      },
 						"header": [
 							{
 								"key": "Accept",
@@ -348,7 +372,10 @@
 				{
 					"name": "Returns pet inventories by status",
 					"request": {
-						"method": "GET",
+						      "protocol": {
+        "method": "GET",
+        "body": "no_body"
+      },
 						"header": [
 							{
 								"key": "Accept",
@@ -380,7 +407,10 @@
 				{
 					"name": "Place an order for a pet",
 					"request": {
-						"method": "POST",
+						      "protocol": {
+        "method": "POST",
+        "body": "no_body"
+      },
 						"header": [
 							{
 								"key": "Accept",
@@ -411,7 +441,10 @@
 				{
 					"name": "Find purchase order by ID",
 					"request": {
-						"method": "GET",
+						      "protocol": {
+        "method": "GET",
+        "body": "no_body"
+      },
 						"header": [
 							{
 								"key": "Accept",
@@ -450,7 +483,10 @@
 				{
 					"name": "Delete purchase order by ID",
 					"request": {
-						"method": "DELETE",
+						      "protocol": {
+        "method": "DELETE",
+        "body": "no_body"
+      },
 						"header": [
 							{
 								"key": "Accept",
@@ -492,7 +528,10 @@
 				{
 					"name": "Create user",
 					"request": {
-						"method": "POST",
+						      "protocol": {
+        "method": "POST",
+        "body": "no_body"
+      },
 						"header": [
 							{
 								"key": "Accept",
@@ -523,7 +562,10 @@
 				{
 					"name": "Creates list of users with given input array",
 					"request": {
-						"method": "POST",
+						      "protocol": {
+        "method": "POST",
+        "body": "no_body"
+      },
 						"header": [
 							{
 								"key": "Accept",
@@ -554,7 +596,10 @@
 				{
 					"name": "Creates list of users with given input array",
 					"request": {
-						"method": "POST",
+						      "protocol": {
+        "method": "POST",
+        "body": "no_body"
+      },
 						"header": [
 							{
 								"key": "Accept",
@@ -585,7 +630,10 @@
 				{
 					"name": "Logs user into the system",
 					"request": {
-						"method": "GET",
+						      "protocol": {
+        "method": "GET",
+        "body": "no_body"
+      },
 						"header": [
 							{
 								"key": "Accept",
@@ -626,7 +674,10 @@
 				{
 					"name": "Logs out current logged in user session",
 					"request": {
-						"method": "GET",
+						      "protocol": {
+        "method": "GET",
+        "body": "no_body"
+      },
 						"header": [
 							{
 								"key": "Accept",
@@ -657,7 +708,10 @@
 				{
 					"name": "Get user by user name",
 					"request": {
-						"method": "GET",
+						      "protocol": {
+        "method": "GET",
+        "body": "no_body"
+      },
 						"header": [
 							{
 								"key": "Accept",
@@ -694,7 +748,10 @@
 				{
 					"name": "Updated user",
 					"request": {
-						"method": "PUT",
+						      "protocol": {
+        "method": "PUT",
+        "body": "no_body"
+      },
 						"header": [
 							{
 								"key": "Accept",
@@ -732,7 +789,10 @@
 				{
 					"name": "Delete user",
 					"request": {
-						"method": "DELETE",
+						      "protocol": {
+        "method": "DELETE",
+        "body": "no_body"
+      },
 						"header": [
 							{
 								"key": "Accept",

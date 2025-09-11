@@ -23,7 +23,7 @@ impl App<'_> {
             Collection(collection_command) => self.handle_collection_command(collection_command).await,
             
             Request(request_command) => self.handle_request_command(request_command).await,
-            
+
             Import(import_command) => match &import_command.import_type {
                 ImportType::Postman(postman_import) => self.import_postman_collection(postman_import),
                 ImportType::Curl(curl_import) => self.import_curl_file(curl_import),
@@ -72,7 +72,7 @@ impl App<'_> {
             RequestSubcommand::Info { .. } => self.cli_describe_request(collection_index, request_index),
             RequestSubcommand::Delete { .. } => self.delete_request(collection_index, request_index),
             RequestSubcommand::Rename { new_request_name, .. } => self.rename_request(collection_index, request_index, new_request_name.clone()),
-            RequestSubcommand::New { .. } => panic!("Should not happen"),
+            RequestSubcommand::New { .. } => unreachable!(),
             RequestSubcommand::Url { subcommand, .. } => match subcommand {
                 UrlCommand::Get => self.cli_print_request_url(collection_index, request_index),
                 UrlCommand::Set { new_url } => self.modify_request_url(collection_index, request_index, new_url.clone())
@@ -101,10 +101,10 @@ impl App<'_> {
                         KeyCommand::Set { value, .. } => self.modify_request_query_param(collection_index, request_index, value.clone(), 1, query_param_index),
                         KeyCommand::Delete { .. } => self.delete_query_param(collection_index, request_index, query_param_index),
                         KeyCommand::Rename { new_key, .. } => self.modify_request_query_param(collection_index, request_index, new_key.clone(), 0, query_param_index),
-                        _ => panic!("Should not happen")
+                        _ => unreachable!()
                     },
                     KeyValueCommand::Toggle { state, .. } => self.toggle_query_param(collection_index, request_index, state.clone(), query_param_index),
-                    _ => panic!("Should not happen")
+                    _ => unreachable!()
                 }
             },
             RequestSubcommand::Auth { subcommand, .. } => match subcommand {
@@ -131,10 +131,10 @@ impl App<'_> {
                         KeyCommand::Set { value, .. } => self.modify_request_header(collection_index, request_index, value.clone(), 1, header_index),
                         KeyCommand::Delete { .. } => self.delete_header(collection_index, request_index, header_index),
                         KeyCommand::Rename { new_key, .. } => self.modify_request_header(collection_index, request_index, new_key.clone(), 0, header_index),
-                        _ => panic!("Should not happen")
+                        _ => unreachable!()
                     },
                     KeyValueCommand::Toggle { state, .. } => self.toggle_header(collection_index, request_index, state.clone(), header_index),
-                    _ => panic!("Should not happen")
+                    _ => unreachable!()
                 }
             },
             RequestSubcommand::Body { subcommand, .. } => match subcommand {
@@ -163,7 +163,7 @@ impl App<'_> {
                             KeyCommand::Rename { new_key, .. } => self.modify_request_form_data(collection_index, request_index, new_key.clone(), 0, form_data_index),
                         },
                         KeyValueCommand::Toggle { state, .. } => self.toggle_form_data(collection_index, request_index, state.clone(), form_data_index),
-                        _ => panic!("Should not happen")
+                        _ => unreachable!()
                     }
                 }
             },

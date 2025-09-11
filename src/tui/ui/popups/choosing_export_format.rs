@@ -39,7 +39,7 @@ impl App<'_> {
         frame.render_widget(popup_block, area);
 
         for (index, element) in self.export_request.choices.iter().enumerate() {
-            let mut paragraph = Paragraph::new(element.clone()).centered();
+            let mut paragraph = Paragraph::new(element.to_string()).centered();
 
             if index == self.export_request.selection {
                 paragraph = paragraph.fg(Yellow).bold();
