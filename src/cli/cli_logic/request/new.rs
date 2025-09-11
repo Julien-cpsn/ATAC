@@ -45,15 +45,13 @@ pub fn create_request_from_new_request_command(request_name: String, new_request
                 Method::GET => {}
                 _ => return Err(anyhow!("Setting a method with a websocket request is incompatible"))
             }
-            
+
             match body {
                 ContentType::NoBody => {}
                 _ => return Err(anyhow!("Setting a body with a websocket request body is incompatible"))
             }
         }
     };
-
-    // TODO
 
     let mut request = Request {
         name: request_name,
