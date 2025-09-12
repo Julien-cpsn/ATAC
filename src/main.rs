@@ -1,7 +1,7 @@
 extern crate core;
 
 use std::fmt::Display;
-use std::io::{Result, stdout};
+use std::io::stdout;
 use std::process::exit;
 
 use ratatui::crossterm::ExecutableCommand;
@@ -21,9 +21,9 @@ mod cli;
 mod tui;
 
 #[tokio::main]
-async fn main() -> Result<()> {
+async fn main() -> anyhow::Result<()> {
   
-    let mut app = App::new();
+    let mut app = App::new()?;
     let app_mode = app.startup();
 
     let should_run_tui = match app_mode {
@@ -44,7 +44,7 @@ async fn main() -> Result<()> {
     Ok(())
 }
 
-async fn run_tui<'a>(app: &mut App<'a>) -> Result<()> {
+async fn run_tui<'a>(app: &mut App<'a>) -> anyhow::Result<()> {
     let terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
 
     app

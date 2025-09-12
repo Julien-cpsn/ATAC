@@ -125,8 +125,8 @@ pub struct App<'a> {
 }
 
 impl App<'_> {
-    pub fn new<'a>() -> App<'a> {
-        App {
+    pub fn new<'a>() -> anyhow::Result<App<'a>> {
+        Ok(App {
             tick_rate: Duration::from_millis(250),
             should_quit: false,
             should_display_help: false,
@@ -217,8 +217,8 @@ impl App<'_> {
                 selection: 0,
             },
             display_request_export: DisplayPopup::default(),
-            clipboard: Clipboard::new().expect("Clipboards are not supported on this system"),
-        }
+            clipboard: Clipboard::new()?,
+        })
     }
 
     pub async fn run(&mut self, mut terminal: Terminal<impl Backend>) -> std::io::Result<()> {
