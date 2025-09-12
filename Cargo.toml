@@ -1,7 +1,7 @@
 [package]
 name = "atac"
 description = "Arguably a Terminal API Client. Feature-full, free, open-source, offline and account-less."
-version = "0.21.0"
+version = "0.22.0"
 authors = ["julien-cpsn"]
 edition = "2021"
 rust-version = "1.82"
@@ -96,7 +96,7 @@ walkdir = "=2.5.0"
 ## Unescape string
 snailquote = "=0.3.1"
 ## Ordered hashmap. Used in environments to preserve files' values order
-indexmap = { version = "=2.11.0", features = ["serde", "rayon"] }
+indexmap = { version = "=2.11.1", features = ["serde", "rayon"] }
 ## Allows the usage of multiple threads in for loops
 rayon = "=1.11.0"
 ## Create custom errors
