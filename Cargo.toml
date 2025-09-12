@@ -114,7 +114,7 @@ regex = "=1.11.2"
 ## Time utils
 chrono = { version = "=0.4.42", default-features = false, features = ["now", "serde"] }
 ## UUID generator
-uuid = { version = "=1.18.1", features = ["v4", "v7"] }
+uuid = { version = "=1.18.1", features = ["v4", "v7", "serde"] }
 ## Decode base64 strings
 base64 = "=0.22.1"
 ## Wrap text to max length

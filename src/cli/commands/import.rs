@@ -11,6 +11,9 @@ nest! {
             /// Import a Postman v2.1.0 file
             Postman(PostmanImport),
 
+            /// Import a Postman environment file
+            PostmanEnv(PostmanEnvImport),
+
             /// Import a curl file
             Curl(CurlImport),
 
@@ -30,6 +33,21 @@ pub struct PostmanImport {
     /// Max depth at which import should stop creating nested collections and only get the deeper requests
     #[arg(long)]
     pub max_depth: Option<u16>,
+}
+
+#[derive(clap::Args, Debug, Clone)]
+pub struct PostmanEnvImport {
+    /// Path to the file to import
+    #[clap(value_hint = clap::ValueHint::FilePath)]
+    pub import_path: PathBuf,
+
+    /// Make each variable key uppercase
+    #[clap(short, long, default_value_t = false)]
+    pub force_uppercase_keys: bool,
+
+    /// Also retrieve disabled variables
+    #[clap(short, long, default_value_t = false)]
+    pub use_disabled: bool,
 }
 
 #[derive(clap::Args, Debug, Clone)]

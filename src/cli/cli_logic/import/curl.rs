@@ -26,7 +26,7 @@ use crate::models::protocol::protocol::Protocol;
 use crate::models::request::{KeyValue, Request};
 
 #[derive(Error, Debug)]
-pub enum ImportCurlError {
+enum ImportCurlError {
     #[error("Could not read cURL file\n\t{0}")]
     CouldNotReadFile(String),
     #[error("Could not parse cURL\n\t{0}")]

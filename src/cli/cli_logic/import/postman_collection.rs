@@ -10,7 +10,7 @@ use thiserror::Error;
 
 use crate::app::app::App;
 use crate::cli::args::ARGS;
-use crate::cli::cli_logic::import::postman::ImportPostmanError::{CollectionAlreadyExists, CouldNotParseCollection, UnknownMethod};
+use crate::cli::cli_logic::import::postman_collection::ImportPostmanError::{CollectionAlreadyExists, CouldNotParseCollection, UnknownMethod};
 use crate::cli::commands::import::PostmanImport;
 use crate::models::auth::Auth;
 use crate::models::protocol::http::body::ContentType;
@@ -22,7 +22,7 @@ use crate::models::request::{DEFAULT_HEADERS, KeyValue, Request};
 use crate::models::settings::{RequestSettings, Setting};
 
 #[derive(Error, Debug)]
-pub enum ImportPostmanError {
+enum ImportPostmanError {
     #[error("Could not parse Postman collection \"{0}\"\n\t{1}")]
     CouldNotParseCollection(String, String),
     #[error("Collection \"{0}\" already exists")]

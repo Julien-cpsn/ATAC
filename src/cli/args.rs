@@ -109,7 +109,7 @@ pub enum Command {
     /// Environment commands
     Env(EnvCommand),
 
-    /// Import a collection or a request from other file formats (Postman v2.1.0, cURL, OpenAPI)
+    /// Import a collection, a request or an environment from other file formats (Postman v2.1.0, cURL, OpenAPI)
     Import(ImportCommand),
 
     /// Create a completion file

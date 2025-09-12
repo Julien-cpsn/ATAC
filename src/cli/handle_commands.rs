@@ -26,8 +26,9 @@ impl App<'_> {
 
             Import(import_command) => match &import_command.import_type {
                 ImportType::Postman(postman_import) => self.import_postman_collection(postman_import),
+                ImportType::PostmanEnv(postman_env_import) => self.import_postman_environment(postman_env_import),
                 ImportType::Curl(curl_import) => self.import_curl_file(curl_import),
-                ImportType::OpenApi(openapi_import) => self.import_openapi_collection(openapi_import)
+                ImportType::OpenApi(openapi_import) => self.import_openapi_collection(openapi_import),
             },
 
             Try(try_command) => self.try_request(&try_command.new_request_command, &try_command.send_command).await,

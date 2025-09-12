@@ -23,7 +23,9 @@ use crate::models::protocol::protocol::Protocol;
 use crate::models::request::{KeyValue, Request};
 
 #[derive(Error, Debug)]
-pub enum ImportOpenApiError {
+enum ImportOpenApiError {
+    #[error("Could not read OpenAPI file\n\t{0}")]
+    CouldNotReadFile(String),
     #[error("Could not parse OpenAPI specification \"{0}\"\n\t{1}")]
     CouldNotParseSpec(String, String),
     #[error("Collection \"{0}\" already exists")]
@@ -44,10 +46,7 @@ impl App<'_> {
         let spec_content = match fs::read_to_string(path_buf) {
             Ok(content) => content,
             Err(e) => {
-                return Err(anyhow!(ImportOpenApiError::CouldNotParseSpec(
-                    path_buf.display().to_string(),
-                    e.to_string()
-                )));
+                return Err(anyhow!(ImportOpenApiError::CouldNotReadFile(e.to_string())));
             }
         };
 
