@@ -222,7 +222,7 @@ cargo run -- -h
 | - HTTP/HTTPS Proxy                                                             | :white_check_mark:                                                                  | :white_check_mark:   | :white_check_mark:       |
 | - Disable CORS                                                                 | :white_check_mark:                                                                  | :x:                  | :x:                      |
 | - Toggle syntax highlighting                                                   | :white_check_mark:                                                                  | :x:                  | :x:                      |
-| **Import from other file formats**                                             | :white_check_mark:                                                                  | :white_check_mark:   | :white_check_mark: / :x: |
+| **Import from other file formats**                                             | :white_check_mark:                                                                  | :white_check_mark:   | :white_check_mark:       |
 | - Postman v2.1.0 and Postman environment import                                | :white_check_mark:                                                                  | :white_check_mark:   | :white_check_mark: / :x: |
 | - OpenAPI import                                                               | :white_check_mark: (AI generated, prone to bugs)                                    | :white_check_mark:   | :white_check_mark:       |
 | - cURL import                                                                  | :white_check_mark:                                                                  | :white_check_mark:   | :white_check_mark:       |
