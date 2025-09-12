@@ -172,7 +172,7 @@ impl App<'_> {
                                 lines = self.syntax_highlighting.highlighted_body.clone().unwrap();
                             }
                             else {
-                                lines = body.lines().par_bridge().map(|line| Line::raw(line)).collect();
+                                lines = body.lines().map(|line| Line::raw(line)).collect();
                             }
 
                             let mut body_paragraph = Paragraph::new(lines);
