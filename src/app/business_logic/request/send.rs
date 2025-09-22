@@ -51,7 +51,8 @@ impl App<'_> {
 
         let mut client_builder = ClientBuilder::new()
             .default_headers(HeaderMap::new())
-            .referer(false);
+            .referer(false)
+            .http1_title_case_headers();
 
         /* REDIRECTS */
 
