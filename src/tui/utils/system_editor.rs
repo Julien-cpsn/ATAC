@@ -6,8 +6,10 @@ use ratatui::crossterm::terminal::{disable_raw_mode, enable_raw_mode, LeaveAlter
 use ratatui::crossterm::ExecutableCommand;
 use edit::{Builder, edit_with_builder};
 
+use crate::tui::utils::stateful::text_input::TextInput;
 
-pub fn run(terminal: &mut Terminal<impl Backend>, default_text: String, file_extention: &str) -> Result<String> {
+
+pub fn run(terminal: &mut Terminal<impl Backend>, default_text: &str, file_extention: &str) -> Result<String> {
     stdout().execute(LeaveAlternateScreen)?;
     disable_raw_mode()?;
 
@@ -22,10 +24,18 @@ pub fn run(terminal: &mut Terminal<impl Backend>, default_text: String, file_ext
 }
 
 pub fn run_and_replace_textarea(terminal: &mut Terminal<impl Backend>, content: &mut TextArea, file_extention: &str) -> Result<()> {
-    let file = run(terminal, content.lines().join("\n"), file_extention)?;
+    let text = &content.lines().join("\n");
+    let file = run(terminal, &text, file_extention)?;
 
     *content = file.lines().collect();
 
     Ok(())
 }
 
+pub fn run_and_replace_textinput(terminal: &mut Terminal<impl Backend>, content: &mut TextInput, file_extention: &str) -> Result<()> {
+    let file = run(terminal, &content.text, file_extention)?;
+
+    content.set_input(file);
+
+    Ok(())
+}

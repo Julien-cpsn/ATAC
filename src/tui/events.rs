@@ -128,6 +128,7 @@ get_key_bindings! {
         GoBackToRequestMenu(EventKeyBinding),
 
         EditUrl(EventKeyBinding),
+        EditUrlSystemEditor(EventKeyBinding),
         EditMethod(EventKeyBinding),
 
         EditSettings(EventKeyBinding),
@@ -610,6 +611,13 @@ impl App<'_> {
                 GoBackToRequestMenu(_) => self.select_request_state(),
                 
                 EditUrl(_) => self.edit_request_url_state(),
+                EditUrlSystemEditor(_) => {
+                    if let Err(e) = system_editor::run_and_replace_textinput(terminal, &mut self.url_text_input, ".txt") {
+                        error!("Failed to run system editor: {}", e);
+                    }
+
+                    self.tui_modify_request_url();
+                },
                 EditMethod(_) => self.tui_next_request_method(),
                 EditSettings(_) => self.edit_request_settings_state(),
 

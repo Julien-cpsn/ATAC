@@ -86,6 +86,7 @@ duplicate_element = "Ctrl-d"
 param_next_tab = "Tab"
 
 change_url = "u"
+alt_change_url = "Shift-U"
 change_method = "m"
 request_settings = "s"
 
