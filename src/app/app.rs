@@ -227,7 +227,7 @@ impl App<'_> {
         while !self.should_quit {
             self.update_current_available_events();
             self.draw(&mut terminal)?;
-            self.handle_events().await;
+            self.handle_events(&mut terminal).await;
         }
 
         Ok(())

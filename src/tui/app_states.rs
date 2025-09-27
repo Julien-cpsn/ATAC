@@ -447,6 +447,8 @@ impl AppState {
                         ],
                         RequestParamsTabs::Body => vec![
                             EditRequestBody(EventKeyBinding::new(vec![key_bindings.generic.list_and_table_actions.edit_element], "Edit body", None)),
+                            // TODO use editor keybinding from config
+                            EditRequestBodySystemEditor(EventKeyBinding::new(vec![key!(Shift-E)], "Edit body via system editor", None)),
 
                             RequestBodyTableMoveUp(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_up], "Move up", None)),
                             RequestBodyTableMoveDown(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_down], "Move down", None)),

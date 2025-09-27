@@ -2,7 +2,9 @@ use crokey::KeyCombination;
 use crokey::OneToThree::One;
 use ratatui::crossterm::event;
 use ratatui::crossterm::event::{Event, KeyCode, KeyEventKind};
-use tracing::{debug};
+use ratatui::prelude::Backend;
+use ratatui::Terminal;
+use tracing::{debug, error};
 use tui_textarea::CursorMove;
 
 use crate::app::app::App;
@@ -12,6 +14,7 @@ use crate::tui::app_states::AVAILABLE_EVENTS;
 use crate::tui::event_key_bindings::EventKeyBinding;
 use crate::tui::events::AppEvent::*;
 use crate::tui::utils::vim_emulation::{Vim, VimTransition};
+use crate::tui::utils::system_editor;
 
 get_key_bindings! {
     #[derive(Clone)]
@@ -165,6 +168,7 @@ get_key_bindings! {
         DuplicateRequestHeader(EventKeyBinding),
 
         EditRequestBody(EventKeyBinding),
+        EditRequestBodySystemEditor(EventKeyBinding),
         RequestBodyTableMoveUp(EventKeyBinding),
         RequestBodyTableMoveDown(EventKeyBinding),
         RequestBodyTableMoveLeft(EventKeyBinding),
@@ -390,7 +394,7 @@ get_key_bindings! {
 
 impl App<'_> {
     /// Handle events
-    pub async fn handle_events(&mut self) {
+    pub async fn handle_events(&mut self, terminal: &mut Terminal<impl Backend>) {
         // Refreshes the app every tick_rate
         if event::poll(self.tick_rate).unwrap() {
             // Block while a key is pressed
@@ -401,7 +405,7 @@ impl App<'_> {
                 }
 
                 let key = KeyCombination::from(key_event);
-                let is_input_missed = self.handle_key(key).await;
+                let is_input_missed = self.handle_key(key, terminal).await;
 
                 if !is_input_missed {
                     debug!("Key pressed: {}", key);
@@ -425,7 +429,7 @@ impl App<'_> {
         }
     }
 
-    async fn handle_key(&mut self, key: KeyCombination) -> bool {
+    async fn handle_key(&mut self, key: KeyCombination, terminal: &mut Terminal<impl Backend>) -> bool {
         // Debug tool
         //dbg!("{}", key.to_string());
 
@@ -850,6 +854,16 @@ impl App<'_> {
                 EditingRequestBodyStringCharInput(_) => match key {
                     KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.body_text_area.insert_char(char),
                     _ => {}
+                },
+                EditRequestBodySystemEditor(_) => {
+                    if let Some(ext) = self.tui_request_body_file_extention() {
+
+                        if let Err(e) = system_editor::run_and_replace_textarea(terminal, &mut self.body_text_area, ext) {
+                            error!("Failed to run system editor: {}", e);
+                        }
+
+                        self.tui_modify_request_body();
+                    }
                 },
 
                 /* Websocket */

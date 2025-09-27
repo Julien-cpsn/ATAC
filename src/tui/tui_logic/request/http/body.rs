@@ -102,6 +102,22 @@ impl App<'_> {
         self.body_text_area = TextArea::new(lines);
     }
 
+    pub fn tui_request_body_file_extention(&self) -> Option<&'static str> {
+        let selected_request_index = &self.collections_tree.selected.unwrap();
+        let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
+        let request = local_selected_request.read();
+        let request = request.get_http_request().unwrap();
+
+        match request.body {
+            ContentType::Raw(_) => Some(".txt"),
+            ContentType::Json(_) => Some(".json"),
+            ContentType::Xml(_) => Some(".xml"),
+            ContentType::Html(_) => Some(".html"),
+            ContentType::Javascript(_) => Some(".js"),
+            _ => None,
+        }
+    }
+
     pub fn tui_modify_request_body(&mut self) {
         let selected_request_index = &self.collections_tree.selected.unwrap();
         let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
