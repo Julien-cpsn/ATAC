@@ -87,6 +87,7 @@ nest! {
                 pub create_element: KeyCombination,
                 pub delete_element: KeyCombination,
                 pub edit_element: KeyCombination,
+                pub alt_edit_element: KeyCombination,
                 /// Only used in the collections list (main menu)
                 pub rename_element: KeyCombination,
                 /// Only used in tables (Query params, headers, cookies)
@@ -217,6 +218,7 @@ impl Default for KeyBindings {
                     create_element: key!(n),
                     delete_element: key!(d),
                     edit_element: key!(enter),
+                    alt_edit_element: key!(Shift-r),
                     rename_element: key!(r),
                     toggle_element: key!(t),
                     duplicate_element: key!(ctrl-d),
