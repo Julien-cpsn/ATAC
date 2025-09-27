@@ -181,6 +181,7 @@ get_key_bindings! {
         EditRequestMessage(EventKeyBinding),
 
         EditRequestScript(EventKeyBinding),
+        EditRequestScriptSystemEditor(EventKeyBinding),
         // Move up or down
         RequestScriptMove(EventKeyBinding),
 
@@ -678,6 +679,22 @@ impl App<'_> {
                 /* Scripts */
 
                 EditRequestScript(_) => self.edit_request_script_state(),
+                EditRequestScriptSystemEditor(_) => {
+                    let mut current_script = match self.script_console.script_selection {
+                        0 => &mut self.script_console.pre_request_text_area,
+                        _ => &mut self.script_console.post_request_text_area
+                    };
+
+                    if let Err(e) = system_editor::run_and_replace_textarea(terminal, &mut current_script, ".js") {
+                        error!("Failed to run system editor: {}", e);
+                    }
+
+                    match self.script_console.script_selection {
+                        0 => self.modify_pre_request_script(),
+                        _ => self.modify_post_request_script()
+                    }
+
+                },
                 RequestScriptMove(_) => self.script_console.change_selection(),
 
                 /* Result tabs */

@@ -464,6 +464,7 @@ impl AppState {
                         ],
                         RequestParamsTabs::Scripts => vec![
                             EditRequestScript(EventKeyBinding::new(vec![key_bindings.generic.list_and_table_actions.edit_element], "Edit request script", Some("Edit"))),
+                            EditRequestScriptSystemEditor(EventKeyBinding::new(vec![key_bindings.generic.list_and_table_actions.alt_edit_element], "Edit request script via system editor", None)),
                             RequestScriptMove(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_up], "Move up", Some("Up"))),
                             RequestScriptMove(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_down], "Move down", Some("Down"))),
                         ]
