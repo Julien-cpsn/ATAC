@@ -93,6 +93,13 @@ impl TextInput {
         self.reset_cursor();
     }
 
+    pub fn set_input(&mut self, text: String) {
+        if let Some(l) = text.lines().next() {
+            self.text = l.to_string();
+            self.move_cursor_line_end();
+        }
+    }
+
     /// Returns the text with ellipsis if the cursor is further the input box length
     pub fn get_padded_text_and_cursor(&self, length: usize) -> (String, usize) {
         let text_char_count = self.text.chars().count();

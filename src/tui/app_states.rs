@@ -361,6 +361,7 @@ impl AppState {
                     Documentation(EventKeyBinding::new(vec![key_bindings.generic.display_help], "Display help", Some("Help"))),
 
                     EditUrl(EventKeyBinding::new(vec![key_bindings.request_selected.change_url], "Edit URL", Some("URL"))),
+                    EditUrlSystemEditor(EventKeyBinding::new(vec![key_bindings.request_selected.alt_change_url], "Edit URL via system editor", Some("URL"))),
                     EditMethod(EventKeyBinding::new(vec![key_bindings.request_selected.change_method], "Change method", Some("Method"))),
 
                     EditSettings(EventKeyBinding::new(vec![key_bindings.request_selected.request_settings], "Request settings", None)),
@@ -447,6 +448,7 @@ impl AppState {
                         ],
                         RequestParamsTabs::Body => vec![
                             EditRequestBody(EventKeyBinding::new(vec![key_bindings.generic.list_and_table_actions.edit_element], "Edit body", None)),
+                            EditRequestBodySystemEditor(EventKeyBinding::new(vec![key_bindings.generic.list_and_table_actions.alt_edit_element], "Edit body via system editor", None)),
 
                             RequestBodyTableMoveUp(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_up], "Move up", None)),
                             RequestBodyTableMoveDown(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_down], "Move down", None)),
@@ -463,6 +465,7 @@ impl AppState {
                         ],
                         RequestParamsTabs::Scripts => vec![
                             EditRequestScript(EventKeyBinding::new(vec![key_bindings.generic.list_and_table_actions.edit_element], "Edit request script", Some("Edit"))),
+                            EditRequestScriptSystemEditor(EventKeyBinding::new(vec![key_bindings.generic.list_and_table_actions.alt_edit_element], "Edit request script via system editor", None)),
                             RequestScriptMove(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_up], "Move up", Some("Up"))),
                             RequestScriptMove(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_down], "Move down", Some("Down"))),
                         ]

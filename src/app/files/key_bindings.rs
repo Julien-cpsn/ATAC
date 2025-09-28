@@ -87,6 +87,7 @@ nest! {
                 pub create_element: KeyCombination,
                 pub delete_element: KeyCombination,
                 pub edit_element: KeyCombination,
+                pub alt_edit_element: KeyCombination,
                 /// Only used in the collections list (main menu)
                 pub rename_element: KeyCombination,
                 /// Only used in tables (Query params, headers, cookies)
@@ -98,6 +99,7 @@ nest! {
         pub request_selected: #[derive(Copy, Clone, Deserialize)] pub struct RequestSelected {
             pub param_next_tab: KeyCombination,
             pub change_url: KeyCombination,
+            pub alt_change_url: KeyCombination,
             pub change_method: KeyCombination,
             pub request_settings: KeyCombination,
             pub export_request: KeyCombination,
@@ -217,6 +219,7 @@ impl Default for KeyBindings {
                     create_element: key!(n),
                     delete_element: key!(d),
                     edit_element: key!(enter),
+                    alt_edit_element: key!(Shift-r),
                     rename_element: key!(r),
                     toggle_element: key!(t),
                     duplicate_element: key!(ctrl-d),
@@ -227,6 +230,7 @@ impl Default for KeyBindings {
                 param_next_tab: key!(tab),
 
                 change_url: key!(u),
+                alt_change_url: key!(ctrl-u),
                 change_method: key!(m),
 
                 request_settings: key!(s),

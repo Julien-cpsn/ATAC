@@ -51,7 +51,7 @@ image = "=0.25.8"
 
 # Main functionalities
 ## Syntax highlighting
-syntect = { version = "=5.2.0", features = ["default-fancy"] }
+syntect = { version = "=5.2.0", default-features = false, features = ["default-fancy"] }
 ## Serialize & Deserialize application data into files
 serde = { version = "=1.0.219", features = ["derive", "rc"] }
 serde_json = "=1.0.143"
@@ -75,6 +75,8 @@ clap = { version = "=4.5", features = ["derive", "color", "suggestions"] }
 directories = "=6.0.0"
 ## Copy response body to clipboard
 arboard = { version = "=3.6.0", features = ["wayland-data-control"] }
+## Used to spawn an external file editor
+edit = "0.1.5"
 
 # Async
 ## Handle asynchronous requests
