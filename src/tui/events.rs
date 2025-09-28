@@ -881,7 +881,7 @@ impl App<'_> {
                     _ => {}
                 },
                 EditRequestBodySystemEditor(_) => {
-                    if let Some(ext) = self.tui_request_body_file_extention() {
+                    if let Some(ext) = self.tui_request_body_file_extension() {
 
                         if let Err(e) = system_editor::run_and_replace_textarea(terminal, &mut self.body_text_area, ext) {
                             error!("Failed to run system editor: {}", e);

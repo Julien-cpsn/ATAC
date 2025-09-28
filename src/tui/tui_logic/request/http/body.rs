@@ -102,7 +102,7 @@ impl App<'_> {
         self.body_text_area = TextArea::new(lines);
     }
 
-    pub fn tui_request_body_file_extention(&self) -> Option<&'static str> {
+    pub fn tui_request_body_file_extension(&self) -> Option<&'static str> {
         let selected_request_index = &self.collections_tree.selected.unwrap();
         let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
         let request = local_selected_request.read();
