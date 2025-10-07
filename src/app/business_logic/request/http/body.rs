@@ -130,6 +130,7 @@ impl App<'_> {
                 None => {
                     let state = !form[row].enabled;
                     // Better user feedback
+                    println!("{state}");
                     state
                 },
                 Some(state) => state

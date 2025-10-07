@@ -72,7 +72,7 @@ impl App<'_> {
                     },
                     RequestParamsTabs::Auth => match request.auth {
                         NoAuth => tab.to_string(),
-                        BasicAuth { .. } | BearerToken { .. } => format!("{} ({})", tab.to_string(), request.auth.to_string())
+                        BasicAuth { .. } | BearerToken { .. } | JwtToken { .. } => format!("{} ({})", tab.to_string(), request.auth.to_string())
                     },
                     RequestParamsTabs::Headers => match request.headers.is_empty() {
                         true => tab.to_string(),
@@ -164,6 +164,9 @@ impl App<'_> {
                     }
                     BearerToken { .. } => {
                         self.render_bearer_token_tab(frame, request_params_layout[1]);
+                    }
+                    JwtToken { .. } => {
+                        self.render_jwt_token_tab(frame, request_params_layout[1]);
                     }
                 }
             }
