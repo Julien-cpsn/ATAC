@@ -27,6 +27,7 @@ impl App<'_> {
             Auth::NoAuth => {}
             Auth::BasicAuth { username, password } => println!("auth: Basic\n\t{username}\n\t{password}"),
             Auth::BearerToken { token: bearer_token } => println!("auth: Bearer token\n\t{bearer_token}"),
+            Auth::JwtToken { algorythm, secret, payload } => println!("auth: JWT\n\t{algorythm}\n\t{secret}\n\t{payload}"),
         }
 
         if let Protocol::HttpRequest(http_request) = &request.protocol {

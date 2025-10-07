@@ -6,7 +6,7 @@ use anyhow::anyhow;
 use thiserror::Error;
 use crate::app::app::App;
 use crate::app::business_logic::request::export::ExportError::{CouldNotParseUrl, ExportFormatNotSupported};
-use crate::app::business_logic::request::send::get_file_content_with_name;
+use crate::app::business_logic::request::send::{ do_jaat, get_file_content_with_name};
 use crate::models::auth::Auth;
 use crate::models::protocol::http::body::ContentType::{File, Form, Html, Javascript, Json, Multipart, NoBody, Raw, Xml};
 use crate::models::export::ExportFormat;
@@ -97,6 +97,14 @@ impl App<'_> {
                 let bearer_token = self.replace_env_keys_by_value(token);
 
                 format!("\nAuthorization: Bearer {}", bearer_token)
+            },
+            Auth::JwtToken { algorythm, secret, payload } => {
+                let algorythm = self.replace_env_keys_by_value(algorythm);
+                let secret = self.replace_env_keys_by_value(secret);
+                let payload = self.replace_env_keys_by_value(payload);
+
+                let token = do_jaat(algorythm, secret, payload);
+                format!("Authorization: Bearer {}", token)
             }
         };
 
@@ -212,6 +220,14 @@ impl App<'_> {
                 let bearer_token = self.replace_env_keys_by_value(token);
 
                 format!("\n--header 'Authorization: Bearer {}' \\", bearer_token)
+            },
+            Auth::JwtToken { algorythm, secret, payload } => {
+                let algorythm = self.replace_env_keys_by_value(algorythm);
+                let secret = self.replace_env_keys_by_value(secret);
+                let payload = self.replace_env_keys_by_value(payload);
+
+                let token =do_jaat(algorythm, secret, payload); 
+                format!("\n--header 'Authorization: Bearer {}' \\", token)
             }
         };
 
@@ -312,6 +328,14 @@ impl App<'_> {
                 let bearer_token = self.replace_env_keys_by_value(token);
 
                 format!("\n    'Authorization' => 'Bearer {}',", bearer_token)
+            },
+            Auth::JwtToken { algorythm, secret, payload } => {
+                let algorythm = self.replace_env_keys_by_value(algorythm);
+                let secret = self.replace_env_keys_by_value(secret);
+                let payload = self.replace_env_keys_by_value(payload);
+
+                let token = do_jaat(algorythm, secret, payload);
+                format!("\n--header 'Authorization: Bearer {}' \\", token)
             }
         };
 
@@ -461,6 +485,14 @@ impl App<'_> {
             Auth::BearerToken { token } => {
                 let bearer_token = self.replace_env_keys_by_value(token);
                 output += &format!("    'Authorization': 'Bearer {}',\n", bearer_token);
+            },
+            Auth::JwtToken { algorythm, secret, payload } => {
+                let algorythm = self.replace_env_keys_by_value(algorythm);
+                let secret = self.replace_env_keys_by_value(secret);
+                let payload = self.replace_env_keys_by_value(payload);
+
+                let token = do_jaat(algorythm, secret, payload);
+                output += &format!("    'Authorization': 'Bearer {}',\n", token);
             }
         };
 
@@ -594,6 +626,14 @@ impl App<'_> {
                 let bearer_token = self.replace_env_keys_by_value(token);
                 has_headers = true;
                 headers_str += &format!("        .header(\"Authorization\", \"Bearer {}\")\n", bearer_token);
+            },
+            Auth::JwtToken { algorythm, secret, payload }=>{
+                let algorythm = self.replace_env_keys_by_value(algorythm);
+                let secret = self.replace_env_keys_by_value(secret);
+                let payload = self.replace_env_keys_by_value(payload);
+
+                let token = do_jaat(algorythm, secret, payload);
+                headers_str += &format!("        .header(\"Authorization\", \"Bearer {}\")\n", token);
             }
         };
 

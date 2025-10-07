@@ -210,6 +210,21 @@ impl App<'_> {
         self.update_inputs();
     }
 
+    pub fn edit_request_auth_jwt_algorythm_state(&mut self) {
+        self.set_app_state(AppState::EditingRequestAuthJwtAlgorythm);
+        self.update_inputs();
+    }
+
+    pub fn edit_request_auth_jwt_secret_state(&mut self) {
+        self.set_app_state(AppState::EditingRequestAuthJwtSecret);
+        self.update_inputs();
+    }
+
+    pub fn edit_request_auth_jwt_payload_state(&mut self) {
+        self.set_app_state(AppState::EditingRequestAuthJwtPayload);
+        self.update_inputs();
+    }
+
     pub fn edit_request_header_state(&mut self) {
         self.set_app_state(AppState::EditingRequestHeader);
         self.update_inputs();

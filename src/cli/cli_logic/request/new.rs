@@ -109,6 +109,13 @@ fn get_auth_from_auth_args(auth_args: AuthArgs) -> Auth {
             token: auth_args.auth_bearer_token[0].clone()
         };
     }
+    else if !auth_args.auth_jwt_token.is_empty() {
+        return Auth::JwtToken {
+            algorythm: auth_args.auth_jwt_token[0].clone(),
+            secret: auth_args.auth_jwt_token[1].clone(),
+            payload: auth_args.auth_jwt_token[2].clone(),
+        };
+    }
     else {
         return Auth::NoAuth;
     }

@@ -7,18 +7,20 @@ impl App<'_> {
 
         {
             let selected_request = local_selected_request.read();
-            
+
             print!("{}", selected_request.auth);
-            
+
             match &selected_request.auth {
                 Auth::NoAuth => {},
                 Auth::BasicAuth { username, password } => print!(" {username} {password}"),
-                Auth::BearerToken { token: bearer_token } => print!(" {bearer_token}")
+                Auth::BearerToken { token: bearer_token } => print!(" {bearer_token}"),
+                Auth::JwtToken { payload, secret, algorythm } => print!(" {algorythm} {secret} {payload}")
             }
-            
+
             println!()
         }
 
         Ok(())
     }
 }
+

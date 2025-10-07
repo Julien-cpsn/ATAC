@@ -129,3 +129,5 @@ tracing-subscriber = { version = "=0.3.20", features = ["parking_lot", "chrono",
 tracing-log = "=0.2.0"
 ## Opentracing middleware implementation for reqwest-middleware
 reqwest-tracing = "=0.5.8"
+
+jsonwebtoken = "9"

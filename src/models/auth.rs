@@ -1,7 +1,7 @@
 use clap::Subcommand;
 use serde::{Deserialize, Serialize};
 use strum::Display;
-use crate::models::auth::Auth::{BasicAuth, BearerToken, NoAuth};
+use crate::models::auth::Auth::{BasicAuth, BearerToken, JwtToken, NoAuth};
 
 #[derive(Subcommand, Clone, Default, Debug, Display, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -24,7 +24,16 @@ pub enum Auth {
     /// Bearer token auth method
     BearerToken {
         token: String
-    }
+    },
+
+    #[strum(to_string = "JWT")]
+    #[clap(visible_alias = "jwt")]
+    /// jwt token auth method
+    JwtToken {
+        algorythm: String,
+        secret: String,
+        payload: String,
+    },
 }
 
 pub fn next_auth(auth: &Auth) -> Auth {
@@ -36,6 +45,11 @@ pub fn next_auth(auth: &Auth) -> Auth {
         BasicAuth { .. } => BearerToken {
             token: String::new(),
         },
-        BearerToken { .. } => NoAuth
+        BearerToken { .. } => JwtToken {
+            algorythm: String::new(),
+            secret: String::new(),
+            payload: String::new(),
+        },
+        JwtToken { .. } => NoAuth,
     }
 }

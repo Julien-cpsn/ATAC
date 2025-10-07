@@ -1,7 +1,7 @@
 use tracing::{info};
 use crate::app::app::App;
 use crate::models::auth::Auth;
-use crate::models::auth::Auth::{BasicAuth, BearerToken};
+use crate::models::auth::Auth::{BasicAuth, BearerToken, JwtToken};
 
 impl App<'_> {
     pub fn modify_request_auth(&mut self, collection_index: usize, request_index: usize, auth: Auth) -> anyhow::Result<()> {
@@ -82,4 +82,59 @@ impl App<'_> {
 
         self.save_collection_to_file(collection_index);
     }
+
+    pub fn modify_request_auth_algorythm(&mut self, collection_index: usize, request_index: usize, algorythm: String) {
+        let local_selected_request = self.get_request_as_local_from_indexes(&(collection_index, request_index));
+
+        {
+            let mut selected_request = local_selected_request.write();
+            
+            info!("Auth jwt algorythm set to \"{}\"", algorythm);
+            
+            if let JwtToken { secret, payload, .. } = &selected_request.auth {
+                selected_request.auth = JwtToken {
+                    algorythm, secret: secret.to_string(), payload: payload.to_string()
+                };
+            }
+        }
+
+        self.save_collection_to_file(collection_index);
+    }
+
+    pub fn modify_request_auth_secret(&mut self, collection_index: usize, request_index: usize, s: String) {
+        let local_selected_request = self.get_request_as_local_from_indexes(&(collection_index, request_index));
+
+        {
+            let mut selected_request = local_selected_request.write();
+            
+            info!("Auth jwt secret set to \"{}\"", s);
+            
+            if let JwtToken { algorythm, payload, .. } = &selected_request.auth {
+                selected_request.auth = JwtToken {
+                    algorythm: algorythm.to_string(), secret:s, payload: payload.to_string()
+                };
+            }
+        }
+
+        self.save_collection_to_file(collection_index);
+    }
+
+    pub fn modify_request_auth_payload(&mut self, collection_index: usize, request_index: usize, payload: String) {
+        let local_selected_request = self.get_request_as_local_from_indexes(&(collection_index, request_index));
+
+        {
+            let mut selected_request = local_selected_request.write();
+            
+            info!("Auth jwt payload set to \"{}\"", payload);
+            
+            if let JwtToken { secret, algorythm, .. } = &selected_request.auth {
+                selected_request.auth = JwtToken {
+                    algorythm: algorythm.to_string(), secret: secret.to_string(), payload 
+                };
+            }
+        }
+
+        self.save_collection_to_file(collection_index);
+    }
+
 }

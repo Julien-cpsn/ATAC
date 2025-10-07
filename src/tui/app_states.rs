@@ -89,6 +89,15 @@ pub enum AppState {
     #[strum(to_string = "Editing request auth bearer token")]
     EditingRequestAuthBearerToken,
 
+    #[strum(to_string = "Editing request jwt algorythm")]
+    EditingRequestAuthJwtAlgorythm,
+
+    #[strum(to_string = "Editing request jwt secret")]
+    EditingRequestAuthJwtSecret,
+
+    #[strum(to_string = "Editing request jwt payload")]
+    EditingRequestAuthJwtPayload,
+
     #[strum(to_string = "Editing request header")]
     EditingRequestHeader,
 
@@ -140,7 +149,10 @@ pub fn next_app_state(app_state: &AppState) -> AppState {
         EditingRequestParam => EditingRequestAuthUsername,
         EditingRequestAuthUsername => EditingRequestAuthPassword,
         EditingRequestAuthPassword => EditingRequestAuthBearerToken,
-        EditingRequestAuthBearerToken => EditingRequestHeader,
+        EditingRequestAuthBearerToken => EditingRequestAuthJwtAlgorythm,
+        EditingRequestAuthJwtAlgorythm => EditingRequestAuthJwtSecret,
+        EditingRequestAuthJwtSecret => EditingRequestAuthJwtPayload,
+        EditingRequestAuthJwtPayload => EditingRequestHeader,
         EditingRequestHeader => EditingRequestBodyTable,
         EditingRequestBodyTable => EditingRequestBodyFile,
         EditingRequestBodyFile => EditingRequestBodyString,
@@ -175,7 +187,10 @@ pub fn previous_app_state(app_state: &AppState) -> AppState {
         EditingRequestAuthUsername => EditingRequestParam,
         EditingRequestAuthPassword => EditingRequestAuthUsername,
         EditingRequestAuthBearerToken => EditingRequestAuthPassword,
-        EditingRequestHeader => EditingRequestAuthBearerToken,
+        EditingRequestAuthJwtAlgorythm => EditingRequestAuthBearerToken,
+        EditingRequestAuthJwtSecret => EditingRequestAuthJwtAlgorythm,
+        EditingRequestAuthJwtPayload => EditingRequestAuthJwtSecret,
+        EditingRequestHeader => EditingRequestAuthJwtPayload,
         EditingRequestBodyTable => EditingRequestHeader,
         EditingRequestBodyFile => EditingRequestBodyTable,
         EditingRequestBodyString => EditingRequestBodyFile,
@@ -558,6 +573,42 @@ impl AppState {
                 EditingRequestAuthBearerTokenMoveCursorLineEnd(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_line_end], "Move cursor line start", Some("Home"))),
                 EditingRequestAuthBearerTokenCharInput(EventKeyBinding::new(vec![], "Char input", None)),
             ],
+            EditingRequestAuthJwtAlgorythm => vec![
+                GoBackToRequestMenu(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.cancel], "Cancel", Some("Cancel"))),
+                ModifyRequestAuthAlgorythm(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.confirm], "Confirm", Some("Confirm"))),
+
+                EditingRequestAuthAlgorythmDeleteCharBackward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_backward], "Delete char backward", Some("Delete"))),
+                EditingRequestAuthAlgorythmDeleteCharForward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_forward], "Delete char forward", Some("Backspace"))),
+                EditingRequestAuthAlgorythmMoveCursorLeft(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_left], "Move cursor left", Some("Left"))),
+                EditingRequestAuthAlgorythmMoveCursorRight(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_right], "Move cursor right", Some("Right"))),
+                EditingRequestAuthAlgorythmMoveCursorLineStart(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_line_start], "Move cursor line start", Some("Home"))),
+                EditingRequestAuthAlgorythmMoveCursorLineEnd(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_line_end], "Move cursor line start", Some("Home"))),
+                EditingRequestAuthAlgorythmCharInput(EventKeyBinding::new(vec![], "Char input", None)),
+            ],
+            EditingRequestAuthJwtSecret => vec![
+                GoBackToRequestMenu(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.cancel], "Cancel", Some("Cancel"))),
+                ModifyRequestAuthSecret(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.confirm], "Confirm", Some("Confirm"))),
+
+                EditingRequestAuthSecretDeleteCharBackward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_backward], "Delete char backward", Some("Delete"))),
+                EditingRequestAuthSecretDeleteCharForward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_forward], "Delete char forward", Some("Backspace"))),
+                EditingRequestAuthSecretMoveCursorLeft(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_left], "Move cursor left", Some("Left"))),
+                EditingRequestAuthSecretMoveCursorRight(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_right], "Move cursor right", Some("Right"))),
+                EditingRequestAuthSecretMoveCursorLineStart(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_line_start], "Move cursor line start", Some("Home"))),
+                EditingRequestAuthSecretMoveCursorLineEnd(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_line_end], "Move cursor line start", Some("Home"))),
+                EditingRequestAuthSecretCharInput(EventKeyBinding::new(vec![], "Char input", None)),
+            ],
+            EditingRequestAuthJwtPayload => vec![
+                GoBackToRequestMenu(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.cancel], "Cancel", Some("Cancel"))),
+                ModifyRequestAuthPayload(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.confirm], "Confirm", Some("Confirm"))),
+
+                EditingRequestAuthPayloadDeleteCharBackward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_backward], "Delete char backward", Some("Delete"))),
+                EditingRequestAuthPayloadDeleteCharForward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_forward], "Delete char forward", Some("Backspace"))),
+                EditingRequestAuthPayloadMoveCursorLeft(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_left], "Move cursor left", Some("Left"))),
+                EditingRequestAuthPayloadMoveCursorRight(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_right], "Move cursor right", Some("Right"))),
+                EditingRequestAuthPayloadMoveCursorLineStart(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_line_start], "Move cursor line start", Some("Home"))),
+                EditingRequestAuthPayloadMoveCursorLineEnd(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_line_end], "Move cursor line start", Some("Home"))),
+                EditingRequestAuthPayloadCharInput(EventKeyBinding::new(vec![], "Char input", None)),
+            ],
             EditingRequestHeader => vec![
                 GoBackToRequestMenu(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.cancel], "Cancel", Some("Cancel"))),
                 ModifyRequestHeader(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.confirm], "Confirm", Some("Confirm"))),
@@ -830,7 +881,7 @@ impl App<'_> {
             SelectedRequest |
             EditingRequestUrl |
             EditingRequestParam |
-            EditingRequestAuthUsername | EditingRequestAuthPassword | EditingRequestAuthBearerToken  |
+            EditingRequestAuthUsername | EditingRequestAuthPassword | EditingRequestAuthBearerToken  | EditingRequestAuthJwtAlgorythm | EditingRequestAuthJwtSecret | EditingRequestAuthJwtPayload |
             EditingRequestHeader |
             EditingRequestBodyTable | EditingRequestBodyFile | EditingRequestBodyString |
             EditingRequestMessage |
@@ -868,7 +919,7 @@ impl App<'_> {
             RenamingRequest |
             EditingRequestUrl |
             EditingRequestParam |
-            EditingRequestAuthUsername | EditingRequestAuthPassword | EditingRequestAuthBearerToken |
+            EditingRequestAuthUsername | EditingRequestAuthPassword | EditingRequestAuthBearerToken  | EditingRequestAuthJwtAlgorythm | EditingRequestAuthJwtSecret | EditingRequestAuthJwtPayload |
             EditingRequestHeader |
             EditingRequestBodyTable | EditingRequestBodyFile | EditingRequestBodyString |
             EditingPreRequestScript | EditingPostRequestScript |

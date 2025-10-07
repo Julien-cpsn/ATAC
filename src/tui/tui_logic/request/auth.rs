@@ -1,5 +1,5 @@
 use crate::app::app::App;
-use crate::models::auth::Auth::{NoAuth, BasicAuth, BearerToken};
+use crate::models::auth::Auth::{NoAuth, BasicAuth, BearerToken, JwtToken};
 use crate::models::auth::next_auth;
 
 impl App<'_> {
@@ -32,6 +32,12 @@ impl App<'_> {
             BearerToken { .. } => match self.auth_text_input_selection.selected {
                 0 => self.edit_request_auth_bearer_token_state(),
                 _ => {}
+            },
+            JwtToken { .. } => match self.auth_text_input_selection.selected {
+                0 => self.edit_request_auth_jwt_algorythm_state(),
+                1 => self.edit_request_auth_jwt_secret_state(),
+                2 => self.edit_request_auth_jwt_payload_state(),
+                _ => {}
             }
         }
     }
@@ -59,6 +65,33 @@ impl App<'_> {
         let selected_request_index = &self.collections_tree.selected.unwrap();
         
         self.modify_request_auth_bearer_token(selected_request_index.0, selected_request_index.1, input_text);
+
+        self.select_request_state();
+    }
+
+    pub fn tui_modify_request_auth_algorythm(&mut self) {
+        let input_text = self.auth_jwt_algorythm_text_input.text.clone();
+        let selected_request_index = &self.collections_tree.selected.unwrap();
+        
+        self.modify_request_auth_algorythm(selected_request_index.0, selected_request_index.1, input_text);
+
+        self.select_request_state();
+    }
+
+    pub fn tui_modify_request_auth_secret(&mut self) {
+        let input_text = self.auth_jwt_secret_text_input.text.clone();
+        let selected_request_index = &self.collections_tree.selected.unwrap();
+        
+        self.modify_request_auth_secret(selected_request_index.0, selected_request_index.1, input_text);
+
+        self.select_request_state();
+    }
+
+    pub fn tui_modify_request_auth_payload(&mut self) {
+        let input_text = self.auth_jwt_payload_text_input.text.clone();
+        let selected_request_index = &self.collections_tree.selected.unwrap();
+        
+        self.modify_request_auth_payload(selected_request_index.0, selected_request_index.1, input_text);
 
         self.select_request_state();
     }
