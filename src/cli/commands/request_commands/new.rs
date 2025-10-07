@@ -84,7 +84,7 @@ pub struct AuthArgs {
     #[arg(long, group = "auth", action = clap::ArgAction::Set, num_args = 1, value_name = "TOKEN", display_order = 4)]
     pub auth_bearer_token: Vec<String>,
 
-    #[arg(long, group = "auth", action = clap::ArgAction::Set, num_args = 3, value_names = ["ALGORYTHM","SECRET","PAYLOAD"], display_order = 5)]
+    #[arg(long, group = "auth", action = clap::ArgAction::Set, num_args = 3, value_names = ["ALGORITHM","SECRET","PAYLOAD"], display_order = 5)]
     pub auth_jwt_token: Vec<String>,
 }
 

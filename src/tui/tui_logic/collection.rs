@@ -13,7 +13,7 @@ impl App<'_> {
         self.auth_basic_username_text_input.reset_input();
         self.auth_basic_password_text_input.reset_input();
         self.auth_bearer_token_text_input.reset_input();
-        self.auth_jwt_algorythm_text_input.reset_input();
+        self.auth_jwt_algorithm_text_input.reset_input();
         self.auth_jwt_secret_text_input.reset_input();
         self.auth_jwt_payload_text_input.reset_input();
         self.headers_table.selection_text_input.reset_input();
@@ -61,11 +61,11 @@ impl App<'_> {
 
                 self.auth_bearer_token_text_input.enter_str(bearer_token);
             }
-            Auth::JwtToken { algorythm, secret, payload } => {
+            Auth::JwtToken { algorithm, secret, payload } => {
                 self.auth_text_input_selection.max_selection = 3;
                 self.auth_text_input_selection.usable = true;
 
-                self.auth_jwt_algorythm_text_input.enter_str(algorythm);
+                self.auth_jwt_algorithm_text_input.enter_str(algorithm);
                 self.auth_jwt_secret_text_input.enter_str(secret);
                 self.auth_jwt_payload_text_input.enter_str(payload);
             }
@@ -156,7 +156,7 @@ impl App<'_> {
         self.auth_basic_username_text_input.reset_cursor();
         self.auth_basic_password_text_input.reset_cursor();
         self.auth_bearer_token_text_input.reset_cursor();
-        self.auth_jwt_algorythm_text_input.reset_cursor();
+        self.auth_jwt_algorithm_text_input.reset_cursor();
         self.auth_jwt_secret_text_input.reset_cursor();
         self.auth_jwt_payload_text_input.reset_cursor();
         self.headers_table.selection_text_input.reset_cursor();

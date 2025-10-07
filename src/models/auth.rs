@@ -30,7 +30,7 @@ pub enum Auth {
     #[clap(visible_alias = "jwt")]
     /// jwt token auth method
     JwtToken {
-        algorythm: String,
+        algorithm: String,
         secret: String,
         payload: String,
     },
@@ -46,7 +46,7 @@ pub fn next_auth(auth: &Auth) -> Auth {
             token: String::new(),
         },
         BearerToken { .. } => JwtToken {
-            algorythm: String::new(),
+            algorithm: String::new(),
             secret: String::new(),
             payload: String::new(),
         },

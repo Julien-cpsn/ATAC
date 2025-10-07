@@ -98,12 +98,12 @@ impl App<'_> {
 
                 format!("\nAuthorization: Bearer {}", bearer_token)
             },
-            Auth::JwtToken { algorythm, secret, payload } => {
-                let algorythm = self.replace_env_keys_by_value(algorythm);
+            Auth::JwtToken { algorithm, secret, payload } => {
+                let algorithm = self.replace_env_keys_by_value(algorithm);
                 let secret = self.replace_env_keys_by_value(secret);
                 let payload = self.replace_env_keys_by_value(payload);
 
-                let token = do_jaat(algorythm, secret, payload);
+                let token = do_jaat(algorithm, secret, payload);
                 format!("Authorization: Bearer {}", token)
             }
         };
@@ -221,12 +221,12 @@ impl App<'_> {
 
                 format!("\n--header 'Authorization: Bearer {}' \\", bearer_token)
             },
-            Auth::JwtToken { algorythm, secret, payload } => {
-                let algorythm = self.replace_env_keys_by_value(algorythm);
+            Auth::JwtToken { algorithm , secret, payload } => {
+                let algorithm = self.replace_env_keys_by_value(algorithm);
                 let secret = self.replace_env_keys_by_value(secret);
                 let payload = self.replace_env_keys_by_value(payload);
 
-                let token =do_jaat(algorythm, secret, payload); 
+                let token =do_jaat(algorithm, secret, payload); 
                 format!("\n--header 'Authorization: Bearer {}' \\", token)
             }
         };
@@ -329,12 +329,12 @@ impl App<'_> {
 
                 format!("\n    'Authorization' => 'Bearer {}',", bearer_token)
             },
-            Auth::JwtToken { algorythm, secret, payload } => {
-                let algorythm = self.replace_env_keys_by_value(algorythm);
+            Auth::JwtToken { algorithm, secret, payload } => {
+                let algorithm = self.replace_env_keys_by_value(algorithm);
                 let secret = self.replace_env_keys_by_value(secret);
                 let payload = self.replace_env_keys_by_value(payload);
 
-                let token = do_jaat(algorythm, secret, payload);
+                let token = do_jaat(algorithm, secret, payload);
                 format!("\n--header 'Authorization: Bearer {}' \\", token)
             }
         };
@@ -486,12 +486,12 @@ impl App<'_> {
                 let bearer_token = self.replace_env_keys_by_value(token);
                 output += &format!("    'Authorization': 'Bearer {}',\n", bearer_token);
             },
-            Auth::JwtToken { algorythm, secret, payload } => {
-                let algorythm = self.replace_env_keys_by_value(algorythm);
+            Auth::JwtToken { algorithm, secret, payload } => {
+                let algorithm = self.replace_env_keys_by_value(algorithm);
                 let secret = self.replace_env_keys_by_value(secret);
                 let payload = self.replace_env_keys_by_value(payload);
 
-                let token = do_jaat(algorythm, secret, payload);
+                let token = do_jaat(algorithm, secret, payload);
                 output += &format!("    'Authorization': 'Bearer {}',\n", token);
             }
         };
@@ -627,12 +627,12 @@ impl App<'_> {
                 has_headers = true;
                 headers_str += &format!("        .header(\"Authorization\", \"Bearer {}\")\n", bearer_token);
             },
-            Auth::JwtToken { algorythm, secret, payload }=>{
-                let algorythm = self.replace_env_keys_by_value(algorythm);
+            Auth::JwtToken { algorithm, secret, payload }=>{
+                let algorithm = self.replace_env_keys_by_value(algorithm);
                 let secret = self.replace_env_keys_by_value(secret);
                 let payload = self.replace_env_keys_by_value(payload);
 
-                let token = do_jaat(algorythm, secret, payload);
+                let token = do_jaat(algorithm, secret, payload);
                 headers_str += &format!("        .header(\"Authorization\", \"Bearer {}\")\n", token);
             }
         };

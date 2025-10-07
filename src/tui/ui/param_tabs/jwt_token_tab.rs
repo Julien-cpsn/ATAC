@@ -6,7 +6,7 @@ use ratatui::widgets::{Block, Borders, Paragraph};
 
 use crate::app::app::App;
 use crate::app::files::theme::THEME;
-use crate::tui::app_states::AppState::{EditingRequestAuthJwtPayload, EditingRequestAuthJwtSecret, EditingRequestAuthJwtAlgorythm, SelectedRequest};
+use crate::tui::app_states::AppState::{EditingRequestAuthJwtPayload, EditingRequestAuthJwtSecret, EditingRequestAuthJwtAlgorithm, SelectedRequest};
 
 impl App<'_> {
     pub(super) fn render_jwt_token_tab(&mut self, frame: &mut Frame, area: Rect) {
@@ -22,8 +22,8 @@ impl App<'_> {
             .horizontal_margin(4)
             .split(area);
 
-        let mut algorythm_block = Block::new()
-            .title("algorythm")
+        let mut algorithm_block = Block::new()
+            .title("algorithm")
             .borders(Borders::ALL)
             .fg(THEME.read().ui.main_foreground_color);
 
@@ -45,15 +45,15 @@ impl App<'_> {
             SelectedRequest => {
                 should_color_blocks = true;
             },
-            EditingRequestAuthJwtAlgorythm | EditingRequestAuthJwtSecret | EditingRequestAuthJwtPayload => {
+            EditingRequestAuthJwtAlgorithm | EditingRequestAuthJwtSecret | EditingRequestAuthJwtPayload => {
                 should_color_blocks = true;
                 should_display_cursor = true;
             },
             _ => {}
         };
 
-        let algorythm_adjusted_input_length = jwt_token_auth_layout[0].width as usize - 2;
-        let (algorythm_padded_text, algorythm_input_cursor_position) = self.auth_jwt_algorythm_text_input.get_padded_text_and_cursor(algorythm_adjusted_input_length);
+        let algorithm_adjusted_input_length = jwt_token_auth_layout[0].width as usize - 2;
+        let (algorithm_padded_text, algorithm_input_cursor_position) = self.auth_jwt_algorithm_text_input.get_padded_text_and_cursor(algorithm_adjusted_input_length);
         
         let secret_adjusted_input_length = jwt_token_auth_layout[1].width as usize - 2;
         let (secret_padded_text, secret_input_cursor_position) = self.auth_jwt_secret_text_input.get_padded_text_and_cursor(secret_adjusted_input_length);
@@ -61,11 +61,11 @@ impl App<'_> {
         let payload_adjusted_input_length = jwt_token_auth_layout[2].width as usize - 2;
         let (payload_padded_text, payload_input_cursor_position) = self.auth_jwt_payload_text_input.get_padded_text_and_cursor(payload_adjusted_input_length);
 
-        let algorythm_line = self.tui_add_color_to_env_keys(&algorythm_padded_text);
+        let algorithm_line = self.tui_add_color_to_env_keys(&algorithm_padded_text);
         let secret_line = self.tui_add_color_to_env_keys(&secret_padded_text);
         let payload_line = self.tui_add_color_to_env_keys(&payload_padded_text);
 
-        let mut algorythm_paragraph = Paragraph::new(algorythm_line)
+        let mut algorithm_paragraph = Paragraph::new(algorithm_line)
             .fg(THEME.read().ui.font_color);
         let mut secret_paragraph = Paragraph::new(secret_line)
             .fg(THEME.read().ui.font_color);
@@ -76,10 +76,10 @@ impl App<'_> {
 
         let input_cursor_position = match input_selected {
             0 if should_color_blocks => {
-                algorythm_block = algorythm_block.fg(THEME.read().others.selection_highlight_color);
-                algorythm_paragraph = algorythm_paragraph.fg(THEME.read().others.selection_highlight_color);
+                algorithm_block = algorithm_block.fg(THEME.read().others.selection_highlight_color);
+                algorithm_paragraph = algorithm_paragraph.fg(THEME.read().others.selection_highlight_color);
                 
-                algorythm_input_cursor_position as u16
+                algorithm_input_cursor_position as u16
             },
             1 if should_color_blocks => {
                 secret_block = secret_block.fg(THEME.read().others.selection_highlight_color);
@@ -103,11 +103,11 @@ impl App<'_> {
             ));
         }
 
-        algorythm_paragraph = algorythm_paragraph.block(algorythm_block);
+        algorithm_paragraph = algorithm_paragraph.block(algorithm_block);
         secret_paragraph = secret_paragraph.block(secret_block);
         payload_paragraph = payload_paragraph.block(payload_block);
 
-        frame.render_widget(algorythm_paragraph, jwt_token_auth_layout[0]);
+        frame.render_widget(algorithm_paragraph, jwt_token_auth_layout[0]);
         frame.render_widget(secret_paragraph, jwt_token_auth_layout[1]);
         frame.render_widget(payload_paragraph, jwt_token_auth_layout[2]);
     }

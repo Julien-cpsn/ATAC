@@ -189,12 +189,12 @@ impl App<'_> {
 
                 request_builder = request_builder.bearer_auth(bearer_token);
             }
-            JwtToken {algorythm, secret, payload } => {
-                let algorythm = self.replace_env_keys_by_value(algorythm);
+            JwtToken {algorithm, secret, payload } => {
+                let algorithm = self.replace_env_keys_by_value(algorithm);
                 let secret = self.replace_env_keys_by_value(secret);
                 let payload = self.replace_env_keys_by_value(payload);
 
-                let token = do_jaat(algorythm, secret, payload);
+                let token = do_jaat(algorithm, secret, payload);
                 let bearer_token = format!("Authorization: Bearer {}", token);
                 request_builder = request_builder.bearer_auth(bearer_token);
             }
@@ -383,9 +383,9 @@ pub fn algorithm_from_str(alg: &str) -> Option<Algorithm> {
     }
 }
 
-pub fn do_jaat(algorythm: String, secret: String, payload: String) ->  String {
+pub fn do_jaat(algorithm: String, secret: String, payload: String) ->  String {
     let claims: Map<String, Value> = serde_json::from_str(payload.as_ref()).expect("Invalid JSON payload");
-    let alg = algorithm_from_str(&algorythm).unwrap_or(Algorithm::HS512);
+    let alg = algorithm_from_str(&algorithm).unwrap_or(Algorithm::HS512);
     let header = Header::new(alg); 
     encode(&header, &claims, &EncodingKey::from_secret(secret.as_ref())).expect("JWT encoding failed")
 }

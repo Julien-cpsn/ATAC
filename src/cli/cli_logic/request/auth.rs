@@ -14,7 +14,7 @@ impl App<'_> {
                 Auth::NoAuth => {},
                 Auth::BasicAuth { username, password } => print!(" {username} {password}"),
                 Auth::BearerToken { token: bearer_token } => print!(" {bearer_token}"),
-                Auth::JwtToken { payload, secret, algorythm } => print!(" {algorythm} {secret} {payload}")
+                Auth::JwtToken { payload, secret, algorithm  } => print!(" {algorithm} {secret} {payload}")
             }
 
             println!()

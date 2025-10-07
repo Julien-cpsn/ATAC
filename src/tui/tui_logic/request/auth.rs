@@ -34,7 +34,7 @@ impl App<'_> {
                 _ => {}
             },
             JwtToken { .. } => match self.auth_text_input_selection.selected {
-                0 => self.edit_request_auth_jwt_algorythm_state(),
+                0 => self.edit_request_auth_jwt_algorithm_state(),
                 1 => self.edit_request_auth_jwt_secret_state(),
                 2 => self.edit_request_auth_jwt_payload_state(),
                 _ => {}
@@ -69,11 +69,11 @@ impl App<'_> {
         self.select_request_state();
     }
 
-    pub fn tui_modify_request_auth_algorythm(&mut self) {
-        let input_text = self.auth_jwt_algorythm_text_input.text.clone();
+    pub fn tui_modify_request_auth_algorithm(&mut self) {
+        let input_text = self.auth_jwt_algorithm_text_input.text.clone();
         let selected_request_index = &self.collections_tree.selected.unwrap();
         
-        self.modify_request_auth_algorythm(selected_request_index.0, selected_request_index.1, input_text);
+        self.modify_request_auth_algorithm(selected_request_index.0, selected_request_index.1, input_text);
 
         self.select_request_state();
     }

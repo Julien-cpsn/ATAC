@@ -255,14 +255,14 @@ get_key_bindings! {
         EditingRequestAuthBearerTokenMoveCursorLineEnd(EventKeyBinding),
         EditingRequestAuthBearerTokenCharInput(EventKeyBinding),
 
-        ModifyRequestAuthAlgorythm(EventKeyBinding),
-        EditingRequestAuthAlgorythmDeleteCharBackward(EventKeyBinding),
-        EditingRequestAuthAlgorythmDeleteCharForward(EventKeyBinding),
-        EditingRequestAuthAlgorythmMoveCursorLeft(EventKeyBinding),
-        EditingRequestAuthAlgorythmMoveCursorRight(EventKeyBinding),
-        EditingRequestAuthAlgorythmMoveCursorLineStart(EventKeyBinding),
-        EditingRequestAuthAlgorythmMoveCursorLineEnd(EventKeyBinding),
-        EditingRequestAuthAlgorythmCharInput(EventKeyBinding),
+        ModifyRequestAuthAlgorithm(EventKeyBinding),
+        EditingRequestAuthAlgorithmDeleteCharBackward(EventKeyBinding),
+        EditingRequestAuthAlgorithmDeleteCharForward(EventKeyBinding),
+        EditingRequestAuthAlgorithmMoveCursorLeft(EventKeyBinding),
+        EditingRequestAuthAlgorithmMoveCursorRight(EventKeyBinding),
+        EditingRequestAuthAlgorithmMoveCursorLineStart(EventKeyBinding),
+        EditingRequestAuthAlgorithmMoveCursorLineEnd(EventKeyBinding),
+        EditingRequestAuthAlgorithmCharInput(EventKeyBinding),
 
         ModifyRequestAuthSecret(EventKeyBinding),
         EditingRequestAuthSecretDeleteCharBackward(EventKeyBinding),
@@ -798,15 +798,15 @@ impl App<'_> {
                     _ => {}
                 },
 
-                ModifyRequestAuthAlgorythm(_) => self.tui_modify_request_auth_algorythm(),
-                EditingRequestAuthAlgorythmDeleteCharBackward(_) => self.auth_jwt_algorythm_text_input.delete_char_forward(),
-                EditingRequestAuthAlgorythmDeleteCharForward(_) => self.auth_jwt_algorythm_text_input.delete_char_backward(),
-                EditingRequestAuthAlgorythmMoveCursorLeft(_) => self.auth_jwt_algorythm_text_input.move_cursor_left(),
-                EditingRequestAuthAlgorythmMoveCursorRight(_) => self.auth_jwt_algorythm_text_input.move_cursor_right(),
-                EditingRequestAuthAlgorythmMoveCursorLineStart(_) => self.auth_jwt_algorythm_text_input.move_cursor_line_start(),
-                EditingRequestAuthAlgorythmMoveCursorLineEnd(_) => self.auth_jwt_algorythm_text_input.move_cursor_line_end(),
-                EditingRequestAuthAlgorythmCharInput(_) => match key {
-                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.auth_jwt_algorythm_text_input.enter_char(char),
+                ModifyRequestAuthAlgorithm(_) => self.tui_modify_request_auth_algorithm(),
+                EditingRequestAuthAlgorithmDeleteCharBackward(_) => self.auth_jwt_algorithm_text_input.delete_char_forward(),
+                EditingRequestAuthAlgorithmDeleteCharForward(_) => self.auth_jwt_algorithm_text_input.delete_char_backward(),
+                EditingRequestAuthAlgorithmMoveCursorLeft(_) => self.auth_jwt_algorithm_text_input.move_cursor_left(),
+                EditingRequestAuthAlgorithmMoveCursorRight(_) => self.auth_jwt_algorithm_text_input.move_cursor_right(),
+                EditingRequestAuthAlgorithmMoveCursorLineStart(_) => self.auth_jwt_algorithm_text_input.move_cursor_line_start(),
+                EditingRequestAuthAlgorithmMoveCursorLineEnd(_) => self.auth_jwt_algorithm_text_input.move_cursor_line_end(),
+                EditingRequestAuthAlgorithmCharInput(_) => match key {
+                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.auth_jwt_algorithm_text_input.enter_char(char),
                     _ => {}
                 },
 
