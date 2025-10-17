@@ -43,11 +43,11 @@ impl App<'_> {
         let file_format = self.config.get_preferred_collection_file_format();
         
         let collections_len = self.collections.len();
-        let last_position = if collections_len == 0 {
-            None
-        } else {
-            Some(collections_len - 1)
+        let last_position = match collections_len == 0 {
+            true => None,
+            false => Some(collections_len - 1),
         };
+        
         let new_collection = Collection {
             name: new_collection_name.clone(),
             last_position,
