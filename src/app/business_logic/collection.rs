@@ -27,7 +27,12 @@ pub enum RequestError {
 
 impl App<'_> {
     pub fn new_collection(&mut self, new_collection_name: String) -> anyhow::Result<()> {
-        if new_collection_name.trim().is_empty() {
+        let new_collection_name = new_collection_name
+            .trim()
+            .replace("/", "")
+            .replace("\"", "");
+
+        if new_collection_name.is_empty() {
             return Err(anyhow!(CollectionNameIsEmpty));
         }
 
@@ -65,7 +70,12 @@ impl App<'_> {
         Ok(())
     }
 
-    pub fn new_request(&mut self, collection_index: usize, new_request: Request) -> Result<(), RequestError> {
+    pub fn new_request(&mut self, collection_index: usize, mut new_request: Request) -> Result<(), RequestError> {
+        new_request.name = new_request.name
+            .trim()
+            .replace("/", "")
+            .replace("\"", "");
+
         if new_request.name.is_empty() {
             return Err(RequestNameIsEmpty);
         }
