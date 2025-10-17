@@ -43,9 +43,14 @@ impl App<'_> {
         let file_format = self.config.get_preferred_collection_file_format();
         
         let collections_len = self.collections.len();
+        let last_position = match collections_len == 0 {
+            true => None,
+            false => Some(collections_len - 1),
+        };
+        
         let new_collection = Collection {
             name: new_collection_name.clone(),
-            last_position: Some(collections_len - 1),
+            last_position,
             requests: vec![],
             path: ARGS.directory.as_ref().unwrap().join(format!("{}.{}", new_collection_name, file_format.to_string())),
             file_format,
