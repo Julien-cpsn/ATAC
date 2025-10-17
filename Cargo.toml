@@ -51,7 +51,7 @@ image = "=0.25.8"
 
 # Main functionalities
 ## Syntax highlighting
-syntect = { version = "=5.2.0", features = ["default-fancy"] }
+syntect = { version = "=5.3.0", features = ["default-fancy"] }
 ## Serialize & Deserialize application data into files
 serde = { version = "=1.0.219", features = ["derive", "rc"] }
 serde_json = "=1.0.143"
