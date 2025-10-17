@@ -687,7 +687,11 @@ impl App<'_> {
 
                 /* Others */
 
+                #[cfg(feature = "clipboard")]
                 CopyResponsePart(_) => self.copy_response_body_content_to_clipboard(),
+
+                #[cfg(not(feature = "clipboard"))]
+                CopyResponsePart(_) => {},
 
                 /* Request Export */
 
@@ -703,7 +707,11 @@ impl App<'_> {
                 ScrollRequestExportLeft(_) => self.display_request_export.horizontal_scrollbar.page_up(),
                 ScrollRequestExportRight(_) => self.display_request_export.horizontal_scrollbar.page_down(),
 
+                #[cfg(feature = "clipboard")]
                 CopyRequestExport(_) => self.copy_request_export_to_clipboard(),
+
+                #[cfg(not(feature = "clipboard"))]
+                CopyRequestExport(_) => {},
 
                 /* Request text inputs */
 

@@ -55,6 +55,7 @@ impl App<'_> {
         Ok(export)
     }
 
+    #[cfg(feature = "clipboard")]
     pub fn copy_request_export_to_clipboard(&mut self) {
         let content = &self.display_request_export.content;
         self.clipboard.set_text(content).expect("Could not copy request export to clipboard")
