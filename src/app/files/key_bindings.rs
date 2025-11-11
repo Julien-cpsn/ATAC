@@ -119,6 +119,7 @@ nest! {
                 pub scroll_left: KeyCombination,
                 pub scroll_right: KeyCombination,
 
+                pub export_response: KeyCombination,
                 pub yank_response_part: KeyCombination,
 
                 /// Will use param_next_tab depending on the selected view
@@ -250,6 +251,7 @@ impl Default for KeyBindings {
                     scroll_left: key!(ctrl-left),
                     scroll_right: key!(ctrl-right),
 
+                    export_response: key!(e),
                     yank_response_part: key!(y),
 
                     result_next_tab: key!(shift-backtab),
