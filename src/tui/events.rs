@@ -193,6 +193,18 @@ get_key_bindings! {
 
         CopyResponsePart(EventKeyBinding),
 
+        /* Response export */
+
+        ExportResponse(EventKeyBinding),
+        ConfirmExportResponse(EventKeyBinding),
+        ExportingResponseDeleteCharBackward(EventKeyBinding),
+        ExportingResponseDeleteCharForward(EventKeyBinding),
+        ExportingResponseMoveCursorLeft(EventKeyBinding),
+        ExportingResponseMoveCursorRight(EventKeyBinding),
+        ExportingResponseMoveCursorLineStart(EventKeyBinding),
+        ExportingResponseMoveCursorLineEnd(EventKeyBinding),
+        ExportingResponseCharInput(EventKeyBinding),
+
         /* Request export */
 
         ExportRequest(EventKeyBinding),
@@ -384,6 +396,7 @@ get_key_bindings! {
 
         /* Others */
 
+        CloseValidationPopup(EventKeyBinding),
         Documentation(EventKeyBinding),
     }
 }
@@ -693,8 +706,21 @@ impl App<'_> {
                 #[cfg(not(feature = "clipboard"))]
                 CopyResponsePart(_) => {},
 
-                /* Request Export */
+                /* Response Export */
+                ExportResponse(_) => self.export_response_state(),
+                ConfirmExportResponse(_) => self.tui_export_response_body(),
+                ExportingResponseDeleteCharBackward(_) => self.export_response_input.delete_char_forward(),
+                ExportingResponseDeleteCharForward(_) => self.export_response_input.delete_char_backward(),
+                ExportingResponseMoveCursorLeft(_) => self.export_response_input.move_cursor_left(),
+                ExportingResponseMoveCursorRight(_) => self.export_response_input.move_cursor_right(),
+                ExportingResponseMoveCursorLineStart(_) => self.export_response_input.move_cursor_line_start(),
+                ExportingResponseMoveCursorLineEnd(_) => self.export_response_input.move_cursor_line_end(),
+                ExportingResponseCharInput(_) => match key {
+                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.export_response_input.enter_char(char),
+                    _ => {}
+                },
 
+                /* Request Export */
                 ExportRequest(_) => self.choose_request_export_format_state(),
 
                 RequestExportFormatMoveCursorLeft(_) => self.export_request.previous(),
@@ -996,7 +1022,7 @@ impl App<'_> {
                 ModifyRequestSettings(_) => self.tui_modify_request_settings(),
 
                 /* Others */
-
+                CloseValidationPopup(_) => self.select_request_state(),
                 Documentation(_) => {}
             }
         };

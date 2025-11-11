@@ -306,4 +306,18 @@ impl App<'_> {
     pub fn display_request_export_state(&mut self) {
         self.set_app_state(AppState::DisplayingRequestExport);
     }
+
+    pub fn export_response_state(&mut self) {
+        self.set_app_state(AppState::ExportingResponse);
+    }
+
+    pub fn tui_show_error_popup(&mut self, message: String) {
+        self.validation_popup.set_message(message);
+        self.set_app_state(AppState::DisplayingErrorPopup);
+    }
+
+    pub fn tui_show_success_popup(&mut self, message: String) {
+        self.validation_popup.set_message(message);
+        self.set_app_state(AppState::DisplayingSuccessPopup);
+    }
 }

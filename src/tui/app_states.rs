@@ -117,7 +117,16 @@ pub enum AppState {
     ChoosingRequestExportFormat,
 
     #[strum(to_string = "Displaying request export")]
-    DisplayingRequestExport
+    DisplayingRequestExport,
+
+    #[strum(to_string = "Exporting response")]
+    ExportingResponse,
+
+    #[strum(to_string = "Displaying success popup")]
+    DisplayingSuccessPopup,
+
+    #[strum(to_string = "Displaying error popup")]
+    DisplayingErrorPopup,
 }
 
 pub fn next_app_state(app_state: &AppState) -> AppState {
@@ -150,7 +159,10 @@ pub fn next_app_state(app_state: &AppState) -> AppState {
         EditingPostRequestScript => EditingRequestSettings,
         EditingRequestSettings => ChoosingRequestExportFormat,
         ChoosingRequestExportFormat => DisplayingRequestExport,
-        DisplayingRequestExport => Normal
+        DisplayingRequestExport => ExportingResponse,
+        ExportingResponse => DisplayingSuccessPopup,
+        DisplayingSuccessPopup => DisplayingErrorPopup,
+        DisplayingErrorPopup => Normal
     }
 }
 
@@ -184,7 +196,10 @@ pub fn previous_app_state(app_state: &AppState) -> AppState {
         EditingPostRequestScript => EditingPreRequestScript,
         EditingRequestSettings => EditingPostRequestScript,
         ChoosingRequestExportFormat => EditingRequestSettings,
-        DisplayingRequestExport => ChoosingRequestExportFormat
+        DisplayingRequestExport => ChoosingRequestExportFormat,
+        ExportingResponse => DisplayingRequestExport,
+        DisplayingSuccessPopup => ExportingResponse,
+        DisplayingErrorPopup => DisplayingSuccessPopup,
     }
 }
 
@@ -482,7 +497,8 @@ impl AppState {
                         ScrollResultDown(EventKeyBinding::new(vec![key_bindings.request_selected.result_tabs.scroll_down], "Scroll result down", None)),
                         ScrollResultLeft(EventKeyBinding::new(vec![key_bindings.request_selected.result_tabs.scroll_left], "Scroll result left", None)),
                         ScrollResultRight(EventKeyBinding::new(vec![key_bindings.request_selected.result_tabs.scroll_right], "Scroll result right", None)),
-                    
+
+                        ExportResponse(EventKeyBinding::new(vec![key_bindings.request_selected.result_tabs.export_response], "Export response", Some("Export"))),
                         CopyResponsePart(EventKeyBinding::new(vec![key_bindings.request_selected.result_tabs.yank_response_part], "Yank response part", Some("Yank"))),
                     ];
 
@@ -737,7 +753,22 @@ impl AppState {
                 ScrollRequestExportRight(EventKeyBinding::new(vec![key_bindings.request_selected.result_tabs.scroll_right], "Scroll request export right", None)),
 
                 CopyRequestExport(EventKeyBinding::new(vec![key_bindings.request_selected.result_tabs.yank_response_part], "Yank request export", Some("Yank"))),
-            ]
+            ],
+            ExportingResponse => vec![
+                GoBackToRequestMenu(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.cancel], "Cancel", Some("Cancel"))),
+                ConfirmExportResponse(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.confirm], "Confirm", Some("Confirm"))),
+
+                ExportingResponseDeleteCharBackward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_backward], "Delete char backward", Some("Delete"))),
+                ExportingResponseDeleteCharForward(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.delete_forward], "Delete char forward", Some("Backspace"))),
+                ExportingResponseMoveCursorLeft(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_left], "Move cursor left", Some("Left"))),
+                ExportingResponseMoveCursorRight(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_right], "Move cursor right", Some("Right"))),
+                ExportingResponseMoveCursorLineStart(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_line_start], "Move cursor line start", Some("Home"))),
+                ExportingResponseMoveCursorLineEnd(EventKeyBinding::new(vec![key_bindings.generic.text_inputs.text_input.move_cursor_line_end], "Move cursor line start", Some("Home"))),
+                ExportingResponseCharInput(EventKeyBinding::new(vec![], "Char input", None)),
+            ],
+            DisplayingSuccessPopup | DisplayingErrorPopup => vec![
+                GoBackToRequestMenu(EventKeyBinding::new(vec![key_bindings.generic.navigation.go_back], "Ok", Some("Ok"))),
+            ],
         }
     }
 }
@@ -836,7 +867,7 @@ impl App<'_> {
             EditingRequestMessage |
             EditingPreRequestScript | EditingPostRequestScript |
             EditingRequestSettings |
-            ChoosingRequestExportFormat | DisplayingRequestExport
+            ChoosingRequestExportFormat | DisplayingRequestExport | ExportingResponse | DisplayingSuccessPopup | DisplayingErrorPopup
             => {
                 let local_selected_request = self.get_selected_request_as_local();
                 let selected_request = local_selected_request.read();
@@ -872,7 +903,8 @@ impl App<'_> {
             EditingRequestHeader |
             EditingRequestBodyTable | EditingRequestBodyFile | EditingRequestBodyString |
             EditingPreRequestScript | EditingPostRequestScript |
-            EditingRequestSettings => true,
+            EditingRequestSettings |
+            ExportingResponse => true,
             _ => false
         }
     }
