@@ -272,6 +272,44 @@ You can read more about it here: https://github.com/Julien-cpsn/ATAC/releases/ta
 Thanks to [@NachoNievaG](https://github.com/NachoNievaG) you can have an ATAC floating window inside your nvim
 https://github.com/NachoNievaG/atac.nvim
 
+You can also integrate ATAC with any terminal plugin.
+Using [toggleterm.nvim](https://github.com/akinsho/toggleterm.nvim) you can open ATAC in a floating window with a custom keybindings without installing a dedicated plugin, full config [here](https://github.com/PolvosMagicos/dotfiles/tree/main/.config/nvim/lua/polvos-magicos/core).
+
+#### utils.lua
+
+```lua
+-- Open ATAC in a floating ToggleTerm window
+M.toggle_atac = function()
+  local Terminal = require("toggleterm.terminal").Terminal
+  local atac = Terminal:new({
+    cmd = "atac",
+    hidden = true,
+    on_open = function()
+      vim.cmd("startinsert!")
+    end,
+    close_on_exit = true,
+    direction = "float",
+    float_opts = {
+      border = "single",
+    },
+  })
+  atac:toggle()
+end
+```
+
+#### maps.lua
+
+```lua
+-- ATAC
+-- <leader>A => open ATAC in a floating window
+map(
+  "n",
+  "<leader>A",
+  "<cmd>lua require('polvos-magicos.core.utils').toggle_atac()<cr>",
+  { desc = "ATAC in ToggleTerm" }
+)
+```
+
 ### Themes
 
 You can read more about it here: https://github.com/Julien-cpsn/ATAC/releases/tag/v0.18.0
