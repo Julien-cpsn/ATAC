@@ -125,7 +125,7 @@ pub struct App<'a> {
     pub display_request_export: DisplayPopup,
 
     #[cfg(feature = "clipboard")]
-    pub clipboard: Clipboard
+    pub clipboard: Option<Clipboard>
 }
 
 impl App<'_> {
@@ -223,7 +223,7 @@ impl App<'_> {
             display_request_export: DisplayPopup::default(),
 
             #[cfg(feature = "clipboard")]
-            clipboard: Clipboard::new()?,
+            clipboard: Clipboard::new().ok(),
         })
     }
 

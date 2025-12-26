@@ -57,8 +57,10 @@ impl App<'_> {
 
     #[cfg(feature = "clipboard")]
     pub fn copy_request_export_to_clipboard(&mut self) {
-        let content = &self.display_request_export.content;
-        self.clipboard.set_text(content).expect("Could not copy request export to clipboard")
+        if let Some(clipboard) = &mut self.clipboard {
+            let content = &self.display_request_export.content;
+            clipboard.set_text(content).expect("Could not copy request export to clipboard")
+        }
     }
 
     fn raw_html(&self, mut output: String, request: &Request, url: Url, headers: Vec<(String, String)>) -> String {

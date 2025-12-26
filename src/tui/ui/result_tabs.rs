@@ -201,7 +201,10 @@ impl App<'_> {
                                 frame.render_widget(image_disabled_paragraph, request_result_layout[2]);
                             },
                             Some(image) => {
-                                let picker = Picker::from_query_stdio().unwrap_or(Picker::from_fontsize((7, 14)));
+                                let picker = match self.config.is_graphical_protocol_disabled() {
+                                    true => Picker::halfblocks(),
+                                    false => Picker::from_query_stdio().unwrap_or(Picker::halfblocks())
+                                };
 
                                 let mut image_static = picker
                                     .new_resize_protocol(image.clone());
