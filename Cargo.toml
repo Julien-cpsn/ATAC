@@ -64,7 +64,7 @@ toml = "=0.9.5"
 ## Create Javascript runtimes. Used for pre and post request scripts
 boa_engine = { version = "=0.20.0", default-features = false }
 ## Deserialize Postman collection files
-parse_postman_collection = "=0.2.3"
+parse_postman_collection = "=0.2.4"
 ## Parse cURL request files
 curl-parser = { version = "=0.6.0", default-features = false }
 ## Parse OpenAPI spec files
@@ -75,6 +75,8 @@ clap = { version = "=4.5", features = ["derive", "color", "suggestions"] }
 directories = "=6.0.0"
 ## Copy response body to clipboard
 arboard = { version = "=3.6.0", features = ["wayland-data-control"] }
+## Create and decode JSON Web Tokens (JWT)
+jsonwebtoken = { version = "10.2.0", features = ["rust_crypto"] }
 
 # Async
 ## Handle asynchronous requests
@@ -129,5 +131,3 @@ tracing-subscriber = { version = "=0.3.20", features = ["parking_lot", "chrono",
 tracing-log = "=0.2.0"
 ## Opentracing middleware implementation for reqwest-middleware
 reqwest-tracing = "=0.5.8"
-
-jsonwebtoken = "9"

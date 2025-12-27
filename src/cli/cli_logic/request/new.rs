@@ -1,8 +1,12 @@
 use anyhow::anyhow;
+use clap::ValueEnum;
 use tokio_util::sync::CancellationToken;
 use crate::app::app::App;
 use crate::cli::commands::request_commands::new::{AuthArgs, BodyArgs, NewRequestCommand};
-use crate::models::auth::Auth;
+use crate::models::auth::auth::Auth;
+use crate::models::auth::basic::BasicAuth;
+use crate::models::auth::bearer_token::BearerToken;
+use crate::models::auth::jwt::{JwtAlgorithm, JwtSecretType, JwtToken};
 use crate::models::protocol::http::body::ContentType;
 use crate::models::protocol::http::method::Method;
 use crate::models::protocol::protocol::Protocol;
@@ -24,7 +28,7 @@ impl App<'_> {
 
 pub fn create_request_from_new_request_command(request_name: String, new_request_command: NewRequestCommand) -> anyhow::Result<Request> {
     let params = string_array_to_key_value_array(new_request_command.add_param);
-    let auth = get_auth_from_auth_args(new_request_command.auth);
+    let auth = get_auth_from_auth_args(new_request_command.auth)?;
     let headers = string_array_to_key_value_array(new_request_command.add_header);
     let body = get_content_type_from_body_args(new_request_command.body);
 
@@ -97,27 +101,34 @@ fn string_array_to_key_value_array(string_array: Vec<String>) -> Vec<KeyValue> {
     return key_value_array
 }
 
-fn get_auth_from_auth_args(auth_args: AuthArgs) -> Auth {
+fn get_auth_from_auth_args(auth_args: AuthArgs) -> anyhow::Result<Auth> {
     if !auth_args.auth_basic.is_empty() {
-        return Auth::BasicAuth {
-            username: auth_args.auth_basic[0].clone(),
-            password: auth_args.auth_basic[1].clone()
-        };
+        return Ok(
+            Auth::BasicAuth(BasicAuth {
+                username: auth_args.auth_basic[0].clone(),
+                password: auth_args.auth_basic[1].clone()
+            })
+        );
     }
     else if !auth_args.auth_bearer_token.is_empty() {
-        return Auth::BearerToken {
-            token: auth_args.auth_bearer_token[0].clone()
-        };
+        return Ok(Auth::BearerToken(
+            BearerToken {
+                token: auth_args.auth_bearer_token[0].clone()
+            })
+        );
     }
     else if !auth_args.auth_jwt_token.is_empty() {
-        return Auth::JwtToken {
-            algorithm: auth_args.auth_jwt_token[0].clone(),
-            secret: auth_args.auth_jwt_token[1].clone(),
-            payload: auth_args.auth_jwt_token[2].clone(),
-        };
+        return Ok(Auth::JwtToken(
+            JwtToken {
+                algorithm: JwtAlgorithm::from_str(&auth_args.auth_jwt_token[0], true).map_err(|e| anyhow!(e))?,
+                secret_type: JwtSecretType::from_str(&auth_args.auth_jwt_token[1], true).map_err(|e| anyhow!(e))?,
+                secret: auth_args.auth_jwt_token[2].clone(),
+                payload: auth_args.auth_jwt_token[3].clone(),
+            }
+        ));
     }
     else {
-        return Auth::NoAuth;
+        return Ok(Auth::NoAuth);
     }
 }
 

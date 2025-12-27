@@ -92,9 +92,9 @@ pub struct App<'a> {
     pub auth_basic_username_text_input: TextInput,
     pub auth_basic_password_text_input: TextInput,
     pub auth_bearer_token_text_input: TextInput,
-    pub auth_jwt_algorithm_text_input: TextInput,
     pub auth_jwt_secret_text_input: TextInput,
-    pub auth_jwt_payload_text_input: TextInput,
+    pub auth_jwt_payload_text_area: TextArea<'a>,
+    pub auth_jwt_payload_text_area_vim_emulation: Vim,
 
     pub headers_table: StatefulCustomTable,
 
@@ -191,9 +191,9 @@ impl App<'_> {
             auth_basic_username_text_input: TextInput::default(),
             auth_basic_password_text_input: TextInput::default(),
             auth_bearer_token_text_input: TextInput::default(),
-            auth_jwt_algorithm_text_input: TextInput::default(),
             auth_jwt_secret_text_input: TextInput::default(),
-            auth_jwt_payload_text_input: TextInput::default(),
+            auth_jwt_payload_text_area: TextArea::default(),
+            auth_jwt_payload_text_area_vim_emulation: Vim::default(),
 
             headers_table: StatefulCustomTable::default(),
 

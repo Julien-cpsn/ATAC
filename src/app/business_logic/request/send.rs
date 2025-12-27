@@ -10,13 +10,14 @@ use reqwest_middleware::Extension;
 use reqwest_tracing::{DisableOtelPropagation, OtelName, TracingMiddleware};
 use thiserror::Error;
 use tracing_log::log::trace;
-use jsonwebtoken::{encode, Header, Algorithm, EncodingKey};
-use serde_json::{Value, Map};
 use crate::app::app::App;
 use crate::app::business_logic::request::scripts::{execute_post_request_script, execute_pre_request_script};
 use crate::app::business_logic::request::send::RequestResponseError::PostRequestScript;
 use crate::app::files::environment::save_environment_to_file;
-use crate::models::auth::Auth::{NoAuth, BasicAuth, BearerToken, JwtToken};
+use crate::models::auth::auth::Auth;
+use crate::models::auth::basic::BasicAuth;
+use crate::models::auth::bearer_token::BearerToken;
+use crate::models::auth::jwt::{jwt_do_jaat, JwtError, JwtToken};
 use crate::models::protocol::http::body::ContentType::{NoBody, File, Form, Html, Javascript, Json, Multipart, Raw, Xml};
 use crate::models::environment::Environment;
 use crate::models::protocol::protocol::Protocol;
@@ -31,7 +32,9 @@ pub enum PrepareRequestError {
     #[error("INVALID URL")]
     InvalidUrl,
     #[error("COULD NOT OPEN FILE")]
-    CouldNotOpenFile
+    CouldNotOpenFile,
+    #[error("{0}")]
+    JwtError(#[from] JwtError),
 }
 
 #[derive(Error, Debug)]
@@ -177,25 +180,23 @@ impl App<'_> {
         /* AUTH */
 
         match &modified_request.auth {
-            NoAuth => {}
-            BasicAuth { username, password} => {
+            Auth::NoAuth => {}
+            Auth::BasicAuth(BasicAuth { username, password}) => {
                 let username = self.replace_env_keys_by_value(username);
                 let password = self.replace_env_keys_by_value(password);
 
                 request_builder = request_builder.basic_auth(username, Some(password));
             }
-            BearerToken { token: bearer_token } => {
+            Auth::BearerToken(BearerToken { token: bearer_token }) => {
                 let bearer_token = self.replace_env_keys_by_value(bearer_token);
 
                 request_builder = request_builder.bearer_auth(bearer_token);
             }
-            JwtToken {algorithm, secret, payload } => {
-                let algorithm = self.replace_env_keys_by_value(algorithm);
+            Auth::JwtToken(JwtToken { algorithm, secret_type, secret, payload }) => {
                 let secret = self.replace_env_keys_by_value(secret);
                 let payload = self.replace_env_keys_by_value(payload);
 
-                let token = do_jaat(algorithm, secret, payload);
-                let bearer_token = format!("Authorization: Bearer {}", token);
+                let bearer_token = jwt_do_jaat(algorithm, secret_type, secret, payload)?;
                 request_builder = request_builder.bearer_auth(bearer_token);
             }
         }
@@ -363,29 +364,4 @@ pub fn get_file_content_with_name(path: PathBuf) -> std::io::Result<(Vec<u8>, St
     let file_name = path.file_name().unwrap().to_str().unwrap();
 
     return Ok((buffer, file_name.to_string()));
-}
-
-
-pub fn algorithm_from_str(alg: &str) -> Option<Algorithm> {
-    match alg {
-        "HS256" => Some(Algorithm::HS256),
-        "HS384" => Some(Algorithm::HS384),
-        "HS512" => Some(Algorithm::HS512),
-        "RS256" => Some(Algorithm::RS256),
-        "RS384" => Some(Algorithm::RS384),
-        "RS512" => Some(Algorithm::RS512),
-        "ES256" => Some(Algorithm::ES256),
-        "ES384" => Some(Algorithm::ES384),
-        "PS256" => Some(Algorithm::PS256),
-        "PS384" => Some(Algorithm::PS384),
-        "PS512" => Some(Algorithm::PS512),
-        _ => None,
-    }
-}
-
-pub fn do_jaat(algorithm: String, secret: String, payload: String) ->  String {
-    let claims: Map<String, Value> = serde_json::from_str(payload.as_ref()).expect("Invalid JSON payload");
-    let alg = algorithm_from_str(&algorithm).unwrap_or(Algorithm::HS512);
-    let header = Header::new(alg); 
-    encode(&header, &claims, &EncodingKey::from_secret(secret.as_ref())).expect("JWT encoding failed")
 }

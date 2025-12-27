@@ -14,7 +14,7 @@ use tokio_util::sync::CancellationToken;
 use crate::app::app::App;
 use crate::app::files::config::SKIP_SAVE_REQUESTS_RESPONSE;
 use crate::app::files::theme::THEME;
-use crate::models::auth::Auth;
+use crate::models::auth::auth::Auth;
 use crate::models::legacy::request::RequestV0_20_2;
 use crate::models::protocol::http::http::HttpRequest;
 use crate::models::protocol::protocol::Protocol;

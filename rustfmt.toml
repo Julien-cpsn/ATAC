@@ -1,3 +1,2 @@
-# This disables rustfmt formatting by using an unknown edition
-edition = "disable"
-
+# Try using your hands!
+disable_all_formatting = true

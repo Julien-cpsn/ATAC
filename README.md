@@ -178,7 +178,8 @@ cargo run -- -h
 | Authentication                                                                 | Partial                                                                             | :white_check_mark:   | :white_check_mark:       |
 | - Basic auth                                                                   | :white_check_mark:                                                                  | :white_check_mark:   | :white_check_mark:       |
 | - Bearer token                                                                 | :white_check_mark:                                                                  | :white_check_mark:   | :white_check_mark:       |
-| - JWT, Digest, OAuth1-2, AWS                                                   | :x: :soon:                                                                          | :white_check_mark:   | :white_check_mark:       |
+| - JWT                                                                          | :white_check_mark:                                                                  | :white_check_mark:   | :white_check_mark:       |
+| - Digest, OAuth1-2, AWS                                                        | :x: :soon:                                                                          | :white_check_mark:   | :white_check_mark:       |
 | Headers                                                                        | :white_check_mark:                                                                  | :white_check_mark:   | :white_check_mark:       |
 | Body                                                                           | :white_check_mark:                                                                  | :white_check_mark:   | :white_check_mark:       |
 | - Multipart form                                                               | :white_check_mark:                                                                  | :white_check_mark:   | :white_check_mark:       |
@@ -329,6 +330,7 @@ You can read more about it here: https://github.com/Julien-cpsn/ATAC/releases/ta
 | [clap](https://github.com/clap-rs/clap)                                          | 4.5         | Command Line Argument Parser                                                           |
 | [directories](https://github.com/soc/directories-rs)                             | 6.0.0       | Use system files                                                                       |
 | [arboard](https://github.com/1Password/arboard)                                  | 3.6.1       | Copy response body to clipboard                                                        |
+| [jsonwebtoken](https://github.com/Keats/jsonwebtoken)                            | 10.2.0      | Encode JSON Web Tokens (JWT)                                                           |
 | **Async**                                                                        |             |                                                                                        |
 | [tokio](https://github.com/tokio-rs/tokio)                                       | 1.47.1      | Handle asynchronous requests                                                           |
 | [parking_lot](https://github.com/Amanieu/parking_lot)                            | 0.12.4      | Smaller, faster and more flexible implementation of RwLock and Mutex. Used everywhere. |

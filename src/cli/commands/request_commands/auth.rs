@@ -1,5 +1,5 @@
 use clap::Subcommand;
-use crate::models::auth::Auth;
+use crate::models::auth::auth::Auth;
 
 #[derive(Subcommand, Debug, Clone)]
 pub enum AuthCommand {

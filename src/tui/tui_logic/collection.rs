@@ -1,5 +1,8 @@
 use crate::app::app::App;
-use crate::models::auth::Auth;
+use crate::models::auth::auth::Auth;
+use crate::models::auth::basic::BasicAuth;
+use crate::models::auth::bearer_token::BearerToken;
+use crate::models::auth::jwt::JwtToken;
 use crate::models::protocol::http::body::ContentType;
 use crate::models::protocol::protocol::Protocol;
 use crate::models::protocol::ws::message_type::MessageType;
@@ -13,9 +16,7 @@ impl App<'_> {
         self.auth_basic_username_text_input.reset_input();
         self.auth_basic_password_text_input.reset_input();
         self.auth_bearer_token_text_input.reset_input();
-        self.auth_jwt_algorithm_text_input.reset_input();
         self.auth_jwt_secret_text_input.reset_input();
-        self.auth_jwt_payload_text_input.reset_input();
         self.headers_table.selection_text_input.reset_input();
         self.body_form_table.selection_text_input.reset_input();
         self.body_file_text_input.reset_input();
@@ -48,26 +49,25 @@ impl App<'_> {
                 self.auth_text_input_selection.max_selection = 0;
                 self.auth_text_input_selection.usable = false;
             }
-            Auth::BasicAuth { username, password } => {
+            Auth::BasicAuth(BasicAuth { username, password }) => {
                 self.auth_text_input_selection.max_selection = 2;
                 self.auth_text_input_selection.usable = true;
 
                 self.auth_basic_username_text_input.enter_str(username);
                 self.auth_basic_password_text_input.enter_str(password);
             }
-            Auth::BearerToken { token: bearer_token } => {
+            Auth::BearerToken(BearerToken { token: bearer_token }) => {
                 self.auth_text_input_selection.max_selection = 1;
                 self.auth_text_input_selection.usable = true;
 
                 self.auth_bearer_token_text_input.enter_str(bearer_token);
             }
-            Auth::JwtToken { algorithm, secret, payload } => {
-                self.auth_text_input_selection.max_selection = 3;
+            Auth::JwtToken(JwtToken { secret, payload, .. }) => {
+                self.auth_text_input_selection.max_selection = 4;
                 self.auth_text_input_selection.usable = true;
 
-                self.auth_jwt_algorithm_text_input.enter_str(algorithm);
                 self.auth_jwt_secret_text_input.enter_str(secret);
-                self.auth_jwt_payload_text_input.enter_str(payload);
+                self.refresh_auth_jwt_payload_textarea(payload);
             }
         }
 
@@ -77,12 +77,10 @@ impl App<'_> {
             let header_text = match selection {
                 (x, 0) => selected_request.headers[x].data.0.clone(),
                 (x, 1) => selected_request.headers[x].data.1.clone(),
-                _ => unreachable!(),
+                _ => unreachable!()
             };
 
-            self.headers_table
-                .selection_text_input
-                .enter_str(&header_text);
+            self.headers_table.selection_text_input.enter_str(&header_text);
         }
 
         match &selected_request.protocol {
@@ -100,12 +98,10 @@ impl App<'_> {
                         let form_text = match selection {
                             (x, 0) => form[x].data.0.clone(),
                             (x, 1) => form[x].data.1.clone(),
-                            _ => unreachable!(),
+                            _ => unreachable!()
                         };
 
-                        self.body_form_table
-                            .selection_text_input
-                            .enter_str(&form_text);
+                        self.body_form_table.selection_text_input.enter_str(&form_text);
                     }
 
                     self.refresh_body_textarea(&String::new());
@@ -113,11 +109,7 @@ impl App<'_> {
                 ContentType::File(file_path) => {
                     self.body_file_text_input.enter_str(file_path);
                 }
-                ContentType::Raw(body)
-                | ContentType::Json(body)
-                | ContentType::Xml(body)
-                | ContentType::Html(body)
-                | ContentType::Javascript(body) => {
+                ContentType::Raw(body) | ContentType::Json(body) | ContentType::Xml(body) | ContentType::Html(body) | ContentType::Javascript(body) => {
                     self.body_form_table.rows = Vec::new();
                     self.refresh_body_textarea(body);
                 }
@@ -125,11 +117,7 @@ impl App<'_> {
             Protocol::WsRequest(ws_request) => {
                 let content = match &ws_request.message_type {
                     MessageType::Text(text) | MessageType::Close(text) => text.clone(),
-                    MessageType::Binary(bytes)
-                    | MessageType::Ping(bytes)
-                    | MessageType::Pong(bytes) => {
-                        String::from_utf8_lossy(bytes.as_ref()).to_string()
-                    }
+                    MessageType::Binary(bytes) | MessageType::Ping(bytes) | MessageType::Pong(bytes) => String::from_utf8_lossy(bytes.as_ref()).to_string()
                 };
 
                 self.refresh_message_textarea(&content);
@@ -138,12 +126,12 @@ impl App<'_> {
 
         let pre_request_script = match &selected_request.scripts.pre_request_script {
             None => "",
-            Some(pre_request_script) => &pre_request_script,
+            Some(pre_request_script) => &pre_request_script
         };
 
         let post_request_script = match &selected_request.scripts.post_request_script {
             None => "",
-            Some(pre_request_script) => &pre_request_script,
+            Some(pre_request_script) => &pre_request_script
         };
 
         self.tui_refresh_pre_request_script_textarea(pre_request_script);
@@ -156,9 +144,7 @@ impl App<'_> {
         self.auth_basic_username_text_input.reset_cursor();
         self.auth_basic_password_text_input.reset_cursor();
         self.auth_bearer_token_text_input.reset_cursor();
-        self.auth_jwt_algorithm_text_input.reset_cursor();
         self.auth_jwt_secret_text_input.reset_cursor();
-        self.auth_jwt_payload_text_input.reset_cursor();
         self.headers_table.selection_text_input.reset_cursor();
         self.body_form_table.selection_text_input.reset_cursor();
         self.body_file_text_input.reset_cursor();
@@ -183,7 +169,6 @@ impl App<'_> {
             }
 
             *self.received_response.lock() = true;
-
             self.select_request_state();
         }
     }
@@ -198,10 +183,10 @@ impl App<'_> {
         match self.collections_tree.state.selected().len() {
             1 => {
                 self.collections_tree.state.toggle_selected();
-            }
+            },
             2 => {
                 self.select_request();
-            }
+            },
             _ => {}
         }
     }
@@ -218,10 +203,8 @@ impl App<'_> {
         let new_collection_name = self.new_collection_input.text.clone();
 
         match self.new_collection(new_collection_name) {
-            Ok(_) => {}
-            Err(_) => {
-                return;
-            }
+            Ok(_) => {},
+            Err(_) => return
         }
 
         self.normal_state();
@@ -242,10 +225,8 @@ impl App<'_> {
         };
 
         match self.new_request(selected_collection_index, new_request) {
-            Ok(_) => {}
-            Err(_) => {
-                return;
-            }
+            Ok(_) => {},
+            Err(_) => return
         }
 
         self.normal_state();
@@ -303,10 +284,8 @@ impl App<'_> {
         let selected_request_index = self.collections_tree.state.selected();
 
         match self.rename_collection(selected_request_index[0], new_collection_name) {
-            Ok(_) => {}
-            Err(_) => {
-                return;
-            }
+            Ok(_) => {},
+            Err(_) => return
         }
 
         self.normal_state();
@@ -316,13 +295,9 @@ impl App<'_> {
         let new_request_name = self.rename_request_input.text.clone();
         let selected_request_index = self.collections_tree.state.selected();
 
-        match self.rename_request(
-            selected_request_index[0],
-            selected_request_index[1],
-            new_request_name,
-        ) {
+        match self.rename_request(selected_request_index[0], selected_request_index[1], new_request_name) {
             Ok(_) => {}
-            Err(_) => return,
+            Err(_) => return
         }
 
         self.normal_state();
@@ -337,7 +312,7 @@ impl App<'_> {
 
                 match self.duplicate_collection(collection_index) {
                     Ok(_) => {}
-                    Err(_) => return,
+                    Err(_) => return
                 }
             }
             // Selection on a request
@@ -346,7 +321,7 @@ impl App<'_> {
 
                 match self.duplicate_request(selected_request_index[0], selected_request_index[1]) {
                     Ok(_) => {}
-                    Err(_) => return,
+                    Err(_) => return
                 }
             }
             _ => {}
@@ -396,9 +371,7 @@ impl App<'_> {
         selection[1] -= 1;
 
         // Insert the request at its new index
-        self.collections[selection[0]]
-            .requests
-            .insert(selection[1], request);
+        self.collections[selection[0]].requests.insert(selection[1], request);
 
         // Update the selection in order to move with the element
         self.collections_tree.state.select(selection.clone());
@@ -450,9 +423,7 @@ impl App<'_> {
         selection[1] += 1;
 
         // Insert the request at its new index
-        self.collections[selection[0]]
-            .requests
-            .insert(selection[1], request);
+        self.collections[selection[0]].requests.insert(selection[1], request);
 
         // Update the selection in order to move with the element
         self.collections_tree.state.select(selection.clone());

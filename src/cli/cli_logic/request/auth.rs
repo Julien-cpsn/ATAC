@@ -1,5 +1,8 @@
 use crate::app::app::App;
-use crate::models::auth::Auth;
+use crate::models::auth::auth::Auth;
+use crate::models::auth::basic::BasicAuth;
+use crate::models::auth::bearer_token::BearerToken;
+use crate::models::auth::jwt::JwtToken;
 
 impl App<'_> {
     pub fn cli_print_request_auth(&mut self, collection_index: usize, request_index: usize) -> anyhow::Result<()> {
@@ -12,9 +15,9 @@ impl App<'_> {
 
             match &selected_request.auth {
                 Auth::NoAuth => {},
-                Auth::BasicAuth { username, password } => print!(" {username} {password}"),
-                Auth::BearerToken { token: bearer_token } => print!(" {bearer_token}"),
-                Auth::JwtToken { payload, secret, algorithm  } => print!(" {algorithm} {secret} {payload}")
+                Auth::BasicAuth(BasicAuth { username, password }) => print!(" {username} {password}"),
+                Auth::BearerToken(BearerToken { token: bearer_token }) => print!(" {bearer_token}"),
+                Auth::JwtToken(JwtToken { algorithm, secret_type, secret, payload  }) => print!(" {algorithm} {secret_type} {secret} {payload}")
             }
 
             println!()

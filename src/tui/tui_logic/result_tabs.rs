@@ -1,12 +1,12 @@
+use std::str::Lines;
+use ratatui::prelude::{Line, Stylize};
 use crate::app::app::App;
 use crate::app::files::theme::THEME;
 use crate::models::protocol::http::body::find_file_format_in_content_type;
 use crate::models::protocol::protocol::Protocol;
-use crate::models::response::ResponseContent;
 use crate::tui::ui::result_tabs::RequestResultTabs;
+use crate::models::response::ResponseContent;
 use crate::tui::utils::syntax_highlighting::highlight;
-use ratatui::prelude::{Line, Stylize};
-use std::str::Lines;
 
 impl App<'_> {
     pub fn tui_next_request_result_tab(&mut self) {
@@ -21,21 +21,18 @@ impl App<'_> {
                 let local_selected_request = self.get_selected_request_as_local();
                 let selected_request = local_selected_request.read();
 
-                match (
-                    &selected_request.console_output.pre_request_output,
-                    &selected_request.console_output.post_request_output,
-                ) {
+                match (&selected_request.console_output.pre_request_output, &selected_request.console_output.post_request_output) {
                     (None, None) => match selected_request.protocol {
                         Protocol::HttpRequest(_) => RequestResultTabs::Body,
-                        Protocol::WsRequest(_) => RequestResultTabs::Messages,
+                        Protocol::WsRequest(_) => RequestResultTabs::Messages
                     },
-                    (_, _) => RequestResultTabs::Console,
+                    (_, _) => RequestResultTabs::Console
                 }
-            }
+            },
             RequestResultTabs::Console => match selected_request.protocol {
                 Protocol::HttpRequest(_) => RequestResultTabs::Body,
-                Protocol::WsRequest(_) => RequestResultTabs::Messages,
-            },
+                Protocol::WsRequest(_) => RequestResultTabs::Messages
+            }
         };
 
         *self.received_response.lock() = true;
@@ -45,27 +42,16 @@ impl App<'_> {
         let local_selected_request = self.get_selected_request_as_local();
         let selected_request = local_selected_request.read();
 
-        if self.request_result_tab == RequestResultTabs::Console
-            && selected_request.console_output.pre_request_output.is_none()
-            && selected_request
-                .console_output
-                .post_request_output
-                .is_none()
-        {
+        if self.request_result_tab == RequestResultTabs::Console && selected_request.console_output.pre_request_output.is_none() && selected_request.console_output.post_request_output.is_none() {
             self.request_result_tab = match selected_request.protocol {
                 Protocol::HttpRequest(_) => RequestResultTabs::Body,
-                Protocol::WsRequest(_) => RequestResultTabs::Messages,
+                Protocol::WsRequest(_) => RequestResultTabs::Messages
             };
-        } else {
+        }
+        else {
             match selected_request.protocol {
-                Protocol::HttpRequest(_)
-                    if self.request_result_tab == RequestResultTabs::Messages =>
-                {
-                    self.request_result_tab = RequestResultTabs::Body
-                }
-                Protocol::WsRequest(_) if self.request_result_tab == RequestResultTabs::Body => {
-                    self.request_result_tab = RequestResultTabs::Messages
-                }
+                Protocol::HttpRequest(_) if self.request_result_tab == RequestResultTabs::Messages => self.request_result_tab = RequestResultTabs::Body,
+                Protocol::WsRequest(_) if self.request_result_tab == RequestResultTabs::Body => self.request_result_tab = RequestResultTabs::Messages,
                 _ => {}
             };
         }
@@ -78,63 +64,30 @@ impl App<'_> {
         self.syntax_highlighting.highlighted_body = None;
         self.syntax_highlighting.highlighted_console_output = vec![];
 
-        if let Some(file_format) =
-            find_file_format_in_content_type(&selected_request.response.headers)
-        {
-            if let Some(ResponseContent::Body(response_content)) =
-                &selected_request.response.content.as_ref()
-            {
-                self.syntax_highlighting.highlighted_body =
-                    highlight(response_content, &file_format);
+        if let Some(file_format) = find_file_format_in_content_type(&selected_request.response.headers) {
+            if let Some(ResponseContent::Body(response_content)) = &selected_request.response.content.as_ref() {
+                self.syntax_highlighting.highlighted_body = highlight(response_content, &file_format);
             }
         }
 
-        if let Some(pre_request_console_output) =
-            &selected_request.console_output.pre_request_output
-        {
-            let mut highlighted_console_output =
-                highlight(pre_request_console_output, "json").unwrap();
+        if let Some(pre_request_console_output) = &selected_request.console_output.pre_request_output {
+            let mut highlighted_console_output = highlight(pre_request_console_output, "json").unwrap();
 
             highlighted_console_output.insert(0, Line::default());
-            highlighted_console_output.insert(
-                1,
-                Line::raw("----- Pre-request script start -----")
-                    .fg(THEME.read().ui.secondary_foreground_color)
-                    .centered(),
-            );
-            highlighted_console_output.push(
-                Line::raw("----- Pre-request script end -----")
-                    .fg(THEME.read().ui.secondary_foreground_color)
-                    .centered(),
-            );
+            highlighted_console_output.insert(1, Line::raw("----- Pre-request script start -----").fg(THEME.read().ui.secondary_foreground_color).centered());
+            highlighted_console_output.push(Line::raw("----- Pre-request script end -----").fg(THEME.read().ui.secondary_foreground_color).centered());
 
-            self.syntax_highlighting
-                .highlighted_console_output
-                .extend(highlighted_console_output);
+            self.syntax_highlighting.highlighted_console_output.extend(highlighted_console_output);
         }
 
-        if let Some(post_request_console_output) =
-            &selected_request.console_output.post_request_output
-        {
-            let mut highlighted_console_output =
-                highlight(post_request_console_output, "json").unwrap();
+        if let Some(post_request_console_output) = &selected_request.console_output.post_request_output {
+            let mut highlighted_console_output = highlight(post_request_console_output, "json").unwrap();
 
             highlighted_console_output.insert(0, Line::default());
-            highlighted_console_output.insert(
-                1,
-                Line::raw("----- Post-request script start -----")
-                    .fg(THEME.read().ui.secondary_foreground_color)
-                    .centered(),
-            );
-            highlighted_console_output.push(
-                Line::raw("----- Post-request script end -----")
-                    .fg(THEME.read().ui.secondary_foreground_color)
-                    .centered(),
-            );
+            highlighted_console_output.insert(1, Line::raw("----- Post-request script start -----").fg(THEME.read().ui.secondary_foreground_color).centered());
+            highlighted_console_output.push(Line::raw("----- Post-request script end -----").fg(THEME.read().ui.secondary_foreground_color).centered());
 
-            self.syntax_highlighting
-                .highlighted_console_output
-                .extend(highlighted_console_output);
+            self.syntax_highlighting.highlighted_console_output.extend(highlighted_console_output);
         }
     }
 
@@ -147,46 +100,51 @@ impl App<'_> {
         let selected_request = local_selected_request.read();
 
         match self.request_result_tab {
-            RequestResultTabs::Body => match &selected_request.response.content {
-                None => {
-                    vertical_max = 0;
-                    horizontal_max = 0;
-                }
-                Some(content) => match content {
-                    ResponseContent::Body(body) => {
-                        vertical_max = body.lines().count() as u16;
-                        horizontal_max = App::get_max_str_len(body.lines()) as u16;
-                    }
-                    ResponseContent::Image(_) => {
+            RequestResultTabs::Body => {
+                match &selected_request.response.content {
+                    None => {
                         vertical_max = 0;
                         horizontal_max = 0;
+                    },
+                    Some(content) => match content {
+                        ResponseContent::Body(body) => {
+                            vertical_max = body.lines().count() as u16;
+                            horizontal_max = App::get_max_str_len(body.lines()) as u16;
+                        }
+                        ResponseContent::Image(_) => {
+                            vertical_max = 0;
+                            horizontal_max = 0;
+                        }
                     }
-                },
+                }
             },
             RequestResultTabs::Messages => {
-                let line_count = self.get_messages_lines_count() as u16;
+                let line_count = self.get_messages_lines_count()  as u16;
                 let max_scroll = line_count.saturating_sub(self.last_messages_area_size.1);
 
                 if self.last_messages_area_size.1 > 0 {
                     vertical_max = max_scroll;
-                } else {
+                }
+                else {
                     vertical_max = 0;
                 }
 
                 horizontal_max = 0;
-            }
-            RequestResultTabs::Cookies => match &selected_request.response.cookies {
-                None => {
-                    vertical_max = 0;
-                    horizontal_max = 0;
-                }
-                Some(cookies) => {
-                    vertical_max = cookies.lines().count() as u16;
-                    horizontal_max = App::get_max_str_len(cookies.lines()) as u16;
+            },
+            RequestResultTabs::Cookies => {
+                match &selected_request.response.cookies {
+                    None => {
+                        vertical_max = 0;
+                        horizontal_max = 0;
+                    },
+                    Some(cookies) => {
+                        vertical_max = cookies.lines().count() as u16;
+                        horizontal_max = App::get_max_str_len(cookies.lines()) as u16;
+                    }
                 }
             },
             RequestResultTabs::Headers => {
-                vertical_max = selected_request.response.headers.len() as u16;
+                vertical_max = selected_request.response.headers.len()  as u16;
 
                 let mut max_tmp: u16 = 0;
 
@@ -198,25 +156,20 @@ impl App<'_> {
                 }
 
                 horizontal_max = max_tmp;
-            }
+            },
             RequestResultTabs::Console => {
-                let console_output: Option<String> = match (
-                    &selected_request.console_output.pre_request_output,
-                    &selected_request.console_output.post_request_output,
-                ) {
+                let console_output = match (&selected_request.console_output.pre_request_output, &selected_request.console_output.post_request_output) {
                     (None, None) => None,
-                    (Some(pre_request_output), None) => Some(pre_request_output.clone()),
-                    (None, Some(post_request_output)) => Some(post_request_output.clone()),
-                    (Some(pre_request_output), Some(post_request_output)) => {
-                        Some(format!("{pre_request_output}\n{post_request_output}"))
-                    }
+                    (Some(pre_request_output), None) => Some(pre_request_output),
+                    (None, Some(post_request_output)) => Some(post_request_output),
+                    (Some(pre_request_output), Some(post_request_output)) => Some(&format!("{}\n{}", pre_request_output, post_request_output)),
                 };
 
                 match console_output {
                     None => {
                         vertical_max = 0;
                         horizontal_max = 0;
-                    }
+                    },
                     Some(console_output) => {
                         vertical_max = console_output.lines().count() as u16;
                         horizontal_max = App::get_max_str_len(console_output.lines()) as u16;
@@ -226,18 +179,18 @@ impl App<'_> {
         }
 
         self.result_vertical_scrollbar.set_max_scroll(vertical_max);
-        self.result_horizontal_scrollbar
-            .set_max_scroll(horizontal_max);
+        self.result_horizontal_scrollbar.set_max_scroll(horizontal_max);
     }
 
     pub fn get_max_str_len(lines: Lines) -> usize {
         let mut max_tmp = 0;
+
         for line in lines {
             if line.len() > max_tmp {
                 max_tmp = line.len();
             }
         }
-        max_tmp
+
+        return max_tmp;
     }
 }
-

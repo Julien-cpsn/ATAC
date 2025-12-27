@@ -9,7 +9,7 @@ use strum::{Display, EnumIter, FromRepr};
 
 use crate::app::app::App;
 use crate::app::files::theme::THEME;
-use crate::models::auth::Auth::*;
+use crate::models::auth::auth::Auth::{NoAuth, BasicAuth, BearerToken, JwtToken};
 use crate::models::protocol::http::body::ContentType::*;
 use crate::models::protocol::protocol::Protocol;
 use crate::models::request::Request;
@@ -72,7 +72,7 @@ impl App<'_> {
                     },
                     RequestParamsTabs::Auth => match request.auth {
                         NoAuth => tab.to_string(),
-                        BasicAuth { .. } | BearerToken { .. } | JwtToken { .. } => format!("{} ({})", tab.to_string(), request.auth.to_string())
+                        BasicAuth(_) | BearerToken(_) | JwtToken(_) => format!("{} ({})", tab.to_string(), request.auth.to_string())
                     },
                     RequestParamsTabs::Headers => match request.headers.is_empty() {
                         true => tab.to_string(),
@@ -159,15 +159,9 @@ impl App<'_> {
 
                         frame.render_widget(auth_paragraph, request_params_layout[1]);
                     }
-                    BasicAuth { .. } => {
-                        self.render_basic_auth_tab(frame, request_params_layout[1]);
-                    }
-                    BearerToken { .. } => {
-                        self.render_bearer_token_tab(frame, request_params_layout[1]);
-                    }
-                    JwtToken { .. } => {
-                        self.render_jwt_token_tab(frame, request_params_layout[1]);
-                    }
+                    BasicAuth(_) => self.render_basic_auth_tab(frame, request_params_layout[1]),
+                    BearerToken(_) => self.render_bearer_token_tab(frame, request_params_layout[1]),
+                    JwtToken(_) => self.render_jwt_token_tab(frame, request_params_layout[1])
                 }
             }
             RequestParamsTabs::Headers => {
