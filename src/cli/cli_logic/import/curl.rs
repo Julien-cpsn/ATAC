@@ -16,7 +16,9 @@ use crate::app::app::App;
 use crate::cli::args::ARGS;
 use crate::cli::cli_logic::import::curl::ImportCurlError::{CouldNotParseCurl, CouldNotParseUrl, CouldNotReadFile, UnknownMethod};
 use crate::cli::commands::import::CurlImport;
-use crate::models::auth::Auth;
+use crate::models::auth::auth::Auth;
+use crate::models::auth::basic::BasicAuth;
+use crate::models::auth::bearer_token::BearerToken;
 use crate::models::protocol::http::body::ContentType;
 use crate::models::protocol::http::body::ContentType::NoBody;
 use crate::models::collection::Collection;
@@ -198,7 +200,7 @@ fn parse_request(path: &PathBuf, request_name: String) -> anyhow::Result<Arc<RwL
             if let Some((_, bearer_token)) = bearer_token_header {
                 let bearer_token = bearer_token.to_str()?[7..].to_string();
 
-                Auth::BearerToken { token: bearer_token }
+                Auth::BearerToken(BearerToken { token: bearer_token })
             }
             else {
                 Auth::NoAuth
@@ -208,7 +210,7 @@ fn parse_request(path: &PathBuf, request_name: String) -> anyhow::Result<Arc<RwL
             let username = capture["username"].to_string();
             let password = capture["password"].to_string();
             
-            Auth::BasicAuth { username, password }
+            Auth::BasicAuth(BasicAuth { username, password })
         }
     };
 

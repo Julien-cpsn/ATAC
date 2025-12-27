@@ -5,9 +5,12 @@ use std::path::PathBuf;
 use anyhow::anyhow;
 use thiserror::Error;
 use crate::app::app::App;
-use crate::app::business_logic::request::export::ExportError::{CouldNotParseUrl, ExportFormatNotSupported};
+use crate::app::business_logic::request::export::ExportError::{CouldNotOpenFile, CouldNotParseUrl, ExportFormatNotSupported};
 use crate::app::business_logic::request::send::get_file_content_with_name;
-use crate::models::auth::Auth;
+use crate::models::auth::auth::Auth;
+use crate::models::auth::basic::BasicAuth;
+use crate::models::auth::bearer_token::BearerToken;
+use crate::models::auth::jwt::{jwt_do_jaat, JwtToken};
 use crate::models::protocol::http::body::ContentType::{File, Form, Html, Javascript, Json, Multipart, NoBody, Raw, Xml};
 use crate::models::export::ExportFormat;
 use crate::models::export::ExportFormat::{Curl, NodeJsAxios, PhpGuzzle, RustReqwest, HTTP};
@@ -22,6 +25,9 @@ enum ExportError {
 
     #[error("Export format not supported for the {0} protocol")]
     ExportFormatNotSupported(String),
+
+    #[error("Could not open file: {0}")]
+    CouldNotOpenFile(String)
 }
 
 impl App<'_> {
@@ -52,7 +58,7 @@ impl App<'_> {
             }
         };
 
-        Ok(export)
+        export
     }
 
     #[cfg(feature = "clipboard")]
@@ -63,7 +69,7 @@ impl App<'_> {
         }
     }
 
-    fn raw_html(&self, mut output: String, request: &Request, url: Url, headers: Vec<(String, String)>) -> String {
+    fn raw_html(&self, mut output: String, request: &Request, url: Url, headers: Vec<(String, String)>) -> anyhow::Result<String> {
         let http_request = request.get_http_request().unwrap();
 
         /* URL & Query params */
@@ -90,16 +96,23 @@ impl App<'_> {
 
         output += &match &request.auth {
             Auth::NoAuth => String::new(),
-            Auth::BasicAuth { username, password } => {
+            Auth::BasicAuth(BasicAuth { username, password }) => {
                 let username = self.replace_env_keys_by_value(username);
                 let password = self.replace_env_keys_by_value(password);
 
                 format!("\nAuthorization: {}", encode_basic_auth(&username, &password))
             },
-            Auth::BearerToken { token } => {
+            Auth::BearerToken(BearerToken { token }) => {
                 let bearer_token = self.replace_env_keys_by_value(token);
 
                 format!("\nAuthorization: Bearer {}", bearer_token)
+            },
+            Auth::JwtToken(JwtToken { algorithm, secret_type, secret, payload }) => {
+                let secret = self.replace_env_keys_by_value(secret);
+                let payload = self.replace_env_keys_by_value(payload);
+
+                let token = jwt_do_jaat(algorithm, secret_type, secret, payload)?;
+                format!("Authorization: Bearer {}", token)
             }
         };
 
@@ -110,10 +123,10 @@ impl App<'_> {
             File(file_path) => {
                 let file_path_with_env_values = self.replace_env_keys_by_value(file_path);
 
-                let file_content = match get_file_content_with_name(PathBuf::from(file_path_with_env_values)) {
+                let file_content = match get_file_content_with_name(PathBuf::from(&file_path_with_env_values)) {
                     Ok((content, _)) => content,
                     Err(_) => {
-                        return String::from("Could not open file");
+                        return Err(anyhow!(CouldNotOpenFile(file_path_with_env_values)));
                     }
                 };
 
@@ -140,7 +153,7 @@ impl App<'_> {
                         let (file_content, file_name) = match get_file_content_with_name(PathBuf::from(file_path)) {
                             Ok(result) => result,
                             Err(_) => {
-                                return String::from("Could not open file");
+                                return Err(anyhow!(CouldNotOpenFile(file_path.to_string())));
                             }
                         };
 
@@ -187,11 +200,11 @@ impl App<'_> {
             }
         };
 
-        output
+        Ok(output)
     }
     
-    fn curl(&self, mut output: String, request: &Request, url: Url, headers: Vec<(String, String)>) -> String {
-        let http_request = request.get_http_request().unwrap();
+    fn curl(&self, mut output: String, request: &Request, url: Url, headers: Vec<(String, String)>) -> anyhow::Result<String> {
+        let http_request = request.get_http_request()?;
 
         /* URL & Query params */
 
@@ -205,16 +218,23 @@ impl App<'_> {
 
         output += &match &request.auth {
             Auth::NoAuth => String::new(),
-            Auth::BasicAuth { username, password } => {
+            Auth::BasicAuth(BasicAuth { username, password }) => {
                 let username = self.replace_env_keys_by_value(username);
                 let password = self.replace_env_keys_by_value(password);
 
                 format!("\n--header '{}' \\", encode_basic_auth(&username, &password))
             },
-            Auth::BearerToken { token } => {
+            Auth::BearerToken(BearerToken { token }) => {
                 let bearer_token = self.replace_env_keys_by_value(token);
 
                 format!("\n--header 'Authorization: Bearer {}' \\", bearer_token)
+            },
+            Auth::JwtToken(JwtToken { algorithm, secret_type, secret, payload }) => {
+                let secret = self.replace_env_keys_by_value(secret);
+                let payload = self.replace_env_keys_by_value(payload);
+
+                let token = jwt_do_jaat(algorithm, secret_type, secret, payload)?;
+                format!("\n--header 'Authorization: Bearer {}' \\", token)
             }
         };
 
@@ -291,11 +311,11 @@ impl App<'_> {
 
         output.pop(); // Remove trailing char
 
-        output
+        Ok(output)
     }
     
-    fn php_guzzle(&self, mut output: String, request: &Request, url: Url, headers: Vec<(String, String)>) -> String {
-        let http_request = request.get_http_request().unwrap();
+    fn php_guzzle(&self, mut output: String, request: &Request, url: Url, headers: Vec<(String, String)>) -> anyhow::Result<String> {
+        let http_request = request.get_http_request()?;
 
         output += "<?php\n$client = new GuzzleHttp\\Client();\n";
 
@@ -305,16 +325,23 @@ impl App<'_> {
 
         headers_str += &match &request.auth {
             Auth::NoAuth => String::new(),
-            Auth::BasicAuth { username, password } => {
+            Auth::BasicAuth(BasicAuth { username, password }) => {
                 let username = self.replace_env_keys_by_value(username);
                 let password = self.replace_env_keys_by_value(password);
 
                 format!("\n    'Authorization' => '{}',", encode_basic_auth(&username, &password))
             },
-            Auth::BearerToken { token } => {
+            Auth::BearerToken(BearerToken { token }) => {
                 let bearer_token = self.replace_env_keys_by_value(token);
 
                 format!("\n    'Authorization' => 'Bearer {}',", bearer_token)
+            },
+            Auth::JwtToken(JwtToken { algorithm, secret_type, secret, payload }) => {
+                let secret = self.replace_env_keys_by_value(secret);
+                let payload = self.replace_env_keys_by_value(payload);
+
+                let token = jwt_do_jaat(algorithm, secret_type, secret, payload)?;
+                format!("\n--header 'Authorization: Bearer {}' \\", token)
             }
         };
 
@@ -355,10 +382,10 @@ impl App<'_> {
             File(file_path) => {
                 let file_path_with_env_values = self.replace_env_keys_by_value(file_path);
 
-                let file_content = match get_file_content_with_name(PathBuf::from(file_path_with_env_values)) {
+                let file_content = match get_file_content_with_name(PathBuf::from(&file_path_with_env_values)) {
                     Ok((content, _)) => content,
                     Err(_) => {
-                        return String::from("Could not open file");
+                        return Err(anyhow!(CouldNotOpenFile(file_path_with_env_values)));
                     }
                 };
 
@@ -437,11 +464,11 @@ impl App<'_> {
 
         output += "\n\necho $response->getBody();";
 
-        output
+        Ok(output)
     }
     
-    fn node_axios(&self, mut output: String, request: &Request, url: Url, headers: Vec<(String, String)>) -> String {
-        let http_request = request.get_http_request().unwrap();
+    fn node_axios(&self, mut output: String, request: &Request, url: Url, headers: Vec<(String, String)>) -> anyhow::Result<String> {
+        let http_request = request.get_http_request()?;
 
         output += "const axios = require('axios');\n";
 
@@ -456,14 +483,21 @@ impl App<'_> {
         /* Auth */
         match &request.auth {
             Auth::NoAuth => {},
-            Auth::BasicAuth { username, password } => {
+            Auth::BasicAuth(BasicAuth { username, password }) => {
                 let username = self.replace_env_keys_by_value(username);
                 let password = self.replace_env_keys_by_value(password);
                 output += &format!("    'Authorization': '{}',\n", encode_basic_auth(&username, &password));
             },
-            Auth::BearerToken { token } => {
+            Auth::BearerToken(BearerToken { token }) => {
                 let bearer_token = self.replace_env_keys_by_value(token);
                 output += &format!("    'Authorization': 'Bearer {}',\n", bearer_token);
+            },
+            Auth::JwtToken(JwtToken { algorithm, secret_type, secret, payload }) => {
+                let secret = self.replace_env_keys_by_value(secret);
+                let payload = self.replace_env_keys_by_value(payload);
+
+                let token = jwt_do_jaat(algorithm, secret_type, secret, payload)?;
+                output += &format!("    'Authorization': 'Bearer {}',\n", token);
             }
         };
 
@@ -566,10 +600,10 @@ impl App<'_> {
         output += "    console.log(error);\n";
         output += "  });";
 
-        output
+        Ok(output)
     }
     
-    fn rust_request(&self, mut output: String, request: &Request, url: Url, headers: Vec<(String, String)>) -> String {
+    fn rust_request(&self, mut output: String, request: &Request, url: Url, headers: Vec<(String, String)>) -> anyhow::Result<String> {
         let method = match &request.protocol {
             Protocol::HttpRequest(http_request) => http_request.method.to_string(),
             Protocol::WsRequest(_) => Method::GET.to_string()
@@ -587,16 +621,23 @@ impl App<'_> {
         /* Auth */
         match &request.auth {
             Auth::NoAuth => {},
-            Auth::BasicAuth { username, password } => {
+            Auth::BasicAuth(BasicAuth { username, password }) => {
                 let username = self.replace_env_keys_by_value(username);
                 let password = self.replace_env_keys_by_value(password);
                 has_headers = true;
                 headers_str += &format!("        .header(\"Authorization\", \"{}\")\n", encode_basic_auth(&username, &password));
             },
-            Auth::BearerToken { token } => {
+            Auth::BearerToken(BearerToken { token }) => {
                 let bearer_token = self.replace_env_keys_by_value(token);
                 has_headers = true;
                 headers_str += &format!("        .header(\"Authorization\", \"Bearer {}\")\n", bearer_token);
+            },
+            Auth::JwtToken(JwtToken { algorithm, secret_type, secret, payload }) => {
+                let secret = self.replace_env_keys_by_value(secret);
+                let payload = self.replace_env_keys_by_value(payload);
+
+                let token = jwt_do_jaat(algorithm, secret_type, secret, payload)?;
+                headers_str += &format!("        .header(\"Authorization\", \"Bearer {}\")\n", token);
             }
         };
 
@@ -748,7 +789,7 @@ impl App<'_> {
         output += "    Ok(())\n";
         output += "}";
 
-        output
+        Ok(output)
     }
 }
 

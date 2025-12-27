@@ -8,7 +8,7 @@ use reqwest::header::CONTENT_TYPE;
 use reqwest_websocket::RequestBuilderExt;
 use tokio::time::sleep;
 use tokio_util::sync::CancellationToken;
-use tracing::{info, trace};
+use tracing::{error, info, trace};
 use crate::app::app::App;
 use crate::app::business_logic::request::send::RequestResponseError;
 use crate::models::environment::Environment;
@@ -57,6 +57,8 @@ pub async fn send_ws_request(prepared_request: reqwest_middleware::RequestBuilde
         },
         response = prepared_request.upgrade().send() => match response {
             Ok(response) => {
+                info!("Response received");
+
                 elapsed_time = request_start.elapsed();
 
                 let status_code = response.status().to_string();
@@ -104,6 +106,8 @@ pub async fn send_ws_request(prepared_request: reqwest_middleware::RequestBuilde
                 }
             },
             Err(error) => {
+                error!("Sending error: {}", error);
+
                 elapsed_time = request_start.elapsed();
 
                 let error = error.to_string();

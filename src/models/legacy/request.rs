@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use tokio_util::sync::CancellationToken;
 
-use crate::models::auth::Auth;
+use crate::models::auth::auth::Auth;
 use crate::models::protocol::http::body::ContentType;
 use crate::models::protocol::http::http::HttpRequest;
 use crate::models::protocol::http::method::Method;

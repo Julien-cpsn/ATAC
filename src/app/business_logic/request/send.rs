@@ -14,7 +14,10 @@ use crate::app::app::App;
 use crate::app::business_logic::request::scripts::{execute_post_request_script, execute_pre_request_script};
 use crate::app::business_logic::request::send::RequestResponseError::PostRequestScript;
 use crate::app::files::environment::save_environment_to_file;
-use crate::models::auth::Auth::{NoAuth, BasicAuth, BearerToken};
+use crate::models::auth::auth::Auth;
+use crate::models::auth::basic::BasicAuth;
+use crate::models::auth::bearer_token::BearerToken;
+use crate::models::auth::jwt::{jwt_do_jaat, JwtError, JwtToken};
 use crate::models::protocol::http::body::ContentType::{NoBody, File, Form, Html, Javascript, Json, Multipart, Raw, Xml};
 use crate::models::environment::Environment;
 use crate::models::protocol::protocol::Protocol;
@@ -29,7 +32,9 @@ pub enum PrepareRequestError {
     #[error("INVALID URL")]
     InvalidUrl,
     #[error("COULD NOT OPEN FILE")]
-    CouldNotOpenFile
+    CouldNotOpenFile,
+    #[error("{0}")]
+    JwtError(#[from] JwtError),
 }
 
 #[derive(Error, Debug)]
@@ -175,16 +180,23 @@ impl App<'_> {
         /* AUTH */
 
         match &modified_request.auth {
-            NoAuth => {}
-            BasicAuth { username, password} => {
-                let username = self.replace_env_keys_by_value(&username);
-                let password = self.replace_env_keys_by_value(&password);
+            Auth::NoAuth => {}
+            Auth::BasicAuth(BasicAuth { username, password}) => {
+                let username = self.replace_env_keys_by_value(username);
+                let password = self.replace_env_keys_by_value(password);
 
                 request_builder = request_builder.basic_auth(username, Some(password));
             }
-            BearerToken { token: bearer_token } => {
-                let bearer_token = self.replace_env_keys_by_value(&bearer_token);
+            Auth::BearerToken(BearerToken { token: bearer_token }) => {
+                let bearer_token = self.replace_env_keys_by_value(bearer_token);
 
+                request_builder = request_builder.bearer_auth(bearer_token);
+            }
+            Auth::JwtToken(JwtToken { algorithm, secret_type, secret, payload }) => {
+                let secret = self.replace_env_keys_by_value(secret);
+                let payload = self.replace_env_keys_by_value(payload);
+
+                let bearer_token = jwt_do_jaat(algorithm, secret_type, secret, payload)?;
                 request_builder = request_builder.bearer_auth(bearer_token);
             }
         }

@@ -5,7 +5,7 @@ use parking_lot::RwLock;
 use rayon::prelude::*;
 use reqwest::header::{CONTENT_TYPE};
 use tokio_util::sync::CancellationToken;
-use tracing::{info, trace};
+use tracing::{error, info, trace};
 use crate::app::app::App;
 use crate::app::business_logic::request::send::RequestResponseError;
 use crate::app::business_logic::request::send::RequestResponseError::CouldNotDecodeResponse;
@@ -53,6 +53,8 @@ pub async fn send_http_request(prepared_request: reqwest_middleware::RequestBuil
         },
         response = prepared_request.send() => match response {
             Ok(response) => {
+                info!("Response received");
+
                 elapsed_time = request_start.elapsed();
 
                 let status_code = response.status().to_string();
@@ -124,6 +126,8 @@ pub async fn send_http_request(prepared_request: reqwest_middleware::RequestBuil
                 }
             },
             Err(error) => {
+                error!("Sending error: {}", error);
+
                 elapsed_time = request_start.elapsed();
 
                 let response_status_code;

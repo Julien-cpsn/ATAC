@@ -68,7 +68,7 @@ toml = "=0.9.10"
 ## Create Javascript runtimes. Used for pre and post request scripts
 boa_engine = { version = "=0.21.0", default-features = false }
 ## Deserialize Postman collection files
-parse_postman_collection = "=0.2.3"
+parse_postman_collection = "=0.2.4"
 ## Parse cURL request files
 curl-parser = { version = "=0.6.0", default-features = false }
 ## Parse OpenAPI spec files
@@ -79,6 +79,8 @@ clap = { version = "=4.5.53", features = ["derive", "color", "suggestions"] }
 directories = "=6.0.0"
 ## Copy response body to clipboard
 arboard = { version = "=3.6.1", features = ["wayland-data-control"], optional = true }
+## Create and decode JSON Web Tokens (JWT)
+jsonwebtoken = { version = "10.2.0", features = ["rust_crypto"] }
 
 # Async
 ## Handle asynchronous requests

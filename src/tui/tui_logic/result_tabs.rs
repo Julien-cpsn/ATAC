@@ -154,7 +154,7 @@ impl App<'_> {
                         max_tmp = str_len;
                     }
                 }
-                
+
                 horizontal_max = max_tmp;
             },
             RequestResultTabs::Console => {
@@ -181,7 +181,7 @@ impl App<'_> {
         self.result_vertical_scrollbar.set_max_scroll(vertical_max);
         self.result_horizontal_scrollbar.set_max_scroll(horizontal_max);
     }
-    
+
     pub fn get_max_str_len(lines: Lines) -> usize {
         let mut max_tmp = 0;
 

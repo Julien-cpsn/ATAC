@@ -1,5 +1,8 @@
 use crate::app::app::App;
-use crate::models::auth::Auth;
+use crate::models::auth::auth::Auth;
+use crate::models::auth::basic::BasicAuth;
+use crate::models::auth::bearer_token::BearerToken;
+use crate::models::auth::jwt::JwtToken;
 use crate::models::protocol::http::body::ContentType;
 use crate::models::protocol::protocol::Protocol;
 use crate::models::protocol::ws::message_type::MessageType;
@@ -13,6 +16,7 @@ impl App<'_> {
         self.auth_basic_username_text_input.reset_input();
         self.auth_basic_password_text_input.reset_input();
         self.auth_bearer_token_text_input.reset_input();
+        self.auth_jwt_secret_text_input.reset_input();
         self.headers_table.selection_text_input.reset_input();
         self.body_form_table.selection_text_input.reset_input();
         self.body_file_text_input.reset_input();
@@ -45,18 +49,25 @@ impl App<'_> {
                 self.auth_text_input_selection.max_selection = 0;
                 self.auth_text_input_selection.usable = false;
             }
-            Auth::BasicAuth { username, password } => {
+            Auth::BasicAuth(BasicAuth { username, password }) => {
                 self.auth_text_input_selection.max_selection = 2;
                 self.auth_text_input_selection.usable = true;
 
                 self.auth_basic_username_text_input.enter_str(username);
                 self.auth_basic_password_text_input.enter_str(password);
             }
-            Auth::BearerToken { token: bearer_token } => {
+            Auth::BearerToken(BearerToken { token: bearer_token }) => {
                 self.auth_text_input_selection.max_selection = 1;
                 self.auth_text_input_selection.usable = true;
 
                 self.auth_bearer_token_text_input.enter_str(bearer_token);
+            }
+            Auth::JwtToken(JwtToken { secret, payload, .. }) => {
+                self.auth_text_input_selection.max_selection = 4;
+                self.auth_text_input_selection.usable = true;
+
+                self.auth_jwt_secret_text_input.enter_str(secret);
+                self.refresh_auth_jwt_payload_textarea(payload);
             }
         }
 
@@ -95,14 +106,14 @@ impl App<'_> {
 
                     self.refresh_body_textarea(&String::new());
                 }
-                ContentType::File(file_path) =>  {
+                ContentType::File(file_path) => {
                     self.body_file_text_input.enter_str(file_path);
-                },
+                }
                 ContentType::Raw(body) | ContentType::Json(body) | ContentType::Xml(body) | ContentType::Html(body) | ContentType::Javascript(body) => {
                     self.body_form_table.rows = Vec::new();
                     self.refresh_body_textarea(body);
                 }
-            }
+            },
             Protocol::WsRequest(ws_request) => {
                 let content = match &ws_request.message_type {
                     MessageType::Text(text) | MessageType::Close(text) => text.clone(),
@@ -112,7 +123,7 @@ impl App<'_> {
                 self.refresh_message_textarea(&content);
             }
         }
-        
+
         let pre_request_script = match &selected_request.scripts.pre_request_script {
             None => "",
             Some(pre_request_script) => &pre_request_script
@@ -122,17 +133,18 @@ impl App<'_> {
             None => "",
             Some(pre_request_script) => &pre_request_script
         };
-        
+
         self.tui_refresh_pre_request_script_textarea(pre_request_script);
         self.tui_refresh_post_request_script_textarea(post_request_script);
     }
-    
+
     pub fn reset_cursors(&mut self) {
         self.url_text_input.reset_cursor();
         self.query_params_table.selection_text_input.reset_cursor();
         self.auth_basic_username_text_input.reset_cursor();
         self.auth_basic_password_text_input.reset_cursor();
         self.auth_bearer_token_text_input.reset_cursor();
+        self.auth_jwt_secret_text_input.reset_cursor();
         self.headers_table.selection_text_input.reset_cursor();
         self.body_form_table.selection_text_input.reset_cursor();
         self.body_file_text_input.reset_cursor();
@@ -157,7 +169,6 @@ impl App<'_> {
             }
 
             *self.received_response.lock() = true;
-            
             self.select_request_state();
         }
     }
@@ -179,7 +190,7 @@ impl App<'_> {
             _ => {}
         }
     }
-    
+
     pub fn new_element(&mut self) {
         match self.creation_popup.selection {
             0 => self.create_new_collection_state(),
@@ -187,17 +198,15 @@ impl App<'_> {
             _ => {}
         }
     }
-    
+
     pub fn tui_new_collection(&mut self) {
         let new_collection_name = self.new_collection_input.text.clone();
 
         match self.new_collection(new_collection_name) {
-            Ok(_) => {}
-            Err(_) => {
-                return;
-            }
+            Ok(_) => {},
+            Err(_) => return
         }
-        
+
         self.normal_state();
     }
 
@@ -214,12 +223,10 @@ impl App<'_> {
             settings: RequestSettings::default(),
             ..Default::default()
         };
-        
+
         match self.new_request(selected_collection_index, new_request) {
-            Ok(_) => {}
-            Err(_) => {
-                return;
-            }
+            Ok(_) => {},
+            Err(_) => return
         }
 
         self.normal_state();
@@ -237,12 +244,12 @@ impl App<'_> {
 
     pub fn tui_delete_collection(&mut self) {
         let selected_request_index = self.collections_tree.state.selected().to_vec();
-        
+
         self.collections_tree.state.select(Vec::new());
         self.collections_tree.selected = None;
-        
+
         self.delete_collection(selected_request_index[0]);
-        
+
         self.normal_state();
     }
 
@@ -256,7 +263,7 @@ impl App<'_> {
 
         match self.delete_request(collection_index, request_index) {
             Ok(_) => {}
-            Err(_) => return
+            Err(_) => return,
         }
 
         self.normal_state();
@@ -277,12 +284,10 @@ impl App<'_> {
         let selected_request_index = self.collections_tree.state.selected();
 
         match self.rename_collection(selected_request_index[0], new_collection_name) {
-            Ok(_) => {}
-            Err(_) => {
-                return;
-            }
+            Ok(_) => {},
+            Err(_) => return
         }
-        
+
         self.normal_state();
     }
 
@@ -304,7 +309,7 @@ impl App<'_> {
             1 => {
                 let selected_request_index = self.collections_tree.state.selected().to_vec();
                 let collection_index = selected_request_index[0];
-                
+
                 match self.duplicate_collection(collection_index) {
                     Ok(_) => {}
                     Err(_) => return
@@ -321,7 +326,6 @@ impl App<'_> {
             }
             _ => {}
         }
-
     }
     pub fn tui_move_element_up(&mut self) {
         match self.collections_tree.state.selected().len() {
@@ -340,7 +344,7 @@ impl App<'_> {
         }
 
         let collection = self.collections.remove(selection[0]);
-        
+
         // Decrement selection
         selection[0] -= 1;
 
@@ -348,7 +352,7 @@ impl App<'_> {
 
         // Update the selection in order to move with the element
         self.collections_tree.state.select(selection.clone());
-        
+
         self.update_collections_last_position();
     }
 
