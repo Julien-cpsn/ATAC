@@ -8,6 +8,8 @@ use ratatui::Terminal;
 use strum::VariantArray;
 use throbber_widgets_tui::ThrobberState;
 use tui_textarea::TextArea;
+
+#[cfg(feature = "clipboard")]
 use arboard::Clipboard;
 
 use crate::app::files::config::Config;
@@ -124,7 +126,9 @@ pub struct App<'a> {
 
     pub export_request: ChoicePopup<ExportFormat>,
     pub display_request_export: DisplayPopup,
-    pub clipboard: Clipboard
+
+    #[cfg(feature = "clipboard")]
+    pub clipboard: Option<Clipboard>
 }
 
 impl App<'_> {
@@ -223,7 +227,9 @@ impl App<'_> {
                 selection: 0,
             },
             display_request_export: DisplayPopup::default(),
-            clipboard: Clipboard::new()?,
+
+            #[cfg(feature = "clipboard")]
+            clipboard: Clipboard::new().ok(),
         })
     }
 

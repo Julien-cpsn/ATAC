@@ -14,24 +14,35 @@ pub static SKIP_SAVE_REQUESTS_RESPONSE: OnceLock<bool> = OnceLock::new();
 #[derive(Default, Serialize, Deserialize)]
 pub struct Config {
     #[serde(default)]
+    /// Should disable syntax highlighting for responses
     pub disable_syntax_highlighting: Option<bool>,
 
     #[serde(default)]
+    /// Should save requests response
     pub save_requests_response: Option<bool>,
     
     #[serde(default)]
+    /// Should not use CORS
     pub disable_cors: Option<bool>,
     
     #[serde(default)]
+    /// Should not display images
     pub disable_images_preview: Option<bool>,
 
     #[serde(default)]
+    /// Should avoid using the terminal emulator graphical protocol when displaying an image. Using halfblocks instead.
+    pub disable_graphical_protocol: Option<bool>,
+
+    #[serde(default)]
+    /// Should wrap response without overflowing in the response area
     pub wrap_responses: Option<bool>,
 
     #[serde(default)]
+    /// Should use either JSON or YAML as preferred collection file format
     pub preferred_collection_file_format: Option<CollectionFileFormat>,
 
     #[serde(default)]
+    /// Proxy usage
     pub proxy: Option<Proxy>
 }
 
@@ -62,6 +73,10 @@ impl Config {
     
     pub fn is_image_preview_disabled(&self) -> bool {
         return self.disable_images_preview.unwrap_or(false)
+    }
+
+    pub fn is_graphical_protocol_disabled(&self) -> bool {
+        return self.disable_graphical_protocol.unwrap_or(false)
     }
     
     pub fn should_wrap_body(&self) -> bool {

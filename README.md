@@ -319,7 +319,7 @@ You can read more about it here: https://github.com/Julien-cpsn/ATAC/releases/ta
 | [ratatui-image](https://github.com/benjajaja/ratatui-image)                      | 8.0.1       | Display response images.                                                               |
 | [image](https://github.com/image-rs/image)                                       | 0.25.8      | Decode images.                                                                         |
 | **Main functionalities**                                                         |             |                                                                                        |
-| [syntect](https://github.com/trishume/syntect)                                   | 5.2.0       | Syntax highlighting                                                                    |
+| [syntect](https://github.com/trishume/syntect)                                   | 5.3.0       | Syntax highlighting                                                                    |
 | [serde](https://github.com/serde-rs/serde)                                       | 1.0.219     | Serialize & Deserialize application data into files                                    |
 | [jsonxf](https://github.com/gamache/jsonxf)                                      | 1.1.1       | Pretty print JSON                                                                      |
 | [toml](https://github.com/toml-rs/toml)                                          | 0.9.5       | Serialize & Deserialize application config files                                       |

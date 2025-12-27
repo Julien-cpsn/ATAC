@@ -150,12 +150,15 @@ impl App<'_> {
                                 }
                             )?;
 
-                            let mut picker = Picker::from_query_stdio()
-                                .unwrap_or(Picker::from_fontsize((7, 14)))
-                                .new_resize_protocol(dynamic_image);
+                            let picker = match self.config.is_graphical_protocol_disabled() {
+                                true => Picker::halfblocks(),
+                                false => Picker::from_query_stdio().unwrap_or(Picker::halfblocks())
+                            };
+
+                            let mut stateful_protocol = picker.new_resize_protocol(dynamic_image);
 
                             terminal.draw(|frame|
-                                picker.resize_encode_render(
+                                stateful_protocol.resize_encode_render(
                                     &Resize::Fit(None),
                                     Rect {
                                         x: 0,
