@@ -79,7 +79,7 @@ clap = { version = "=4.5.53", features = ["derive", "color", "suggestions"] }
 directories = "=6.0.0"
 ## Copy response body to clipboard
 arboard = { version = "=3.6.1", features = ["wayland-data-control"], optional = true }
-## Create and decode JSON Web Tokens (JWT)
+## Create and encode JSON Web Tokens (JWT)
 jsonwebtoken = { version = "10.2.0", features = ["rust_crypto"] }
 
 # Async
