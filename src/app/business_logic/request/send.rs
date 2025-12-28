@@ -73,7 +73,7 @@ impl App<'_> {
         /* PROXY */
 
         if request.settings.use_config_proxy.as_bool() {
-            match &self.config.proxy {
+            match &self.config.get_proxy() {
                 None => {}
                 Some(proxy) => {
                     match &proxy.http_proxy {

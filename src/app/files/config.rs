@@ -54,7 +54,7 @@ pub struct Proxy {
 
 impl Config {
     pub fn is_syntax_highlighting_disabled(&self) -> bool {
-        return self.disable_syntax_highlighting.unwrap_or(false)
+        self.disable_syntax_highlighting.unwrap_or(false)
     }
 
     pub fn should_save_requests_response(&self) -> bool {
@@ -68,19 +68,19 @@ impl Config {
     }
     
     pub fn is_cors_disabled(&self) -> bool {
-        return self.disable_cors.unwrap_or(false)
+        self.disable_cors.unwrap_or(false)
     }
     
     pub fn is_image_preview_disabled(&self) -> bool {
-        return self.disable_images_preview.unwrap_or(false)
+        self.disable_images_preview.unwrap_or(false)
     }
 
     pub fn is_graphical_protocol_disabled(&self) -> bool {
-        return self.disable_graphical_protocol.unwrap_or(false)
+        self.disable_graphical_protocol.unwrap_or(false)
     }
     
     pub fn should_wrap_body(&self) -> bool {
-        return self.wrap_responses.unwrap_or(false)
+        self.wrap_responses.unwrap_or(false)
     }
     
     pub fn get_preferred_collection_file_format(&self) -> CollectionFileFormat {
@@ -89,13 +89,17 @@ impl Config {
             Some(file_format) => file_format.clone()
         }
     }
+
+    pub fn get_proxy(&self) -> &Option<Proxy> {
+        &self.proxy
+    }
 }
 
 impl App<'_> {
     pub fn parse_config_file(&mut self, path_buf: &PathBuf) {
         let mut file_content = String::new();
 
-        trace!("Trying to open or create \"atac.toml\" config file");
+        trace!("Trying to open \"atac.toml\" config file");
 
         let mut config_file = OpenOptions::new()
             .read(true)
@@ -115,5 +119,61 @@ impl App<'_> {
         self.config = config;
 
         trace!("Config file parsed!");
+    }
+
+    pub fn parse_global_config_file(&mut self, path_buf: &PathBuf) {
+        let mut file_content = String::new();
+
+        trace!("Trying to open \"{}\" global config file", path_buf.display());
+
+        let mut global_config_file = OpenOptions::new()
+            .read(true)
+            .open(path_buf.clone())
+            .expect("\tCould not open global config file");
+
+        global_config_file.read_to_string(&mut file_content).expect("\tCould not read global config file");
+
+        let global_config: Config = match toml::from_str(&file_content) {
+            Ok(config) => config,
+            Err(e) => panic_error(format!("Could not parse config file\n\t{e}"))
+        };
+
+        // Replace an attribute if it is not set
+
+        if self.config.disable_syntax_highlighting.is_none() {
+            self.config.disable_syntax_highlighting = global_config.disable_syntax_highlighting;
+        }
+
+        if self.config.save_requests_response.is_none() {
+            self.config.save_requests_response = global_config.save_requests_response;
+        }
+
+        if self.config.disable_cors.is_none() {
+            self.config.disable_cors = global_config.disable_cors;
+        }
+
+        if self.config.disable_images_preview.is_none() {
+            self.config.disable_images_preview = global_config.disable_images_preview;
+        }
+
+        if self.config.disable_graphical_protocol.is_none() {
+            self.config.disable_graphical_protocol = global_config.disable_graphical_protocol;
+        }
+
+        if self.config.wrap_responses.is_none() {
+            self.config.wrap_responses = global_config.wrap_responses;
+        }
+
+        if self.config.preferred_collection_file_format.is_none() {
+            self.config.preferred_collection_file_format = global_config.preferred_collection_file_format;
+        }
+
+        if self.config.proxy.is_none() {
+            self.config.proxy = global_config.proxy;
+        }
+
+        self.config.set_should_skip_requests_response();
+
+        trace!("Global config file parsed!");
     }
 }

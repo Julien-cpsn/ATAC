@@ -111,6 +111,15 @@ impl<'a> App<'a> {
             }
         }
 
+        // Check if the global config file exists
+        if let Some(config_directory) = &ARGS.config_directory {
+            let global_config_file_path = config_directory.join("global.toml");
+            
+            if global_config_file_path.exists() {
+                self.parse_global_config_file(&global_config_file_path);
+            }
+        }
+
         // Ensures that legacy collections and requests gets save as their new version
         if ARGS.should_save {
             for index in 0..self.collections.len() {
