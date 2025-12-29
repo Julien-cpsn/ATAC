@@ -195,6 +195,18 @@ get_key_bindings! {
 
         CopyResponsePart(EventKeyBinding),
 
+        /* Response export */
+
+        ExportResponse(EventKeyBinding),
+        ConfirmExportResponse(EventKeyBinding),
+        ExportingResponseDeleteCharBackward(EventKeyBinding),
+        ExportingResponseDeleteCharForward(EventKeyBinding),
+        ExportingResponseMoveCursorLeft(EventKeyBinding),
+        ExportingResponseMoveCursorRight(EventKeyBinding),
+        ExportingResponseMoveCursorLineStart(EventKeyBinding),
+        ExportingResponseMoveCursorLineEnd(EventKeyBinding),
+        ExportingResponseCharInput(EventKeyBinding),
+
         /* Request export */
 
         ExportRequest(EventKeyBinding),
@@ -414,7 +426,6 @@ get_key_bindings! {
         ModifyRequestSettings(EventKeyBinding),
 
         /* Others */
-
         Documentation(EventKeyBinding),
     }
 }
@@ -563,12 +574,12 @@ impl App<'_> {
                 DeleteCookie(_) => self.tui_delete_cookie(),
 
                 /* Logs */
-                
+
                 ScrollLogsUp(_) => self.logs_vertical_scrollbar.page_up(),
                 ScrollLogsDown(_) => self.logs_vertical_scrollbar.page_down(),
                 ScrollLogsLeft(_) => self.logs_horizontal_scrollbar.page_up(),
                 ScrollLogsRight(_) => self.logs_horizontal_scrollbar.page_down(),
-                
+
                 /* Collections */
 
                 ChooseElementToCreateMoveCursorLeft(_) => self.creation_popup.previous(),
@@ -603,7 +614,7 @@ impl App<'_> {
                     true => self.tui_delete_collection(),
                     false => self.normal_state(),
                 },
-                
+
                 DeletingRequestMoveCursorLeft(_) => self.delete_request_popup.change_state(),
                 DeletingRequestMoveCursorRight(_) => self.delete_request_popup.change_state(),
                 DeleteRequest(_) => match self.delete_request_popup.state {
@@ -620,7 +631,7 @@ impl App<'_> {
                     KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.rename_collection_input.enter_char(char),
                     _ => {}
                 },
-                
+
                 RenameRequest(_) => self.tui_rename_request(),
                 RenamingRequestDeleteCharBackward(_) => self.rename_request_input.delete_char_forward(),
                 RenamingRequestDeleteCharForward(_) => self.rename_request_input.delete_char_backward(),
@@ -630,11 +641,11 @@ impl App<'_> {
                     KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.rename_request_input.enter_char(char),
                     _ => {}
                 },
-                
+
                 /* Selected Request */
 
                 GoBackToRequestMenu(_) => self.select_request_state(),
-                
+
                 EditUrl(_) => self.edit_request_url_state(),
                 EditMethod(_) => self.tui_next_request_method(),
                 EditSettings(_) => self.edit_request_settings_state(),
@@ -726,8 +737,21 @@ impl App<'_> {
                 #[cfg(not(feature = "clipboard"))]
                 CopyResponsePart(_) => {},
 
-                /* Request Export */
+                /* Response Export */
+                ExportResponse(_) => self.export_response_state(),
+                ConfirmExportResponse(_) => self.tui_export_response_body(),
+                ExportingResponseDeleteCharForward(_) => self.export_response_input.delete_char_backward(),
+                ExportingResponseDeleteCharBackward(_) => self.export_response_input.delete_char_forward(),
+                ExportingResponseMoveCursorLeft(_) => self.export_response_input.move_cursor_left(),
+                ExportingResponseMoveCursorRight(_) => self.export_response_input.move_cursor_right(),
+                ExportingResponseMoveCursorLineStart(_) => self.export_response_input.move_cursor_line_start(),
+                ExportingResponseMoveCursorLineEnd(_) => self.export_response_input.move_cursor_line_end(),
+                ExportingResponseCharInput(_) => match key {
+                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.export_response_input.enter_char(char),
+                    _ => {}
+                },
 
+                /* Request Export */
                 ExportRequest(_) => self.choose_request_export_format_state(),
 
                 RequestExportFormatMoveCursorLeft(_) => self.export_request.previous(),
@@ -773,7 +797,7 @@ impl App<'_> {
                 },
 
                 /* Auth */
-                
+
                 // self.auth_text_input_selection.usable
 
                 ModifyRequestAuthUsername(_) => self.tui_modify_request_auth_basic_username(),
@@ -787,7 +811,7 @@ impl App<'_> {
                     KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.auth_basic_username_text_input.enter_char(char),
                     _ => {}
                 },
-                
+
                 ModifyRequestAuthPassword(_) => self.tui_modify_request_auth_basic_password(),
                 EditingRequestAuthPasswordDeleteCharBackward(_) => self.auth_basic_password_text_input.delete_char_forward(),
                 EditingRequestAuthPasswordDeleteCharForward(_) => self.auth_basic_password_text_input.delete_char_backward(),
@@ -799,7 +823,7 @@ impl App<'_> {
                     KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.auth_basic_password_text_input.enter_char(char),
                     _ => {}
                 },
-                
+
                 ModifyRequestAuthBearerToken(_) => self.tui_modify_request_auth_bearer_token(),
                 EditingRequestAuthBearerTokenDeleteCharBackward(_) => self.auth_bearer_token_text_input.delete_char_forward(),
                 EditingRequestAuthBearerTokenDeleteCharForward(_) => self.auth_bearer_token_text_input.delete_char_backward(),
@@ -892,7 +916,7 @@ impl App<'_> {
                     KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.body_form_table.selection_text_input.enter_char(char),
                     _ => {}
                 },
-                
+
                 ModifyRequestBodyFile(_) => self.tui_modify_request_body(),
                 EditingRequestBodyFileDeleteCharBackward(_) => self.body_file_text_input.delete_char_forward(),
                 EditingRequestBodyFileDeleteCharForward(_) => self.body_file_text_input.delete_char_backward(),
@@ -988,7 +1012,7 @@ impl App<'_> {
                     KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.message_text_area.insert_char(char),
                     _ => {}
                 },
-                
+
                 /* Scripts */
 
                 EditingPreRequestScriptVimInput(_) => match self.script_console.vim_emulation.transition(key, &mut self.script_console.pre_request_text_area) {
@@ -1072,7 +1096,7 @@ impl App<'_> {
                     KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.script_console.post_request_text_area.insert_char(char),
                     _ => {}
                 },
-                
+
                 /* Settings */
 
                 RequestSettingsMoveUp(_) => self.request_settings_popup.previous(),
@@ -1082,7 +1106,6 @@ impl App<'_> {
                 ModifyRequestSettings(_) => self.tui_modify_request_settings(),
 
                 /* Others */
-
                 Documentation(_) => {}
             }
         };
