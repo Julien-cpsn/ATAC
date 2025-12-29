@@ -14,7 +14,9 @@ use crate::app::app::App;
 use crate::cli::args::ARGS;
 use crate::cli::cli_logic::import::openapi::ImportOpenApiError::InvalidUrl;
 use crate::cli::commands::import::OpenApiImport;
-use crate::models::auth::Auth;
+use crate::models::auth::auth::Auth;
+use crate::models::auth::basic::BasicAuth;
+use crate::models::auth::bearer_token::BearerToken;
 use crate::models::protocol::http::body::ContentType;
 use crate::models::collection::Collection;
 use crate::models::protocol::http::http::HttpRequest;
@@ -530,13 +532,13 @@ fn process_security(request: &mut Request, security_requirements: &Vec<SecurityR
                                 },
                                 SecurityScheme::HTTP { scheme, .. } => {
                                     request.auth = match scheme.as_str() {
-                                        "basic" => Auth::BasicAuth {
+                                        "basic" => Auth::BasicAuth(BasicAuth {
                                             username: "username".to_string(),
                                             password: "password".to_string(),
-                                        },
-                                        "bearer" => Auth::BearerToken {
+                                        }),
+                                        "bearer" => Auth::BearerToken(BearerToken {
                                             token: "BEARER_TOKEN".to_string(),
-                                        },
+                                        }),
                                         _ => Auth::NoAuth
                                     }
                                 },

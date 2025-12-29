@@ -83,6 +83,10 @@ pub struct AuthArgs {
     /// Set a bearer token auth method
     #[arg(long, group = "auth", action = clap::ArgAction::Set, num_args = 1, value_name = "TOKEN", display_order = 4)]
     pub auth_bearer_token: Vec<String>,
+
+    /// Set a JWT token auth method
+    #[arg(long, group = "auth", action = clap::ArgAction::Set, num_args = 4, value_names = ["ALGORITHM", "SECRET_TYPE", "SECRET", "PAYLOAD"], display_order = 5)]
+    pub auth_jwt_token: Vec<String>,
 }
 
 #[derive(clap::Args, Debug, Clone)]
@@ -122,3 +126,4 @@ pub struct BodyArgs {
     #[arg(long, group = "body", value_name = "JAVASCRIPT", display_order = 14)]
     pub body_javascript: Option<String>,
 }
+

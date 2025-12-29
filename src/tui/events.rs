@@ -153,6 +153,8 @@ get_key_bindings! {
         EditRequestAuth(EventKeyBinding),
         RequestAuthMoveUp(EventKeyBinding),
         RequestAuthMoveDown(EventKeyBinding),
+        RequestAuthMoveLeft(EventKeyBinding),
+        RequestAuthMoveRight(EventKeyBinding),
 
         EditRequestHeader(EventKeyBinding),
         RequestHeadersMoveUp(EventKeyBinding),
@@ -266,6 +268,35 @@ get_key_bindings! {
         EditingRequestAuthBearerTokenMoveCursorLineStart(EventKeyBinding),
         EditingRequestAuthBearerTokenMoveCursorLineEnd(EventKeyBinding),
         EditingRequestAuthBearerTokenCharInput(EventKeyBinding),
+
+        ModifyRequestAuthJwtSecret(EventKeyBinding),
+        EditingRequestAuthJwtSecretDeleteCharBackward(EventKeyBinding),
+        EditingRequestAuthJwtSecretDeleteCharForward(EventKeyBinding),
+        EditingRequestAuthJwtSecretMoveCursorLeft(EventKeyBinding),
+        EditingRequestAuthJwtSecretMoveCursorRight(EventKeyBinding),
+        EditingRequestAuthJwtSecretMoveCursorLineStart(EventKeyBinding),
+        EditingRequestAuthJwtSecretMoveCursorLineEnd(EventKeyBinding),
+        EditingRequestAuthJwtSecretCharInput(EventKeyBinding),
+
+        EditingRequestAuthJwtPayloadVimInput(EventKeyBinding),
+        EditingRequestAuthJwtPayloadSaveAndQuit(EventKeyBinding),
+        EditingRequestAuthJwtPayloadCopy(EventKeyBinding),
+        EditingRequestAuthJwtPayloadPaste(EventKeyBinding),
+        EditingRequestAuthJwtPayloadUndo(EventKeyBinding),
+        EditingRequestAuthJwtPayloadRedo(EventKeyBinding),
+        EditingRequestAuthJwtPayloadNewLine(EventKeyBinding),
+        EditingRequestAuthJwtPayloadIndent(EventKeyBinding),
+        EditingRequestAuthJwtPayloadDeleteCharBackward(EventKeyBinding),
+        EditingRequestAuthJwtPayloadDeleteCharForward(EventKeyBinding),
+        EditingRequestAuthJwtPayloadSkipWordLeft(EventKeyBinding),
+        EditingRequestAuthJwtPayloadSkipWordRight(EventKeyBinding),
+        EditingRequestAuthJwtPayloadMoveCursorUp(EventKeyBinding),
+        EditingRequestAuthJwtPayloadMoveCursorDown(EventKeyBinding),
+        EditingRequestAuthJwtPayloadMoveCursorLeft(EventKeyBinding),
+        EditingRequestAuthJwtPayloadMoveCursorRight(EventKeyBinding),
+        EditingRequestAuthJwtPayloadMoveCursorLineStart(EventKeyBinding),
+        EditingRequestAuthJwtPayloadMoveCursorLineEnd(EventKeyBinding),
+        EditingRequestAuthJwtPayloadCharInput(EventKeyBinding),
 
         /* Headers */
 
@@ -656,6 +687,8 @@ impl App<'_> {
                     true => self.auth_text_input_selection.next(),
                     false => {}
                 },
+                RequestAuthMoveLeft(_) => self.tui_request_auth_move_left(),
+                RequestAuthMoveRight(_) => self.tui_request_auth_move_right(),
 
                 EditRequestHeader(_) => match self.headers_table.is_selected() {
                     true => self.edit_request_header_state(),
@@ -802,6 +835,59 @@ impl App<'_> {
                 EditingRequestAuthBearerTokenMoveCursorLineEnd(_) => self.auth_bearer_token_text_input.move_cursor_line_end(),
                 EditingRequestAuthBearerTokenCharInput(_) => match key {
                     KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.auth_bearer_token_text_input.enter_char(char),
+                    _ => {}
+                },
+
+                ModifyRequestAuthJwtSecret(_) => self.tui_modify_request_auth_secret(),
+                EditingRequestAuthJwtSecretDeleteCharBackward(_) => self.auth_jwt_secret_text_input.delete_char_forward(),
+                EditingRequestAuthJwtSecretDeleteCharForward(_) => self.auth_jwt_secret_text_input.delete_char_backward(),
+                EditingRequestAuthJwtSecretMoveCursorLeft(_) => self.auth_jwt_secret_text_input.move_cursor_left(),
+                EditingRequestAuthJwtSecretMoveCursorRight(_) => self.auth_jwt_secret_text_input.move_cursor_right(),
+                EditingRequestAuthJwtSecretMoveCursorLineStart(_) => self.auth_jwt_secret_text_input.move_cursor_line_start(),
+                EditingRequestAuthJwtSecretMoveCursorLineEnd(_) => self.auth_jwt_secret_text_input.move_cursor_line_end(),
+                EditingRequestAuthJwtSecretCharInput(_) => match key {
+                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.auth_jwt_secret_text_input.enter_char(char),
+                    _ => {}
+                },
+
+                EditingRequestAuthJwtPayloadVimInput(_) => match self.auth_jwt_payload_text_area_vim_emulation.transition(key, &mut self.auth_jwt_payload_text_area) {
+                    VimTransition::Mode(mode) if self.auth_jwt_payload_text_area_vim_emulation.mode != mode => {
+                        self.auth_jwt_payload_text_area.set_block(mode.block());
+                        self.auth_jwt_payload_text_area.set_cursor_style(mode.cursor_style());
+                        self.auth_jwt_payload_text_area_vim_emulation = Vim::new(mode);
+                    }
+                    VimTransition::Nop | VimTransition::Mode(_) => {
+                        self.auth_jwt_payload_text_area_vim_emulation = self.auth_jwt_payload_text_area_vim_emulation.clone();
+                    },
+                    VimTransition::Pending(input) => {
+                        self.auth_jwt_payload_text_area_vim_emulation = self.auth_jwt_payload_text_area_vim_emulation.clone().with_pending(input);
+                    },
+                    VimTransition::Quit => self.select_request_state(),
+                    VimTransition::SaveAndQuit => self.tui_modify_request_auth_payload(),
+                },
+
+                EditingRequestAuthJwtPayloadSaveAndQuit(_) => self.tui_modify_request_auth_payload(),
+                EditingRequestAuthJwtPayloadCopy(_) => self.auth_jwt_payload_text_area.copy(),
+                EditingRequestAuthJwtPayloadPaste(_) => {self.auth_jwt_payload_text_area.paste();},
+                EditingRequestAuthJwtPayloadUndo(_) => {self.auth_jwt_payload_text_area.undo();},
+                EditingRequestAuthJwtPayloadRedo(_) => {self.auth_jwt_payload_text_area.redo();},
+                EditingRequestAuthJwtPayloadNewLine(_) => self.auth_jwt_payload_text_area.insert_newline(),
+                EditingRequestAuthJwtPayloadIndent(_) => {
+                    self.auth_jwt_payload_text_area.set_hard_tab_indent(true);
+                    self.auth_jwt_payload_text_area.insert_tab();
+                },
+                EditingRequestAuthJwtPayloadDeleteCharBackward(_) => {self.auth_jwt_payload_text_area.delete_next_char();},
+                EditingRequestAuthJwtPayloadDeleteCharForward(_) => {self.auth_jwt_payload_text_area.delete_char();},
+                EditingRequestAuthJwtPayloadSkipWordLeft(_) => self.auth_jwt_payload_text_area.move_cursor(CursorMove::WordBack),
+                EditingRequestAuthJwtPayloadSkipWordRight(_) => self.auth_jwt_payload_text_area.move_cursor(CursorMove::WordForward),
+                EditingRequestAuthJwtPayloadMoveCursorUp(_) => self.auth_jwt_payload_text_area.move_cursor(CursorMove::Up),
+                EditingRequestAuthJwtPayloadMoveCursorDown(_) => self.auth_jwt_payload_text_area.move_cursor(CursorMove::Bottom),
+                EditingRequestAuthJwtPayloadMoveCursorLeft(_) => self.auth_jwt_payload_text_area.move_cursor(CursorMove::Back),
+                EditingRequestAuthJwtPayloadMoveCursorRight(_) => self.auth_jwt_payload_text_area.move_cursor(CursorMove::Forward),
+                EditingRequestAuthJwtPayloadMoveCursorLineStart(_) => self.auth_jwt_payload_text_area.move_cursor(CursorMove::Head),
+                EditingRequestAuthJwtPayloadMoveCursorLineEnd(_) => self.auth_jwt_payload_text_area.move_cursor(CursorMove::End),
+                EditingRequestAuthJwtPayloadCharInput(_) => match key {
+                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.auth_jwt_payload_text_area.insert_char(char),
                     _ => {}
                 },
 

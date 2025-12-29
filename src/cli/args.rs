@@ -122,7 +122,9 @@ pub enum Command {
 lazy_static! {
     pub static ref ARGS: GlobalArgs = {
         let args = Args::parse();
-        
+
+        let config_directory = get_app_config_dir();
+
         let (directory, should_parse_directory) = match &args.command {
             // CLI
             Some(command) => match command.clone() {
@@ -131,14 +133,15 @@ lazy_static! {
                 // Commands that use no dir at all
                 Command::Try(_) => (None, false),
                 // Commands that use the app dir
-                _ => (Some(choose_app_directory(args.directory)), true)
+                _ => (Some(choose_app_directory(args.directory, &config_directory)), true)
             },
             // TUI
-            None => (Some(choose_app_directory(args.directory)), true) 
+            None => (Some(choose_app_directory(args.directory, &config_directory)), true)
         };
 
         GlobalArgs {
             directory,
+            config_directory,
             command: args.command,
             collection_filter: args.filter,
             should_run_tui: args.tui,
@@ -150,7 +153,27 @@ lazy_static! {
     };
 }
 
-fn choose_app_directory(path_buf: Option<PathBuf>) -> PathBuf {
+fn get_app_config_dir() -> Option<PathBuf> {
+    let project_directory = ProjectDirs::from("com", "Julien-cpsn", "ATAC");
+
+    let config_directory = match project_directory {
+        Some(project_directory) => {
+            let config_directory = project_directory.config_dir().to_path_buf();
+
+            // Create the config dir if it does not exist
+            if !config_directory.exists() {
+                fs::create_dir_all(&config_directory).expect(&format!("Could not recursively create folder \"{}\"", config_directory.display()));
+            }
+
+            Some(config_directory)
+        },
+        None => None
+    };
+
+    return config_directory;
+}
+
+fn choose_app_directory(path_buf: Option<PathBuf>, config_directory: &Option<PathBuf>) -> PathBuf {
     match path_buf {
         // If a directory was provided with the CLI argument
         Some(directory) => expand_tilde(directory),
@@ -161,16 +184,8 @@ fn choose_app_directory(path_buf: Option<PathBuf>) -> PathBuf {
             Ok(env_directory) => expand_tilde(PathBuf::from(env_directory)),
             
             // No ATAC_MAIN_DIR env variable
-            Err(_) => match ProjectDirs::from("com", "Julien-cpsn", "ATAC") {
-                Some(project_dir) => {
-                    let config_dir = project_dir.config_dir();
-                    
-                    if !config_dir.exists() {
-                        fs::create_dir_all(config_dir).expect(&format!("Could not recursively create folder \"{}\"", config_dir.display()));
-                    }
-                    
-                    config_dir.to_path_buf()
-                },
+            Err(_) => match config_directory {
+                Some(config_directory) => config_directory.clone(),
                 None => panic_error("No directory provided, provide one either with `--directory <dir>` or via the environment variable `ATAC_MAIN_DIR`")
             }
         }
@@ -180,6 +195,7 @@ fn choose_app_directory(path_buf: Option<PathBuf>) -> PathBuf {
 #[derive(Debug)]
 pub struct GlobalArgs {
     pub directory: Option<PathBuf>,
+    pub config_directory: Option<PathBuf>,
     pub command: Option<Command>,
     pub collection_filter: Option<Regex>,
     pub should_run_tui: bool,

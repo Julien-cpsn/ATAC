@@ -94,6 +94,9 @@ pub struct App<'a> {
     pub auth_basic_username_text_input: TextInput,
     pub auth_basic_password_text_input: TextInput,
     pub auth_bearer_token_text_input: TextInput,
+    pub auth_jwt_secret_text_input: TextInput,
+    pub auth_jwt_payload_text_area: TextArea<'a>,
+    pub auth_jwt_payload_text_area_vim_emulation: Vim,
 
     pub headers_table: StatefulCustomTable,
 
@@ -127,7 +130,7 @@ pub struct App<'a> {
     pub validation_popup: ValidationPopup,
 
     #[cfg(feature = "clipboard")]
-    pub clipboard: Clipboard
+    pub clipboard: Option<Clipboard>
 }
 
 impl App<'_> {
@@ -194,6 +197,9 @@ impl App<'_> {
             auth_basic_username_text_input: TextInput::default(),
             auth_basic_password_text_input: TextInput::default(),
             auth_bearer_token_text_input: TextInput::default(),
+            auth_jwt_secret_text_input: TextInput::default(),
+            auth_jwt_payload_text_area: TextArea::default(),
+            auth_jwt_payload_text_area_vim_emulation: Vim::default(),
 
             headers_table: StatefulCustomTable::default(),
 
@@ -227,7 +233,7 @@ impl App<'_> {
             validation_popup: ValidationPopup::default(),
 
             #[cfg(feature = "clipboard")]
-            clipboard: Clipboard::new()?,
+            clipboard: Clipboard::new().ok(),
         })
     }
 

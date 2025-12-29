@@ -1,15 +1,18 @@
+use arboard::ImageData;
+use image::EncodableLayout;
 use rayon::prelude::*;
 
 use crate::app::app::App;
+use crate::models::response::ResponseContent;
+use crate::tui::ui::result_tabs::RequestResultTabs;
 
 impl App<'_> {
     #[cfg(feature = "clipboard")]
     /// Copy the response's body content to the clipboard if it's present, otherwise does nothing
     pub fn copy_response_body_content_to_clipboard(&mut self) {
-        use arboard::ImageData;
-        use image::EncodableLayout;
-        use crate::models::response::ResponseContent;
-        use crate::tui::ui::result_tabs::RequestResultTabs;
+        if self.clipboard.is_none() {
+            return;
+        }
 
         let local_selected_request = self.get_selected_request_as_local();
         let selected_request = local_selected_request.read();
@@ -19,7 +22,11 @@ impl App<'_> {
                 None => {}
                 Some(content) => match content {
                     ResponseContent::Body(body) => {
-                        self.clipboard.set_text(body).expect("Could not copy response content to clipboard");
+                        self.clipboard
+                            .as_mut()
+                            .unwrap()
+                            .set_text(body)
+                            .expect("Could not copy response content to clipboard");
                     }
                     ResponseContent::Image(image_response) => match &image_response.image {
                         None => {}
@@ -27,6 +34,8 @@ impl App<'_> {
                             let rgba_image = image.to_rgba8();
 
                             self.clipboard
+                                .as_mut()
+                                .unwrap()
                                 .set_image(ImageData {
                                     width: rgba_image.width() as usize,
                                     height: rgba_image.height() as usize,
@@ -52,12 +61,22 @@ impl App<'_> {
                     .join("\n");
 
                 if !text.is_empty() {
-                    self.clipboard.set_text(text).expect("Could not copy messages content to clipboard");
+                    self.clipboard
+                        .as_mut()
+                        .unwrap()
+                        .set_text(text)
+                        .expect("Could not copy messages content to clipboard");
                 }
             },
             RequestResultTabs::Cookies => match &selected_request.response.cookies {
                 None => {}
-                Some(cookies) => self.clipboard.set_text(cookies).expect("Could not copy cookies to clipboard")
+                Some(cookies) => {
+                    self.clipboard
+                        .as_mut()
+                        .unwrap()
+                        .set_text(cookies)
+                        .expect("Could not copy cookies to clipboard")
+                }
             }
             RequestResultTabs::Headers => {
                 let headers_string: String = selected_request.response.headers
@@ -66,7 +85,11 @@ impl App<'_> {
                     .collect();
 
                 if !headers_string.is_empty() {
-                    self.clipboard.set_text(headers_string).expect("Could not copy headers to clipboard");
+                    self.clipboard
+                        .as_mut()
+                        .unwrap()
+                        .set_text(headers_string)
+                        .expect("Could not copy headers to clipboard");
                 }
             }
             RequestResultTabs::Console => {
@@ -78,7 +101,11 @@ impl App<'_> {
                 };
 
                 if !text.is_empty() {
-                    self.clipboard.set_text(text).expect("Could not copy console output to clipboard")
+                    self.clipboard
+                        .as_mut()
+                        .unwrap()
+                        .set_text(text)
+                        .expect("Could not copy console output to clipboard")
                 }
             }
         }

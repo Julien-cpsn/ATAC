@@ -27,7 +27,7 @@ clipboard = ["arboard"]
 [dependencies]
 # Request
 ## Send requests
-reqwest = { version = "=0.12.23", default-features = false, features = ["cookies", "rustls-tls-native-roots", "multipart", "gzip", "brotli", "deflate", "stream"] }
+reqwest = { version = "=0.12.28", default-features = false, features = ["cookies", "rustls-tls-native-roots", "multipart", "gzip", "brotli", "deflate", "stream"] }
 ## Wrapper around reqwest to allow for client middleware chains
 reqwest-middleware = { version = "=0.4.2", features = ["rustls-tls", "json", "multipart"] }
 ## Wrapper around reqwest to handle web-socket requests
@@ -41,52 +41,54 @@ ratatui = { version = "=0.29.0", features = ["serde"] }
 ## Used to parse, use key bindings files and some utilities
 crokey = "=1.1.2"
 ## Display big texts. Only used for displaying ATAC in the homepage.
-tui-big-text = "=0.7.1"
+tui-big-text = "=0.7.3"
 ## Display tree-like lists. Used for displaying the collections.
 tui-tree-widget = "=0.23.1"
 ## Text area that handle a lot of features. Used for editing request body.
 tui-textarea = { version = "=0.7.0", features = ["ratatui"] }
 ## Display loading UI elements. Used when request is pending.
-throbber-widgets-tui = "=0.8.0"
+throbber-widgets-tui = "=0.9.0"
 ## Display response images.
-ratatui-image = { version = "=8.0.1", features = ["crossterm"] }
+ratatui-image = { version = "=9.0.0", default-features = false, features = ["crossterm", "image-defaults"] }
 ## Decode images.
-image = "=0.25.8"
+image = "=0.25.9"
 
 # Main functionalities
 ## Syntax highlighting
 syntect = { version = "=5.3.0", features = ["default-fancy"] }
 ## Serialize & Deserialize application data into files
-serde = { version = "=1.0.219", features = ["derive", "rc"] }
-serde_json = "=1.0.143"
+serde = { version = "=1.0.228", features = ["derive", "rc"] }
+serde_json = "=1.0.147"
 serde_yaml = "=0.9.34"
-serde-versioning = "1.0.219"
+serde-versioning = "1.0.228-fix.1"
 ## Pretty print JSON
 jsonxf = "=1.1.1"
 ## Serialize & Deserialize application config files
-toml = "=0.9.5"
+toml = "=0.9.10"
 ## Create Javascript runtimes. Used for pre and post request scripts
-boa_engine = { version = "=0.20.0", default-features = false }
+boa_engine = { version = "=0.21.0", default-features = false }
 ## Deserialize Postman collection files
-parse_postman_collection = "=0.2.3"
+parse_postman_collection = "=0.2.4"
 ## Parse cURL request files
 curl-parser = { version = "=0.6.0", default-features = false }
 ## Parse OpenAPI spec files
 openapiv3 = "2.2.0"
 ## Command Line Argument Parser
-clap = { version = "=4.5", features = ["derive", "color", "suggestions"] }
+clap = { version = "=4.5.53", features = ["derive", "color", "suggestions"] }
 ## Use system files
 directories = "=6.0.0"
 ## Copy response body to clipboard
 arboard = { version = "=3.6.1", features = ["wayland-data-control"], optional = true }
+## Create and encode JSON Web Tokens (JWT)
+jsonwebtoken = { version = "10.2.0", features = ["rust_crypto"] }
 
 # Async
 ## Handle asynchronous requests
-tokio = { version = "=1.47.1", features = ["rt", "rt-multi-thread", "macros", "io-std", "io-util"] }
-tokio-util = { version = "=0.7.16", features = ["compat"] }
+tokio = { version = "=1.48.0", features = ["rt", "rt-multi-thread", "macros", "io-std", "io-util"] }
+tokio-util = { version = "=0.7.17", features = ["compat"] }
 futures-util = { version = "0.3.31", features = ["sink", "alloc"] }
 ## Smaller, faster and more flexible implementation of RwLock and Mutex. Used everywhere.
-parking_lot = { version = "=0.12.4", features = ["serde", "send_guard"] }
+parking_lot = { version = "=0.12.5", features = ["serde", "send_guard"] }
 
 # Utils
 ## Enum facilities
@@ -100,25 +102,25 @@ walkdir = "=2.5.0"
 ## Unescape string
 snailquote = "=0.3.1"
 ## Ordered hashmap. Used in environments to preserve files' values order
-indexmap = { version = "=2.11.1", features = ["serde", "rayon"] }
+indexmap = { version = "=2.12.1", features = ["serde", "rayon"] }
 ## Allows the usage of multiple threads in for loops
 rayon = "=1.11.0"
 ## Create custom errors
-thiserror = "=2.0.16"
+thiserror = "=2.0.17"
 ## Result that can contain any error
-anyhow = "=1.0.99"
+anyhow = "=1.0.100"
 ## Add verbosity flag to the CLI
 clap-verbosity-flag = "=3.0.4"
 ## Generate completion file
-clap_complete = "=4.5"
+clap_complete = "=4.5.62"
 ## Generate man pages
-clap_mangen = "=0.2"
+clap_mangen = "=0.2.31"
 ## Regex. Using for parsing requests URL
-regex = "=1.11.2"
+regex = "=1.12.2"
 ## Time utils
 chrono = { version = "=0.4.42", default-features = false, features = ["now", "serde"] }
 ## UUID generator
-uuid = { version = "=1.18.1", features = ["v4", "v7", "serde"] }
+uuid = { version = "=1.19.0", features = ["v4", "v7", "serde"] }
 ## Decode base64 strings
 base64 = "=0.22.1"
 ## Wrap text to max length
@@ -126,9 +128,9 @@ textwrap = "0.16.2"
 
 # Tracing
 ## Log events
-tracing = { version = "=0.1.41", features = ["async-await"] }
+tracing = { version = "=0.1.44", features = ["async-await"] }
 ## Utilities for implementing and composing tracing subscribers
-tracing-subscriber = { version = "=0.3.20", features = ["parking_lot", "chrono", "regex"] }
+tracing-subscriber = { version = "=0.3.22", features = ["parking_lot", "chrono", "regex"] }
 ## Log crate compatibility for tracing
 tracing-log = "=0.2.0"
 ## Opentracing middleware implementation for reqwest-middleware

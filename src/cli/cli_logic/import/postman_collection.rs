@@ -2,6 +2,7 @@ use std::str::FromStr;
 use std::sync::Arc;
 
 use anyhow::anyhow;
+use clap::ValueEnum;
 use parking_lot::RwLock;
 use rayon::prelude::*;
 
@@ -12,7 +13,10 @@ use crate::app::app::App;
 use crate::cli::args::ARGS;
 use crate::cli::cli_logic::import::postman_collection::ImportPostmanError::{CollectionAlreadyExists, CouldNotParseCollection, UnknownMethod};
 use crate::cli::commands::import::PostmanImport;
-use crate::models::auth::Auth;
+use crate::models::auth::auth::Auth;
+use crate::models::auth::basic::BasicAuth;
+use crate::models::auth::bearer_token::BearerToken;
+use crate::models::auth::jwt::{JwtAlgorithm, JwtSecretType, JwtToken};
 use crate::models::protocol::http::body::ContentType;
 use crate::models::collection::{Collection, CollectionFileFormat};
 use crate::models::protocol::http::http::HttpRequest;
@@ -413,7 +417,7 @@ fn retrieve_auth(request_class: &RequestClass) -> Option<Auth> {
                 }
             }
 
-            Some(Auth::BasicAuth { username, password })
+            Some(Auth::BasicAuth(BasicAuth { username, password }))
         },
         AuthType::Bearer => {
             let bearer_token_attributes = auth.bearer?;
@@ -427,7 +431,36 @@ fn retrieve_auth(request_class: &RequestClass) -> Option<Auth> {
                 }
             }
 
-            Some(Auth::BearerToken { token: bearer_token })
+            Some(Auth::BearerToken(BearerToken { token: bearer_token }))
+        },
+        AuthType::Jwt => {
+            let jwt_attributes = auth.jwt?;
+
+            let mut algorithm = String::new();
+            let mut secret = String::new();
+            let mut payload = String::new();
+
+            let mut is_secret_base64 = false;
+
+            for jwt_attribute in jwt_attributes {
+                match jwt_attribute.key.as_str() {
+                    "algorithm" => algorithm = jwt_attribute.value.unwrap().as_str()?.to_string(),
+                    "secret" => secret = jwt_attribute.value.unwrap().as_str()?.to_string(),
+                    "payload" => payload = jwt_attribute.value.unwrap().as_str()?.to_string(),
+                    "isSecretBase64Encoded" => is_secret_base64 = jwt_attribute.value.unwrap().as_bool()?,
+                    _ => {}
+                }
+            }
+
+            let algorithm = JwtAlgorithm::from_str(&algorithm, true).unwrap();
+            let mut secret_type = algorithm.default_secret_type();
+
+            match algorithm {
+                JwtAlgorithm::HS256 | JwtAlgorithm::HS384 | JwtAlgorithm::HS512 if is_secret_base64 => secret_type = JwtSecretType::Base64,
+                _ => {}
+            }
+
+            Some(Auth::JwtToken(JwtToken { algorithm, secret_type, secret, payload }))
         },
         AuthType::Awsv4 => None,
         AuthType::Digest => None,

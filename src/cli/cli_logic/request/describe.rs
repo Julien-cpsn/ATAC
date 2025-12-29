@@ -1,6 +1,9 @@
 use crate::app::app::App;
 use crate::app::business_logic::key_value::print_key_value_vector;
-use crate::models::auth::Auth;
+use crate::models::auth::auth::Auth;
+use crate::models::auth::basic::BasicAuth;
+use crate::models::auth::bearer_token::BearerToken;
+use crate::models::auth::jwt::JwtToken;
 use crate::models::protocol::http::body::ContentType;
 use crate::models::protocol::protocol::Protocol;
 
@@ -25,8 +28,9 @@ impl App<'_> {
 
         match &request.auth {
             Auth::NoAuth => {}
-            Auth::BasicAuth { username, password } => println!("auth: Basic\n\t{username}\n\t{password}"),
-            Auth::BearerToken { token: bearer_token } => println!("auth: Bearer token\n\t{bearer_token}"),
+            Auth::BasicAuth(BasicAuth { username, password }) => println!("auth: Basic\n\t{username}\n\t{password}"),
+            Auth::BearerToken(BearerToken { token: bearer_token }) => println!("auth: Bearer token\n\t{bearer_token}"),
+            Auth::JwtToken(JwtToken { algorithm, secret_type, secret, payload }) => println!("auth: JWT\n\t{algorithm}\n\t{secret_type}\n\t{secret}\n\t{payload}"),
         }
 
         if let Protocol::HttpRequest(http_request) = &request.protocol {
