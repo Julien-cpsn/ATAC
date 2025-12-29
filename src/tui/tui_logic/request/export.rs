@@ -38,19 +38,29 @@ impl App<'_> {
     pub fn tui_export_response_body(&mut self) {
         let local_selected_request = self.get_selected_request_as_local();
         let selected_request = local_selected_request.read();
-    
-        if let Some(content) = &selected_request.response.content {
-            if let ResponseContent::Body(body) = content {
-                let path = self.export_response_input.text.clone();
+
+        let path = self.export_response_input.text.clone();
+        match &selected_request.response.content {
+            None => {
+                self.tui_show_error_popup("No response to export".to_string());
+            }
+            Some(ResponseContent::Body(body)) => {
                 let body = body.clone();
-    
                 if let Err(e) = std::fs::write(&path, body) {
-                    self.tui_show_error_popup(format!("Could not save response to file: {}", e));
+                    self
+                        .tui_show_error_popup(format!("Could not save response to file: {}", e));
                 } else {
                     self.tui_show_success_popup(format!("Response saved to {}", path));
                 }
             }
+            Some(ResponseContent::Image(image_response)) => {
+                if let Err(e) = std::fs::write(&path, &image_response.data) {
+                    self
+                        .tui_show_error_popup(format!("Could not save image response to file: {}", e));
+                } else {
+                    self.tui_show_success_popup(format!("Image response saved to {}", path));
+                }
+            }
         }
-        //self.select_request_state();
     }
 }

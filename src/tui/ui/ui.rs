@@ -149,8 +149,8 @@ impl App<'_> {
             ChoosingRequestExportFormat => self.render_export_format_popup(frame),
             DisplayingRequestExport => self.display_request_export.render(frame),
             ExportingResponse => self.render_exporting_response_popup(frame),
-            DisplayingSuccessPopup => self.render_success_popup(frame, self.validation_popup.message.clone()),
-            DisplayingErrorPopup => self.render_error_popup(frame, self.validation_popup.message.clone()),
+            DisplayingSuccessPopup => self.render_success_popup(frame, self.export_confirmation_popup.message.clone()),
+            DisplayingErrorPopup => self.render_error_popup(frame, self.export_confirmation_popup.message.clone()),
             _ => {}
         }
 

@@ -318,16 +318,17 @@ impl App<'_> {
     }
 
     pub fn export_response_state(&mut self) {
+        self.export_response_input.reset_input();
         self.set_app_state(AppState::ExportingResponse);
     }
 
     pub fn tui_show_error_popup(&mut self, message: String) {
-        self.validation_popup.set_message(message);
+        self.export_confirmation_popup.set_message(message);
         self.set_app_state(AppState::DisplayingErrorPopup);
     }
 
     pub fn tui_show_success_popup(&mut self, message: String) {
-        self.validation_popup.set_message(message);
+        self.export_confirmation_popup.set_message(message);
         self.set_app_state(AppState::DisplayingSuccessPopup);
     }
 }
