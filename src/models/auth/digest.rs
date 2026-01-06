@@ -163,6 +163,13 @@ pub fn next_digest_algorithm(algorithm: &DigestAlgorithm) -> DigestAlgorithm {
 }
 
 impl DigestQop {
+    pub fn from_digest_auth_qop(qop: digest_auth::Qop) -> Self {
+        match qop {
+            digest_auth::Qop::AUTH => DigestQop::Auth,
+            digest_auth::Qop::AUTH_INT => DigestQop::AuthInt,
+        }
+    }
+    
     fn to_digest_auth_qop(&self) -> Option<Vec<digest_auth::Qop>> {
         match self {
             DigestQop::None => None,

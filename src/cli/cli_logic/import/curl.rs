@@ -1,16 +1,16 @@
+use anyhow::anyhow;
 use std::fs;
 use std::path::PathBuf;
 use std::str::FromStr;
 use std::sync::Arc;
-use anyhow::anyhow;
 
 use parking_lot::RwLock;
-use regex::{Captures, Regex};
-use reqwest::header::{HeaderName, HeaderValue, CONTENT_TYPE};
+use rayon::prelude::*;
+use regex::Regex;
+use reqwest::header::CONTENT_TYPE;
 use reqwest::Url;
 use thiserror::Error;
 use walkdir::WalkDir;
-use rayon::prelude::*;
 
 use crate::app::app::App;
 use crate::cli::args::ARGS;
@@ -20,9 +20,9 @@ use crate::models::auth::auth::Auth;
 use crate::models::auth::basic::BasicAuth;
 use crate::models::auth::bearer_token::BearerToken;
 use crate::models::auth::digest::{extract_www_authenticate_digest_data, Digest, DigestAlgorithm, DigestCharset, DigestQop};
+use crate::models::collection::Collection;
 use crate::models::protocol::http::body::ContentType;
 use crate::models::protocol::http::body::ContentType::NoBody;
-use crate::models::collection::Collection;
 use crate::models::protocol::http::http::HttpRequest;
 use crate::models::protocol::http::method::Method;
 use crate::models::protocol::protocol::Protocol;

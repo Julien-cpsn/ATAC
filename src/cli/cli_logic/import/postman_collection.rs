@@ -490,6 +490,10 @@ fn retrieve_auth(request_class: &RequestClass) -> Option<anyhow::Result<Auth>> {
                         Ok(new_algorithm) => algorithm = DigestAlgorithm::from_digest_auth_algorithm(new_algorithm),
                         Err(_) => return Some(Err(anyhow!(DigestError::InvalidAlgorithm(value))))
                     },
+                    "qop" => match digest_auth::Qop::from_str(&value) {
+                        Ok(new_qop) => qop = DigestQop::from_digest_auth_qop(new_qop),
+                        Err(_) => return Some(Err(anyhow!(DigestError::InvalidAlgorithm(value))))
+                    },
                     _ => {}
                 }
             }
