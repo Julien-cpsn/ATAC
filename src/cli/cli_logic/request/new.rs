@@ -6,6 +6,7 @@ use crate::cli::commands::request_commands::new::{AuthArgs, BodyArgs, NewRequest
 use crate::models::auth::auth::Auth;
 use crate::models::auth::basic::BasicAuth;
 use crate::models::auth::bearer_token::BearerToken;
+use crate::models::auth::digest::{extract_www_authenticate_digest_data, Digest};
 use crate::models::auth::jwt::{JwtAlgorithm, JwtSecretType, JwtToken};
 use crate::models::protocol::http::body::ContentType;
 use crate::models::protocol::http::method::Method;
@@ -14,6 +15,7 @@ use crate::models::request::{ConsoleOutput, KeyValue, Request, DEFAULT_HEADERS};
 use crate::models::response::RequestResponse;
 use crate::models::scripts::RequestScripts;
 use crate::models::settings::{RequestSettings, Setting};
+use crate::panic_error;
 
 impl App<'_> {
     pub fn cli_new_request(&mut self, collection_slash_request: (String, String), new_request_command: NewRequestCommand) -> anyhow::Result<()> {
@@ -103,19 +105,19 @@ fn string_array_to_key_value_array(string_array: Vec<String>) -> Vec<KeyValue> {
 
 fn get_auth_from_auth_args(auth_args: AuthArgs) -> anyhow::Result<Auth> {
     if !auth_args.auth_basic.is_empty() {
-        return Ok(
+        Ok(
             Auth::BasicAuth(BasicAuth {
                 username: auth_args.auth_basic[0].clone(),
                 password: auth_args.auth_basic[1].clone()
             })
-        );
+        )
     }
     else if !auth_args.auth_bearer_token.is_empty() {
-        return Ok(Auth::BearerToken(
+        Ok(Auth::BearerToken(
             BearerToken {
                 token: auth_args.auth_bearer_token[0].clone()
             })
-        );
+        )
     }
     else if !auth_args.auth_jwt_token.is_empty() {
         return Ok(Auth::JwtToken(
@@ -126,6 +128,28 @@ fn get_auth_from_auth_args(auth_args: AuthArgs) -> anyhow::Result<Auth> {
                 payload: auth_args.auth_jwt_token[3].clone(),
             }
         ));
+    }
+    else if !auth_args.auth_digest.is_empty() {
+        let www_authenticate_header = &auth_args.auth_digest[2];
+        return match extract_www_authenticate_digest_data(www_authenticate_header) {
+            Ok((domains, realm, nonce, opaque, stale, algorithm, qop, user_hash, charset)) => Ok(Auth::Digest(
+                Digest {
+                    username: auth_args.auth_digest[0].clone(),
+                    password: auth_args.auth_digest[1].clone(),
+                    domains,
+                    realm,
+                    nonce,
+                    opaque,
+                    stale,
+                    algorithm,
+                    qop,
+                    user_hash,
+                    charset,
+                    nc: 0,
+                }
+            )),
+            Err(error) => panic_error(error)
+        };
     }
     else {
         return Ok(Auth::NoAuth);

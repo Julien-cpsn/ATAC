@@ -178,8 +178,9 @@ cargo run -- -h
 | Authentication                                                                 | Partial                                                                             | :white_check_mark:   | :white_check_mark:       |
 | - Basic auth                                                                   | :white_check_mark:                                                                  | :white_check_mark:   | :white_check_mark:       |
 | - Bearer token                                                                 | :white_check_mark:                                                                  | :white_check_mark:   | :white_check_mark:       |
+| - Digest                                                                       | :white_check_mark:                                                                  | :white_check_mark:   | :white_check_mark:       |
 | - JWT                                                                          | :white_check_mark:                                                                  | :white_check_mark:   | :white_check_mark:       |
-| - Digest, OAuth1-2, AWS                                                        | :x: :soon:                                                                          | :white_check_mark:   | :white_check_mark:       |
+| - OAuth1-2, AWS                                                                | :x: :soon:                                                                          | :white_check_mark:   | :white_check_mark:       |
 | Headers                                                                        | :white_check_mark:                                                                  | :white_check_mark:   | :white_check_mark:       |
 | Body                                                                           | :white_check_mark:                                                                  | :white_check_mark:   | :white_check_mark:       |
 | - Multipart form                                                               | :white_check_mark:                                                                  | :white_check_mark:   | :white_check_mark:       |
@@ -331,6 +332,7 @@ You can read more about it here: https://github.com/Julien-cpsn/ATAC/releases/ta
 | [directories](https://github.com/soc/directories-rs)                             | 6.0.0       | Use system files                                                                       |
 | [arboard](https://github.com/1Password/arboard)                                  | 3.6.1       | Copy response body to clipboard                                                        |
 | [jsonwebtoken](https://github.com/Keats/jsonwebtoken)                            | 10.2.0      | Create and encode JSON Web Tokens (JWT)                                                |
+| [digest_auth](https://git.ondrovo.com/packages/digest_auth_rs)                   | 0.3.1       | Decode www-authenticate header and format digest auth authorization                    |
 | **Async**                                                                        |             |                                                                                        |
 | [tokio](https://github.com/tokio-rs/tokio)                                       | 1.48.0      | Handle asynchronous requests                                                           |
 | [parking_lot](https://github.com/Amanieu/parking_lot)                            | 0.12.5      | Smaller, faster and more flexible implementation of RwLock and Mutex. Used everywhere. |

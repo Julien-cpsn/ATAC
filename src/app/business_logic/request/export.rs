@@ -7,9 +7,11 @@ use thiserror::Error;
 use crate::app::app::App;
 use crate::app::business_logic::request::export::ExportError::{CouldNotOpenFile, CouldNotParseUrl, ExportFormatNotSupported};
 use crate::app::business_logic::request::send::get_file_content_with_name;
+use crate::app::business_logic::utils::to_train_case;
 use crate::models::auth::auth::Auth;
 use crate::models::auth::basic::BasicAuth;
 use crate::models::auth::bearer_token::BearerToken;
+use crate::models::auth::digest::{digest_to_authorization_header, Digest};
 use crate::models::auth::jwt::{jwt_do_jaat, JwtToken};
 use crate::models::protocol::http::body::ContentType::{File, Form, Html, Javascript, Json, Multipart, NoBody, Raw, Xml};
 use crate::models::export::ExportFormat;
@@ -42,7 +44,11 @@ impl App<'_> {
             Err(_) => return Err(anyhow!(CouldNotParseUrl))
         };
 
-        let headers = self.key_value_vec_to_tuple_vec(&request.headers);
+        let headers = self
+            .key_value_vec_to_tuple_vec(&request.headers)
+            .iter()
+            .map(|(k, v)| (to_train_case(k), v.to_owned()))
+            .collect();
 
         let export = match request.protocol {
             Protocol::HttpRequest(_) => match export_format {
@@ -70,7 +76,7 @@ impl App<'_> {
     }
 
     fn raw_html(&self, mut output: String, request: &Request, url: Url, headers: Vec<(String, String)>) -> anyhow::Result<String> {
-        let http_request = request.get_http_request().unwrap();
+        let http_request = request.get_http_request()?;
 
         /* URL & Query params */
 
@@ -112,7 +118,26 @@ impl App<'_> {
                 let payload = self.replace_env_keys_by_value(payload);
 
                 let token = jwt_do_jaat(algorithm, secret_type, secret, payload)?;
-                format!("Authorization: Bearer {}", token)
+                format!("\nAuthorization: Bearer {}", token)
+            }
+            Auth::Digest(Digest { username, password, domains, realm, nonce, opaque, stale, algorithm, qop, user_hash, charset, nc }) => {
+                let digest_header = digest_to_authorization_header(
+                    username,
+                    password,
+                    url.path(),
+                    domains.clone(),
+                    realm.clone(),
+                    nonce.clone(),
+                    opaque.clone(),
+                    *stale,
+                    algorithm,
+                    &qop,
+                    *user_hash,
+                    &charset,
+                    *nc
+                );
+
+                format!("\nAuthorization: {}", digest_header)
             }
         };
 
@@ -235,6 +260,25 @@ impl App<'_> {
 
                 let token = jwt_do_jaat(algorithm, secret_type, secret, payload)?;
                 format!("\n--header 'Authorization: Bearer {}' \\", token)
+            },
+            Auth::Digest(Digest { username, password, domains, realm, nonce, opaque, stale, algorithm, qop, user_hash, charset, nc }) => {
+                let digest_header = digest_to_authorization_header(
+                    username,
+                    password,
+                    url.path(),
+                    domains.clone(),
+                    realm.clone(),
+                    nonce.clone(),
+                    opaque.clone(),
+                    *stale,
+                    algorithm,
+                    &qop,
+                    *user_hash,
+                    &charset,
+                    *nc
+                );
+
+                format!("\n--header 'Authorization: Bearer {}' \\", digest_header)
             }
         };
 
@@ -315,6 +359,8 @@ impl App<'_> {
     }
     
     fn php_guzzle(&self, mut output: String, request: &Request, url: Url, headers: Vec<(String, String)>) -> anyhow::Result<String> {
+        let escape_char = '\'';
+
         let http_request = request.get_http_request()?;
 
         output += "<?php\n$client = new GuzzleHttp\\Client();\n";
@@ -329,26 +375,45 @@ impl App<'_> {
                 let username = self.replace_env_keys_by_value(username);
                 let password = self.replace_env_keys_by_value(password);
 
-                format!("\n    'Authorization' => '{}',", encode_basic_auth(&username, &password))
+                format!("\n    'Authorization' => '{}',", escape(encode_basic_auth(&username, &password), escape_char))
             },
             Auth::BearerToken(BearerToken { token }) => {
                 let bearer_token = self.replace_env_keys_by_value(token);
 
-                format!("\n    'Authorization' => 'Bearer {}',", bearer_token)
+                format!("\n    'Authorization' => 'Bearer {}',", escape(bearer_token, escape_char))
             },
             Auth::JwtToken(JwtToken { algorithm, secret_type, secret, payload }) => {
                 let secret = self.replace_env_keys_by_value(secret);
                 let payload = self.replace_env_keys_by_value(payload);
 
                 let token = jwt_do_jaat(algorithm, secret_type, secret, payload)?;
-                format!("\n--header 'Authorization: Bearer {}' \\", token)
+                format!("\n    'Authorization' => 'Bearer {}',", escape(token, escape_char))
+            },
+            Auth::Digest(Digest { username, password, domains, realm, nonce, opaque, stale, algorithm, qop, user_hash, charset, nc }) => {
+                let digest_header = digest_to_authorization_header(
+                    username,
+                    password,
+                    url.path(),
+                    domains.clone(),
+                    realm.clone(),
+                    nonce.clone(),
+                    opaque.clone(),
+                    *stale,
+                    algorithm,
+                    &qop,
+                    *user_hash,
+                    &charset,
+                    *nc
+                );
+
+                format!("\n    'Authorization' => '{}',", escape(digest_header, escape_char))
             }
         };
 
         /* Headers */
 
         for (header, value) in &headers {
-            headers_str += &format!("\n    '{}' => '{}',", header, value);
+            headers_str += &format!("\n    '{}' => '{}',", escape(header, escape_char), escape(value, escape_char));
         }
 
         /* Proxy */
@@ -407,12 +472,12 @@ impl App<'_> {
                         let file_path = &value[2..];
                         multipart_output += &format!(
                             "\n        [\n            'name' => '{}',\n            'contents' => fopen('{}', 'r'),\n            'filename' => basename('{}')\n        ],",
-                            key, file_path, file_path
+                            escape(key, escape_char), file_path, file_path
                         );
                     } else {
                         multipart_output += &format!(
                             "\n        [\n            'name' => '{}',\n            'contents' => '{}'\n        ],",
-                            key, value
+                            escape(key, escape_char), escape(value, escape_char)
                         );
                     }
                 }
@@ -426,7 +491,7 @@ impl App<'_> {
                 let form = self.key_value_vec_to_tuple_vec(form_data);
 
                 for (key, value) in form {
-                    form_output += &format!("\n        '{}' => '{}',", key, value);
+                    form_output += &format!("\n        '{}' => '{}',", escape(key, escape_char), escape(value, escape_char));
                 }
 
                 form_output += "\n    ]\n];\n";
@@ -434,7 +499,7 @@ impl App<'_> {
             }
             Raw(body) | Json(body) | Xml(body) | Html(body) | Javascript(body) => {
                 has_body = true;
-                output += &format!("\n$body = '{}';\n", body);
+                output += &format!("\n$body = '{}';\n", escape(body, escape_char));
 
                 if matches!(http_request.body, Json(_)) {
                     options_str = Some("\n$options = [\n    'json' => json_decode($body, true)\n];\n".to_string());
@@ -468,6 +533,8 @@ impl App<'_> {
     }
     
     fn node_axios(&self, mut output: String, request: &Request, url: Url, headers: Vec<(String, String)>) -> anyhow::Result<String> {
+        let escape_char = '\'';
+        
         let http_request = request.get_http_request()?;
 
         output += "const axios = require('axios');\n";
@@ -486,24 +553,43 @@ impl App<'_> {
             Auth::BasicAuth(BasicAuth { username, password }) => {
                 let username = self.replace_env_keys_by_value(username);
                 let password = self.replace_env_keys_by_value(password);
-                output += &format!("    'Authorization': '{}',\n", encode_basic_auth(&username, &password));
+                output += &format!("    'Authorization': '{}',\n", escape(encode_basic_auth(&username, &password), escape_char));
             },
             Auth::BearerToken(BearerToken { token }) => {
                 let bearer_token = self.replace_env_keys_by_value(token);
-                output += &format!("    'Authorization': 'Bearer {}',\n", bearer_token);
+                output += &format!("    'Authorization': 'Bearer {}',\n", escape(bearer_token, escape_char));
             },
             Auth::JwtToken(JwtToken { algorithm, secret_type, secret, payload }) => {
                 let secret = self.replace_env_keys_by_value(secret);
                 let payload = self.replace_env_keys_by_value(payload);
 
                 let token = jwt_do_jaat(algorithm, secret_type, secret, payload)?;
-                output += &format!("    'Authorization': 'Bearer {}',\n", token);
+                output += &format!("    'Authorization': 'Bearer {}',\n", escape(token, escape_char));
+            },
+            Auth::Digest(Digest { username, password, domains, realm, nonce, opaque, stale, algorithm, qop, user_hash, charset, nc }) => {
+                let digest_header = digest_to_authorization_header(
+                    username,
+                    password,
+                    url.path(),
+                    domains.clone(),
+                    realm.clone(),
+                    nonce.clone(),
+                    opaque.clone(),
+                    *stale,
+                    algorithm,
+                    &qop,
+                    *user_hash,
+                    &charset,
+                    *nc
+                );
+
+                output += &format!("    'Authorization': '{}',\n", escape(digest_header, escape_char))
             }
         };
 
         /* Regular Headers */
         for (header, value) in &headers {
-            output += &format!("    '{}': '{}',\n", header, value);
+            output += &format!("    '{}': '{}',\n", header, escape(value, escape_char));
         }
 
         output += "  }";
@@ -537,7 +623,7 @@ impl App<'_> {
                         let file_path = &value[2..];
                         output += &format!("formData.append('{}', fs.createReadStream('{}'));\n", key, file_path);
                     } else {
-                        output += &format!("formData.append('{}', '{}');\n", key, value);
+                        output += &format!("formData.append('{}', '{}');\n", escape(key, escape_char), escape(value, escape_char));
                     }
                 }
 
@@ -551,23 +637,23 @@ impl App<'_> {
 
                 let form = self.key_value_vec_to_tuple_vec(form_data);
                 for (key, value) in form {
-                    output += &format!("params.append('{}', '{}');\n", key, value);
+                    output += &format!("params.append('{}', '{}');\n", escape(key, escape_char), escape(value, escape_char));
                 }
 
                 output += "\nconfig.data = params;\n";
             }
             Raw(body) => {
                 output += ",\n  data: '";
-                output += body;
+                output += &escape(body, escape_char);
                 output += "'";
             }
             Json(body) => {
                 output += ",\n  data: ";
-                output += body;
+                output += &escape(body, escape_char);
             }
             Xml(body) | Html(body) | Javascript(body) => {
                 output += ",\n  data: '";
-                output += body;
+                output += &escape(body, escape_char);
                 output += "'";
             }
         };
@@ -604,6 +690,8 @@ impl App<'_> {
     }
     
     fn rust_request(&self, mut output: String, request: &Request, url: Url, headers: Vec<(String, String)>) -> anyhow::Result<String> {
+        let escape_char = '"';
+
         let method = match &request.protocol {
             Protocol::HttpRequest(http_request) => http_request.method.to_string(),
             Protocol::WsRequest(_) => Method::GET.to_string()
@@ -615,7 +703,7 @@ impl App<'_> {
 
         for (header, value) in &headers {
             has_headers = true;
-            headers_str += &format!("        .header(\"{}\", \"{}\")\n", header, value);
+            headers_str += &format!("        .header(\"{}\", \"{}\")\n", escape(header, escape_char), escape(value, escape_char));
         }
 
         /* Auth */
@@ -625,19 +713,38 @@ impl App<'_> {
                 let username = self.replace_env_keys_by_value(username);
                 let password = self.replace_env_keys_by_value(password);
                 has_headers = true;
-                headers_str += &format!("        .header(\"Authorization\", \"{}\")\n", encode_basic_auth(&username, &password));
+                headers_str += &format!("        .header(\"Authorization\", \"{}\")\n", escape(encode_basic_auth(&username, &password), escape_char));
             },
             Auth::BearerToken(BearerToken { token }) => {
                 let bearer_token = self.replace_env_keys_by_value(token);
                 has_headers = true;
-                headers_str += &format!("        .header(\"Authorization\", \"Bearer {}\")\n", bearer_token);
+                headers_str += &format!("        .header(\"Authorization\", \"Bearer {}\")\n", escape(bearer_token, escape_char));
             },
             Auth::JwtToken(JwtToken { algorithm, secret_type, secret, payload }) => {
                 let secret = self.replace_env_keys_by_value(secret);
                 let payload = self.replace_env_keys_by_value(payload);
 
                 let token = jwt_do_jaat(algorithm, secret_type, secret, payload)?;
-                headers_str += &format!("        .header(\"Authorization\", \"Bearer {}\")\n", token);
+                headers_str += &format!("        .header(\"Authorization\", \"Bearer {}\")\n", escape(token, escape_char));
+            },
+            Auth::Digest(Digest { username, password, domains, realm, nonce, opaque, stale, algorithm, qop, user_hash, charset, nc }) => {
+                let digest_header = digest_to_authorization_header(
+                    username,
+                    password,
+                    url.path(),
+                    domains.clone(),
+                    realm.clone(),
+                    nonce.clone(),
+                    opaque.clone(),
+                    *stale,
+                    algorithm,
+                    &qop,
+                    *user_hash,
+                    &charset,
+                    *nc
+                );
+
+                headers_str += &format!("        .header(\"Authorization\", \"{}\")\n", escape(digest_header, escape_char));
             }
         };
 
@@ -698,9 +805,9 @@ impl App<'_> {
 
                         if value.starts_with("!!") {
                             let file_path = &value[2..];
-                            output += &format!("\n        .part(\"{}\", Part::file(\"{}\")?)", key, file_path);
+                            output += &format!("\n        .part(\"{}\", Part::file(\"{}\")?)", escape(key, escape_char), file_path);
                         } else {
-                            output += &format!("\n        .text(\"{}\", \"{}\")", key, value);
+                            output += &format!("\n        .text(\"{}\", \"{}\")", escape(key, escape_char), escape(value, escape_char));
                         }
                     }
 
@@ -712,22 +819,22 @@ impl App<'_> {
 
                     let form = self.key_value_vec_to_tuple_vec(form_data);
                     for (key, value) in form {
-                        output += &format!("    form.insert(\"{}\", \"{}\");\n", key, value);
+                        output += &format!("    form.insert(\"{}\", \"{}\");\n", escape(key, escape_char), escape(value, escape_char));
                     }
 
                     output += "\n";
                     body_str += "        .form(&form)\n";
                 },
                 Raw(body) => {
-                    body_str += &format!("        .body(\"{}\")\n", body);
+                    body_str += &format!("        .body(r#\"{}\"#)\n", body);
                 },
                 Json(body) => {
-                    body_str += &format!("        .json(&{})\n", body);
+                    body_str += &format!("        .json(r#\"{}\"#)\n", body);
                 },
                 Xml(body) | Html(body) | Javascript(body) => {
                     has_headers = true;
                     headers_str += &format!("            .header(\"Content-Type\", \"{}\")\n", http_request.body.to_content_type());
-                    body_str += &format!("        .body(\"{}\")\n", body);
+                    body_str += &format!("        .body(r#\"{}\"#)\n", body);
                 }
             }
             Protocol::WsRequest(_) => {}
@@ -803,4 +910,10 @@ fn encode_basic_auth(username: &String, password: &String) -> String {
     }
 
     String::from_utf8_lossy(&buf).to_string()
+}
+
+fn escape<T: AsRef<str>>(text: T, to_escape: char) -> String {
+    text
+        .as_ref()
+        .replace(to_escape, &format!("\\{to_escape}"))
 }

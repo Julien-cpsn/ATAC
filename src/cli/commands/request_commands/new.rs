@@ -25,51 +25,51 @@ pub struct NewRequestCommand {
 
     /// Do not use base headers
     /// (cache-control, user-agent, accept, accept-encoding, connection)
-    #[arg(long, default_value_t = false, display_order = 6)]
+    #[arg(long, default_value_t = false, display_order = 7)]
     pub no_base_headers: bool,
 
     /// Add a header
     /// (can be used multiple times)
-    #[arg(long, action = clap::ArgAction::Append, num_args = 2, value_names = ["KEY", "VALUE"], display_order = 7)]
+    #[arg(long, action = clap::ArgAction::Append, num_args = 2, value_names = ["KEY", "VALUE"], display_order = 8)]
     pub add_header: Vec<String>,
 
     #[command(flatten)]
     pub body: BodyArgs,
 
     /// Set a pre-request script
-    #[arg(long, display_order = 16)]
+    #[arg(long, display_order = 17)]
     pub pre_request_script: Option<String>,
 
     /// Set a post-request script
-    #[arg(long, display_order = 17)]
+    #[arg(long, display_order = 18)]
     pub post_request_script: Option<String>,
 
     /// Do not use config proxy
-    #[arg(long, default_value_t = false, display_order = 18)]
+    #[arg(long, default_value_t = false, display_order = 19)]
     pub no_proxy: bool,
 
     /// Do not allow redirects
-    #[arg(long, default_value_t = false, display_order = 19)]
+    #[arg(long, default_value_t = false, display_order = 20)]
     pub no_redirects: bool,
 
     /// Timeout (ms)
-    #[arg(long, default_value_t = 30000, display_order = 20)]
+    #[arg(long, default_value_t = 30000, display_order = 21)]
     pub timeout: u32,
 
     /// Do not store received cookies
-    #[arg(long, default_value_t = false, display_order = 21)]
+    #[arg(long, default_value_t = false, display_order = 22)]
     pub no_cookies: bool,
 
     /// Do not pretty print response content
-    #[arg(long, default_value_t = false, display_order = 22)]
+    #[arg(long, default_value_t = false, display_order = 23)]
     pub no_pretty: bool,
 
     /// Accept invalid certificates
-    #[arg(long, default_value_t = false, display_order = 23)]
+    #[arg(long, default_value_t = false, display_order = 24)]
     pub accept_invalid_certs: bool,
 
     /// Accept invalid hostnames
-    #[arg(long, default_value_t = false, display_order = 24)]
+    #[arg(long, default_value_t = false, display_order = 25)]
     pub accept_invalid_hostnames: bool
 }
 
@@ -87,43 +87,47 @@ pub struct AuthArgs {
     /// Set a JWT token auth method
     #[arg(long, group = "auth", action = clap::ArgAction::Set, num_args = 4, value_names = ["ALGORITHM", "SECRET_TYPE", "SECRET", "PAYLOAD"], display_order = 5)]
     pub auth_jwt_token: Vec<String>,
+
+    /// Set a digest auth method
+    #[arg(long, group = "auth", action = clap::ArgAction::Set, num_args = 3, value_names = ["USERNAME", "PASSWORD", "WWW_AUTHENTICATE_HEADER"], display_order = 6)]
+    pub auth_digest: Vec<String>,
 }
 
 #[derive(clap::Args, Debug, Clone)]
 #[group(multiple = false)]
 pub struct BodyArgs {
     /// Set a file body
-    #[arg(long, group = "body", value_name = "FILE_PATH", value_hint = clap::ValueHint::FilePath, display_order = 7)]
+    #[arg(long, group = "body", value_name = "FILE_PATH", value_hint = clap::ValueHint::FilePath, display_order = 9)]
     pub body_file: Option<String>,
 
     /// Set a multipart form body
     /// (adds a value each time used)
-    #[arg(long, action = clap::ArgAction::Append, num_args = 2, value_names = ["KEY", "VALUE"], display_order = 8)]
+    #[arg(long, action = clap::ArgAction::Append, num_args = 2, value_names = ["KEY", "VALUE"], display_order = 10)]
     pub add_body_multipart: Vec<String>,
 
     /// Set a form body
     /// (adds a value each time used)
-    #[arg(long, action = clap::ArgAction::Append, num_args = 2, value_names = ["KEY", "VALUE"], display_order = 9)]
+    #[arg(long, action = clap::ArgAction::Append, num_args = 2, value_names = ["KEY", "VALUE"], display_order = 11)]
     pub add_body_form: Vec<String>,
 
     /// Set a raw test body
-    #[arg(long, group = "body", value_name = "TEXT", display_order = 10)]
+    #[arg(long, group = "body", value_name = "TEXT", display_order = 12)]
     pub body_raw: Option<String>,
 
     /// Set a JSON body
-    #[arg(long, group = "body", value_name = "JSON", display_order = 11)]
+    #[arg(long, group = "body", value_name = "JSON", display_order = 13)]
     pub body_json: Option<String>,
 
     /// Set an XML body
-    #[arg(long, group = "body", value_name = "XML", display_order = 12)]
+    #[arg(long, group = "body", value_name = "XML", display_order = 14)]
     pub body_xml: Option<String>,
 
     /// Set an HTML body
-    #[arg(long, group = "body", value_name = "HTML", display_order = 13)]
+    #[arg(long, group = "body", value_name = "HTML", display_order = 15)]
     pub body_html: Option<String>,
 
     /// Set an JavaScript body
-    #[arg(long, group = "body", value_name = "JAVASCRIPT", display_order = 14)]
+    #[arg(long, group = "body", value_name = "JAVASCRIPT", display_order = 16)]
     pub body_javascript: Option<String>,
 }
 

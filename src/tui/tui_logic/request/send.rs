@@ -6,6 +6,7 @@ use tracing::info;
 use crate::app::app::App;
 use crate::app::business_logic::request::http::send::send_http_request;
 use crate::app::business_logic::request::ws::send::send_ws_request;
+use crate::models::auth::auth::Auth;
 use crate::models::protocol::protocol::Protocol;
 
 impl App<'_> {
@@ -73,18 +74,26 @@ impl App<'_> {
                 Protocol::WsRequest(_) => send_ws_request(prepared_request, local_selected_request.clone(), &local_env, local_should_refresh_scrollbars.clone()).await
             };
 
-            let response = match response {
-                Ok(response) => response,
+            match response {
+                Ok(response) => {
+                    let mut selected_request = local_selected_request.write();
+
+                    match &mut selected_request.auth {
+                        Auth::Digest(digest) => digest.update_from_www_authenticate_header(&response.headers),
+                        _ => {}
+                    }
+
+                    selected_request.response = response;
+
+                    *local_should_refresh_scrollbars.lock() = true;
+                    return;
+                },
                 Err(response_error) => {
                     let mut selected_request = local_selected_request.write();
                     selected_request.response.status_code = Some(response_error.to_string());
                     return;
                 }
             };
-
-            let mut selected_request = local_selected_request.write();
-            selected_request.response = response;
-            *local_should_refresh_scrollbars.lock() = true;
         });
     }
 }

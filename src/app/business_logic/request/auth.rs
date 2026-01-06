@@ -84,7 +84,7 @@ impl App<'_> {
         self.save_collection_to_file(collection_index);
     }
 
-    pub fn modify_request_auth_secret(&mut self, collection_index: usize, request_index: usize, secret: String) {
+    pub fn modify_request_auth_jwt_secret(&mut self, collection_index: usize, request_index: usize, secret: String) {
         let local_selected_request = self.get_request_as_local_from_indexes(&(collection_index, request_index));
 
         {
@@ -99,7 +99,7 @@ impl App<'_> {
         self.save_collection_to_file(collection_index);
     }
 
-    pub fn modify_request_auth_payload(&mut self, collection_index: usize, request_index: usize, payload: String) {
+    pub fn modify_request_auth_jwt_payload(&mut self, collection_index: usize, request_index: usize, payload: String) {
         let local_selected_request = self.get_request_as_local_from_indexes(&(collection_index, request_index));
 
         {
@@ -114,4 +114,93 @@ impl App<'_> {
         self.save_collection_to_file(collection_index);
     }
 
+    pub fn modify_request_auth_digest_username(&mut self, collection_index: usize, request_index: usize, username: String) {
+        let local_selected_request = self.get_request_as_local_from_indexes(&(collection_index, request_index));
+
+        {
+            let mut selected_request = local_selected_request.write();
+            let digest = selected_request.auth.get_digest_mut();
+
+            info!("Auth digest username set to \"{}\"", username);
+
+            digest.username = username.to_string();
+        }
+
+        self.save_collection_to_file(collection_index);
+    }
+
+    pub fn modify_request_auth_digest_password(&mut self, collection_index: usize, request_index: usize, password: String) {
+        let local_selected_request = self.get_request_as_local_from_indexes(&(collection_index, request_index));
+
+        {
+            let mut selected_request = local_selected_request.write();
+            let digest = selected_request.auth.get_digest_mut();
+
+            info!("Auth digest password set to \"{}\"", password);
+
+            digest.password = password.to_string();
+        }
+
+        self.save_collection_to_file(collection_index);
+    }
+
+    pub fn modify_request_auth_digest_domains(&mut self, collection_index: usize, request_index: usize, domains: String) {
+        let local_selected_request = self.get_request_as_local_from_indexes(&(collection_index, request_index));
+
+        {
+            let mut selected_request = local_selected_request.write();
+            let digest = selected_request.auth.get_digest_mut();
+
+            info!("Auth digest domains set to \"{}\"", domains);
+
+            digest.domains = domains.to_string();
+        }
+
+        self.save_collection_to_file(collection_index);
+    }
+
+    pub fn modify_request_auth_digest_realm(&mut self, collection_index: usize, request_index: usize, realm: String) {
+        let local_selected_request = self.get_request_as_local_from_indexes(&(collection_index, request_index));
+
+        {
+            let mut selected_request = local_selected_request.write();
+            let digest = selected_request.auth.get_digest_mut();
+
+            info!("Auth digest realm set to \"{}\"", realm);
+
+            digest.realm = realm.to_string();
+        }
+
+        self.save_collection_to_file(collection_index);
+    }
+
+    pub fn modify_request_auth_digest_nonce(&mut self, collection_index: usize, request_index: usize, nonce: String) {
+        let local_selected_request = self.get_request_as_local_from_indexes(&(collection_index, request_index));
+
+        {
+            let mut selected_request = local_selected_request.write();
+            let digest = selected_request.auth.get_digest_mut();
+
+            info!("Auth digest nonce set to \"{}\"", nonce);
+
+            digest.nonce = nonce.to_string();
+        }
+
+        self.save_collection_to_file(collection_index);
+    }
+
+    pub fn modify_request_auth_digest_opaque(&mut self, collection_index: usize, request_index: usize, opaque: String) {
+        let local_selected_request = self.get_request_as_local_from_indexes(&(collection_index, request_index));
+
+        {
+            let mut selected_request = local_selected_request.write();
+            let digest = selected_request.auth.get_digest_mut();
+
+            info!("Auth digest opaque set to \"{}\"", opaque);
+
+            digest.opaque = opaque.to_string();
+        }
+
+        self.save_collection_to_file(collection_index);
+    }
 }

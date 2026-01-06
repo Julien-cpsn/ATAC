@@ -230,23 +230,23 @@ get_key_bindings! {
 
         /* Auth */
 
-        ModifyRequestAuthUsername(EventKeyBinding),
-        EditingRequestAuthUsernameDeleteCharBackward(EventKeyBinding),
-        EditingRequestAuthUsernameDeleteCharForward(EventKeyBinding),
-        EditingRequestAuthUsernameMoveCursorLeft(EventKeyBinding),
-        EditingRequestAuthUsernameMoveCursorRight(EventKeyBinding),
-        EditingRequestAuthUsernameMoveCursorLineStart(EventKeyBinding),
-        EditingRequestAuthUsernameMoveCursorLineEnd(EventKeyBinding),
-        EditingRequestAuthUsernameCharInput(EventKeyBinding),
+        ModifyRequestAuthBasicUsername(EventKeyBinding),
+        EditingRequestAuthBasicUsernameDeleteCharBackward(EventKeyBinding),
+        EditingRequestAuthBasicUsernameDeleteCharForward(EventKeyBinding),
+        EditingRequestAuthBasicUsernameMoveCursorLeft(EventKeyBinding),
+        EditingRequestAuthBasicUsernameMoveCursorRight(EventKeyBinding),
+        EditingRequestAuthBasicUsernameMoveCursorLineStart(EventKeyBinding),
+        EditingRequestAuthBasicUsernameMoveCursorLineEnd(EventKeyBinding),
+        EditingRequestAuthBasicUsernameCharInput(EventKeyBinding),
 
-        ModifyRequestAuthPassword(EventKeyBinding),
-        EditingRequestAuthPasswordDeleteCharBackward(EventKeyBinding),
-        EditingRequestAuthPasswordDeleteCharForward(EventKeyBinding),
-        EditingRequestAuthPasswordMoveCursorLeft(EventKeyBinding),
-        EditingRequestAuthPasswordMoveCursorRight(EventKeyBinding),
-        EditingRequestAuthPasswordMoveCursorLineStart(EventKeyBinding),
-        EditingRequestAuthPasswordMoveCursorLineEnd(EventKeyBinding),
-        EditingRequestAuthPasswordCharInput(EventKeyBinding),
+        ModifyRequestAuthBasicPassword(EventKeyBinding),
+        EditingRequestAuthBasicPasswordDeleteCharBackward(EventKeyBinding),
+        EditingRequestAuthBasicPasswordDeleteCharForward(EventKeyBinding),
+        EditingRequestAuthBasicPasswordMoveCursorLeft(EventKeyBinding),
+        EditingRequestAuthBasicPasswordMoveCursorRight(EventKeyBinding),
+        EditingRequestAuthBasicPasswordMoveCursorLineStart(EventKeyBinding),
+        EditingRequestAuthBasicPasswordMoveCursorLineEnd(EventKeyBinding),
+        EditingRequestAuthBasicPasswordCharInput(EventKeyBinding),
 
         ModifyRequestAuthBearerToken(EventKeyBinding),
         EditingRequestAuthBearerTokenDeleteCharBackward(EventKeyBinding),
@@ -285,6 +285,60 @@ get_key_bindings! {
         EditingRequestAuthJwtPayloadMoveCursorLineStart(EventKeyBinding),
         EditingRequestAuthJwtPayloadMoveCursorLineEnd(EventKeyBinding),
         EditingRequestAuthJwtPayloadCharInput(EventKeyBinding),
+
+        ModifyRequestAuthDigestUsername(EventKeyBinding),
+        EditingRequestAuthDigestUsernameDeleteCharBackward(EventKeyBinding),
+        EditingRequestAuthDigestUsernameDeleteCharForward(EventKeyBinding),
+        EditingRequestAuthDigestUsernameMoveCursorLeft(EventKeyBinding),
+        EditingRequestAuthDigestUsernameMoveCursorRight(EventKeyBinding),
+        EditingRequestAuthDigestUsernameMoveCursorLineStart(EventKeyBinding),
+        EditingRequestAuthDigestUsernameMoveCursorLineEnd(EventKeyBinding),
+        EditingRequestAuthDigestUsernameCharInput(EventKeyBinding),
+
+        ModifyRequestAuthDigestPassword(EventKeyBinding),
+        EditingRequestAuthDigestPasswordDeleteCharBackward(EventKeyBinding),
+        EditingRequestAuthDigestPasswordDeleteCharForward(EventKeyBinding),
+        EditingRequestAuthDigestPasswordMoveCursorLeft(EventKeyBinding),
+        EditingRequestAuthDigestPasswordMoveCursorRight(EventKeyBinding),
+        EditingRequestAuthDigestPasswordMoveCursorLineStart(EventKeyBinding),
+        EditingRequestAuthDigestPasswordMoveCursorLineEnd(EventKeyBinding),
+        EditingRequestAuthDigestPasswordCharInput(EventKeyBinding),
+
+        ModifyRequestAuthDigestDomains(EventKeyBinding),
+        EditingRequestAuthDigestDomainsDeleteCharBackward(EventKeyBinding),
+        EditingRequestAuthDigestDomainsDeleteCharForward(EventKeyBinding),
+        EditingRequestAuthDigestDomainsMoveCursorLeft(EventKeyBinding),
+        EditingRequestAuthDigestDomainsMoveCursorRight(EventKeyBinding),
+        EditingRequestAuthDigestDomainsMoveCursorLineStart(EventKeyBinding),
+        EditingRequestAuthDigestDomainsMoveCursorLineEnd(EventKeyBinding),
+        EditingRequestAuthDigestDomainsCharInput(EventKeyBinding),
+
+        ModifyRequestAuthDigestRealm(EventKeyBinding),
+        EditingRequestAuthDigestRealmDeleteCharBackward(EventKeyBinding),
+        EditingRequestAuthDigestRealmDeleteCharForward(EventKeyBinding),
+        EditingRequestAuthDigestRealmMoveCursorLeft(EventKeyBinding),
+        EditingRequestAuthDigestRealmMoveCursorRight(EventKeyBinding),
+        EditingRequestAuthDigestRealmMoveCursorLineStart(EventKeyBinding),
+        EditingRequestAuthDigestRealmMoveCursorLineEnd(EventKeyBinding),
+        EditingRequestAuthDigestRealmCharInput(EventKeyBinding),
+
+        ModifyRequestAuthDigestNonce(EventKeyBinding),
+        EditingRequestAuthDigestNonceDeleteCharBackward(EventKeyBinding),
+        EditingRequestAuthDigestNonceDeleteCharForward(EventKeyBinding),
+        EditingRequestAuthDigestNonceMoveCursorLeft(EventKeyBinding),
+        EditingRequestAuthDigestNonceMoveCursorRight(EventKeyBinding),
+        EditingRequestAuthDigestNonceMoveCursorLineStart(EventKeyBinding),
+        EditingRequestAuthDigestNonceMoveCursorLineEnd(EventKeyBinding),
+        EditingRequestAuthDigestNonceCharInput(EventKeyBinding),
+
+        ModifyRequestAuthDigestOpaque(EventKeyBinding),
+        EditingRequestAuthDigestOpaqueDeleteCharBackward(EventKeyBinding),
+        EditingRequestAuthDigestOpaqueDeleteCharForward(EventKeyBinding),
+        EditingRequestAuthDigestOpaqueMoveCursorLeft(EventKeyBinding),
+        EditingRequestAuthDigestOpaqueMoveCursorRight(EventKeyBinding),
+        EditingRequestAuthDigestOpaqueMoveCursorLineStart(EventKeyBinding),
+        EditingRequestAuthDigestOpaqueMoveCursorLineEnd(EventKeyBinding),
+        EditingRequestAuthDigestOpaqueCharInput(EventKeyBinding),
 
         /* Headers */
 
@@ -776,26 +830,26 @@ impl App<'_> {
                 
                 // self.auth_text_input_selection.usable
 
-                ModifyRequestAuthUsername(_) => self.tui_modify_request_auth_basic_username(),
-                EditingRequestAuthUsernameDeleteCharBackward(_) => self.auth_basic_username_text_input.delete_char_forward(),
-                EditingRequestAuthUsernameDeleteCharForward(_) => self.auth_basic_username_text_input.delete_char_backward(),
-                EditingRequestAuthUsernameMoveCursorLeft(_) => self.auth_basic_username_text_input.move_cursor_left(),
-                EditingRequestAuthUsernameMoveCursorRight(_) => self.auth_basic_username_text_input.move_cursor_right(),
-                EditingRequestAuthUsernameMoveCursorLineStart(_) => self.auth_basic_username_text_input.move_cursor_line_start(),
-                EditingRequestAuthUsernameMoveCursorLineEnd(_) => self.auth_basic_username_text_input.move_cursor_line_end(),
-                EditingRequestAuthUsernameCharInput(_) => match key {
+                ModifyRequestAuthBasicUsername(_) => self.tui_modify_request_auth_basic_username(),
+                EditingRequestAuthBasicUsernameDeleteCharBackward(_) => self.auth_basic_username_text_input.delete_char_forward(),
+                EditingRequestAuthBasicUsernameDeleteCharForward(_) => self.auth_basic_username_text_input.delete_char_backward(),
+                EditingRequestAuthBasicUsernameMoveCursorLeft(_) => self.auth_basic_username_text_input.move_cursor_left(),
+                EditingRequestAuthBasicUsernameMoveCursorRight(_) => self.auth_basic_username_text_input.move_cursor_right(),
+                EditingRequestAuthBasicUsernameMoveCursorLineStart(_) => self.auth_basic_username_text_input.move_cursor_line_start(),
+                EditingRequestAuthBasicUsernameMoveCursorLineEnd(_) => self.auth_basic_username_text_input.move_cursor_line_end(),
+                EditingRequestAuthBasicUsernameCharInput(_) => match key {
                     KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.auth_basic_username_text_input.enter_char(char),
                     _ => {}
                 },
                 
-                ModifyRequestAuthPassword(_) => self.tui_modify_request_auth_basic_password(),
-                EditingRequestAuthPasswordDeleteCharBackward(_) => self.auth_basic_password_text_input.delete_char_forward(),
-                EditingRequestAuthPasswordDeleteCharForward(_) => self.auth_basic_password_text_input.delete_char_backward(),
-                EditingRequestAuthPasswordMoveCursorLeft(_) => self.auth_basic_password_text_input.move_cursor_left(),
-                EditingRequestAuthPasswordMoveCursorRight(_) => self.auth_basic_password_text_input.move_cursor_right(),
-                EditingRequestAuthPasswordMoveCursorLineStart(_) => self.auth_basic_password_text_input.move_cursor_line_start(),
-                EditingRequestAuthPasswordMoveCursorLineEnd(_) => self.auth_basic_password_text_input.move_cursor_line_end(),
-                EditingRequestAuthPasswordCharInput(_) => match key {
+                ModifyRequestAuthBasicPassword(_) => self.tui_modify_request_auth_basic_password(),
+                EditingRequestAuthBasicPasswordDeleteCharBackward(_) => self.auth_basic_password_text_input.delete_char_forward(),
+                EditingRequestAuthBasicPasswordDeleteCharForward(_) => self.auth_basic_password_text_input.delete_char_backward(),
+                EditingRequestAuthBasicPasswordMoveCursorLeft(_) => self.auth_basic_password_text_input.move_cursor_left(),
+                EditingRequestAuthBasicPasswordMoveCursorRight(_) => self.auth_basic_password_text_input.move_cursor_right(),
+                EditingRequestAuthBasicPasswordMoveCursorLineStart(_) => self.auth_basic_password_text_input.move_cursor_line_start(),
+                EditingRequestAuthBasicPasswordMoveCursorLineEnd(_) => self.auth_basic_password_text_input.move_cursor_line_end(),
+                EditingRequestAuthBasicPasswordCharInput(_) => match key {
                     KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.auth_basic_password_text_input.enter_char(char),
                     _ => {}
                 },
@@ -812,7 +866,7 @@ impl App<'_> {
                     _ => {}
                 },
 
-                ModifyRequestAuthJwtSecret(_) => self.tui_modify_request_auth_secret(),
+                ModifyRequestAuthJwtSecret(_) => self.tui_modify_request_auth_jwt_secret(),
                 EditingRequestAuthJwtSecretDeleteCharBackward(_) => self.auth_jwt_secret_text_input.delete_char_forward(),
                 EditingRequestAuthJwtSecretDeleteCharForward(_) => self.auth_jwt_secret_text_input.delete_char_backward(),
                 EditingRequestAuthJwtSecretMoveCursorLeft(_) => self.auth_jwt_secret_text_input.move_cursor_left(),
@@ -837,10 +891,10 @@ impl App<'_> {
                         self.auth_jwt_payload_text_area_vim_emulation = self.auth_jwt_payload_text_area_vim_emulation.clone().with_pending(input);
                     },
                     VimTransition::Quit => self.select_request_state(),
-                    VimTransition::SaveAndQuit => self.tui_modify_request_auth_payload(),
+                    VimTransition::SaveAndQuit => self.tui_modify_request_auth_jwt_payload(),
                 },
 
-                EditingRequestAuthJwtPayloadSaveAndQuit(_) => self.tui_modify_request_auth_payload(),
+                EditingRequestAuthJwtPayloadSaveAndQuit(_) => self.tui_modify_request_auth_jwt_payload(),
                 EditingRequestAuthJwtPayloadCopy(_) => self.auth_jwt_payload_text_area.copy(),
                 EditingRequestAuthJwtPayloadPaste(_) => {self.auth_jwt_payload_text_area.paste();},
                 EditingRequestAuthJwtPayloadUndo(_) => {self.auth_jwt_payload_text_area.undo();},
@@ -862,6 +916,78 @@ impl App<'_> {
                 EditingRequestAuthJwtPayloadMoveCursorLineEnd(_) => self.auth_jwt_payload_text_area.move_cursor(CursorMove::End),
                 EditingRequestAuthJwtPayloadCharInput(_) => match key {
                     KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.auth_jwt_payload_text_area.insert_char(char),
+                    _ => {}
+                },
+
+                ModifyRequestAuthDigestUsername(_) => self.tui_modify_request_auth_digest_username(),
+                EditingRequestAuthDigestUsernameDeleteCharBackward(_) => self.auth_digest_username_text_input.delete_char_forward(),
+                EditingRequestAuthDigestUsernameDeleteCharForward(_) => self.auth_digest_username_text_input.delete_char_backward(),
+                EditingRequestAuthDigestUsernameMoveCursorLeft(_) => self.auth_digest_username_text_input.move_cursor_left(),
+                EditingRequestAuthDigestUsernameMoveCursorRight(_) => self.auth_digest_username_text_input.move_cursor_right(),
+                EditingRequestAuthDigestUsernameMoveCursorLineStart(_) => self.auth_digest_username_text_input.move_cursor_line_start(),
+                EditingRequestAuthDigestUsernameMoveCursorLineEnd(_) => self.auth_digest_username_text_input.move_cursor_line_end(),
+                EditingRequestAuthDigestUsernameCharInput(_) => match key {
+                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.auth_digest_username_text_input.enter_char(char),
+                    _ => {}
+                },
+
+                ModifyRequestAuthDigestPassword(_) => self.tui_modify_request_auth_digest_password(),
+                EditingRequestAuthDigestPasswordDeleteCharBackward(_) => self.auth_digest_password_text_input.delete_char_forward(),
+                EditingRequestAuthDigestPasswordDeleteCharForward(_) => self.auth_digest_password_text_input.delete_char_backward(),
+                EditingRequestAuthDigestPasswordMoveCursorLeft(_) => self.auth_digest_password_text_input.move_cursor_left(),
+                EditingRequestAuthDigestPasswordMoveCursorRight(_) => self.auth_digest_password_text_input.move_cursor_right(),
+                EditingRequestAuthDigestPasswordMoveCursorLineStart(_) => self.auth_digest_password_text_input.move_cursor_line_start(),
+                EditingRequestAuthDigestPasswordMoveCursorLineEnd(_) => self.auth_digest_password_text_input.move_cursor_line_end(),
+                EditingRequestAuthDigestPasswordCharInput(_) => match key {
+                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.auth_digest_password_text_input.enter_char(char),
+                    _ => {}
+                },
+
+                ModifyRequestAuthDigestDomains(_) => self.tui_modify_request_auth_digest_domains(),
+                EditingRequestAuthDigestDomainsDeleteCharBackward(_) => self.auth_digest_domains_text_input.delete_char_forward(),
+                EditingRequestAuthDigestDomainsDeleteCharForward(_) => self.auth_digest_domains_text_input.delete_char_backward(),
+                EditingRequestAuthDigestDomainsMoveCursorLeft(_) => self.auth_digest_domains_text_input.move_cursor_left(),
+                EditingRequestAuthDigestDomainsMoveCursorRight(_) => self.auth_digest_domains_text_input.move_cursor_right(),
+                EditingRequestAuthDigestDomainsMoveCursorLineStart(_) => self.auth_digest_domains_text_input.move_cursor_line_start(),
+                EditingRequestAuthDigestDomainsMoveCursorLineEnd(_) => self.auth_digest_domains_text_input.move_cursor_line_end(),
+                EditingRequestAuthDigestDomainsCharInput(_) => match key {
+                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.auth_digest_domains_text_input.enter_char(char),
+                    _ => {}
+                },
+
+                ModifyRequestAuthDigestRealm(_) => self.tui_modify_request_auth_digest_realm(),
+                EditingRequestAuthDigestRealmDeleteCharBackward(_) => self.auth_digest_realm_text_input.delete_char_forward(),
+                EditingRequestAuthDigestRealmDeleteCharForward(_) => self.auth_digest_realm_text_input.delete_char_backward(),
+                EditingRequestAuthDigestRealmMoveCursorLeft(_) => self.auth_digest_realm_text_input.move_cursor_left(),
+                EditingRequestAuthDigestRealmMoveCursorRight(_) => self.auth_digest_realm_text_input.move_cursor_right(),
+                EditingRequestAuthDigestRealmMoveCursorLineStart(_) => self.auth_digest_realm_text_input.move_cursor_line_start(),
+                EditingRequestAuthDigestRealmMoveCursorLineEnd(_) => self.auth_digest_realm_text_input.move_cursor_line_end(),
+                EditingRequestAuthDigestRealmCharInput(_) => match key {
+                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.auth_digest_realm_text_input.enter_char(char),
+                    _ => {}
+                },
+
+                ModifyRequestAuthDigestNonce(_) => self.tui_modify_request_auth_digest_nonce(),
+                EditingRequestAuthDigestNonceDeleteCharBackward(_) => self.auth_digest_nonce_text_input.delete_char_forward(),
+                EditingRequestAuthDigestNonceDeleteCharForward(_) => self.auth_digest_nonce_text_input.delete_char_backward(),
+                EditingRequestAuthDigestNonceMoveCursorLeft(_) => self.auth_digest_nonce_text_input.move_cursor_left(),
+                EditingRequestAuthDigestNonceMoveCursorRight(_) => self.auth_digest_nonce_text_input.move_cursor_right(),
+                EditingRequestAuthDigestNonceMoveCursorLineStart(_) => self.auth_digest_nonce_text_input.move_cursor_line_start(),
+                EditingRequestAuthDigestNonceMoveCursorLineEnd(_) => self.auth_digest_nonce_text_input.move_cursor_line_end(),
+                EditingRequestAuthDigestNonceCharInput(_) => match key {
+                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.auth_digest_nonce_text_input.enter_char(char),
+                    _ => {}
+                },
+
+                ModifyRequestAuthDigestOpaque(_) => self.tui_modify_request_auth_digest_opaque(),
+                EditingRequestAuthDigestOpaqueDeleteCharBackward(_) => self.auth_digest_opaque_text_input.delete_char_forward(),
+                EditingRequestAuthDigestOpaqueDeleteCharForward(_) => self.auth_digest_opaque_text_input.delete_char_backward(),
+                EditingRequestAuthDigestOpaqueMoveCursorLeft(_) => self.auth_digest_opaque_text_input.move_cursor_left(),
+                EditingRequestAuthDigestOpaqueMoveCursorRight(_) => self.auth_digest_opaque_text_input.move_cursor_right(),
+                EditingRequestAuthDigestOpaqueMoveCursorLineStart(_) => self.auth_digest_opaque_text_input.move_cursor_line_start(),
+                EditingRequestAuthDigestOpaqueMoveCursorLineEnd(_) => self.auth_digest_opaque_text_input.move_cursor_line_end(),
+                EditingRequestAuthDigestOpaqueCharInput(_) => match key {
+                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.auth_digest_opaque_text_input.enter_char(char),
                     _ => {}
                 },
 
