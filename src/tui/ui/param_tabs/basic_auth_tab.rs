@@ -6,7 +6,7 @@ use ratatui::widgets::{Block, Borders, Paragraph};
 
 use crate::app::app::App;
 use crate::app::files::theme::THEME;
-use crate::tui::app_states::AppState::{SelectedRequest, EditingRequestAuthUsername, EditingRequestAuthPassword};
+use crate::tui::app_states::AppState::{SelectedRequest, EditingRequestAuthBasicUsername, EditingRequestAuthBasicPassword};
 
 impl App<'_> {
     pub(super) fn render_basic_auth_tab(&mut self, frame: &mut Frame, area: Rect) {
@@ -41,7 +41,7 @@ impl App<'_> {
             SelectedRequest => {
                 should_color_blocks = true;
             },
-            EditingRequestAuthUsername | EditingRequestAuthPassword => {
+            EditingRequestAuthBasicUsername | EditingRequestAuthBasicPassword => {
                 should_color_blocks = true;
                 should_display_cursor = true;
             },

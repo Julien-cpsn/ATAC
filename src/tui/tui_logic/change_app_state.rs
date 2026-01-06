@@ -196,12 +196,12 @@ impl App<'_> {
     }
 
     pub fn edit_request_auth_username_state(&mut self) {
-        self.set_app_state(AppState::EditingRequestAuthUsername);
+        self.set_app_state(AppState::EditingRequestAuthBasicUsername);
         self.update_inputs();
     }
 
     pub fn edit_request_auth_password_state(&mut self) {
-        self.set_app_state(AppState::EditingRequestAuthPassword);
+        self.set_app_state(AppState::EditingRequestAuthBasicPassword);
         self.update_inputs();
     }
 
@@ -217,6 +217,36 @@ impl App<'_> {
 
     pub fn edit_request_auth_jwt_payload_state(&mut self) {
         self.set_app_state(AppState::EditingRequestAuthJwtPayload);
+        self.update_inputs();
+    }
+
+    pub fn edit_request_auth_digest_username_state(&mut self) {
+        self.set_app_state(AppState::EditingRequestAuthDigestUsername);
+        self.update_inputs();
+    }
+
+    pub fn edit_request_auth_digest_password_state(&mut self) {
+        self.set_app_state(AppState::EditingRequestAuthDigestPassword);
+        self.update_inputs();
+    }
+
+    pub fn edit_request_auth_digest_domains_state(&mut self) {
+        self.set_app_state(AppState::EditingRequestAuthDigestDomains);
+        self.update_inputs();
+    }
+
+    pub fn edit_request_auth_digest_realm_state(&mut self) {
+        self.set_app_state(AppState::EditingRequestAuthDigestRealm);
+        self.update_inputs();
+    }
+
+    pub fn edit_request_auth_digest_nonce_state(&mut self) {
+        self.set_app_state(AppState::EditingRequestAuthDigestNonce);
+        self.update_inputs();
+    }
+
+    pub fn edit_request_auth_digest_opaque_state(&mut self) {
+        self.set_app_state(AppState::EditingRequestAuthDigestOpaque);
         self.update_inputs();
     }
 

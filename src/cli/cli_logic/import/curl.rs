@@ -5,8 +5,8 @@ use std::sync::Arc;
 use anyhow::anyhow;
 
 use parking_lot::RwLock;
-use regex::Regex;
-use reqwest::header::CONTENT_TYPE;
+use regex::{Captures, Regex};
+use reqwest::header::{HeaderName, HeaderValue, CONTENT_TYPE};
 use reqwest::Url;
 use thiserror::Error;
 use walkdir::WalkDir;
@@ -19,6 +19,7 @@ use crate::cli::commands::import::CurlImport;
 use crate::models::auth::auth::Auth;
 use crate::models::auth::basic::BasicAuth;
 use crate::models::auth::bearer_token::BearerToken;
+use crate::models::auth::digest::{extract_www_authenticate_digest_data, Digest, DigestAlgorithm, DigestCharset, DigestQop};
 use crate::models::protocol::http::body::ContentType;
 use crate::models::protocol::http::body::ContentType::NoBody;
 use crate::models::collection::Collection;
@@ -188,24 +189,82 @@ fn parse_request(path: &PathBuf, request_name: String) -> anyhow::Result<Arc<RwL
 
     /* AUTH */
 
-    let basic_auth_regex = Regex::new(r#"(-u|--user) ["'](?<username>.*):(?<password>.*)["']"#).unwrap();
+    let basic_auth_regex = Regex::new(r#"(-u|--user) ["'](?<username>.*):(?<password>.*)["']"#)?;
+    let digest_auth_regex = Regex::new(r#"--digest (-u|--user) ["'](?<username>.*):(?<password>.*)["']"#)?;
 
     let auth = match basic_auth_regex.captures(&curl_stringed) {
         None => {
-            let bearer_token_header = parsed_curl.headers
+            let authorization_header_value = parsed_curl.headers
                 .iter()
                 .par_bridge()
-                .find_any(|(header_name, value)| header_name.as_str() == "authorization" && value.to_str().unwrap().starts_with("Bearer "));
+                .find_map_any(|(header_name, value)| match header_name.as_str() == "authorization" {
+                    true => Some(value.to_str().unwrap()),
+                    false => None
+                });
 
-            if let Some((_, bearer_token)) = bearer_token_header {
-                let bearer_token = bearer_token.to_str()?[7..].to_string();
+            let digest_credentials = match digest_auth_regex.captures(&curl_stringed) {
+                None => None,
+                Some(capture) => {
+                    let username = capture["username"].to_string();
+                    let password = capture["password"].to_string();
 
-                Auth::BearerToken(BearerToken { token: bearer_token })
+                    Some((username, password))
+                }
+            };
+
+            match authorization_header_value {
+                None => match digest_credentials {
+                    None => Auth::NoAuth,
+                    Some((username, password)) => Auth::Digest(Digest {
+                        username,
+                        password,
+                        domains: String::new(),
+                        realm: String::new(),
+                        nonce: String::new(),
+                        opaque: String::new(),
+                        stale: false,
+                        algorithm: DigestAlgorithm::default(),
+                        qop: DigestQop::default(),
+                        user_hash: false,
+                        charset: DigestCharset::default(),
+                        nc: 0,
+                    })
+                },
+                Some(authorization_header_value) => {
+                    if authorization_header_value.starts_with("Bearer ") {
+                        let bearer_token = authorization_header_value[7..].to_string();
+
+                        Auth::BearerToken(BearerToken { token: bearer_token })
+                    }
+                    else if authorization_header_value.starts_with("Digest ") {
+                        let (username, password) = match digest_credentials {
+                            None => (String::new(), String::new()),
+                            Some((username, password)) => (username, password),
+                        };
+
+                        let (domains, realm, nonce, opaque, stale, algorithm, qop, user_hash, charset) = extract_www_authenticate_digest_data(authorization_header_value)?;
+
+                        Auth::Digest(Digest {
+                            username,
+                            password,
+                            domains,
+                            realm,
+                            nonce,
+                            opaque,
+                            stale,
+                            algorithm,
+                            qop,
+                            user_hash,
+                            charset,
+                            nc: 0,
+                        })
+                    }
+                    else {
+                        Auth::NoAuth
+                    }
+                }
             }
-            else {
-                Auth::NoAuth
-            }
-        }
+        },
         Some(capture) => {
             let username = capture["username"].to_string();
             let password = capture["password"].to_string();

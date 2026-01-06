@@ -17,6 +17,7 @@ use crate::app::files::environment::save_environment_to_file;
 use crate::models::auth::auth::Auth;
 use crate::models::auth::basic::BasicAuth;
 use crate::models::auth::bearer_token::BearerToken;
+use crate::models::auth::digest::{digest_to_authorization_header, Digest};
 use crate::models::auth::jwt::{jwt_do_jaat, JwtError, JwtToken};
 use crate::models::protocol::http::body::ContentType::{NoBody, File, Form, Html, Javascript, Json, Multipart, Raw, Xml};
 use crate::models::environment::Environment;
@@ -154,10 +155,10 @@ impl App<'_> {
 
         let url = match url {
             Ok(url) => url,
-            Err(_) => {
-                return Err(PrepareRequestError::InvalidUrl);
-            }
+            Err(_) => return Err(PrepareRequestError::InvalidUrl)
         };
+
+        let url_path = url.path().to_owned();
 
         /* REQUEST */
 
@@ -198,6 +199,28 @@ impl App<'_> {
 
                 let bearer_token = jwt_do_jaat(algorithm, secret_type, secret, payload)?;
                 request_builder = request_builder.bearer_auth(bearer_token);
+            }
+            Auth::Digest(Digest { username, password, domains, realm, nonce, opaque, stale, algorithm, qop, user_hash, charset, .. }) => {
+                let digest = request.auth.get_digest_mut();
+                digest.nc += 1;
+                
+                let digest_header = digest_to_authorization_header(
+                    username,
+                    password,
+                    &url_path,
+                    domains.clone(),
+                    realm.clone(),
+                    nonce.clone(),
+                    opaque.clone(),
+                    *stale,
+                    algorithm,
+                    &qop,
+                    *user_hash,
+                    &charset,
+                    digest.nc
+                );
+
+                request_builder = request_builder.header("Authorization", &digest_header);
             }
         }
 
@@ -247,9 +270,7 @@ impl App<'_> {
                         Ok(file) => {
                             request_builder = request_builder.body(file);
                         }
-                        Err(_) => {
-                            return Err(PrepareRequestError::CouldNotOpenFile);
-                        }
+                        Err(_) => return Err(PrepareRequestError::CouldNotOpenFile)
                     }
                 },
                 Raw(body) | Json(body) | Xml(body) | Html(body) | Javascript(body) => {
@@ -309,9 +330,7 @@ impl App<'_> {
                 request.console_output.pre_request_output = Some(console_output);
 
                 match result_request {
-                    None => {
-                        return Err(PrepareRequestError::PreRequestScript);
-                    }
+                    None => Err(PrepareRequestError::PreRequestScript),
                     Some(request) => Ok(request)
                 }
             }
