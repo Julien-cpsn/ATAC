@@ -148,6 +148,9 @@ impl App<'_> {
             RenamingRequest => self.render_renaming_request_popup(frame),
             ChoosingRequestExportFormat => self.render_export_format_popup(frame),
             DisplayingRequestExport => self.display_request_export.render(frame),
+            ExportingResponse => self.render_exporting_response_popup(frame),
+            DisplayingSuccessPopup => self.render_success_popup(frame, self.export_confirmation_popup.message.clone()),
+            DisplayingErrorPopup => self.render_error_popup(frame, self.export_confirmation_popup.message.clone()),
             _ => {}
         }
 
