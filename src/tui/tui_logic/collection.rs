@@ -2,6 +2,7 @@ use crate::app::app::App;
 use crate::models::auth::auth::Auth;
 use crate::models::auth::basic::BasicAuth;
 use crate::models::auth::bearer_token::BearerToken;
+use crate::models::auth::digest::Digest;
 use crate::models::auth::jwt::JwtToken;
 use crate::models::protocol::http::body::ContentType;
 use crate::models::protocol::protocol::Protocol;
@@ -17,6 +18,12 @@ impl App<'_> {
         self.auth_basic_password_text_input.reset_input();
         self.auth_bearer_token_text_input.reset_input();
         self.auth_jwt_secret_text_input.reset_input();
+        self.auth_digest_username_text_input.reset_input();
+        self.auth_digest_password_text_input.reset_input();
+        self.auth_digest_domains_text_input.reset_input();
+        self.auth_digest_realm_text_input.reset_input();
+        self.auth_digest_nonce_text_input.reset_input();
+        self.auth_digest_opaque_text_input.reset_input();
         self.headers_table.selection_text_input.reset_input();
         self.body_form_table.selection_text_input.reset_input();
         self.body_file_text_input.reset_input();
@@ -68,6 +75,17 @@ impl App<'_> {
 
                 self.auth_jwt_secret_text_input.enter_str(secret);
                 self.refresh_auth_jwt_payload_textarea(payload);
+            },
+            Auth::Digest(Digest { username, password, domains, realm, nonce, opaque, .. }) => {
+                self.auth_text_input_selection.max_selection = 11;
+                self.auth_text_input_selection.usable = true;
+
+                self.auth_digest_username_text_input.enter_str(username);
+                self.auth_digest_password_text_input.enter_str(password);
+                self.auth_digest_domains_text_input.enter_str(domains);
+                self.auth_digest_realm_text_input.enter_str(realm);
+                self.auth_digest_nonce_text_input.enter_str(nonce);
+                self.auth_digest_opaque_text_input.enter_str(opaque);
             }
         }
 
@@ -145,6 +163,12 @@ impl App<'_> {
         self.auth_basic_password_text_input.reset_cursor();
         self.auth_bearer_token_text_input.reset_cursor();
         self.auth_jwt_secret_text_input.reset_cursor();
+        self.auth_digest_username_text_input.reset_cursor();
+        self.auth_digest_password_text_input.reset_cursor();
+        self.auth_digest_domains_text_input.reset_cursor();
+        self.auth_digest_realm_text_input.reset_cursor();
+        self.auth_digest_nonce_text_input.reset_cursor();
+        self.auth_digest_opaque_text_input.reset_cursor();
         self.headers_table.selection_text_input.reset_cursor();
         self.body_form_table.selection_text_input.reset_cursor();
         self.body_file_text_input.reset_cursor();

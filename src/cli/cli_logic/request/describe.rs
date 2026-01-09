@@ -3,6 +3,7 @@ use crate::app::business_logic::key_value::print_key_value_vector;
 use crate::models::auth::auth::Auth;
 use crate::models::auth::basic::BasicAuth;
 use crate::models::auth::bearer_token::BearerToken;
+use crate::models::auth::digest::Digest;
 use crate::models::auth::jwt::JwtToken;
 use crate::models::protocol::http::body::ContentType;
 use crate::models::protocol::protocol::Protocol;
@@ -28,9 +29,23 @@ impl App<'_> {
 
         match &request.auth {
             Auth::NoAuth => {}
-            Auth::BasicAuth(BasicAuth { username, password }) => println!("auth: Basic\n\t{username}\n\t{password}"),
-            Auth::BearerToken(BearerToken { token: bearer_token }) => println!("auth: Bearer token\n\t{bearer_token}"),
-            Auth::JwtToken(JwtToken { algorithm, secret_type, secret, payload }) => println!("auth: JWT\n\t{algorithm}\n\t{secret_type}\n\t{secret}\n\t{payload}"),
+            Auth::BasicAuth(BasicAuth { username, password }) => println!("auth: Basic\n\tusername: {username}\n\tpassword: {password}"),
+            Auth::BearerToken(BearerToken { token: bearer_token }) => println!("auth: Bearer token\n\ttoken: {bearer_token}"),
+            Auth::JwtToken(JwtToken { algorithm, secret_type, secret, payload }) => println!("auth: JWT\n\talgorithm: {algorithm}\n\tsecret_type: {secret_type}\n\tsecret: {secret}\n\tpayload: {payload}"),
+            Auth::Digest(Digest {
+                username,
+                password,
+                domains,
+                realm,
+                nonce,
+                opaque,
+                stale,
+                algorithm,
+                qop,
+                user_hash,
+                charset,
+                ..
+             }) => println!("auth: Digest\n\tusername: {username}\n\tpassword: {password}\n\tdomains: {domains}\n\trealm: {realm}\n\tnonce: {nonce}\n\topaque: {opaque}\n\tstale: {}\n\talgorithm: {algorithm}\n\tqop: {qop}\n\tuser_hash: {}\n\tcharset: {charset}", stale.to_string(), user_hash.to_string()),
         }
 
         if let Protocol::HttpRequest(http_request) = &request.protocol {
@@ -42,7 +57,7 @@ impl App<'_> {
                     print_key_value_vector(form, Some("\t"));
                 },
                 ContentType::Raw(body) | ContentType::Json(body) | ContentType::Xml(body) | ContentType::Html(body) | ContentType::Javascript(body) => {
-                    println!("body: {}{body}", &http_request.body.to_string());
+                    println!("body: {}\n{body}", &http_request.body.to_string());
                 }
             }
         }

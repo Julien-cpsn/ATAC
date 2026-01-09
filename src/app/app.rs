@@ -89,28 +89,52 @@ pub struct App<'a> {
 
     pub url_text_input: TextInput,
 
+    /* Query params */
+    
     pub query_params_table: StatefulCustomTable,
 
+    /* Auth */
+
     pub auth_text_input_selection: TextInputSelection,
+
     pub auth_basic_username_text_input: TextInput,
     pub auth_basic_password_text_input: TextInput,
+
     pub auth_bearer_token_text_input: TextInput,
+
     pub auth_jwt_secret_text_input: TextInput,
     pub auth_jwt_payload_text_area: TextArea<'a>,
     pub auth_jwt_payload_text_area_vim_emulation: Vim,
 
+    pub auth_digest_username_text_input: TextInput,
+    pub auth_digest_password_text_input: TextInput,
+    pub auth_digest_domains_text_input: TextInput,
+    pub auth_digest_realm_text_input: TextInput,
+    pub auth_digest_nonce_text_input: TextInput,
+    pub auth_digest_opaque_text_input: TextInput,
+
+    /* Headers */
+    
     pub headers_table: StatefulCustomTable,
 
+    /* Body */
+    
     pub body_file_text_input: TextInput,
     pub body_form_table: StatefulCustomTable,
     pub body_text_area: TextArea<'a>,
     pub body_text_area_vim_emulation: Vim,
 
+    /* WS message */
+    
     pub message_text_area: TextArea<'a>,
     pub message_text_area_vim_emulation: Vim,
 
+    /* Settings */
+    
     pub request_settings_popup: SettingsPopup,
 
+    /* Response */
+    
     pub received_response: Arc<Mutex<bool>>,
     
     pub result_throbber_state: ThrobberState,
@@ -119,6 +143,8 @@ pub struct App<'a> {
 
     pub last_messages_area_size: (u16, u16),
 
+    /* Scripts */
+    
     pub script_console: ScriptConsole<'a>,
 
     /* Others */
@@ -192,27 +218,51 @@ impl App<'_> {
             
             url_text_input: TextInput::default(),
 
+            /* Query params */
+            
             query_params_table: StatefulCustomTable::default(),
 
+            /* Auth */
+            
             auth_text_input_selection: TextInputSelection::default(),
+            
             auth_basic_username_text_input: TextInput::default(),
             auth_basic_password_text_input: TextInput::default(),
+            
             auth_bearer_token_text_input: TextInput::default(),
+            
             auth_jwt_secret_text_input: TextInput::default(),
             auth_jwt_payload_text_area: TextArea::default(),
             auth_jwt_payload_text_area_vim_emulation: Vim::default(),
 
+            auth_digest_username_text_input: TextInput::default(),
+            auth_digest_password_text_input: TextInput::default(),
+            auth_digest_domains_text_input: TextInput::default(),
+            auth_digest_realm_text_input: TextInput::default(),
+            auth_digest_nonce_text_input: TextInput::default(),
+            auth_digest_opaque_text_input: TextInput::default(),
+            
+            /* Headers */
+            
             headers_table: StatefulCustomTable::default(),
 
+            /* Body */
+            
             body_file_text_input: TextInput::default(),
             body_form_table: StatefulCustomTable::default(),
             body_text_area: TextArea::default(),
             body_text_area_vim_emulation: Vim::default(),
 
+            /* WS message */
+            
             message_text_area: TextArea::default(),
             message_text_area_vim_emulation: Vim::default(),
 
+            /* Settings */
+            
             request_settings_popup: SettingsPopup::default(),
+            
+            /* Response */
             
             result_throbber_state: ThrobberState::default(),
             received_response: Arc::new(Mutex::new(false)),

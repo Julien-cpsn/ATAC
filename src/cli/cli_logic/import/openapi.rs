@@ -539,6 +539,7 @@ fn process_security(request: &mut Request, security_requirements: &Vec<SecurityR
                                         "bearer" => Auth::BearerToken(BearerToken {
                                             token: "BEARER_TOKEN".to_string(),
                                         }),
+                                        // Digest not supported
                                         _ => Auth::NoAuth
                                     }
                                 },

@@ -93,13 +93,13 @@ impl App<'_> {
                 secret_type_block = secret_type_block.fg(THEME.read().others.selection_highlight_color);
                 secret_type_paragraph = secret_type_paragraph.fg(THEME.read().others.selection_highlight_color);
 
-                secret_input_cursor_position as u16
+                0
             },
             2 if should_color_blocks => {
                 secret_block = secret_block.fg(THEME.read().others.selection_highlight_color);
                 secret_paragraph = secret_paragraph.fg(THEME.read().others.selection_highlight_color);
 
-                secret_input_cursor_position as u16
+                secret_input_cursor_position
             },
             3 if should_color_blocks => {
                 payload_block = payload_block.fg(THEME.read().others.selection_highlight_color);
@@ -112,7 +112,7 @@ impl App<'_> {
 
         if should_display_cursor {
             frame.set_cursor_position(Position::new(
-                jwt_token_auth_layout[input_selected].x + input_cursor_position + 1,
+                jwt_token_auth_layout[input_selected].x + input_cursor_position as u16 + 1,
                 jwt_token_auth_layout[input_selected].y + 1
             ));
         }

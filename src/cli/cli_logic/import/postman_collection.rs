@@ -11,11 +11,12 @@ use thiserror::Error;
 
 use crate::app::app::App;
 use crate::cli::args::ARGS;
-use crate::cli::cli_logic::import::postman_collection::ImportPostmanError::{CollectionAlreadyExists, CouldNotParseCollection, UnknownMethod};
+use crate::cli::cli_logic::import::postman_collection::ImportPostmanError::{AuthError, CollectionAlreadyExists, CouldNotParseCollection, UnknownMethod};
 use crate::cli::commands::import::PostmanImport;
 use crate::models::auth::auth::Auth;
 use crate::models::auth::basic::BasicAuth;
 use crate::models::auth::bearer_token::BearerToken;
+use crate::models::auth::digest::{Digest, DigestAlgorithm, DigestCharset, DigestError, DigestQop};
 use crate::models::auth::jwt::{JwtAlgorithm, JwtSecretType, JwtToken};
 use crate::models::protocol::http::body::ContentType;
 use crate::models::collection::{Collection, CollectionFileFormat};
@@ -33,6 +34,8 @@ enum ImportPostmanError {
     CollectionAlreadyExists(String),
     #[error("Unknown method \"{0}\"")]
     UnknownMethod(String),
+    #[error("{0}")]
+    AuthError(String),
 }
 
 impl App<'_> {
@@ -240,9 +243,7 @@ fn parse_request(item: Items) -> anyhow::Result<Request> {
                 let http_request = request.get_http_request_mut()?;
                 http_request.method = match Method::from_str(method) {
                     Ok(method) => method,
-                    Err(_) => {
-                        return Err(anyhow!(UnknownMethod(method.clone())))
-                    }
+                    Err(_) => return Err(anyhow!(UnknownMethod(method.clone())))
                 };
             }
 
@@ -250,7 +251,10 @@ fn parse_request(item: Items) -> anyhow::Result<Request> {
 
             match retrieve_auth(&request_class) {
                 None => {}
-                Some(auth) => request.auth = auth
+                Some(auth) => match auth {
+                    Ok(auth) => request.auth = auth,
+                    Err(error) => return Err(anyhow!(AuthError(error.to_string())))
+                }
             }
 
             /* HEADERS */
@@ -399,7 +403,7 @@ fn retrieve_body(request_class: &RequestClass) -> Option<ContentType> {
     }
 }
 
-fn retrieve_auth(request_class: &RequestClass) -> Option<Auth> {
+fn retrieve_auth(request_class: &RequestClass) -> Option<anyhow::Result<Auth>> {
     let auth = request_class.auth.clone()?;
 
     match auth.auth_type {
@@ -417,7 +421,7 @@ fn retrieve_auth(request_class: &RequestClass) -> Option<Auth> {
                 }
             }
 
-            Some(Auth::BasicAuth(BasicAuth { username, password }))
+            Some(Ok(Auth::BasicAuth(BasicAuth { username, password })))
         },
         AuthType::Bearer => {
             let bearer_token_attributes = auth.bearer?;
@@ -431,7 +435,7 @@ fn retrieve_auth(request_class: &RequestClass) -> Option<Auth> {
                 }
             }
 
-            Some(Auth::BearerToken(BearerToken { token: bearer_token }))
+            Some(Ok(Auth::BearerToken(BearerToken { token: bearer_token })))
         },
         AuthType::Jwt => {
             let jwt_attributes = auth.jwt?;
@@ -460,15 +464,61 @@ fn retrieve_auth(request_class: &RequestClass) -> Option<Auth> {
                 _ => {}
             }
 
-            Some(Auth::JwtToken(JwtToken { algorithm, secret_type, secret, payload }))
+            Some(Ok(Auth::JwtToken(JwtToken { algorithm, secret_type, secret, payload })))
         },
-        AuthType::Awsv4 => None,
-        AuthType::Digest => None,
-        AuthType::Hawk => None,
-        AuthType::Noauth => None,
-        AuthType::Ntlm => None,
-        AuthType::Oauth1 => None,
-        AuthType::Oauth2 => None,
+        AuthType::Digest => {
+            let digest_attributes = auth.digest?;
+
+            let mut username = String::new();
+            let mut password = String::new();
+            let mut realm = String::new();
+            let mut nonce = String::new();
+            let mut opaque = String::new();
+            let mut algorithm = DigestAlgorithm::default();
+            let mut qop = DigestQop::default();
+
+            for digest_attribute in digest_attributes {
+                let value = digest_attribute.value.unwrap().as_str()?.to_string();
+
+                match digest_attribute.key.as_str() {
+                    "username" => username = value,
+                    "password" => password = value,
+                    "realm" => realm = value,
+                    "nonce" => nonce = value,
+                    "opaque" => opaque = value,
+                    "algorithm" => match digest_auth::Algorithm::from_str(&value) {
+                        Ok(new_algorithm) => algorithm = DigestAlgorithm::from_digest_auth_algorithm(new_algorithm),
+                        Err(_) => return Some(Err(anyhow!(DigestError::InvalidAlgorithm(value))))
+                    },
+                    "qop" => match digest_auth::Qop::from_str(&value) {
+                        Ok(new_qop) => qop = DigestQop::from_digest_auth_qop(new_qop),
+                        Err(_) => return Some(Err(anyhow!(DigestError::InvalidAlgorithm(value))))
+                    },
+                    _ => {}
+                }
+            }
+
+            Some(Ok(Auth::Digest(Digest {
+                username,
+                password,
+                domains: String::new(),
+                realm,
+                nonce,
+                opaque,
+                stale: false,
+                algorithm,
+                qop,
+                user_hash: false,
+                charset: DigestCharset::default(),
+                nc: 0,
+            })))
+        },
+        AuthType::Awsv4 => Some(Ok(Auth::NoAuth)),
+        AuthType::Hawk => Some(Ok(Auth::NoAuth)),
+        AuthType::Noauth => Some(Ok(Auth::NoAuth)),
+        AuthType::Ntlm => Some(Ok(Auth::NoAuth)),
+        AuthType::Oauth1 => Some(Ok(Auth::NoAuth)),
+        AuthType::Oauth2 => Some(Ok(Auth::NoAuth)),
     }
 }
 

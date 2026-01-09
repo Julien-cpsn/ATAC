@@ -44,6 +44,8 @@ crokey = "=1.1.2"
 tui-big-text = "=0.7.3"
 ## Display tree-like lists. Used for displaying the collections.
 tui-tree-widget = "=0.23.1"
+## Display scrollable panels
+tui-scrollview = "0.5.3"
 ## Text area that handle a lot of features. Used for editing request body.
 tui-textarea = { version = "=0.7.0", features = ["ratatui"] }
 ## Display loading UI elements. Used when request is pending.
@@ -81,6 +83,8 @@ directories = "=6.0.0"
 arboard = { version = "=3.6.1", features = ["wayland-data-control"], optional = true }
 ## Create and encode JSON Web Tokens (JWT)
 jsonwebtoken = { version = "10.2.0", features = ["rust_crypto"] }
+## Digest auth
+digest_auth = "0.3.1"
 
 # Async
 ## Handle asynchronous requests
