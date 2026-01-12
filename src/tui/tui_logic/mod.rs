@@ -3,4 +3,6 @@ mod collection;
 mod request;
 mod param_tabs;
 mod result_tabs;
-mod environment;
+pub mod environment;
+mod inputs;
+pub mod utils;

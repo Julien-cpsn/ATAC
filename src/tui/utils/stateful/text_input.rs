@@ -1,141 +1,437 @@
-#[derive(Default)]
+use crate::app::files::key_bindings::{CustomTextArea, TextAreaMode, KEY_BINDINGS};
+use crate::app::files::theme::THEME;
+use crate::tui::utils::syntax_highlighting::{ENV_VARIABLE_SYNTAX_REF, ENV_VARIABLE_SYNTAX_SET, SYNTAX_SET, SYNTAX_THEME, THEME_SET};
+use crokey::KeyCombination;
+use edtui::actions::insert::PushLine;
+use edtui::actions::motion::MoveToFirstRow;
+use edtui::actions::search::StartSearch;
+use edtui::actions::{Composed, CopySelection, DeleteChar, FindNext, FindPrevious, InsertChar, LineBreak, MoveBackward, MoveDown, MoveForward, MoveToEndOfLine, MoveToStartOfLine, MoveUp, MoveWordBackward, MoveWordForward, OpenSystemEditor, Paste, Redo, RemoveChar, RemoveCharFromSearch, SelectCurrentSearch, StopSearch, SwitchMode, Undo};
+use edtui::events::{KeyEventHandler, KeyEventRegister, KeyInput};
+use edtui::{system_editor, EditorEventHandler, EditorMode, EditorState, EditorStatusLine, EditorTheme, EditorView, LineNumbers, SyntaxHighlighter};
+use ratatui::backend::CrosstermBackend;
+use ratatui::buffer::Buffer;
+use ratatui::crossterm::event::{KeyCode, KeyEvent};
+use ratatui::layout::HorizontalAlignment;
+use ratatui::prelude::{Constraint, Layout, Rect, Span, Style, Stylize, Widget};
+use ratatui::style::Color;
+use ratatui::widgets::{Block, Borders, Padding};
+use ratatui::Terminal;
+use std::collections::HashMap;
+use std::io::Stdout;
+use syntect::parsing::SyntaxReference;
+
 pub struct TextInput {
-    pub text: String,
-    pub cursor_position: usize
+    pub state: EditorState,
+    pub event_handler: Option<EditorEventHandler>,
+    pub default_mode: EditorMode,
+    pub block_title: Option<String>,
+    pub is_single_line: bool,
+    pub insert_mode_only: bool,
+    pub highlight_text: bool,
+    pub highlight_block: bool,
+    pub display_cursor: bool
 }
 
-const ELLIPSIS: &str = "..";
+pub struct SingleLineTextInput<'a>(pub &'a mut TextInput);
+pub struct MultiLineTextInput<'a>(pub &'a mut TextInput, pub SyntaxReference);
+
+impl<'a> Widget for SingleLineTextInput<'a> {
+    fn render(self, area: Rect, buf: &mut Buffer) where Self: Sized {
+        let new_area = match &self.0.block_title {
+            None => area,
+            Some(block_title) => {
+                let mut block = Block::new()
+                    .title(block_title.as_str())
+                    .borders(Borders::ALL)
+                    .padding(Padding::horizontal(1));
+
+                block = match self.0.highlight_block {
+                    true => block.fg(THEME.read().others.selection_highlight_color),
+                    false => block.fg(THEME.read().ui.main_foreground_color),
+                };
+
+                let block_area = block.inner(area);
+
+                block.render(area, buf);
+
+                block_area
+            }
+        };
+
+
+        let should_display_status = self.0.display_cursor &&
+            !self.0.insert_mode_only &&
+            !(self.0.default_mode == EditorMode::Insert && self.0.state.mode == EditorMode::Insert);
+
+        let constraints = match should_display_status {
+            true => vec![
+                Constraint::Fill(1),
+                Constraint::Length(6),
+            ],
+            false => vec![
+                Constraint::Fill(1)
+            ]
+        };
+
+        let layout = Layout::horizontal(constraints).split(new_area);
+
+        let mut theme = EditorTheme::default().hide_status_line();
+
+        theme = match self.0.highlight_text {
+            true => theme.base(Style::new().fg(THEME.read().ui.font_color)),
+            false => theme.base(Style::new().fg(THEME.read().others.selection_highlight_color)),
+        };
+
+        if !self.0.display_cursor {
+            theme = theme
+                .cursor_style(Style::new())
+                .selection_style(Style::new());
+        }
+        else if self.0.state.mode == EditorMode::Search {
+            theme = theme.cursor_style(Style::new());
+        }
+
+        let syntax_highlighter = SyntaxHighlighter::with_sets(
+            SYNTAX_THEME.clone(),
+            THEME_SET.clone(),
+            ENV_VARIABLE_SYNTAX_REF.clone(),
+            ENV_VARIABLE_SYNTAX_SET.clone()
+        );
+
+        let editor = EditorView::new(&mut self.0.state)
+            .theme(theme)
+            .syntax_highlighter(Some(syntax_highlighter))
+            .wrap(false);
+
+        editor.render(layout[0], buf);
+
+        if should_display_status {
+            let status_line_bg_color = get_color_from_mode(&self.0.state.mode);
+
+            let status_line = Span::raw(self.0.state.mode.name())
+                .style(Style::new().fg(THEME.read().ui.font_color).bg(status_line_bg_color));
+
+            status_line.render(layout[1], buf);
+        }
+    }
+}
+
+impl<'a> Widget for MultiLineTextInput<'a> {
+    fn render(self, area: Rect, buf: &mut Buffer) where Self: Sized {
+        let mut theme = EditorTheme::default()
+            .base(Style::new().fg(THEME.read().ui.font_color))
+            .line_numbers_style(Style::new().fg(THEME.read().ui.secondary_foreground_color));
+
+        if !self.0.display_cursor {
+            theme = theme
+                .hide_status_line()
+                .cursor_style(Style::new())
+                .selection_style(Style::new());
+        }
+        else {
+            if self.0.default_mode != EditorMode::Insert || self.0.state.mode == EditorMode::Search {
+                let status_line_bg_color = get_color_from_mode(&self.0.state.mode);
+
+                let status_line = EditorStatusLine::default()
+                    .alignment(HorizontalAlignment::Center)
+                    .style_mode(Style::new().fg(THEME.read().ui.font_color).bg(status_line_bg_color))
+                    .style_search(Style::new().fg(THEME.read().ui.font_color))
+                    .style_line(Style::new());
+
+                theme = theme.status_line(status_line);
+            }
+            else {
+                theme = theme.hide_status_line();
+            }
+        }
+
+        if let Some(block_title) = &self.0.block_title {
+            let mut block = Block::new()
+                .title(block_title.as_str())
+                .borders(Borders::ALL)
+                .padding(Padding::horizontal(1));
+
+            block = match self.0.highlight_block {
+                true => block.fg(THEME.read().others.selection_highlight_color),
+                false => block.fg(THEME.read().ui.main_foreground_color),
+            };
+
+            theme = theme.block(block);
+        }
+
+        let syntax_set = match &self.1.name == "Double Brace Variables" {
+            true => &*ENV_VARIABLE_SYNTAX_SET,
+            false => &*SYNTAX_SET
+        };
+
+
+        let syntax_highlighter = SyntaxHighlighter::with_sets(
+            SYNTAX_THEME.clone(),
+            THEME_SET.clone(),
+            self.1,
+            syntax_set.clone()
+        );
+
+        let editor = EditorView::new(&mut self.0.state)
+            .theme(theme)
+            .syntax_highlighter(Some(syntax_highlighter))
+            .wrap(false)
+            .line_numbers(LineNumbers::Absolute)
+            .tab_width(4);
+
+        editor.render(area, buf)
+    }
+}
 
 impl TextInput {
+    pub fn new(block_title: Option<String>) -> Self {
+        let state = EditorState::default();
+
+        Self {
+            state,
+            event_handler: None,
+            default_mode: EditorMode::Insert, // Placeholder
+            block_title,
+            is_single_line: true, // Placeholder
+            insert_mode_only: false, // Placeholder
+            highlight_text: false, // Placeholder
+            highlight_block: false, // Placeholder
+            display_cursor: false, // Placeholder
+        }
+    }
+
+    pub fn update_handler(&mut self) {
+        let editor_handler = EditorEventHandler::new(generate_key_handler(self.is_single_line, self.insert_mode_only));
+        self.event_handler = Some(editor_handler);
+    }
+
+    pub fn reset_mode(&mut self) {
+        self.state.mode = self.default_mode;
+    }
+
+    pub fn reset_cursor_position(&mut self) {
+        if self.is_single_line {
+            self.move_cursor_line_end();
+        }
+        else {
+            self.move_cursor_start();
+        }
+    }
+
+    pub fn reset_selection(&mut self) {
+        self.state.selection = None;
+    }
+
+    pub fn clear(&mut self) {
+        self.state.lines.clear();
+    }
+
+    pub fn to_string(&self) -> String {
+        self.state.lines.to_string()
+    }
+
+    pub fn to_lines(&self) -> Vec<String> {
+        self.state.lines.to_vecs().iter().map(|line| line.iter().collect()).collect()
+    }
+
+    pub fn is_in_default_mode(&self) -> bool {
+        self.state.mode == self.default_mode
+    }
+
+    #[allow(unused)]
+    pub fn delete_char_forward(&mut self) {
+        self.state.execute(RemoveChar(1));
+    }
+
+    #[allow(unused)]
+    pub fn delete_char_backward(&mut self) {
+        self.state.execute(DeleteChar(1));
+    }
+
+    #[allow(unused)]
     pub fn move_cursor_left(&mut self) {
-        let cursor_moved_left = self.cursor_position.saturating_sub(1);
-        self.cursor_position = self.clamp_cursor(cursor_moved_left);
+        self.state.execute(MoveBackward(1));
     }
 
+    #[allow(unused)]
     pub fn move_cursor_right(&mut self) {
-        let cursor_moved_right = self.cursor_position.saturating_add(1);
-        self.cursor_position = self.clamp_cursor(cursor_moved_right);
+        self.state.execute(MoveForward(1));
     }
 
+    pub fn move_cursor_start(&mut self) {
+        self.state.execute(MoveToFirstRow())
+    }
+
+    #[allow(unused)]
     pub fn move_cursor_line_start(&mut self) {
-        self.cursor_position = 0;
+        self.state.execute(MoveToStartOfLine())
     }
 
     pub fn move_cursor_line_end(&mut self) {
-        self.cursor_position = self.text.chars().count();
+        self.state.execute(MoveToEndOfLine())
     }
 
-    pub fn enter_char(&mut self, new_char: char) {
-        // Remove ASCII-only check to support UTF-8
-        let byte_index = self.get_byte_index(self.cursor_position);
-        self.text.insert(byte_index, new_char);
-        self.move_cursor_right();
+    #[allow(unused)]
+    pub fn push_char(&mut self, char: char) {
+        self.state.execute(InsertChar(char));
     }
 
-    pub fn enter_str(&mut self, string: &str) {
-        for char in string.chars() {
-            self.enter_char(char)
+    pub fn push_str(&mut self, line: &str) {
+        for line in line.split('\n') {
+            self.state.execute(PushLine(line));
         }
     }
 
-    pub fn delete_char_backward(&mut self) {
-        let is_not_cursor_leftmost = self.cursor_position != 0;
-        if is_not_cursor_leftmost {
-            // Use character-based removal instead of byte manipulation
-            let current_index = self.cursor_position;
-            let from_left_to_current_index = current_index - 1;
+    pub fn key_event(&mut self, key: KeyCombination, terminal: Option<&mut Terminal<CrosstermBackend<Stdout>>>) {
+        self.event_handler.as_mut().unwrap().on_key_event::<KeyEvent>(key.into(), &mut self.state);
 
-            // Getting all characters before the selected character
-            let before_char_to_delete = self.text.chars().take(from_left_to_current_index);
-            // Getting all characters after selected character
-            let after_char_to_delete = self.text.chars().skip(current_index);
-
-            // Put all characters together except the selected one
-            self.text = before_char_to_delete.chain(after_char_to_delete).collect();
-            self.move_cursor_left();
+        if let Some(terminal) = terminal && system_editor::is_pending(&self.state) {
+            system_editor::open(&mut self.state, terminal).ok();
         }
     }
+}
 
-    pub fn delete_char_forward(&mut self) {
-        let is_not_cursor_rightmost = self.cursor_position < self.text.chars().count();
+fn generate_key_handler(is_single_line: bool, insert_mode_only: bool) -> KeyEventHandler {
+    let text_input = KEY_BINDINGS.read().generic.text_input;
+    match text_input.mode {
+        TextAreaMode::Vim => {
+            let mut handler = KeyEventHandler::vim_mode();
 
-        if is_not_cursor_rightmost {
-            // Use character-based removal instead of byte manipulation
-            let current_index = self.cursor_position;
+            if is_single_line {
+                // Remove new line
+                handler.remove(&KeyEventRegister::i(vec![KeyInput::new(KeyCode::Enter)]));
+                handler.remove(&KeyEventRegister::n(vec![KeyInput::new(KeyCode::Char('o'))]));
+                handler.remove(&KeyEventRegister::n(vec![KeyInput::new(KeyCode::Char('O'))]));
+                handler.remove(&KeyEventRegister::n(vec![KeyInput::new(KeyCode::Char('J'))]));
 
-            // Getting all characters before the selected character
-            let before_char_to_delete = self.text.chars().take(current_index);
-            // Getting all characters after selected character
-            let after_char_to_delete = self.text.chars().skip(current_index + 1);
+                // External system editor
+                handler.remove(&KeyEventRegister::n(vec![KeyInput::ctrl(KeyCode::Char('e'))]));
+            }
 
-            // Put all characters together except the selected one
-            self.text = before_char_to_delete.chain(after_char_to_delete).collect();
+            if insert_mode_only {
+                handler.remove(&KeyEventRegister::i(vec![KeyInput::new(KeyCode::Esc)]));
+            }
+
+            handler
+        },
+        TextAreaMode::Emacs => {
+            let mut handler = KeyEventHandler::emacs_mode();
+
+            if is_single_line {
+                // Remove new line
+                handler.remove(&KeyEventRegister::i(vec![KeyInput::ctrl(KeyCode::Char('o'))]));
+                handler.remove(&KeyEventRegister::i(vec![KeyInput::new(KeyCode::Enter)]));
+                handler.remove(&KeyEventRegister::i(vec![KeyInput::ctrl(KeyCode::Char('j'))]));
+
+                // External system editor
+                handler.remove(&KeyEventRegister::i(vec![KeyInput::alt(KeyCode::Char('e'))]))
+            }
+
+            if insert_mode_only {
+                handler.remove(&KeyEventRegister::i(vec![KeyInput::ctrl('s')]));
+            }
+
+            handler
+        },
+        _ => {
+            let custom_text_input = match text_input.mode {
+                TextAreaMode::Default => CustomTextArea::default(),
+                TextAreaMode::Custom(custom_text_input) => custom_text_input,
+                _ => unreachable!()
+            };
+
+            let copy: KeyEvent = custom_text_input.copy.into();
+            let paste: KeyEvent = custom_text_input.paste.into();
+
+            let undo: KeyEvent = custom_text_input.undo.into();
+            let redo: KeyEvent = custom_text_input.redo.into();
+
+            let system_editor: KeyEvent = custom_text_input.system_editor.into();
+
+            let search: KeyEvent = custom_text_input.search.into();
+            let quit_without_saving: KeyEvent = text_input.quit_without_saving.into();
+
+            let new_line: KeyEvent = custom_text_input.new_line.into();
+
+            let delete_backward: KeyEvent = custom_text_input.delete_backward.into();
+            let delete_forward: KeyEvent = custom_text_input.delete_forward.into();
+
+            let skip_word_left: KeyEvent = custom_text_input.skip_word_left.into();
+            let skip_word_right: KeyEvent = custom_text_input.skip_word_right.into();
+
+            let move_cursor_right: KeyEvent = custom_text_input.move_cursor_right.into();
+            let move_cursor_left: KeyEvent = custom_text_input.move_cursor_left.into();
+            let move_cursor_up: KeyEvent = custom_text_input.move_cursor_up.into();
+            let move_cursor_down: KeyEvent = custom_text_input.move_cursor_down.into();
+            let move_cursor_line_start: KeyEvent = custom_text_input.move_cursor_line_start.into();
+            let move_cursor_line_end: KeyEvent = custom_text_input.move_cursor_line_end.into();
+
+            let mut keys = HashMap::from([
+                (KeyEventRegister::s(vec![KeyInput::from(delete_forward)]), RemoveCharFromSearch.into()),
+                // INSERT
+                (KeyEventRegister::i(vec![KeyInput::from(move_cursor_right)]), MoveForward(1).into()),
+                (KeyEventRegister::i(vec![KeyInput::from(move_cursor_left)]), MoveBackward(1).into()),
+                (KeyEventRegister::i(vec![KeyInput::from(move_cursor_up)]), MoveUp(1).into()),
+                (KeyEventRegister::i(vec![KeyInput::from(move_cursor_down)]), MoveDown(1).into()),
+                (KeyEventRegister::i(vec![KeyInput::from(skip_word_right)]), MoveWordForward(1).into()),
+                (KeyEventRegister::i(vec![KeyInput::from(skip_word_left)]), MoveWordBackward(1).into()),
+                (KeyEventRegister::i(vec![KeyInput::from(move_cursor_line_start)]), MoveToStartOfLine().into()),
+                (KeyEventRegister::i(vec![KeyInput::from(move_cursor_line_end)]), MoveToEndOfLine().into()),
+                (KeyEventRegister::i(vec![KeyInput::from(delete_forward)]), DeleteChar(1).into()),
+                (KeyEventRegister::i(vec![KeyInput::from(delete_backward)]), RemoveChar(1).into()),
+                (KeyEventRegister::i(vec![KeyInput::from(undo)]), Undo.into()),
+                (KeyEventRegister::i(vec![KeyInput::from(redo)]), Redo.into()),
+                (KeyEventRegister::i(vec![KeyInput::from(copy)]), CopySelection.into()),
+                (KeyEventRegister::i(vec![KeyInput::from(paste)]), Paste.into()),
+                (KeyEventRegister::i(vec![KeyInput::from(system_editor)]), OpenSystemEditor.into())
+            ]);
+
+            if !is_single_line {
+                keys.insert(KeyEventRegister::i(vec![KeyInput::from(new_line)]), LineBreak(1).into());
+            }
+
+            if !insert_mode_only {
+                keys.extend([
+                    // SEARCH
+                    (
+                        KeyEventRegister::i(vec![KeyInput::from(search)]),
+                        Composed::new(StartSearch)
+                            .chain(SwitchMode(EditorMode::Search))
+                            .into()
+                    ),
+                    (KeyEventRegister::s(vec![KeyInput::from(move_cursor_down)]), FindNext.into()),
+                    (KeyEventRegister::s(vec![KeyInput::from(move_cursor_up)]), FindPrevious.into()),
+                    (
+                        KeyEventRegister::s(vec![KeyInput::from(new_line)]),
+                        Composed::new(SelectCurrentSearch)
+                            .chain(SwitchMode(EditorMode::Insert))
+                            .into()
+                    ),
+                    (
+                        KeyEventRegister::s(vec![KeyInput::from(search)]),
+                        Composed::new(StopSearch)
+                            .chain(SwitchMode(EditorMode::Insert))
+                            .into()
+                    ),
+                    (
+                        KeyEventRegister::s(vec![KeyInput::from(quit_without_saving)]),
+                        Composed::new(StopSearch)
+                            .chain(SwitchMode(EditorMode::Insert))
+                            .into()
+                    ),
+                ]);
+            }
+
+            KeyEventHandler::new(keys, false)
         }
     }
+}
 
-    // Helper method to convert character index to byte index
-    fn get_byte_index(&self, char_index: usize) -> usize {
-        self.text.char_indices()
-            .nth(char_index)
-            .map_or(self.text.len(), |(byte_index, _)| byte_index)
-    }
-
-    pub fn clamp_cursor(&self, new_cursor_pos: usize) -> usize {
-        new_cursor_pos.clamp(0, self.text.chars().count())
-    }
-
-    pub fn reset_cursor(&mut self) {
-        self.cursor_position = 0;
-    }
-
-    pub fn reset_input(&mut self) {
-        self.text.clear();
-        self.reset_cursor();
-    }
-
-    /// Returns the text with ellipsis if the cursor is further the input box length
-    pub fn get_padded_text_and_cursor(&self, length: usize) -> (String, usize) {
-        let text_char_count = self.text.chars().count();
-
-        // if the text is shorter than the desired length
-        if text_char_count <= length {
-            return (self.text.clone(), self.cursor_position);
-        }
-
-        let ellipsis_char_count = ELLIPSIS.chars().count();
-
-        // Calculate the visible portion length
-        let first_part_length = length - ellipsis_char_count;
-
-        // If cursor is within the first visible portion
-        if self.cursor_position <= first_part_length {
-            // Take the first part of the text (in characters)
-            let first_part: String = self.text.chars().take(first_part_length).collect();
-            let text = format!("{}{}", first_part, ELLIPSIS);
-            return (text, self.cursor_position);
-        }
-
-        // For cursor positions beyond the first visible portion
-        let double_adjusted_length = length - 2 * ellipsis_char_count;
-        let char_vec: Vec<char> = self.text.chars().collect();
-
-        // Calculate the number of "pages" of text
-        let nb_lengths_text = ((text_char_count - first_part_length) / double_adjusted_length) + 1;
-        let nb_lengths_cursor = ((self.cursor_position - first_part_length) / double_adjusted_length) + 1;
-
-        // Calculate the starting character index for the visible portion
-        let start_index = first_part_length + (nb_lengths_cursor - 1) * double_adjusted_length;
-
-        if nb_lengths_cursor == nb_lengths_text {
-            // If cursor is in the last "page"
-            let text = format!("{}{}", ELLIPSIS, char_vec[start_index..].iter().collect::<String>());
-            return (text, self.cursor_position + ellipsis_char_count - start_index);
-        } else {
-            // If cursor is in a middle "page"
-            let end_index = std::cmp::min(start_index + double_adjusted_length, text_char_count);
-            let visible_text: String = char_vec[start_index..end_index].iter().collect();
-            let text = format!("{}{}{}", ELLIPSIS, visible_text, ELLIPSIS);
-            return (text, self.cursor_position + ellipsis_char_count - start_index);
-        }
+fn get_color_from_mode(mode: &EditorMode) -> Color {
+    match mode {
+        EditorMode::Normal => THEME.read().ui.secondary_foreground_color,
+        EditorMode::Insert => Color::Green,
+        EditorMode::Visual => Color::Yellow,
+        EditorMode::Search => Color::Magenta
     }
 }

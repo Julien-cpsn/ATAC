@@ -1,7 +1,5 @@
 use reqwest::header::CONTENT_TYPE;
 use tracing::{info};
-use tui_textarea::TextArea;
-use rayon::prelude::*;
 
 use crate::app::app::App;
 use crate::models::protocol::http::body::{ContentType, next_content_type};
@@ -27,7 +25,7 @@ impl App<'_> {
         let selected_request_index = &self.collections_tree.selected.unwrap();
 
         let selection = self.body_form_table.selection.unwrap();
-        let input_text = self.body_form_table.selection_text_input.text.clone();
+        let input_text = self.body_form_table.selection_text_input.to_string();
 
         if let Err(_) = self.modify_request_form_data(selected_request_index.0, selected_request_index.1, input_text, selection.1, selection.0) {
             return;
@@ -93,15 +91,6 @@ impl App<'_> {
         self.update_inputs();
     }
 
-    pub fn refresh_body_textarea(&mut self, text: &String) {
-        let lines: Vec<String> = text
-            .par_lines()
-            .map(|line| line.to_string())
-            .collect();
-
-        self.body_text_area = TextArea::new(lines);
-    }
-
     pub fn tui_modify_request_body(&mut self) {
         let selected_request_index = &self.collections_tree.selected.unwrap();
         let local_selected_request = self.get_request_as_local_from_indexes(selected_request_index);
@@ -111,14 +100,14 @@ impl App<'_> {
             let selected_http_request = selected_request.get_http_request_mut().unwrap();
 
             let body_form = &self.body_form_table.rows;
-            let body_file = &self.body_file_text_input.text;
-            let body_string = self.body_text_area.lines().join("\n");
+            let body_file = self.body_file_text_input.to_string();
+            let body_string = self.body_text_area.to_string();
 
             let new_body = match selected_http_request.body {
                 ContentType::NoBody => ContentType::NoBody,
                 ContentType::Multipart(_) => ContentType::Multipart(body_form.clone()),
                 ContentType::Form(_) => ContentType::Form(body_form.clone()),
-                ContentType::File(_) => ContentType::File(body_file.clone()),
+                ContentType::File(_) => ContentType::File(body_file),
                 ContentType::Raw(_) => ContentType::Raw(body_string.clone()),
                 ContentType::Json(_) => ContentType::Json(body_string.clone()),
                 ContentType::Xml(_) => ContentType::Xml(body_string.clone()),

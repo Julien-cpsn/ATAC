@@ -2,7 +2,7 @@ use crate::app::app::App;
 
 impl App<'_> {
     pub fn tui_modify_request_url(&mut self) {
-        let input_text = self.url_text_input.text.clone();
+        let input_text = self.url_text_input.to_string();
 
         let selected_request_index = &self.collections_tree.selected.unwrap();
 

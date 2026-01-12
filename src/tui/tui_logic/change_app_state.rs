@@ -1,14 +1,15 @@
 use crate::app::app::App;
 use crate::app::log::{LOGS, SHOULD_RECORD_LOGS};
+use crate::models::export::ExportFormat;
 use crate::models::protocol::http::body::ContentType;
+use crate::models::protocol::protocol::Protocol;
 use crate::tui::app_states::AppState;
 use crate::tui::ui::param_tabs::param_tabs::RequestParamsTabs;
 use crate::tui::utils::stateful::cookie_table::cookie_to_row;
+use edtui::actions::MoveToEndOfLine;
 use std::sync::atomic::Ordering;
 use std::sync::Arc;
 use strum::VariantArray;
-use crate::models::export::ExportFormat;
-use crate::models::protocol::protocol::Protocol;
 
 impl App<'_> {
     fn set_app_state(&mut self, app_state: AppState) {
@@ -47,8 +48,6 @@ impl App<'_> {
             let env = local_env.read();
 
             if !env.values.is_empty() {
-                self.env_editor_table.selection_text_input.reset_input();
-
                 let selection = self.env_editor_table.selection.unwrap();
 
                 let pair = env.values.get_index(selection.0).unwrap();
@@ -58,7 +57,10 @@ impl App<'_> {
                     _ => unreachable!()
                 };
 
-                self.env_editor_table.selection_text_input.enter_str(&text);
+                self.env_editor_table.selection_text_input.reset_mode();
+                self.env_editor_table.selection_text_input.clear();
+                self.env_editor_table.selection_text_input.push_str(&text);
+                self.env_editor_table.selection_text_input.move_cursor_line_end();
                 self.set_app_state(AppState::EditingEnvVariable);
             }
         }
@@ -83,9 +85,9 @@ impl App<'_> {
 
         let input_text = self.cookies_popup.cookies_table.rows[selection.0][selection.1].clone();
 
-        self.cookies_popup.cookies_table.selection_text_input.reset_input();
-        self.cookies_popup.cookies_table.selection_text_input.enter_str(&input_text);
-        self.cookies_popup.cookies_table.selection_text_input.cursor_position = input_text.len();
+        self.cookies_popup.cookies_table.selection_text_input.clear();
+        self.cookies_popup.cookies_table.selection_text_input.push_str(&input_text);
+        self.cookies_popup.cookies_table.selection_text_input.move_cursor_line_end();
 
         self.set_app_state(AppState::EditingCookies);
     }
@@ -161,8 +163,9 @@ impl App<'_> {
         let selected_request_index = self.collections_tree.state.selected();
 
         let collection_name = &self.collections[selected_request_index[0]].name;
-        self.rename_collection_input.text = collection_name.clone();
-        self.rename_collection_input.cursor_position = collection_name.len();
+        self.rename_collection_input.clear();
+        self.rename_collection_input.push_str(collection_name);
+        self.rename_collection_input.state.execute(MoveToEndOfLine());
         
         self.set_app_state(AppState::RenamingCollection);
     }
@@ -172,8 +175,9 @@ impl App<'_> {
 
         {
             let selected_request = self.collections[selected_request_index[0]].requests[selected_request_index[1]].read();
-            self.rename_request_input.text = selected_request.name.clone();
-            self.rename_request_input.cursor_position = selected_request.name.len();
+            self.rename_request_input.clear();
+            self.rename_request_input.push_str(&selected_request.name);
+            self.rename_request_input.state.execute(MoveToEndOfLine());
         }
 
         self.set_app_state(AppState::RenamingRequest);

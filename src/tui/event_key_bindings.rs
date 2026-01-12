@@ -5,7 +5,7 @@ use ratatui::style::{Color, Stylize};
 use crate::tui::app_states::EMPTY_KEY;
 use crate::app::files::key_bindings::unique_key_and_help;
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct EventKeyBinding {
     pub keys: Vec<KeyCombination>,
     pub event_name: String,

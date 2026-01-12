@@ -17,24 +17,14 @@ display_logs = "Shift-L"
 [keybindings.generic]
 display_help = "Shift-h" # Take care to not overlap other inputs, the help can be triggered from anywhere
 
-# Collection name, request name, URL, Header, Query param, Basic Auth, Bearer Token
-[keybindings.generic.text_inputs.text_input]
-confirm = "Enter"
-cancel = "Esc"
+# E.g. Collection name, request name, URL, Header, Query param, Basic Auth, Bearer Token, Request body
+[keybindings.generic.text_input]
+quit_without_saving = "Esc"
+save_and_quit_single_line = "Enter"
+save_and_quit_area = "Ctrl-s"
 
-delete_backward = "Delete"
-delete_forward = "Backspace"
-
-move_cursor_left = "Ctrl-h"
-move_cursor_right = "Ctrl-l"
-move_cursor_line_start = "Home"
-move_cursor_line_end = "End"
-
-# Request body
-[keybindings.generic.text_inputs]
-
-# Will simulate most of the Vim key bindings in the text areas (Request body)
-text_area_mode = "VimEmulation"
+# Will simulate most of the Vim key bindings in the text areas (e.g. Request body)
+mode = "vim"
 
 # Navigation in tables, popups, up and down in the collections list
 [keybindings.generic.navigation]

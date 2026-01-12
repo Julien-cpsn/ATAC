@@ -1,18 +1,18 @@
 # Please avoid using Ctrl-v, it will paste your clipboard and trigger many unwanted event
 
 [keybindings.main_menu]
-exit = "q" # ctrl-c is implemented by default
+exit = "Ctrl-x" # ctrl-c is implemented by default
 
 unselect_request = "Left"
 expand_collection = "Right"
 
-move_request_up = "Shift-Up"
-move_request_down = "Shift-Down"
+move_request_up = "Ctrl-Up"
+move_request_down = "Ctrl-Down"
 
-next_environment = "e"
-display_env_editor = "ctrl-e"
-display_cookies = "c"
-display_logs = "l"
+next_environment = "Ctrl-e"
+display_env_editor = "Shift-e"
+display_cookies = "Ctrl-c"
+display_logs = "Ctrl-l"
 
 [keybindings.generic]
 display_help = "Ctrl-h" # Take care to not overlap other inputs, the help can be triggered from anywhere
@@ -21,34 +21,10 @@ display_help = "Ctrl-h" # Take care to not overlap other inputs, the help can be
 [keybindings.generic.text_input]
 quit_without_saving = "Esc"
 save_and_quit_single_line = "Enter"
-save_and_quit_area = "Ctrl-s"
+save_and_quit_area = "Ctrl-x"
 
-[keybindings.generic.text_input.mode.custom]
-copy = "Ctrl-c"
-paste = "Ctrl-v"
-
-undo = "Ctrl-z"
-redo = "Ctrl-y"
-
-search = "Ctrl-f"
-system_editor = "Ctrl-e"
-
-new_line = "Enter"
-indent = "Tab"
-
-delete_backward = "Delete"
-delete_forward = "Backspace"
-
-skip_word_right = "Ctrl-Right"
-skip_word_left = "Ctrl-Left"
-
-move_cursor_up = "Up"
-move_cursor_down = "Down"
-move_cursor_left = "Left"
-move_cursor_right = "Right"
-
-move_cursor_line_start = "Home"
-move_cursor_line_end = "End"
+# Will simulate most of the emcas key bindings in the text areas (e.g. Request body)
+mode = "emacs"
 
 # Navigation in tables, popups, up and down in the collections list
 [keybindings.generic.navigation]
@@ -69,21 +45,21 @@ select = "Enter"
 
 # Collections list, query params, headers, cookies
 [keybindings.generic.list_and_table_actions]
-create_element = "n"
-delete_element = "d"
-edit_element = "Enter"       # Edit query param, header, basic auth, bearer token
-rename_element = "r"         # Only used in the collections list (main menu)
-toggle_element = "t"         # Only used in tables (Query params, headers, cookies)
-duplicate_element = "Ctrl-d"
+create_element = "Ctrl-n"
+delete_element = "Ctrl-d"
+edit_element = "Enter" # Edit query param, header, basic auth, bearer token
+rename_element = "Ctrl-r" # Only used in the collections list (main menu)
+toggle_element = "Ctrl-t" # Only used in tables (Query params, headers, cookies)
+duplicate_element = "Shift-d"
 
 [keybindings.request_selected]
 param_next_tab = "Tab"
 
-change_url = "u"
-change_method = "m"
-request_settings = "s"
+change_url = "Ctrl-u"
+change_method = "Ctrl-m"
+request_settings = "Ctrl-s"
 
-next_view = "v"
+next_view = "Ctrl-v"
 
 send_request = "Space"
 alt_send_request = "Ctrl-Enter"
@@ -96,11 +72,11 @@ change_body_content_type = "Ctrl-b"
 change_message_type = "Ctrl-m"
 
 [keybindings.request_selected.result_tabs]
-scroll_up = "Shift-Up"
-scroll_down = "Shift-Down"
-scroll_left = "Shift-Left"
-scroll_right = "Shift-Right"
+scroll_up = "Ctrl-Up"
+scroll_down = "Ctrl-Down"
+scroll_left = "Ctrl-Left"
+scroll_right = "Ctrl-Right"
 
-yank_response_part = "y" # Used to yank the current result tab (e.g. body, headers, cookies)
+yank_response_part = "Ctrl-y" # Used to yank the current result tab (e.g. body, headers, cookies)
 
 result_next_tab = "Shift-BackTab" # Will use param_next_tab depending on the selected view

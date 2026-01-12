@@ -1,26 +1,42 @@
-use crate::app::app::App;
 use crate::app::files::theme::THEME;
 use crate::models::request::KeyValue;
-use crate::tui::app_states::AppState;
-use crate::tui::utils::stateful::text_input::TextInput;
+use crate::tui::utils::stateful::text_input::{SingleLineTextInput, TextInput};
+use ratatui::buffer::Buffer;
 use ratatui::layout::Direction::{Horizontal, Vertical};
-use ratatui::layout::{Constraint, Layout, Position, Rect};
-use ratatui::prelude::{Line, Modifier, Style, Stylize};
-use ratatui::widgets::{Block, Borders, List, ListState, Paragraph};
-use ratatui::Frame;
+use ratatui::layout::{Constraint, Layout, Rect};
+use ratatui::prelude::{Line, Modifier, StatefulWidget, Style, Stylize, Widget};
+use ratatui::widgets::{Block, Borders, List, ListItem, ListState, Paragraph};
 
 
-#[derive(Default)]
-pub struct StatefulCustomTable {
+pub struct StatefulCustomTable<'a> {
     pub left_state: ListState,
     pub right_state: ListState,
     /// (x, y)
     pub selection: Option<(usize, usize)>,
     pub rows: Vec<KeyValue>,
     pub selection_text_input: TextInput,
+
+    pub is_editing: bool,
+    pub empty_rows_lines: Vec<Line<'a>>,
+    pub default_key: &'static str,
+    pub default_value: &'static str,
 }
 
-impl StatefulCustomTable {
+impl<'a> StatefulCustomTable<'a> {
+    pub fn new(empty_rows_lines: Vec<Line<'a>>, default_key: &'static str, default_value: &'static str) -> Self {
+        Self {
+            left_state: ListState::default(),
+            right_state: ListState::default(),
+            selection: None,
+            rows: vec![],
+            selection_text_input: TextInput::new(None),
+            is_editing: false,
+            empty_rows_lines,
+            default_key,
+            default_value,
+        }
+    }
+
     pub fn update_selection(&mut self, selection: Option<(usize, usize)>) {
         match selection {
             None => {
@@ -124,22 +140,15 @@ impl StatefulCustomTable {
     }
 }
 
-impl App<'_> {
-    pub fn render_custom_table(
-        &self,
-        frame: &mut Frame,
-        area: Rect,
-        table: &StatefulCustomTable,
-        no_selection_lines: Vec<Line>,
-        editing_state: AppState,
-        key_name: &'static str,
-        value_name: &'static str
-    ) {
-        match table.selection {
-            None => {
-                let headers_paragraph = Paragraph::new(no_selection_lines).centered();
+impl<'a> StatefulWidget for &'a mut StatefulCustomTable<'_> {
+    type State = (Vec<ListItem<'a>>, Vec<ListItem<'a>>);
 
-                frame.render_widget(headers_paragraph, area);
+    fn render(self, area: Rect, buf: &mut Buffer, rows: &mut Self::State) where Self: Sized {
+        match self.selection {
+            None => {
+                let headers_paragraph = Paragraph::new(self.empty_rows_lines.clone()).centered();
+
+                headers_paragraph.render(area, buf);
             },
             Some(selection) => {
                 let layout = Layout::new(
@@ -160,7 +169,7 @@ impl App<'_> {
                 )
                     .split(layout[0]);
 
-                let title = Paragraph::new(key_name)
+                let title = Paragraph::new(self.default_key)
                     .centered()
                     .block(
                         Block::new()
@@ -169,7 +178,7 @@ impl App<'_> {
                     )
                     .fg(THEME.read().ui.secondary_foreground_color);
 
-                let form_value = Paragraph::new(value_name)
+                let form_value = Paragraph::new(self.default_value)
                     .centered()
                     .block(
                         Block::new()
@@ -178,8 +187,8 @@ impl App<'_> {
                     )
                     .fg(THEME.read().ui.secondary_foreground_color);
 
-                frame.render_widget(title, inner_layout[0]);
-                frame.render_widget(form_value, inner_layout[1]);
+                title.render(inner_layout[0], buf);
+                form_value.render(inner_layout[1], buf);
 
                 let horizontal_margin = 2;
 
@@ -206,53 +215,50 @@ impl App<'_> {
                     _ => {}
                 }
 
-                let (keys, values) = self.key_value_vec_to_items_list(&table.rows);
-
-                let left_list = List::new(keys)
+                let left_list = List::new(rows.0.to_owned())
                     .highlight_style(left_list_style)
                     .fg(THEME.read().ui.font_color);
 
-                let right_list = List::new(values)
+                let right_list = List::new(rows.1.to_owned())
                     .highlight_style(right_list_style)
                     .fg(THEME.read().ui.font_color);
 
-                frame.render_stateful_widget(left_list, table_layout[0], &mut table.left_state.clone());
-                frame.render_stateful_widget(right_list, table_layout[1], &mut table.right_state.clone());
+                StatefulWidget::render(left_list, table_layout[0], buf, &mut self.left_state.clone());
+                StatefulWidget::render(right_list, table_layout[1], buf, &mut self.right_state.clone());
 
                 // Form input & cursor
 
-                if self.state == editing_state {
-                    let cell_with = layout[1].width / 2;
+                let cell_with = layout[1].width / 2;
 
-                    let width_adjustment = match selection.1 {
-                        0 => 0,
-                        1 => {
-                            let even_odd_adjustment = match layout[1].width % 2 {
-                                1 => 1,
-                                0 => 2,
-                                _ => 0
-                            };
-                            cell_with - even_odd_adjustment
-                        },
-                        _ => 0
-                    };
+                let width_adjustment = match selection.1 {
+                    0 => 0,
+                    1 => {
+                        let even_odd_adjustment = match layout[1].width % 2 {
+                            1 => 1,
+                            0 => 2,
+                            _ => 0
+                        };
 
-                    let height_adjustment = (selection.0 - table.left_state.offset()) as u16 % layout[1].height;
+                        cell_with.saturating_sub(even_odd_adjustment)
+                    },
+                    _ => 0
+                };
 
-                    let selection_position_x = layout[1].x + width_adjustment + horizontal_margin;
-                    let selection_position_y = layout[1].y + height_adjustment;
+                let height_adjustment = (selection.0 - self.left_state.offset()) as u16 % layout[1].height;
 
-                    let data_text = table.selection_text_input.text.clone();
+                let selection_position_x = layout[1].x + width_adjustment + horizontal_margin;
+                let selection_position_y = layout[1].y + height_adjustment;
 
-                    let text_input = Paragraph::new(format!("{:fill$}", data_text, fill = (cell_with - horizontal_margin) as usize));
-                    let text_rect = Rect::new(selection_position_x, selection_position_y, cell_with, 1);
+                let text_rect = Rect::new(selection_position_x, selection_position_y, cell_with.saturating_sub(horizontal_margin), 1);
 
-                    frame.render_widget(text_input, text_rect);
-
-                    frame.set_cursor_position(Position::new(
-                        selection_position_x + table.selection_text_input.cursor_position as u16,
-                        selection_position_y
-                    ));
+                if self.is_editing {
+                    self.selection_text_input.display_cursor = true;
+                    self.selection_text_input.highlight_text = true;
+                    " ".repeat(text_rect.width as usize).render(text_rect, buf);
+                    SingleLineTextInput(&mut self.selection_text_input).render(text_rect, buf);
+                } else {
+                    self.selection_text_input.display_cursor = false;
+                    self.selection_text_input.highlight_text = false;
                 }
             }
         }

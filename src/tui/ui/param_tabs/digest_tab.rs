@@ -7,6 +7,7 @@ use ratatui::prelude::{Position, Size, StatefulWidget, Stylize};
 use ratatui::widgets::{Block, Borders, Paragraph};
 use ratatui::Frame;
 use tui_scrollview::{ScrollView, ScrollViewState};
+use crate::tui::utils::stateful::text_input::SingleLineTextInput;
 
 impl App<'_> {
     pub(super) fn render_digest_tab(&mut self, frame: &mut Frame, area: Rect) {
@@ -39,37 +40,6 @@ impl App<'_> {
 
             selected_request.auth.get_digest().clone()
         };
-
-        let mut username_block = Block::new()
-            .title("Username")
-            .borders(Borders::ALL)
-            .fg(THEME.read().ui.main_foreground_color);
-
-
-        let mut password_block = Block::new()
-            .title("Password")
-            .borders(Borders::ALL)
-            .fg(THEME.read().ui.main_foreground_color);
-
-        let mut domains_block = Block::new()
-            .title("Domains")
-            .borders(Borders::ALL)
-            .fg(THEME.read().ui.main_foreground_color);
-
-        let mut realm_block = Block::new()
-            .title("Realm")
-            .borders(Borders::ALL)
-            .fg(THEME.read().ui.main_foreground_color);
-
-        let mut nonce_block = Block::new()
-            .title("Nonce")
-            .borders(Borders::ALL)
-            .fg(THEME.read().ui.main_foreground_color);
-
-        let mut opaque_block = Block::new()
-            .title("Opaque")
-            .borders(Borders::ALL)
-            .fg(THEME.read().ui.main_foreground_color);
 
         let mut stale_block = Block::new()
             .title("Stale ← →")
@@ -112,45 +82,19 @@ impl App<'_> {
             _ => {}
         };
 
-        let username_adjusted_input_length = digest_auth_layout[0].width as usize - 2;
-        let (username_padded_text, username_input_cursor_position) = self.auth_digest_username_text_input.get_padded_text_and_cursor(username_adjusted_input_length);
+        let mut highlight_username = false;
+        let mut display_username_cursor = false;
+        let mut highlight_password = false;
+        let mut display_password_cursor = false;
+        let mut highlight_domains = false;
+        let mut display_domains_cursor = false;
+        let mut highlight_realm = false;
+        let mut display_realm_cursor = false;
+        let mut highlight_nonce = false;
+        let mut display_nonce_cursor = false;
+        let mut highlight_opaque = false;
+        let mut display_opaque_cursor = false;
 
-        let password_adjusted_input_length = digest_auth_layout[1].width as usize - 2;
-        let (password_padded_text, password_input_cursor_position) = self.auth_digest_password_text_input.get_padded_text_and_cursor(password_adjusted_input_length);
-
-        let domains_adjusted_input_length = digest_auth_layout[2].width as usize - 2;
-        let (domains_padded_text, domains_input_cursor_position) = self.auth_digest_domains_text_input.get_padded_text_and_cursor(domains_adjusted_input_length);
-
-        let realm_adjusted_input_length = digest_auth_layout[3].width as usize - 2;
-        let (realm_padded_text, realm_input_cursor_position) = self.auth_digest_realm_text_input.get_padded_text_and_cursor(realm_adjusted_input_length);
-
-        let nonce_adjusted_input_length = digest_auth_layout[4].width as usize - 2;
-        let (nonce_padded_text, nonce_input_cursor_position) = self.auth_digest_nonce_text_input.get_padded_text_and_cursor(nonce_adjusted_input_length);
-
-        let opaque_adjusted_input_length = digest_auth_layout[5].width as usize - 2;
-        let (opaque_padded_text, opaque_input_cursor_position) = self.auth_digest_opaque_text_input.get_padded_text_and_cursor(opaque_adjusted_input_length);
-
-
-        let username_line = self.tui_add_color_to_env_keys(&username_padded_text);
-        let password_line = self.tui_add_color_to_env_keys(&password_padded_text);
-        let domains_line = self.tui_add_color_to_env_keys(&domains_padded_text);
-        let realm_line = self.tui_add_color_to_env_keys(&realm_padded_text);
-        let nonce_line = self.tui_add_color_to_env_keys(&nonce_padded_text);
-        let opaque_line = self.tui_add_color_to_env_keys(&opaque_padded_text);
-
-
-        let mut username_paragraph = Paragraph::new(username_line)
-            .fg(THEME.read().ui.font_color);
-        let mut password_paragraph = Paragraph::new(password_line)
-            .fg(THEME.read().ui.font_color);
-        let mut domains_paragraph = Paragraph::new(domains_line)
-            .fg(THEME.read().ui.font_color);
-        let mut realm_paragraph = Paragraph::new(realm_line)
-            .fg(THEME.read().ui.font_color);
-        let mut nonce_paragraph = Paragraph::new(nonce_line)
-            .fg(THEME.read().ui.font_color);
-        let mut opaque_paragraph = Paragraph::new(opaque_line)
-            .fg(THEME.read().ui.font_color);
         let mut stale_paragraph = Paragraph::new(digest_auth.stale.to_string())
             .fg(THEME.read().ui.font_color);
         let mut algorithm_paragraph = Paragraph::new(digest_auth.algorithm.to_string())
@@ -164,94 +108,84 @@ impl App<'_> {
 
         let input_selected = self.auth_text_input_selection.selected;
 
-        let input_cursor_position = match input_selected {
+        match input_selected {
             0 if should_color_blocks => {
-                username_block = username_block.fg(THEME.read().others.selection_highlight_color);
-                username_paragraph = username_paragraph.fg(THEME.read().others.selection_highlight_color);
-
-                username_input_cursor_position
+                highlight_username = true;
+                display_username_cursor = should_display_cursor;
             },
             1 if should_color_blocks => {
-                password_block = password_block.fg(THEME.read().others.selection_highlight_color);
-                password_paragraph = password_paragraph.fg(THEME.read().others.selection_highlight_color);
-
-                password_input_cursor_position
+                highlight_password = true;
+                display_password_cursor = should_display_cursor;
             },
             2 if should_color_blocks => {
-                domains_block = domains_block.fg(THEME.read().others.selection_highlight_color);
-                domains_paragraph = domains_paragraph.fg(THEME.read().others.selection_highlight_color);
-
-                domains_input_cursor_position
+                highlight_domains = true;
+                display_domains_cursor = should_display_cursor;
             },
             3 if should_color_blocks => {
-                realm_block = realm_block.fg(THEME.read().others.selection_highlight_color);
-                realm_paragraph = realm_paragraph.fg(THEME.read().others.selection_highlight_color);
-
-                realm_input_cursor_position
+                highlight_realm = true;
+                display_realm_cursor = should_display_cursor;
             },
             4 if should_color_blocks => {
-                nonce_block = nonce_block.fg(THEME.read().others.selection_highlight_color);
-                nonce_paragraph = nonce_paragraph.fg(THEME.read().others.selection_highlight_color);
-
-                nonce_input_cursor_position
+                highlight_nonce = true;
+                display_nonce_cursor = should_display_cursor;
             },
             5 if should_color_blocks => {
-                opaque_block = opaque_block.fg(THEME.read().others.selection_highlight_color);
-                opaque_paragraph = opaque_paragraph.fg(THEME.read().others.selection_highlight_color);
-
-                opaque_input_cursor_position
+                highlight_opaque = true;
+                display_opaque_cursor = should_display_cursor;
             },
             6 if should_color_blocks => {
                 stale_paragraph = stale_paragraph.fg(THEME.read().others.selection_highlight_color);
                 stale_block = stale_block.fg(THEME.read().others.selection_highlight_color);
-
-                0
             },
             7 if should_color_blocks => {
                 algorithm_block = algorithm_block.fg(THEME.read().others.selection_highlight_color);
                 algorithm_paragraph = algorithm_paragraph.fg(THEME.read().others.selection_highlight_color);
-
-                0
             },
             8 if should_color_blocks => {
                 qop_block = qop_block.fg(THEME.read().others.selection_highlight_color);
                 qop_paragraph = qop_paragraph.fg(THEME.read().others.selection_highlight_color);
-
-                0
             },
             9 if should_color_blocks => {
                 user_hash_block = user_hash_block.fg(THEME.read().others.selection_highlight_color);
                 user_hash_paragraph = user_hash_paragraph.fg(THEME.read().others.selection_highlight_color);
-
-                0
             },
             10 if should_color_blocks => {
                 charset_block = charset_block.fg(THEME.read().others.selection_highlight_color);
                 charset_paragraph = charset_paragraph.fg(THEME.read().others.selection_highlight_color);
-
-                0
             },
-            _ => 0
-        };
+            _ => {}
+        }
 
-        username_paragraph = username_paragraph.block(username_block);
-        password_paragraph = password_paragraph.block(password_block);
-        domains_paragraph = domains_paragraph.block(domains_block);
-        realm_paragraph = realm_paragraph.block(realm_block);
-        nonce_paragraph = nonce_paragraph.block(nonce_block);
-        opaque_paragraph = opaque_paragraph.block(opaque_block);
+        self.auth_digest_username_text_input.highlight_text = highlight_username;
+        self.auth_digest_username_text_input.highlight_block = highlight_username;
+        self.auth_digest_username_text_input.display_cursor = display_username_cursor;
+        self.auth_digest_password_text_input.highlight_text = highlight_password;
+        self.auth_digest_password_text_input.highlight_block = highlight_password;
+        self.auth_digest_password_text_input.display_cursor = display_password_cursor;
+        self.auth_digest_domains_text_input.highlight_text = highlight_domains;
+        self.auth_digest_domains_text_input.highlight_block = highlight_domains;
+        self.auth_digest_domains_text_input.display_cursor = display_domains_cursor;
+        self.auth_digest_realm_text_input.highlight_text = highlight_realm;
+        self.auth_digest_realm_text_input.highlight_block = highlight_realm;
+        self.auth_digest_realm_text_input.display_cursor = display_realm_cursor;
+        self.auth_digest_nonce_text_input.highlight_text = highlight_nonce;
+        self.auth_digest_nonce_text_input.highlight_block = highlight_nonce;
+        self.auth_digest_nonce_text_input.display_cursor = display_nonce_cursor;
+        self.auth_digest_opaque_text_input.highlight_text = highlight_opaque;
+        self.auth_digest_opaque_text_input.highlight_block = highlight_opaque;
+        self.auth_digest_opaque_text_input.display_cursor = display_opaque_cursor;
         stale_paragraph = stale_paragraph.block(stale_block);
         algorithm_paragraph = algorithm_paragraph.block(algorithm_block);
         qop_paragraph = qop_paragraph.block(qop_block);
         user_hash_paragraph = user_hash_paragraph.block(user_hash_block);
         charset_paragraph = charset_paragraph.block(charset_block);
 
-        digest_auth_scroll_view.render_widget(username_paragraph, digest_auth_layout[0]);
-        digest_auth_scroll_view.render_widget(password_paragraph, digest_auth_layout[1]);
-        digest_auth_scroll_view.render_widget(domains_paragraph, digest_auth_layout[2]);
-        digest_auth_scroll_view.render_widget(realm_paragraph, digest_auth_layout[3]);
-        digest_auth_scroll_view.render_widget(nonce_paragraph, digest_auth_layout[4]);
-        digest_auth_scroll_view.render_widget(opaque_paragraph, digest_auth_layout[5]);
+        digest_auth_scroll_view.render_widget(SingleLineTextInput(&mut self.auth_digest_username_text_input), digest_auth_layout[0]);
+        digest_auth_scroll_view.render_widget(SingleLineTextInput(&mut self.auth_digest_password_text_input), digest_auth_layout[1]);
+        digest_auth_scroll_view.render_widget(SingleLineTextInput(&mut self.auth_digest_domains_text_input), digest_auth_layout[2]);
+        digest_auth_scroll_view.render_widget(SingleLineTextInput(&mut self.auth_digest_realm_text_input), digest_auth_layout[3]);
+        digest_auth_scroll_view.render_widget(SingleLineTextInput(&mut self.auth_digest_nonce_text_input), digest_auth_layout[4]);
+        digest_auth_scroll_view.render_widget(SingleLineTextInput(&mut self.auth_digest_opaque_text_input), digest_auth_layout[5]);
         digest_auth_scroll_view.render_widget(stale_paragraph, digest_auth_layout[6]);
         digest_auth_scroll_view.render_widget(algorithm_paragraph, digest_auth_layout[7]);
         digest_auth_scroll_view.render_widget(qop_paragraph, digest_auth_layout[8]);
@@ -271,13 +205,6 @@ impl App<'_> {
         };
 
         scrollbar_state.set_offset(Position::new(0, scroll_offset));
-
-        if should_display_cursor {
-            frame.set_cursor_position(Position::new(
-                area.x + digest_auth_layout[input_selected].x + input_cursor_position as u16 + 1,
-                (area.y + digest_auth_layout[input_selected].y + 1).saturating_sub(scroll_offset)
-            ));
-        }
 
         digest_auth_scroll_view.render(area, frame.buffer_mut(), &mut scrollbar_state)
     }

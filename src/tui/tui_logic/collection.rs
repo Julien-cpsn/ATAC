@@ -11,31 +11,14 @@ use crate::models::request::{Request, DEFAULT_HEADERS};
 use crate::models::settings::RequestSettings;
 
 impl App<'_> {
-    pub fn reset_inputs(&mut self) {
-        self.url_text_input.reset_input();
-        self.query_params_table.selection_text_input.reset_input();
-        self.auth_basic_username_text_input.reset_input();
-        self.auth_basic_password_text_input.reset_input();
-        self.auth_bearer_token_text_input.reset_input();
-        self.auth_jwt_secret_text_input.reset_input();
-        self.auth_digest_username_text_input.reset_input();
-        self.auth_digest_password_text_input.reset_input();
-        self.auth_digest_domains_text_input.reset_input();
-        self.auth_digest_realm_text_input.reset_input();
-        self.auth_digest_nonce_text_input.reset_input();
-        self.auth_digest_opaque_text_input.reset_input();
-        self.headers_table.selection_text_input.reset_input();
-        self.body_form_table.selection_text_input.reset_input();
-        self.body_file_text_input.reset_input();
-    }
-
     pub fn update_inputs(&mut self) {
-        self.reset_inputs();
+        self.reset_inputs_mode();
+        self.clear_inputs();
 
         let local_selected_request = self.get_selected_request_as_local();
         let selected_request = local_selected_request.read();
 
-        self.url_text_input.enter_str(&selected_request.url_with_params_to_string());
+        self.url_text_input.push_str(&selected_request.url_with_params_to_string());
         self.query_params_table.rows = selected_request.params.clone();
         self.headers_table.rows = selected_request.headers.clone();
 
@@ -48,7 +31,7 @@ impl App<'_> {
                 _ => unreachable!()
             };
 
-            self.query_params_table.selection_text_input.enter_str(&param_text);
+            self.query_params_table.selection_text_input.push_str(&param_text);
         }
 
         match &selected_request.auth {
@@ -60,32 +43,32 @@ impl App<'_> {
                 self.auth_text_input_selection.max_selection = 2;
                 self.auth_text_input_selection.usable = true;
 
-                self.auth_basic_username_text_input.enter_str(username);
-                self.auth_basic_password_text_input.enter_str(password);
+                self.auth_basic_username_text_input.push_str(username);
+                self.auth_basic_password_text_input.push_str(password);
             }
             Auth::BearerToken(BearerToken { token: bearer_token }) => {
                 self.auth_text_input_selection.max_selection = 1;
                 self.auth_text_input_selection.usable = true;
 
-                self.auth_bearer_token_text_input.enter_str(bearer_token);
+                self.auth_bearer_token_text_input.push_str(bearer_token);
             }
             Auth::JwtToken(JwtToken { secret, payload, .. }) => {
                 self.auth_text_input_selection.max_selection = 4;
                 self.auth_text_input_selection.usable = true;
 
-                self.auth_jwt_secret_text_input.enter_str(secret);
-                self.refresh_auth_jwt_payload_textarea(payload);
+                self.auth_jwt_secret_text_input.push_str(secret);
+                self.auth_jwt_payload_text_area.push_str(payload);
             },
             Auth::Digest(Digest { username, password, domains, realm, nonce, opaque, .. }) => {
                 self.auth_text_input_selection.max_selection = 11;
                 self.auth_text_input_selection.usable = true;
 
-                self.auth_digest_username_text_input.enter_str(username);
-                self.auth_digest_password_text_input.enter_str(password);
-                self.auth_digest_domains_text_input.enter_str(domains);
-                self.auth_digest_realm_text_input.enter_str(realm);
-                self.auth_digest_nonce_text_input.enter_str(nonce);
-                self.auth_digest_opaque_text_input.enter_str(opaque);
+                self.auth_digest_username_text_input.push_str(username);
+                self.auth_digest_password_text_input.push_str(password);
+                self.auth_digest_domains_text_input.push_str(domains);
+                self.auth_digest_realm_text_input.push_str(realm);
+                self.auth_digest_nonce_text_input.push_str(nonce);
+                self.auth_digest_opaque_text_input.push_str(opaque);
             }
         }
 
@@ -98,14 +81,14 @@ impl App<'_> {
                 _ => unreachable!()
             };
 
-            self.headers_table.selection_text_input.enter_str(&header_text);
+            self.headers_table.selection_text_input.push_str(&header_text);
         }
 
         match &selected_request.protocol {
             Protocol::HttpRequest(http_request) => match &http_request.body {
                 ContentType::NoBody => {
                     self.body_form_table.rows = Vec::new();
-                    self.refresh_body_textarea(&String::new());
+                    self.body_text_area.clear();
                 }
                 ContentType::Multipart(form) | ContentType::Form(form) => {
                     self.body_form_table.rows = form.clone();
@@ -119,17 +102,18 @@ impl App<'_> {
                             _ => unreachable!()
                         };
 
-                        self.body_form_table.selection_text_input.enter_str(&form_text);
+                        self.body_form_table.selection_text_input.push_str(&form_text);
                     }
 
-                    self.refresh_body_textarea(&String::new());
+                    self.body_text_area.clear();
                 }
                 ContentType::File(file_path) => {
-                    self.body_file_text_input.enter_str(file_path);
+                    self.body_file_text_input.push_str(file_path);
                 }
                 ContentType::Raw(body) | ContentType::Json(body) | ContentType::Xml(body) | ContentType::Html(body) | ContentType::Javascript(body) => {
                     self.body_form_table.rows = Vec::new();
-                    self.refresh_body_textarea(body);
+
+                    self.body_text_area.push_str(&body);
                 }
             },
             Protocol::WsRequest(ws_request) => {
@@ -138,7 +122,7 @@ impl App<'_> {
                     MessageType::Binary(bytes) | MessageType::Ping(bytes) | MessageType::Pong(bytes) => String::from_utf8_lossy(bytes.as_ref()).to_string()
                 };
 
-                self.refresh_message_textarea(&content);
+                self.message_text_area.push_str(&content);
             }
         }
 
@@ -152,26 +136,8 @@ impl App<'_> {
             Some(pre_request_script) => &pre_request_script
         };
 
-        self.tui_refresh_pre_request_script_textarea(pre_request_script);
-        self.tui_refresh_post_request_script_textarea(post_request_script);
-    }
-
-    pub fn reset_cursors(&mut self) {
-        self.url_text_input.reset_cursor();
-        self.query_params_table.selection_text_input.reset_cursor();
-        self.auth_basic_username_text_input.reset_cursor();
-        self.auth_basic_password_text_input.reset_cursor();
-        self.auth_bearer_token_text_input.reset_cursor();
-        self.auth_jwt_secret_text_input.reset_cursor();
-        self.auth_digest_username_text_input.reset_cursor();
-        self.auth_digest_password_text_input.reset_cursor();
-        self.auth_digest_domains_text_input.reset_cursor();
-        self.auth_digest_realm_text_input.reset_cursor();
-        self.auth_digest_nonce_text_input.reset_cursor();
-        self.auth_digest_opaque_text_input.reset_cursor();
-        self.headers_table.selection_text_input.reset_cursor();
-        self.body_form_table.selection_text_input.reset_cursor();
-        self.body_file_text_input.reset_cursor();
+        self.script_console.pre_request_text_area.push_str(pre_request_script);
+        self.script_console.post_request_text_area.push_str(post_request_script);
     }
 
     pub fn select_request(&mut self) {
@@ -224,7 +190,7 @@ impl App<'_> {
     }
 
     pub fn tui_new_collection(&mut self) {
-        let new_collection_name = self.new_collection_input.text.clone();
+        let new_collection_name = self.new_collection_input.to_string();
 
         match self.new_collection(new_collection_name) {
             Ok(_) => {},
@@ -235,7 +201,7 @@ impl App<'_> {
     }
 
     pub fn tui_new_request(&mut self) {
-        let new_request_name = self.new_request_popup.text_input.text.trim().to_string();
+        let new_request_name = self.new_request_popup.text_input.to_string().trim().to_owned();
 
         let selected_collection_index = self.new_request_popup.selected_collection;
         let protocol = self.new_request_popup.protocol.clone();
@@ -304,7 +270,7 @@ impl App<'_> {
     }
 
     pub fn tui_rename_collection(&mut self) {
-        let new_collection_name = self.rename_collection_input.text.clone();
+        let new_collection_name = self.rename_collection_input.to_string();
         let selected_request_index = self.collections_tree.state.selected();
 
         match self.rename_collection(selected_request_index[0], new_collection_name) {
@@ -316,7 +282,7 @@ impl App<'_> {
     }
 
     pub fn tui_rename_request(&mut self) {
-        let new_request_name = self.rename_request_input.text.clone();
+        let new_request_name = self.rename_request_input.to_string();
         let selected_request_index = self.collections_tree.state.selected();
 
         match self.rename_request(selected_request_index[0], selected_request_index[1], new_request_name) {
