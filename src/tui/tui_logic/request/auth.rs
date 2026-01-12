@@ -1,6 +1,4 @@
-use rayon::prelude::*;
 use tracing::info;
-use tui_textarea::TextArea;
 use crate::app::app::App;
 use crate::models::auth::auth::Auth::{NoAuth, BasicAuth, BearerToken, JwtToken, Digest};
 use crate::models::auth::auth::next_auth;
@@ -58,7 +56,7 @@ impl App<'_> {
     }
 
     pub fn tui_modify_request_auth_basic_username(&mut self) {
-        let input_text = self.auth_basic_username_text_input.text.clone();
+        let input_text = self.auth_basic_username_text_input.to_string();
         let selected_request_index = &self.collections_tree.selected.unwrap();
         
         self.modify_request_auth_basic_username(selected_request_index.0, selected_request_index.1, input_text);
@@ -67,7 +65,7 @@ impl App<'_> {
     }
 
     pub fn tui_modify_request_auth_basic_password(&mut self) {
-        let input_text = self.auth_basic_password_text_input.text.clone();
+        let input_text = self.auth_basic_password_text_input.to_string();
         let selected_request_index = &self.collections_tree.selected.unwrap();
         
         self.modify_request_auth_basic_password(selected_request_index.0, selected_request_index.1, input_text);
@@ -76,7 +74,7 @@ impl App<'_> {
     }
 
     pub fn tui_modify_request_auth_bearer_token(&mut self) {
-        let input_text = self.auth_bearer_token_text_input.text.clone();
+        let input_text = self.auth_bearer_token_text_input.to_string();
         let selected_request_index = &self.collections_tree.selected.unwrap();
         
         self.modify_request_auth_bearer_token(selected_request_index.0, selected_request_index.1, input_text);
@@ -144,15 +142,6 @@ impl App<'_> {
                 _ => {}
             }
         }
-    }
-
-    pub fn refresh_auth_jwt_payload_textarea(&mut self, text: &String) {
-        let lines: Vec<String> = text
-            .par_lines()
-            .map(|line| line.to_string())
-            .collect();
-
-        self.auth_jwt_payload_text_area = TextArea::new(lines);
     }
 
     pub fn tui_request_auth_previous_jwt_algorithm(&mut self) {
@@ -234,7 +223,7 @@ impl App<'_> {
     }
 
     pub fn tui_modify_request_auth_jwt_secret(&mut self) {
-        let input_text = self.auth_jwt_secret_text_input.text.clone();
+        let input_text = self.auth_jwt_secret_text_input.to_string();
         let selected_request_index = &self.collections_tree.selected.unwrap();
         
         self.modify_request_auth_jwt_secret(selected_request_index.0, selected_request_index.1, input_text);
@@ -243,7 +232,7 @@ impl App<'_> {
     }
 
     pub fn tui_modify_request_auth_jwt_payload(&mut self) {
-        let payload = self.auth_jwt_payload_text_area.lines().join("\n");
+        let payload = self.auth_jwt_payload_text_area.to_string();
         let selected_request_index = &self.collections_tree.selected.unwrap();
         
         self.modify_request_auth_jwt_payload(selected_request_index.0, selected_request_index.1, payload);
@@ -252,7 +241,7 @@ impl App<'_> {
     }
 
     pub fn tui_modify_request_auth_digest_username(&mut self) {
-        let input_text = self.auth_digest_username_text_input.text.clone();
+        let input_text = self.auth_digest_username_text_input.to_string();
         let selected_request_index = &self.collections_tree.selected.unwrap();
 
         self.modify_request_auth_digest_username(selected_request_index.0, selected_request_index.1, input_text);
@@ -261,7 +250,7 @@ impl App<'_> {
     }
 
     pub fn tui_modify_request_auth_digest_password(&mut self) {
-        let input_text = self.auth_digest_password_text_input.text.clone();
+        let input_text = self.auth_digest_password_text_input.to_string();
         let selected_request_index = &self.collections_tree.selected.unwrap();
 
         self.modify_request_auth_digest_password(selected_request_index.0, selected_request_index.1, input_text);
@@ -270,7 +259,7 @@ impl App<'_> {
     }
 
     pub fn tui_modify_request_auth_digest_domains(&mut self) {
-        let input_text = self.auth_digest_domains_text_input.text.clone();
+        let input_text = self.auth_digest_domains_text_input.to_string();
         let selected_request_index = &self.collections_tree.selected.unwrap();
 
         self.modify_request_auth_digest_domains(selected_request_index.0, selected_request_index.1, input_text);
@@ -279,7 +268,7 @@ impl App<'_> {
     }
 
     pub fn tui_modify_request_auth_digest_realm(&mut self) {
-        let input_text = self.auth_digest_realm_text_input.text.clone();
+        let input_text = self.auth_digest_realm_text_input.to_string();
         let selected_request_index = &self.collections_tree.selected.unwrap();
 
         self.modify_request_auth_digest_realm(selected_request_index.0, selected_request_index.1, input_text);
@@ -288,7 +277,7 @@ impl App<'_> {
     }
 
     pub fn tui_modify_request_auth_digest_nonce(&mut self) {
-        let input_text = self.auth_digest_nonce_text_input.text.clone();
+        let input_text = self.auth_digest_nonce_text_input.to_string();
         let selected_request_index = &self.collections_tree.selected.unwrap();
 
         self.modify_request_auth_digest_nonce(selected_request_index.0, selected_request_index.1, input_text);
@@ -297,7 +286,7 @@ impl App<'_> {
     }
 
     pub fn tui_modify_request_auth_digest_opaque(&mut self) {
-        let input_text = self.auth_digest_opaque_text_input.text.clone();
+        let input_text = self.auth_digest_opaque_text_input.to_string();
         let selected_request_index = &self.collections_tree.selected.unwrap();
 
         self.modify_request_auth_digest_opaque(selected_request_index.0, selected_request_index.1, input_text);

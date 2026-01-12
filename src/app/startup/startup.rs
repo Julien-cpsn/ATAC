@@ -61,7 +61,8 @@ impl<'a> App<'a> {
         else {
             self.parse_key_bindings_file();
             self.parse_theme_file();
-            
+            self.update_text_inputs_handler();
+
             TUI
         }
     }

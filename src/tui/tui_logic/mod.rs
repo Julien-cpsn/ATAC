@@ -4,3 +4,4 @@ mod request;
 mod param_tabs;
 mod result_tabs;
 mod environment;
+mod inputs;

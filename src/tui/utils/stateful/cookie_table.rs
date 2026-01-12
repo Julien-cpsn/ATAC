@@ -26,7 +26,7 @@ pub enum CookieColumns {
 }
 
 impl CookieColumns {
-    pub fn constraints() -> [Constraint; 8]{
+    pub fn constraints() -> [Constraint; 8] {
         [
             Constraint::Percentage(10),
             Constraint::Percentage(15),
@@ -48,6 +48,26 @@ pub struct StatefulCookieTable {
     pub selection: Option<(usize, usize)>,
     pub rows: Vec<[String; COOKIES_COLUMNS_NUMBER]>,
     pub selection_text_input: TextInput,
+}
+
+impl Default for StatefulCookieTable {
+    fn default() -> Self {
+        Self {
+            lists_states: [
+                ListState::default(),
+                ListState::default(),
+                ListState::default(),
+                ListState::default(),
+                ListState::default(),
+                ListState::default(),
+                ListState::default(),
+                ListState::default()
+            ],
+            selection: None,
+            rows: vec![],
+            selection_text_input: TextInput::new(None),
+        }
+    }
 }
 
 impl StatefulCookieTable {
@@ -150,26 +170,6 @@ impl StatefulCookieTable {
 
         match self.selection.unwrap() {
             (x, _) => self.selection = Some((x, y))
-        }
-    }
-}
-
-impl Default for StatefulCookieTable {
-    fn default() -> Self {
-        StatefulCookieTable {
-            lists_states: [
-                ListState::default(),
-                ListState::default(),
-                ListState::default(),
-                ListState::default(),
-                ListState::default(),
-                ListState::default(),
-                ListState::default(),
-                ListState::default()
-            ],
-            selection: None,
-            rows: vec![],
-            selection_text_input: TextInput::default(),
         }
     }
 }

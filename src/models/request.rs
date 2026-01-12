@@ -69,7 +69,7 @@ fn should_skip_requests_response(_: &RequestResponse) -> bool {
 impl App<'_> {
     pub fn key_value_vec_to_tuple_vec(&self, key_value: &Vec<KeyValue>) -> Vec<(String, String)> {
         key_value
-            .par_iter()
+            .iter()
             .filter_map(|param| {
                 if param.enabled {
                     let key = self.replace_env_keys_by_value(&param.data.0);

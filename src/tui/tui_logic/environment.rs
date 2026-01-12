@@ -93,7 +93,7 @@ impl App<'_> {
         let selected_env_index = self.selected_environment;
         let (row, column) = self.env_editor_table.selection.unwrap();
 
-        let input_text = self.env_editor_table.selection_text_input.text.clone();
+        let input_text = self.env_editor_table.selection_text_input.to_string();
 
         match column {
             0 => match self.rename_env_key_by_index(selected_env_index, row, input_text) {

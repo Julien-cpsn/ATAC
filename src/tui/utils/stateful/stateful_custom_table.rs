@@ -4,13 +4,12 @@ use crate::models::request::KeyValue;
 use crate::tui::app_states::AppState;
 use crate::tui::utils::stateful::text_input::TextInput;
 use ratatui::layout::Direction::{Horizontal, Vertical};
-use ratatui::layout::{Constraint, Layout, Position, Rect};
+use ratatui::layout::{Constraint, Layout, Rect};
 use ratatui::prelude::{Line, Modifier, Style, Stylize};
 use ratatui::widgets::{Block, Borders, List, ListState, Paragraph};
 use ratatui::Frame;
 
 
-#[derive(Default)]
 pub struct StatefulCustomTable {
     pub left_state: ListState,
     pub right_state: ListState,
@@ -18,6 +17,18 @@ pub struct StatefulCustomTable {
     pub selection: Option<(usize, usize)>,
     pub rows: Vec<KeyValue>,
     pub selection_text_input: TextInput,
+}
+
+impl Default for StatefulCustomTable {
+    fn default() -> Self {
+        Self {
+            left_state: ListState::default(),
+            right_state: ListState::default(),
+            selection: None,
+            rows: vec![],
+            selection_text_input: TextInput::new(None),
+        }
+    }
 }
 
 impl StatefulCustomTable {
@@ -242,17 +253,18 @@ impl App<'_> {
                     let selection_position_x = layout[1].x + width_adjustment + horizontal_margin;
                     let selection_position_y = layout[1].y + height_adjustment;
 
-                    let data_text = table.selection_text_input.text.clone();
+                    let data_text = table.selection_text_input.to_string();
 
                     let text_input = Paragraph::new(format!("{:fill$}", data_text, fill = (cell_with - horizontal_margin) as usize));
                     let text_rect = Rect::new(selection_position_x, selection_position_y, cell_with, 1);
 
                     frame.render_widget(text_input, text_rect);
 
+                    /* is TODO?
                     frame.set_cursor_position(Position::new(
                         selection_position_x + table.selection_text_input.cursor_position as u16,
                         selection_position_y
-                    ));
+                    ));*/
                 }
             }
         }

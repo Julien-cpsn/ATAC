@@ -13,7 +13,7 @@ impl App<'_> {
     }
 
     pub fn tui_modify_request_query_param(&mut self) {
-        let input_text = self.query_params_table.selection_text_input.text.clone();
+        let input_text = self.query_params_table.selection_text_input.to_string();
         let selected_request_index = &self.collections_tree.selected.unwrap();
 
         let selection = self.query_params_table.selection.unwrap();

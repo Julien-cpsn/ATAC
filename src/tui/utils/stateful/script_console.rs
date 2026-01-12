@@ -1,15 +1,12 @@
-use tui_textarea::TextArea;
-use crate::tui::utils::vim_emulation::Vim;
+use crate::tui::utils::stateful::text_input::TextInput;
 
-#[derive(Default)]
-pub struct ScriptConsole<'a> {
-    pub pre_request_text_area: TextArea<'a>,
-    pub post_request_text_area: TextArea<'a>,
+pub struct ScriptConsole {
+    pub pre_request_text_area: TextInput,
+    pub post_request_text_area: TextInput,
     pub script_selection: u16,
-    pub vim_emulation: Vim
 }
 
-impl ScriptConsole<'_> {
+impl ScriptConsole {
     pub fn change_selection(&mut self) {
         self.script_selection = match self.script_selection {
             0 => 1,

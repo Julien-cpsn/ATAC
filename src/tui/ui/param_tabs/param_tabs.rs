@@ -1,19 +1,19 @@
-use ratatui::Frame;
-use ratatui::layout::{Constraint, Layout, Rect};
 use ratatui::layout::Direction::Vertical;
-use ratatui::prelude::Style;
+use ratatui::layout::{Constraint, Layout, Rect};
 use ratatui::style::Stylize;
 use ratatui::text::Line;
 use ratatui::widgets::{Block, Borders, Paragraph, Tabs};
+use ratatui::Frame;
 use strum::{Display, EnumIter, FromRepr};
 
 use crate::app::app::App;
 use crate::app::files::theme::THEME;
-use crate::models::auth::auth::Auth::{NoAuth, BasicAuth, BearerToken, JwtToken, Digest};
+use crate::models::auth::auth::Auth::{BasicAuth, BearerToken, Digest, JwtToken, NoAuth};
 use crate::models::protocol::http::body::ContentType::*;
 use crate::models::protocol::protocol::Protocol;
 use crate::models::request::Request;
-use crate::tui::app_states::AppState::{EditingRequestBodyTable, EditingRequestHeader, EditingRequestParam};
+use crate::tui::app_states::AppState::{EditingRequestBodyString, EditingRequestBodyTable, EditingRequestMessage, EditingRequestHeader, EditingRequestParam};
+use crate::tui::utils::syntax_highlighting::{ENV_VARIABLE_SYNTAX_REF, HTML_SYNTAX_REF, JSON_SYNTAX_REF, JS_SYNTAX_REF, XML_SYNTAX_REF};
 
 #[derive(Default, Clone, Copy, PartialEq, Display, FromRepr, EnumIter)]
 pub enum RequestParamsTabs {
@@ -218,18 +218,38 @@ impl App<'_> {
                       self.render_file_body_tab(frame, request_params_layout[1]);
                     },
                     Raw(_) | Json(_) | Xml(_) | Html(_) | Javascript(_) => {
-                        self.body_text_area.set_style(Style::new().fg(THEME.read().ui.font_color));
-                        self.body_text_area.set_line_number_style(Style::new().fg(THEME.read().ui.secondary_foreground_color));
+                        let display_cursor = matches!(&self.state, EditingRequestBodyString);
+                        let syntax_reference = match &http_request.body {
+                            Raw(_) => ENV_VARIABLE_SYNTAX_REF.clone(),
+                            Json(_) => JSON_SYNTAX_REF.clone(),
+                            Xml(_) => XML_SYNTAX_REF.clone(),
+                            Html(_) => HTML_SYNTAX_REF.clone(),
+                            Javascript(_) => JS_SYNTAX_REF.clone(),
+                            _ => unreachable!()
+                        };
+                        
+                        self.body_text_area.display_cursor = display_cursor;
+                        
+                        let body_text_area_editor = self.body_text_area.multi_line_editor(
+                            None,
+                            syntax_reference
+                        );
 
-                        frame.render_widget(&self.body_text_area, request_params_layout[1]);
+                        frame.render_widget(body_text_area_editor, request_params_layout[1]);
                     }
                 }
             },
             RequestParamsTabs::Message => {
-                self.message_text_area.set_style(Style::new().fg(THEME.read().ui.font_color));
-                self.message_text_area.set_line_number_style(Style::new().fg(THEME.read().ui.secondary_foreground_color));
+                let display_cursor = matches!(&self.state, EditingRequestMessage);
 
-                frame.render_widget(&self.message_text_area, request_params_layout[1]);            }
+                self.message_text_area.display_cursor = display_cursor;
+
+                let message_text_area_editor = self.message_text_area.multi_line_editor(
+                    None,
+                    ENV_VARIABLE_SYNTAX_REF.clone()
+                );
+
+                frame.render_widget(message_text_area_editor, request_params_layout[1]);            }
             RequestParamsTabs::Scripts => {
                 self.render_request_script(frame, request_params_layout[1]);
             }

@@ -16,7 +16,7 @@ impl App<'_> {
         let selected_request_index = &self.collections_tree.selected.unwrap();
 
         let selection = self.headers_table.selection.unwrap();
-        let input_text = self.headers_table.selection_text_input.text.clone();
+        let input_text = self.headers_table.selection_text_input.to_string();
 
         match self.modify_request_header(selected_request_index.0, selected_request_index.1, input_text, selection.1, selection.0) {
             Ok(_) => {}
