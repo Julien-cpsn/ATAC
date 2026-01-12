@@ -52,7 +52,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
       - uses: taiki-e/setup-cross-toolchain-action@v1
@@ -79,7 +79,7 @@ jobs:
     if: ${{ false }} # Temporally disabled
     steps:
       - name: Release my project to my Homebrew tap
-        uses: Justintime50/homebrew-releaser@v1
+        uses: Justintime50/homebrew-releaser@v3
         with:
           # The name of the homebrew tap to publish your formula to as it appears on GitHub.
           # Required - strings
