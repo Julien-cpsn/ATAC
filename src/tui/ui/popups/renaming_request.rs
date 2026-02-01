@@ -1,11 +1,11 @@
-use ratatui::Frame;
-use ratatui::layout::Position;
 use ratatui::prelude::Stylize;
-use ratatui::widgets::{Block, Borders, Clear, Paragraph};
+use ratatui::widgets::{Block, Borders, Clear};
+use ratatui::Frame;
 
 use crate::app::app::App;
 use crate::app::files::theme::THEME;
 use crate::tui::utils::centered_rect::centered_rect;
+use crate::tui::utils::stateful::text_input::SingleLineTextInput;
 
 impl App<'_> {
     pub fn render_renaming_request_popup(&mut self, frame: &mut Frame) {
@@ -19,18 +19,11 @@ impl App<'_> {
         let area = centered_rect(50, 3, frame.area());
         let renaming_request_area = popup_block.inner(area);
 
-        let adjusted_input_length = renaming_request_area.width as usize;
-        let (padded_text, input_cursor_position) = self.rename_request_input.get_padded_text_and_cursor(adjusted_input_length);
-        
-        let new_request_paragraph = Paragraph::new(padded_text).fg(THEME.read().ui.font_color);
-
         frame.render_widget(Clear, area);
         frame.render_widget(popup_block, area);
-        frame.render_widget(new_request_paragraph, renaming_request_area);
 
-        frame.set_cursor_position(Position::new(
-            renaming_request_area.x + input_cursor_position as u16,
-            renaming_request_area.y
-        ));
+        self.rename_request_input.display_cursor = true;
+        
+        frame.render_widget(SingleLineTextInput(&mut self.rename_request_input), renaming_request_area);
     }
 }

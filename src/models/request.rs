@@ -2,7 +2,6 @@ use anyhow::anyhow;
 use lazy_static::lazy_static;
 use ratatui::prelude::{Line, Modifier, Span};
 use ratatui::style::{Color, Stylize};
-use ratatui::widgets::ListItem;
 use tracing::trace;
 use tui_tree_widget::TreeItem;
 use rayon::prelude::*;
@@ -69,7 +68,7 @@ fn should_skip_requests_response(_: &RequestResponse) -> bool {
 impl App<'_> {
     pub fn key_value_vec_to_tuple_vec(&self, key_value: &Vec<KeyValue>) -> Vec<(String, String)> {
         key_value
-            .par_iter()
+            .iter()
             .filter_map(|param| {
                 if param.enabled {
                     let key = self.replace_env_keys_by_value(&param.data.0);
@@ -81,29 +80,6 @@ impl App<'_> {
                 }
             })
             .collect()
-    }
-
-    pub fn key_value_vec_to_items_list(&self, rows: &Vec<KeyValue>) -> (Vec<ListItem<'_>>, Vec<ListItem<'_>>) {
-        let mut keys: Vec<ListItem> = vec![];
-        let mut values: Vec<ListItem> = vec![];
-
-        for row in rows.iter() {
-            let key = self.tui_add_color_to_env_keys(&row.data.0);
-            let value = self.tui_add_color_to_env_keys(&row.data.1);
-
-            let mut key = ListItem::from(key);
-            let mut value = ListItem::from(value);
-
-            if !row.enabled {
-                key = key.fg(THEME.read().ui.secondary_foreground_color).dim();
-                value = value.fg(THEME.read().ui.secondary_foreground_color).dim();
-            }
-
-            keys.push(key);
-            values.push(value);
-        }
-
-        (keys, values)
     }
 }
 

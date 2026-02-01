@@ -1,11 +1,8 @@
 use chrono::Local;
 use futures_util::SinkExt;
-use rayon::prelude::ParallelString;
 use reqwest_websocket::{Bytes, CloseCode};
 use textwrap::wrap;
 use tracing::info;
-use tui_textarea::TextArea;
-use rayon::prelude::*;
 use crate::app::app::App;
 use crate::models::protocol::ws::message_type::{next_message_type, MessageType};
 use crate::models::protocol::ws::ws::{Message, Sender};
@@ -23,7 +20,7 @@ impl App<'_> {
 
             if selected_ws_request.is_connected {
                 if let Some(websocket) = &selected_ws_request.websocket {
-                    let lines = self.message_text_area.lines();
+                    let lines = self.message_text_area.to_lines();
 
                     selected_ws_request.message_type = match selected_ws_request.message_type {
                         MessageType::Text(_) => MessageType::Text(lines.join("\n")),
@@ -109,14 +106,5 @@ impl App<'_> {
         }
 
         line_count
-    }
-
-    pub fn refresh_message_textarea(&mut self, text: &String) {
-        let lines: Vec<String> = text
-            .par_lines()
-            .map(|line| line.to_string())
-            .collect();
-
-        self.message_text_area = TextArea::new(lines);
     }
 }

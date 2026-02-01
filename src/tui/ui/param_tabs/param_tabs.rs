@@ -1,19 +1,21 @@
-use ratatui::Frame;
-use ratatui::layout::{Constraint, Layout, Rect};
 use ratatui::layout::Direction::Vertical;
-use ratatui::prelude::Style;
+use ratatui::layout::{Constraint, Layout, Rect};
 use ratatui::style::Stylize;
 use ratatui::text::Line;
 use ratatui::widgets::{Block, Borders, Paragraph, Tabs};
+use ratatui::Frame;
 use strum::{Display, EnumIter, FromRepr};
 
 use crate::app::app::App;
 use crate::app::files::theme::THEME;
-use crate::models::auth::auth::Auth::{NoAuth, BasicAuth, BearerToken, JwtToken, Digest};
+use crate::models::auth::auth::Auth::{BasicAuth, BearerToken, Digest, JwtToken, NoAuth};
 use crate::models::protocol::http::body::ContentType::*;
 use crate::models::protocol::protocol::Protocol;
 use crate::models::request::Request;
-use crate::tui::app_states::AppState::{EditingRequestBodyTable, EditingRequestHeader, EditingRequestParam};
+use crate::tui::app_states::AppState::{EditingRequestBodyString, EditingRequestBodyTable, EditingRequestHeader, EditingRequestMessage, EditingRequestParam};
+use crate::tui::tui_logic::utils::key_value_vec_to_items_list;
+use crate::tui::utils::stateful::text_input::MultiLineTextInput;
+use crate::tui::utils::syntax_highlighting::{ENV_VARIABLE_SYNTAX_REF, HTML_SYNTAX_REF, JSON_SYNTAX_REF, JS_SYNTAX_REF, XML_SYNTAX_REF};
 
 #[derive(Default, Clone, Copy, PartialEq, Display, FromRepr, EnumIter)]
 pub enum RequestParamsTabs {
@@ -130,21 +132,11 @@ impl App<'_> {
 
         match self.request_param_tab {
             RequestParamsTabs::QueryParams => {
-                let no_selection_lines = vec![
-                    Line::default(),
-                    Line::from("No params").fg(THEME.read().ui.font_color),
-                    Line::from("(Add one with n or via the URL)").fg(THEME.read().ui.secondary_foreground_color)
-                ];
+                self.query_params_table.is_editing = matches!(&self.state, EditingRequestParam);
 
-                self.render_custom_table(
-                    frame,
-                    request_params_layout[1],
-                    &self.query_params_table,
-                    no_selection_lines,
-                    EditingRequestParam,
-                    "Param",
-                    "Value"
-                );
+                let mut rows = key_value_vec_to_items_list(&self.get_selected_env_as_local(), &self.query_params_table.rows);
+
+                frame.render_stateful_widget(&mut self.query_params_table, request_params_layout[1], &mut rows);
             }
             RequestParamsTabs::Auth => {
                 match &request.auth {
@@ -166,21 +158,11 @@ impl App<'_> {
                 }
             }
             RequestParamsTabs::Headers => {
-                let no_selection_lines = vec![
-                    Line::default(),
-                    Line::from("Default headers").fg(THEME.read().ui.font_color),
-                    Line::from("(Add one with n)").fg(THEME.read().ui.secondary_foreground_color)
-                ];
-                
-                self.render_custom_table(
-                    frame,
-                    request_params_layout[1],
-                    &self.headers_table,
-                    no_selection_lines,
-                    EditingRequestHeader,
-                    "Header",
-                    "Value"
-                );
+                self.headers_table.is_editing = matches!(self.state, EditingRequestHeader);
+
+                let mut rows = key_value_vec_to_items_list(&self.get_selected_env_as_local(), &self.headers_table.rows);
+
+                frame.render_stateful_widget(&mut self.headers_table, request_params_layout[1], &mut rows);
             }
             RequestParamsTabs::Body => {
                 let http_request = request.get_http_request().unwrap();
@@ -198,38 +180,38 @@ impl App<'_> {
                         frame.render_widget(body_paragraph, request_params_layout[1]);
                     }
                     Multipart(_) | Form(_) => {
-                        let no_selection_lines = vec![
-                            Line::default(),
-                            Line::from("No form data").fg(THEME.read().ui.font_color),
-                            Line::from("(Add one with n)").fg(THEME.read().ui.secondary_foreground_color)
-                        ];
+                        self.body_form_table.is_editing = matches!(self.state, EditingRequestBodyTable);
 
-                        self.render_custom_table(
-                            frame,
-                            request_params_layout[1],
-                            &self.body_form_table,
-                            no_selection_lines,
-                            EditingRequestBodyTable,
-                            "key",
-                            "value"
-                        );
+                        let mut rows = key_value_vec_to_items_list(&self.get_selected_env_as_local(), &self.body_form_table.rows);
+
+                        frame.render_stateful_widget(&mut self.body_form_table, request_params_layout[1], &mut rows);
                     },
                     File(_) => {
                       self.render_file_body_tab(frame, request_params_layout[1]);
                     },
                     Raw(_) | Json(_) | Xml(_) | Html(_) | Javascript(_) => {
-                        self.body_text_area.set_style(Style::new().fg(THEME.read().ui.font_color));
-                        self.body_text_area.set_line_number_style(Style::new().fg(THEME.read().ui.secondary_foreground_color));
+                        let display_cursor = matches!(&self.state, EditingRequestBodyString);
+                        let syntax_reference = match &http_request.body {
+                            Raw(_) => ENV_VARIABLE_SYNTAX_REF.clone(),
+                            Json(_) => JSON_SYNTAX_REF.clone(),
+                            Xml(_) => XML_SYNTAX_REF.clone(),
+                            Html(_) => HTML_SYNTAX_REF.clone(),
+                            Javascript(_) => JS_SYNTAX_REF.clone(),
+                            _ => unreachable!()
+                        };
+                        
+                        self.body_text_area.display_cursor = display_cursor;
 
-                        frame.render_widget(&self.body_text_area, request_params_layout[1]);
+                        frame.render_widget(MultiLineTextInput(&mut self.body_text_area, syntax_reference), request_params_layout[1]);
                     }
                 }
             },
             RequestParamsTabs::Message => {
-                self.message_text_area.set_style(Style::new().fg(THEME.read().ui.font_color));
-                self.message_text_area.set_line_number_style(Style::new().fg(THEME.read().ui.secondary_foreground_color));
+                let display_cursor = matches!(&self.state, EditingRequestMessage);
 
-                frame.render_widget(&self.message_text_area, request_params_layout[1]);            }
+                self.message_text_area.display_cursor = display_cursor;
+
+                frame.render_widget(MultiLineTextInput(&mut self.message_text_area, ENV_VARIABLE_SYNTAX_REF.clone()), request_params_layout[1]);            }
             RequestParamsTabs::Scripts => {
                 self.render_request_script(frame, request_params_layout[1]);
             }

@@ -43,26 +43,20 @@ nest! {
         pub generic: #[derive(Copy, Clone, Deserialize)] pub struct Generic {
             pub display_help: KeyCombination,
 
-            pub text_inputs: #[derive(Copy, Clone, Deserialize)] pub struct TexInputs {
-                /// Collection name, request name, URL, Header, Query param, Basic Auth, Bearer Token
-                pub text_input: #[derive(Copy, Clone, Deserialize)] pub struct TextInput {
-                    pub cancel: KeyCombination,
-                    pub confirm: KeyCombination,
-
-                    pub delete_backward: KeyCombination,
-                    pub delete_forward: KeyCombination,
-
-                    pub move_cursor_left: KeyCombination,
-                    pub move_cursor_right: KeyCombination,
-                    pub move_cursor_line_start: KeyCombination,
-                    pub move_cursor_line_end: KeyCombination,
-                },
-
-                /// Request body
-                pub text_area_mode: #[derive(Copy, Clone, PartialEq, Deserialize)] pub enum TextAreaMode {
-                    VimEmulation,
+            pub text_input: #[derive(Copy, Clone, Deserialize)] pub struct TextInput {
+                pub quit_without_saving: KeyCombination,
+                pub save_and_quit_single_line: KeyCombination,
+                pub save_and_quit_area: KeyCombination,
+                pub mode: #[derive(Copy, Clone, PartialEq, Deserialize)] pub enum TextAreaMode {
+                    #[serde(alias = "vim", alias = "VIM")]
+                    Vim,
+                    #[serde(alias = "emacs", alias = "EMACS")]
+                    Emacs,
+                    #[serde(alias = "default", alias = "DEFAULT")]
+                    Default,
+                    #[serde(alias = "custom", alias = "CUSTOM")]
                     Custom(CustomTextArea)
-                }
+                },
             },
 
             /// Navigation in tables, popups, up and down in the collections list
@@ -134,15 +128,14 @@ lazy_static! {
 
 #[derive(Copy, Clone, PartialEq, Deserialize)]
 pub struct CustomTextArea {
-    pub quit_without_saving: KeyCombination,
-
     pub copy: KeyCombination,
     pub paste: KeyCombination,
 
+    pub search: KeyCombination,
+    pub system_editor: KeyCombination,
+
     pub undo: KeyCombination,
     pub redo: KeyCombination,
-
-    pub save_and_quit: KeyCombination,
 
     pub new_line: KeyCombination,
     pub indent: KeyCombination,
@@ -183,20 +176,11 @@ impl Default for KeyBindings {
             generic: Generic {
                 display_help: key!(Ctrl-h),
 
-                text_inputs: TexInputs {
-                    text_input: TextInput {
-                        cancel: key!(esc),
-                        confirm: key!(enter),
-
-                        delete_backward: key!(delete),
-                        delete_forward: key!(backspace),
-
-                        move_cursor_left: key!(left),
-                        move_cursor_right: key!(right),
-                        move_cursor_line_start: key!(home),
-                        move_cursor_line_end: key!(end),
-                    },
-                    text_area_mode: TextAreaMode::Custom(CustomTextArea::default()),
+                text_input: TextInput {
+                    quit_without_saving: key!(esc),
+                    save_and_quit_single_line: key!(enter),
+                    save_and_quit_area: key!(ctrl-s),
+                    mode: TextAreaMode::Default,
                 },
 
                 navigation: Navigation {
@@ -262,15 +246,14 @@ impl Default for KeyBindings {
 impl Default for CustomTextArea {
     fn default() -> Self {
         CustomTextArea {
-            quit_without_saving: key!(esc),
-
             copy: key!(ctrl-c),
             paste: key!(ctrl-v),
 
+            search: key!(ctrl-f),
+            system_editor: key!(ctrl-e),
+
             undo: key!(ctrl-z),
             redo: key!(ctrl-y),
-
-            save_and_quit: key!(ctrl-s),
 
             new_line: key!(enter),
             indent: key!(tab),

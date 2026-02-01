@@ -1,9 +1,8 @@
-use crate::models::protocol::protocol::Protocol;
 use crate::models::protocol::http::http::HttpRequest;
+use crate::models::protocol::protocol::Protocol;
 use crate::models::protocol::ws::ws::WsRequest;
 use crate::tui::utils::stateful::text_input::TextInput;
 
-#[derive(Default)]
 pub struct NewRequestPopup {
     pub selection: usize,
 
@@ -13,6 +12,18 @@ pub struct NewRequestPopup {
     pub protocol: Protocol,
 
     pub text_input: TextInput
+}
+
+impl Default for NewRequestPopup {
+    fn default() -> Self {
+        Self {
+            selection: 0,
+            selected_collection: 0,
+            max_collection_selection: 0,
+            protocol: Protocol::default(),
+            text_input: TextInput::new(Some(String::from("Request name"))),
+        }
+    }
 }
 
 impl NewRequestPopup {

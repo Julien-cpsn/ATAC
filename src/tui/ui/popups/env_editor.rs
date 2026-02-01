@@ -1,12 +1,12 @@
 use crate::app::app::App;
 use crate::app::files::theme::THEME;
+use crate::tui::app_states::AppState::EditingEnvVariable;
 use crate::tui::utils::centered_rect::centered_rect;
 use ratatui::layout::Margin;
 use ratatui::style::Stylize;
 use ratatui::widgets::{Block, Borders, Clear};
 use ratatui::Frame;
-use ratatui::prelude::Line;
-use crate::tui::app_states::AppState::EditingEnvVariable;
+use crate::tui::tui_logic::utils::key_value_vec_to_items_list;
 
 impl App<'_> {
     pub fn render_env_editor_popup(&mut self, frame: &mut Frame) {
@@ -26,20 +26,10 @@ impl App<'_> {
 
         let env_variables_editor_layout = area.inner(Margin::new(1, 1));
 
-        let no_selection_lines = vec![
-            Line::default(),
-            Line::from("No environment variable").fg(THEME.read().ui.font_color),
-            Line::from("(Add one with n)").fg(THEME.read().ui.secondary_foreground_color)
-        ];
+        self.env_editor_table.is_editing = matches!(self.state, EditingEnvVariable);
 
-        self.render_custom_table(
-            frame,
-            env_variables_editor_layout,
-            &self.env_editor_table,
-            no_selection_lines,
-            EditingEnvVariable,
-            "Key",
-            "Value"
-        )
+        let mut rows = key_value_vec_to_items_list(&self.get_selected_env_as_local(), &self.env_editor_table.rows);
+
+        frame.render_stateful_widget(&mut self.env_editor_table, env_variables_editor_layout, &mut rows);
     }
 }

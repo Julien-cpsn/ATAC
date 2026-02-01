@@ -1,16 +1,13 @@
+use std::io::Stdout;
 use std::sync::Arc;
 use std::time::Duration;
 
-use ratatui::crossterm::terminal::disable_raw_mode;
 use parking_lot::{Mutex, RwLock};
-use ratatui::backend::Backend;
+use ratatui::backend::{Backend, CrosstermBackend};
+use ratatui::crossterm::terminal::disable_raw_mode;
 use ratatui::Terminal;
 use strum::VariantArray;
 use throbber_widgets_tui::ThrobberState;
-use tui_textarea::TextArea;
-
-#[cfg(feature = "clipboard")]
-use arboard::Clipboard;
 
 use crate::app::files::config::Config;
 use crate::models::collection::Collection;
@@ -34,7 +31,10 @@ use crate::tui::utils::stateful::text_input::TextInput;
 use crate::tui::utils::stateful::text_input_selection::TextInputSelection;
 use crate::tui::utils::stateful::validation_popup::ValidationPopup;
 use crate::tui::utils::syntax_highlighting::SyntaxHighlighting;
-use crate::tui::utils::vim_emulation::Vim;
+#[cfg(feature = "clipboard")]
+use arboard::Clipboard;
+use ratatui::prelude::{Line, Stylize};
+use crate::app::files::theme::THEME;
 
 pub struct App<'a> {
     pub tick_rate: Duration,
@@ -54,7 +54,7 @@ pub struct App<'a> {
     
     pub environments: Vec<Arc<RwLock<Environment>>>,
     pub selected_environment: usize,
-    pub env_editor_table: StatefulCustomTable,
+    pub env_editor_table: StatefulCustomTable<'a>,
 
     /* Cookies */
     
@@ -90,7 +90,7 @@ pub struct App<'a> {
 
     /* Query params */
     
-    pub query_params_table: StatefulCustomTable,
+    pub query_params_table: StatefulCustomTable<'a>,
 
     /* Auth */
 
@@ -102,8 +102,7 @@ pub struct App<'a> {
     pub auth_bearer_token_text_input: TextInput,
 
     pub auth_jwt_secret_text_input: TextInput,
-    pub auth_jwt_payload_text_area: TextArea<'a>,
-    pub auth_jwt_payload_text_area_vim_emulation: Vim,
+    pub auth_jwt_payload_text_area: TextInput,
 
     pub auth_digest_username_text_input: TextInput,
     pub auth_digest_password_text_input: TextInput,
@@ -114,19 +113,17 @@ pub struct App<'a> {
 
     /* Headers */
     
-    pub headers_table: StatefulCustomTable,
+    pub headers_table: StatefulCustomTable<'a>,
 
     /* Body */
     
     pub body_file_text_input: TextInput,
-    pub body_form_table: StatefulCustomTable,
-    pub body_text_area: TextArea<'a>,
-    pub body_text_area_vim_emulation: Vim,
+    pub body_form_table: StatefulCustomTable<'a>,
+    pub body_text_area: TextInput,
 
     /* WS message */
     
-    pub message_text_area: TextArea<'a>,
-    pub message_text_area_vim_emulation: Vim,
+    pub message_text_area: TextInput,
 
     /* Settings */
     
@@ -144,7 +141,7 @@ pub struct App<'a> {
 
     /* Scripts */
     
-    pub script_console: ScriptConsole<'a>,
+    pub script_console: ScriptConsole,
 
     /* Others */
     
@@ -177,7 +174,15 @@ impl App<'_> {
 
             environments: vec![],
             selected_environment: 0,
-            env_editor_table: StatefulCustomTable::default(),
+            env_editor_table: StatefulCustomTable::new(
+                vec![
+                    Line::default(),
+                    Line::from("No environment variable").fg(THEME.read().ui.font_color),
+                    Line::from("(Add one with n)").fg(THEME.read().ui.secondary_foreground_color)
+                ],
+                "Key",
+                "Value"
+            ),
 
             /* Cookies */
 
@@ -203,57 +208,78 @@ impl App<'_> {
               selection: 0
             },
             
-            new_collection_input: TextInput::default(),
-            rename_collection_input: TextInput::default(),
+            new_collection_input: TextInput::new(None),
+            rename_collection_input: TextInput::new(None),
             new_request_popup: NewRequestPopup::default(),
-            rename_request_input: TextInput::default(),
+            rename_request_input: TextInput::new(None),
 
             delete_collection_popup: ValidationPopup::default(),
             delete_request_popup: ValidationPopup::default(),
             
             /* Request */
             
-            url_text_input: TextInput::default(),
+            url_text_input: TextInput::new(Some(String::from("URL"))),
 
             /* Query params */
             
-            query_params_table: StatefulCustomTable::default(),
+            query_params_table: StatefulCustomTable::new(
+                vec![
+                    Line::default(),
+                    Line::from("No params").fg(THEME.read().ui.font_color),
+                    Line::from("(Add one with n or via the URL)").fg(THEME.read().ui.secondary_foreground_color)
+                ],
+                "Param",
+                "Value"
+            ),
 
             /* Auth */
             
             auth_text_input_selection: TextInputSelection::default(),
             
-            auth_basic_username_text_input: TextInput::default(),
-            auth_basic_password_text_input: TextInput::default(),
+            auth_basic_username_text_input: TextInput::new(Some(String::from("Username"))),
+            auth_basic_password_text_input: TextInput::new(Some(String::from("Password"))),
             
-            auth_bearer_token_text_input: TextInput::default(),
+            auth_bearer_token_text_input: TextInput::new(Some(String::from("Bearer token"))),
             
-            auth_jwt_secret_text_input: TextInput::default(),
-            auth_jwt_payload_text_area: TextArea::default(),
-            auth_jwt_payload_text_area_vim_emulation: Vim::default(),
+            auth_jwt_secret_text_input: TextInput::new(Some(String::from("Secret"))),
+            auth_jwt_payload_text_area: TextInput::new(Some(String::from("Payload"))),
 
-            auth_digest_username_text_input: TextInput::default(),
-            auth_digest_password_text_input: TextInput::default(),
-            auth_digest_domains_text_input: TextInput::default(),
-            auth_digest_realm_text_input: TextInput::default(),
-            auth_digest_nonce_text_input: TextInput::default(),
-            auth_digest_opaque_text_input: TextInput::default(),
+            auth_digest_username_text_input: TextInput::new(Some(String::from("Username"))),
+            auth_digest_password_text_input: TextInput::new(Some(String::from("Password"))),
+            auth_digest_domains_text_input: TextInput::new(Some(String::from("Domains"))),
+            auth_digest_realm_text_input: TextInput::new(Some(String::from("Realm"))),
+            auth_digest_nonce_text_input: TextInput::new(Some(String::from("Nonce"))),
+            auth_digest_opaque_text_input: TextInput::new(Some(String::from("Opaque"))),
             
             /* Headers */
             
-            headers_table: StatefulCustomTable::default(),
+            headers_table: StatefulCustomTable::new(
+                vec![
+                    Line::default(),
+                    Line::from("Default headers").fg(THEME.read().ui.font_color),
+                    Line::from("(Add one with n)").fg(THEME.read().ui.secondary_foreground_color)
+                ],
+                "Header",
+                "Value"
+            ),
 
             /* Body */
             
-            body_file_text_input: TextInput::default(),
-            body_form_table: StatefulCustomTable::default(),
-            body_text_area: TextArea::default(),
-            body_text_area_vim_emulation: Vim::default(),
+            body_file_text_input: TextInput::new(Some(String::from("File path"))),
+            body_form_table: StatefulCustomTable::new(
+                vec![
+                    Line::default(),
+                    Line::from("No form data").fg(THEME.read().ui.font_color),
+                    Line::from("(Add one with n)").fg(THEME.read().ui.secondary_foreground_color)
+                ],
+                "Key",
+                "Value"
+            ),
+            body_text_area: TextInput::new(None),
 
             /* WS message */
             
-            message_text_area: TextArea::default(),
-            message_text_area_vim_emulation: Vim::default(),
+            message_text_area: TextInput::new(None),
 
             /* Settings */
             
@@ -267,7 +293,11 @@ impl App<'_> {
             result_horizontal_scrollbar: StatefulScrollbar::default(),
 
             last_messages_area_size: (0, 0),
-            script_console: ScriptConsole::default(),
+            script_console: ScriptConsole {
+                pre_request_text_area: TextInput::new(None),
+                post_request_text_area: TextInput::new(None),
+                script_selection: 0,
+            },
 
             /* Others */
 
@@ -283,13 +313,13 @@ impl App<'_> {
         })
     }
 
-    pub async fn run(&mut self, mut terminal: Terminal<impl Backend>) -> std::io::Result<()> {
+    pub async fn run(&mut self, mut terminal: Terminal<CrosstermBackend<Stdout>>) -> Result<(), <CrosstermBackend<Stdout> as Backend>::Error> {
         terminal.clear()?;
 
         while !self.should_quit {
             self.update_current_available_events();
             self.draw(&mut terminal)?;
-            self.handle_events().await;
+            self.handle_events(&mut terminal).await;
         }
 
         Ok(())

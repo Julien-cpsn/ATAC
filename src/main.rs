@@ -50,7 +50,8 @@ async fn run_tui<'a>(app: &mut App<'a>) -> anyhow::Result<()> {
     app
         .prepare_terminal()
         .chain_hook()
-        .run(terminal).await?;
+        .run(terminal)
+        .await?;
 
     stdout().execute(LeaveAlternateScreen)?;
     disable_raw_mode()?;

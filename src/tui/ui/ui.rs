@@ -6,7 +6,6 @@ use ratatui::prelude::{Modifier};
 use ratatui::style::{Stylize};
 use ratatui::text::Line;
 use ratatui::widgets::{Block, Borders};
-use ratatui::widgets::block::Title;
 
 use crate::app::app::{App};
 use crate::app::files::theme::THEME;
@@ -124,10 +123,12 @@ impl App<'_> {
         ).concat());
 
         let footer_left = Block::new()
-            .title(Title::from(state_line)).title_alignment(Alignment::Left);
+            .title(Line::from(state_line))
+            .title_alignment(Alignment::Left);
         
         let footer_right = Block::new()
-            .title(Title::from(available_keys)).title_alignment(Alignment::Right);
+            .title(Line::from(available_keys))
+            .title_alignment(Alignment::Right);
 
         frame.render_widget(footer_left, main_layout[2]);
         frame.render_widget(footer_right, main_layout[2]);
@@ -156,7 +157,7 @@ impl App<'_> {
         }
     }
 
-    pub fn draw(&mut self, terminal: &mut Terminal<impl Backend>) -> std::io::Result<()> {
+    pub fn draw<B: Backend>(&mut self, terminal: &mut Terminal<B>) -> Result<(), B::Error> {
         terminal.draw(|frame | self.ui(frame))?;
         Ok(())
     }

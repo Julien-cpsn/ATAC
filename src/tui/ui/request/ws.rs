@@ -1,14 +1,15 @@
-use ratatui::Frame;
-use ratatui::layout::{Alignment, Constraint, Layout, Position, Rect};
 use ratatui::layout::Direction::{Horizontal, Vertical};
+use ratatui::layout::{Alignment, Constraint, Layout, Rect};
 use ratatui::style::Stylize;
 use ratatui::widgets::{Block, Borders, Padding, Paragraph};
+use ratatui::Frame;
 
 use crate::app::app::App;
 use crate::app::files::theme::THEME;
 use crate::models::request::Request;
+use crate::tui::app_states::AppState;
 use crate::tui::ui::views::RequestView;
-use crate::tui::app_states::AppState::EditingRequestUrl;
+use crate::tui::utils::stateful::text_input::SingleLineTextInput;
 
 impl App<'_> {
     pub fn render_ws_request(&mut self, frame: &mut Frame, rect: Rect, request: Request) {
@@ -71,33 +72,9 @@ impl App<'_> {
 
         // REQUEST URL
 
-        let url_block = Block::new()
-            .title("URL")
-            .borders(Borders::ALL)
-            .padding(Padding::horizontal(1))
-            .fg(THEME.read().ui.main_foreground_color);
-
-        let adjusted_input_length = request_header_layout[1].width as usize - 4;
-        let (padded_text, input_cursor_position) = self.url_text_input.get_padded_text_and_cursor(adjusted_input_length);
-
-        let url_line = self.tui_add_color_to_env_keys(&padded_text);
-
-        let url_paragraph = Paragraph::new(url_line)
-            .block(url_block)
-            .fg(THEME.read().ui.font_color);
-
-        frame.render_widget(url_paragraph, request_header_layout[1]);
-
-        match self.state {
-            EditingRequestUrl => {
-                frame.set_cursor_position(Position::new(
-                    request_header_layout[1].x + input_cursor_position as u16 + 2,
-                    request_header_layout[1].y + 1
-                ));
-            }
-            _ => {}
-        }
-
+        self.url_text_input.display_cursor = matches!(self.state, AppState::EditingRequestUrl);
+        frame.render_widget(SingleLineTextInput(&mut self.url_text_input), request_header_layout[1]);
+        
         // REQUEST MAIN LAYOUT
 
         let request_main_layout_constraints = match self.request_view {

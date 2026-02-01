@@ -23,7 +23,6 @@ pub fn collection_slash_request_validator(arg: &str) -> Result<(String, String),
 
 #[allow(unused)]
 pub fn key_value_array_validator(arg: &str) -> Result<KeyValue, Error> {
-    dbg!(arg);
     let pair = match arg.split_once(" ") {
         None => return Err(Error::new(InvalidValue)),
         Some(pair) => pair

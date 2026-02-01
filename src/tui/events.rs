@@ -1,9 +1,10 @@
+use std::io::Stdout;
 use crokey::KeyCombination;
-use crokey::OneToThree::One;
 use ratatui::crossterm::event;
-use ratatui::crossterm::event::{Event, KeyCode, KeyEventKind};
+use ratatui::crossterm::event::{Event, KeyEventKind};
+use ratatui::prelude::{CrosstermBackend};
+use ratatui::Terminal;
 use tracing::{debug};
-use tui_textarea::CursorMove;
 
 use crate::app::app::App;
 use crate::app::files::key_bindings::KEY_BINDINGS;
@@ -11,10 +12,9 @@ use crate::get_key_bindings;
 use crate::tui::app_states::AVAILABLE_EVENTS;
 use crate::tui::event_key_bindings::EventKeyBinding;
 use crate::tui::events::AppEvent::*;
-use crate::tui::utils::vim_emulation::{Vim, VimTransition};
 
 get_key_bindings! {
-    #[derive(Clone)]
+    #[derive(Debug, Clone)]
     pub enum AppEvent {
         /* Main Page */
 
@@ -53,13 +53,8 @@ get_key_bindings! {
         DeleteEnvVariable(EventKeyBinding),
 
         ModifyEnvVariable(EventKeyBinding),
-        EditingEnvVariableDeleteCharBackward(EventKeyBinding),
-        EditingEnvVariableDeleteCharForward(EventKeyBinding),
-        EditingEnvVariableMoveCursorLeft(EventKeyBinding),
-        EditingEnvVariableMoveCursorRight(EventKeyBinding),
-        EditingEnvVariableMoveCursorLineStart(EventKeyBinding),
-        EditingEnvVariableMoveCursorLineEnd(EventKeyBinding),
-        EditingEnvVariableCharInput(EventKeyBinding),
+        CancelModifyEnvVariable(EventKeyBinding),
+        KeyEventModifyEnvVariable(EventKeyBinding),
 
         /* Cookies */
 
@@ -83,20 +78,16 @@ get_key_bindings! {
         SelectElementToCreate(EventKeyBinding),
 
         CreateNewCollection(EventKeyBinding),
-        CreatingCollectionDeleteCharBackward(EventKeyBinding),
-        CreatingCollectionDeleteCharForward(EventKeyBinding),
-        CreatingCollectionMoveCursorLeft(EventKeyBinding),
-        CreatingCollectionMoveCursorRight(EventKeyBinding),
-        CreatingCollectionCharInput(EventKeyBinding),
+        CancelCreateNewCollection(EventKeyBinding),
+        KeyEventCreateNewCollection(EventKeyBinding),
 
         CreateNewRequest(EventKeyBinding),
+        CancelCreateNewRequest(EventKeyBinding),
         CreatingRequestSelectInputUp(EventKeyBinding),
         CreatingRequestSelectInputDown(EventKeyBinding),
         CreatingRequestInputLeft(EventKeyBinding),
         CreatingRequestInputRight(EventKeyBinding),
-        CreatingRequestDeleteCharBackward(EventKeyBinding),
-        CreatingRequestDeleteCharForward(EventKeyBinding),
-        CreatingRequestCharInput(EventKeyBinding),
+        KeyEventCreateNewRequest(EventKeyBinding),
 
         DeletingCollectionMoveCursorLeft(EventKeyBinding),
         DeletingCollectionMoveCursorRight(EventKeyBinding),
@@ -107,18 +98,12 @@ get_key_bindings! {
         DeleteRequest(EventKeyBinding),
 
         RenameCollection(EventKeyBinding),
-        RenamingCollectionDeleteCharBackward(EventKeyBinding),
-        RenamingCollectionDeleteCharForward(EventKeyBinding),
-        RenamingCollectionMoveCursorLeft(EventKeyBinding),
-        RenamingCollectionMoveCursorRight(EventKeyBinding),
-        RenamingCollectionCharInput(EventKeyBinding),
+        CancelRenameCollection(EventKeyBinding),
+        KeyEventRenameCollection(EventKeyBinding),
 
         RenameRequest(EventKeyBinding),
-        RenamingRequestDeleteCharBackward(EventKeyBinding),
-        RenamingRequestDeleteCharForward(EventKeyBinding),
-        RenamingRequestMoveCursorLeft(EventKeyBinding),
-        RenamingRequestMoveCursorRight(EventKeyBinding),
-        RenamingRequestCharInput(EventKeyBinding),
+        CancelRenameRequest(EventKeyBinding),
+        KeyEventRenameRequest(EventKeyBinding),
 
         /* Request */
 
@@ -211,253 +196,94 @@ get_key_bindings! {
         /* Request Text inputs */
 
         ModifyRequestUrl(EventKeyBinding),
-        EditingRequestUrlDeleteCharBackward(EventKeyBinding),
-        EditingRequestUrlDeleteCharForward(EventKeyBinding),
-        EditingRequestUrlMoveCursorLeft(EventKeyBinding),
-        EditingRequestUrlMoveCursorRight(EventKeyBinding),
-        EditingRequestUrlMoveCursorLineStart(EventKeyBinding),
-        EditingRequestUrlMoveCursorLineEnd(EventKeyBinding),
-        EditingRequestUrlCharInput(EventKeyBinding),
+        CancelEditRequestUrl(EventKeyBinding),
+        KeyEventEditRequestUrl(EventKeyBinding),
 
         ModifyRequestQueryParam(EventKeyBinding),
-        EditingRequestQueryParamDeleteCharBackward(EventKeyBinding),
-        EditingRequestQueryParamDeleteCharForward(EventKeyBinding),
-        EditingRequestQueryParamMoveCursorLeft(EventKeyBinding),
-        EditingRequestQueryParamMoveCursorRight(EventKeyBinding),
-        EditingRequestQueryParamMoveCursorLineStart(EventKeyBinding),
-        EditingRequestQueryParamMoveCursorLineEnd(EventKeyBinding),
-        EditingRequestQueryParamCharInput(EventKeyBinding),
+        CancelEditRequestQueryParam(EventKeyBinding),
+        KeyEventEditRequestQueryParam(EventKeyBinding),
 
         /* Auth */
 
         ModifyRequestAuthBasicUsername(EventKeyBinding),
-        EditingRequestAuthBasicUsernameDeleteCharBackward(EventKeyBinding),
-        EditingRequestAuthBasicUsernameDeleteCharForward(EventKeyBinding),
-        EditingRequestAuthBasicUsernameMoveCursorLeft(EventKeyBinding),
-        EditingRequestAuthBasicUsernameMoveCursorRight(EventKeyBinding),
-        EditingRequestAuthBasicUsernameMoveCursorLineStart(EventKeyBinding),
-        EditingRequestAuthBasicUsernameMoveCursorLineEnd(EventKeyBinding),
-        EditingRequestAuthBasicUsernameCharInput(EventKeyBinding),
+        CancelEditRequestAuthBasicUsername(EventKeyBinding),
+        KeyEventEditRequestAuthBasicUsername(EventKeyBinding),
 
         ModifyRequestAuthBasicPassword(EventKeyBinding),
-        EditingRequestAuthBasicPasswordDeleteCharBackward(EventKeyBinding),
-        EditingRequestAuthBasicPasswordDeleteCharForward(EventKeyBinding),
-        EditingRequestAuthBasicPasswordMoveCursorLeft(EventKeyBinding),
-        EditingRequestAuthBasicPasswordMoveCursorRight(EventKeyBinding),
-        EditingRequestAuthBasicPasswordMoveCursorLineStart(EventKeyBinding),
-        EditingRequestAuthBasicPasswordMoveCursorLineEnd(EventKeyBinding),
-        EditingRequestAuthBasicPasswordCharInput(EventKeyBinding),
+        CancelEditRequestAuthBasicPassword(EventKeyBinding),
+        KeyEventEditRequestAuthBasicPassword(EventKeyBinding),
 
         ModifyRequestAuthBearerToken(EventKeyBinding),
-        EditingRequestAuthBearerTokenDeleteCharBackward(EventKeyBinding),
-        EditingRequestAuthBearerTokenDeleteCharForward(EventKeyBinding),
-        EditingRequestAuthBearerTokenMoveCursorLeft(EventKeyBinding),
-        EditingRequestAuthBearerTokenMoveCursorRight(EventKeyBinding),
-        EditingRequestAuthBearerTokenMoveCursorLineStart(EventKeyBinding),
-        EditingRequestAuthBearerTokenMoveCursorLineEnd(EventKeyBinding),
-        EditingRequestAuthBearerTokenCharInput(EventKeyBinding),
+        CancelEditRequestAuthBearerToken(EventKeyBinding),
+        KeyEventEditRequestAuthBearerToken(EventKeyBinding),
 
         ModifyRequestAuthJwtSecret(EventKeyBinding),
-        EditingRequestAuthJwtSecretDeleteCharBackward(EventKeyBinding),
-        EditingRequestAuthJwtSecretDeleteCharForward(EventKeyBinding),
-        EditingRequestAuthJwtSecretMoveCursorLeft(EventKeyBinding),
-        EditingRequestAuthJwtSecretMoveCursorRight(EventKeyBinding),
-        EditingRequestAuthJwtSecretMoveCursorLineStart(EventKeyBinding),
-        EditingRequestAuthJwtSecretMoveCursorLineEnd(EventKeyBinding),
-        EditingRequestAuthJwtSecretCharInput(EventKeyBinding),
+        CancelEditRequestAuthJwtSecret(EventKeyBinding),
+        KeyEventEditRequestAuthJwtSecret(EventKeyBinding),
 
-        EditingRequestAuthJwtPayloadVimInput(EventKeyBinding),
-        EditingRequestAuthJwtPayloadSaveAndQuit(EventKeyBinding),
-        EditingRequestAuthJwtPayloadCopy(EventKeyBinding),
-        EditingRequestAuthJwtPayloadPaste(EventKeyBinding),
-        EditingRequestAuthJwtPayloadUndo(EventKeyBinding),
-        EditingRequestAuthJwtPayloadRedo(EventKeyBinding),
-        EditingRequestAuthJwtPayloadNewLine(EventKeyBinding),
-        EditingRequestAuthJwtPayloadIndent(EventKeyBinding),
-        EditingRequestAuthJwtPayloadDeleteCharBackward(EventKeyBinding),
-        EditingRequestAuthJwtPayloadDeleteCharForward(EventKeyBinding),
-        EditingRequestAuthJwtPayloadSkipWordLeft(EventKeyBinding),
-        EditingRequestAuthJwtPayloadSkipWordRight(EventKeyBinding),
-        EditingRequestAuthJwtPayloadMoveCursorUp(EventKeyBinding),
-        EditingRequestAuthJwtPayloadMoveCursorDown(EventKeyBinding),
-        EditingRequestAuthJwtPayloadMoveCursorLeft(EventKeyBinding),
-        EditingRequestAuthJwtPayloadMoveCursorRight(EventKeyBinding),
-        EditingRequestAuthJwtPayloadMoveCursorLineStart(EventKeyBinding),
-        EditingRequestAuthJwtPayloadMoveCursorLineEnd(EventKeyBinding),
-        EditingRequestAuthJwtPayloadCharInput(EventKeyBinding),
+        ModifyRequestAuthJwtPayload(EventKeyBinding),
+        CancelEditRequestAuthJwtPayload(EventKeyBinding),
+        KeyEventEditRequestAuthJwtPayload(EventKeyBinding),
 
         ModifyRequestAuthDigestUsername(EventKeyBinding),
-        EditingRequestAuthDigestUsernameDeleteCharBackward(EventKeyBinding),
-        EditingRequestAuthDigestUsernameDeleteCharForward(EventKeyBinding),
-        EditingRequestAuthDigestUsernameMoveCursorLeft(EventKeyBinding),
-        EditingRequestAuthDigestUsernameMoveCursorRight(EventKeyBinding),
-        EditingRequestAuthDigestUsernameMoveCursorLineStart(EventKeyBinding),
-        EditingRequestAuthDigestUsernameMoveCursorLineEnd(EventKeyBinding),
-        EditingRequestAuthDigestUsernameCharInput(EventKeyBinding),
+        CancelEditRequestAuthDigestUsername(EventKeyBinding),
+        KeyEventEditRequestAuthDigestUsername(EventKeyBinding),
 
         ModifyRequestAuthDigestPassword(EventKeyBinding),
-        EditingRequestAuthDigestPasswordDeleteCharBackward(EventKeyBinding),
-        EditingRequestAuthDigestPasswordDeleteCharForward(EventKeyBinding),
-        EditingRequestAuthDigestPasswordMoveCursorLeft(EventKeyBinding),
-        EditingRequestAuthDigestPasswordMoveCursorRight(EventKeyBinding),
-        EditingRequestAuthDigestPasswordMoveCursorLineStart(EventKeyBinding),
-        EditingRequestAuthDigestPasswordMoveCursorLineEnd(EventKeyBinding),
-        EditingRequestAuthDigestPasswordCharInput(EventKeyBinding),
+        CancelEditRequestAuthDigestPassword(EventKeyBinding),
+        KeyEventEditRequestAuthDigestPassword(EventKeyBinding),
 
         ModifyRequestAuthDigestDomains(EventKeyBinding),
-        EditingRequestAuthDigestDomainsDeleteCharBackward(EventKeyBinding),
-        EditingRequestAuthDigestDomainsDeleteCharForward(EventKeyBinding),
-        EditingRequestAuthDigestDomainsMoveCursorLeft(EventKeyBinding),
-        EditingRequestAuthDigestDomainsMoveCursorRight(EventKeyBinding),
-        EditingRequestAuthDigestDomainsMoveCursorLineStart(EventKeyBinding),
-        EditingRequestAuthDigestDomainsMoveCursorLineEnd(EventKeyBinding),
-        EditingRequestAuthDigestDomainsCharInput(EventKeyBinding),
+        CancelEditRequestAuthDigestDomains(EventKeyBinding),
+        KeyEventEditRequestAuthDigestDomains(EventKeyBinding),
 
         ModifyRequestAuthDigestRealm(EventKeyBinding),
-        EditingRequestAuthDigestRealmDeleteCharBackward(EventKeyBinding),
-        EditingRequestAuthDigestRealmDeleteCharForward(EventKeyBinding),
-        EditingRequestAuthDigestRealmMoveCursorLeft(EventKeyBinding),
-        EditingRequestAuthDigestRealmMoveCursorRight(EventKeyBinding),
-        EditingRequestAuthDigestRealmMoveCursorLineStart(EventKeyBinding),
-        EditingRequestAuthDigestRealmMoveCursorLineEnd(EventKeyBinding),
-        EditingRequestAuthDigestRealmCharInput(EventKeyBinding),
+        CancelEditRequestAuthDigestRealm(EventKeyBinding),
+        KeyEventEditRequestAuthDigestRealm(EventKeyBinding),
 
         ModifyRequestAuthDigestNonce(EventKeyBinding),
-        EditingRequestAuthDigestNonceDeleteCharBackward(EventKeyBinding),
-        EditingRequestAuthDigestNonceDeleteCharForward(EventKeyBinding),
-        EditingRequestAuthDigestNonceMoveCursorLeft(EventKeyBinding),
-        EditingRequestAuthDigestNonceMoveCursorRight(EventKeyBinding),
-        EditingRequestAuthDigestNonceMoveCursorLineStart(EventKeyBinding),
-        EditingRequestAuthDigestNonceMoveCursorLineEnd(EventKeyBinding),
-        EditingRequestAuthDigestNonceCharInput(EventKeyBinding),
+        CancelEditRequestAuthDigestNonce(EventKeyBinding),
+        KeyEventEditRequestAuthDigestNonce(EventKeyBinding),
 
         ModifyRequestAuthDigestOpaque(EventKeyBinding),
-        EditingRequestAuthDigestOpaqueDeleteCharBackward(EventKeyBinding),
-        EditingRequestAuthDigestOpaqueDeleteCharForward(EventKeyBinding),
-        EditingRequestAuthDigestOpaqueMoveCursorLeft(EventKeyBinding),
-        EditingRequestAuthDigestOpaqueMoveCursorRight(EventKeyBinding),
-        EditingRequestAuthDigestOpaqueMoveCursorLineStart(EventKeyBinding),
-        EditingRequestAuthDigestOpaqueMoveCursorLineEnd(EventKeyBinding),
-        EditingRequestAuthDigestOpaqueCharInput(EventKeyBinding),
+        CancelEditRequestAuthDigestOpaque(EventKeyBinding),
+        KeyEventEditRequestAuthDigestOpaque(EventKeyBinding),
 
         /* Headers */
 
         ModifyRequestHeader(EventKeyBinding),
-        EditingRequestHeaderDeleteCharBackward(EventKeyBinding),
-        EditingRequestHeaderDeleteCharForward(EventKeyBinding),
-        EditingRequestHeaderMoveCursorLeft(EventKeyBinding),
-        EditingRequestHeaderMoveCursorRight(EventKeyBinding),
-        EditingRequestHeaderMoveCursorLineStart(EventKeyBinding),
-        EditingRequestHeaderMoveCursorLineEnd(EventKeyBinding),
-        EditingRequestHeaderCharInput(EventKeyBinding),
+        CancelEditRequestHeader(EventKeyBinding),
+        KeyEventEditRequestHeader(EventKeyBinding),
 
         /* Body */
 
         ModifyRequestBodyTable(EventKeyBinding),
-        EditingRequestBodyTableDeleteCharBackward(EventKeyBinding),
-        EditingRequestBodyTableDeleteCharForward(EventKeyBinding),
-        EditingRequestBodyTableMoveCursorLeft(EventKeyBinding),
-        EditingRequestBodyTableMoveCursorRight(EventKeyBinding),
-        EditingRequestBodyTableMoveCursorLineStart(EventKeyBinding),
-        EditingRequestBodyTableMoveCursorLineEnd(EventKeyBinding),
-        EditingRequestBodyTableCharInput(EventKeyBinding),
+        CancelEditRequestBodyTable(EventKeyBinding),
+        KeyEventEditRequestBodyTable(EventKeyBinding),
 
         ModifyRequestBodyFile(EventKeyBinding),
-        EditingRequestBodyFileDeleteCharBackward(EventKeyBinding),
-        EditingRequestBodyFileDeleteCharForward(EventKeyBinding),
-        EditingRequestBodyFileMoveCursorLeft(EventKeyBinding),
-        EditingRequestBodyFileMoveCursorRight(EventKeyBinding),
-        EditingRequestBodyFileMoveCursorLineStart(EventKeyBinding),
-        EditingRequestBodyFileMoveCursorLineEnd(EventKeyBinding),
-        EditingRequestBodyFileCharInput(EventKeyBinding),
+        CancelEditRequestBodyFile(EventKeyBinding),
+        KeyEventEditRequestBodyFile(EventKeyBinding),
 
-        EditingRequestBodyStringVimInput(EventKeyBinding),
-
-        EditingRequestBodyStringSaveAndQuit(EventKeyBinding),
-        EditingRequestBodyStringCopy(EventKeyBinding),
-        EditingRequestBodyStringPaste(EventKeyBinding),
-        EditingRequestBodyStringUndo(EventKeyBinding),
-        EditingRequestBodyStringRedo(EventKeyBinding),
-        EditingRequestBodyStringNewLine(EventKeyBinding),
-        EditingRequestBodyStringIndent(EventKeyBinding),
-        EditingRequestBodyStringDeleteCharBackward(EventKeyBinding),
-        EditingRequestBodyStringDeleteCharForward(EventKeyBinding),
-        EditingRequestBodyStringSkipWordLeft(EventKeyBinding),
-        EditingRequestBodyStringSkipWordRight(EventKeyBinding),
-        EditingRequestBodyStringMoveCursorUp(EventKeyBinding),
-        EditingRequestBodyStringMoveCursorDown(EventKeyBinding),
-        EditingRequestBodyStringMoveCursorLeft(EventKeyBinding),
-        EditingRequestBodyStringMoveCursorRight(EventKeyBinding),
-        EditingRequestBodyStringMoveCursorLineStart(EventKeyBinding),
-        EditingRequestBodyStringMoveCursorLineEnd(EventKeyBinding),
-        EditingRequestBodyStringCharInput(EventKeyBinding),
+        ModifyRequestBodyString(EventKeyBinding),
+        CancelEditRequestBodyString(EventKeyBinding),
+        KeyEventEditRequestBodyString(EventKeyBinding),
 
         /* Websocket */
 
-        EditingRequestMessageVimInput(EventKeyBinding),
-
-        EditingRequestMessageSaveAndQuit(EventKeyBinding),
-        EditingRequestMessageCopy(EventKeyBinding),
-        EditingRequestMessagePaste(EventKeyBinding),
-        EditingRequestMessageUndo(EventKeyBinding),
-        EditingRequestMessageRedo(EventKeyBinding),
-        EditingRequestMessageNewLine(EventKeyBinding),
-        EditingRequestMessageIndent(EventKeyBinding),
-        EditingRequestMessageDeleteCharBackward(EventKeyBinding),
-        EditingRequestMessageDeleteCharForward(EventKeyBinding),
-        EditingRequestMessageSkipWordLeft(EventKeyBinding),
-        EditingRequestMessageSkipWordRight(EventKeyBinding),
-        EditingRequestMessageMoveCursorUp(EventKeyBinding),
-        EditingRequestMessageMoveCursorDown(EventKeyBinding),
-        EditingRequestMessageMoveCursorLeft(EventKeyBinding),
-        EditingRequestMessageMoveCursorRight(EventKeyBinding),
-        EditingRequestMessageMoveCursorLineStart(EventKeyBinding),
-        EditingRequestMessageMoveCursorLineEnd(EventKeyBinding),
-        EditingRequestMessageCharInput(EventKeyBinding),
+        ModifyRequestMessage(EventKeyBinding),
+        CancelEditRequestMessage(EventKeyBinding),
+        KeyEventEditRequestMessage(EventKeyBinding),
 
         /* Scripts */
 
-        EditingPreRequestScriptVimInput(EventKeyBinding),
+        ModifyRequestPreRequestScript(EventKeyBinding),
+        CancelEditRequestPreRequestScript(EventKeyBinding),
+        KeyEventEditRequestPreRequestScript(EventKeyBinding),
 
-        EditingPreRequestScriptSaveAndQuit(EventKeyBinding),
-        EditingPreRequestScriptCopy(EventKeyBinding),
-        EditingPreRequestScriptPaste(EventKeyBinding),
-        EditingPreRequestScriptUndo(EventKeyBinding),
-        EditingPreRequestScriptRedo(EventKeyBinding),
-        EditingPreRequestScriptNewLine(EventKeyBinding),
-        EditingPreRequestScriptIndent(EventKeyBinding),
-        EditingPreRequestScriptDeleteCharBackward(EventKeyBinding),
-        EditingPreRequestScriptDeleteCharForward(EventKeyBinding),
-        EditingPreRequestScriptSkipWordLeft(EventKeyBinding),
-        EditingPreRequestScriptSkipWordRight(EventKeyBinding),
-        EditingPreRequestScriptMoveCursorUp(EventKeyBinding),
-        EditingPreRequestScriptMoveCursorDown(EventKeyBinding),
-        EditingPreRequestScriptMoveCursorLeft(EventKeyBinding),
-        EditingPreRequestScriptMoveCursorRight(EventKeyBinding),
-        EditingPreRequestScriptMoveCursorLineStart(EventKeyBinding),
-        EditingPreRequestScriptMoveCursorLineEnd(EventKeyBinding),
-        EditingPreRequestScriptCharInput(EventKeyBinding),
-
-        EditingPostRequestScriptVimInput(EventKeyBinding),
-
-        EditingPostRequestScriptSaveAndQuit(EventKeyBinding),
-        EditingPostRequestScriptCopy(EventKeyBinding),
-        EditingPostRequestScriptPaste(EventKeyBinding),
-        EditingPostRequestScriptUndo(EventKeyBinding),
-        EditingPostRequestScriptRedo(EventKeyBinding),
-        EditingPostRequestScriptNewLine(EventKeyBinding),
-        EditingPostRequestScriptIndent(EventKeyBinding),
-        EditingPostRequestScriptDeleteCharBackward(EventKeyBinding),
-        EditingPostRequestScriptDeleteCharForward(EventKeyBinding),
-        EditingPostRequestScriptSkipWordLeft(EventKeyBinding),
-        EditingPostRequestScriptSkipWordRight(EventKeyBinding),
-        EditingPostRequestScriptMoveCursorUp(EventKeyBinding),
-        EditingPostRequestScriptMoveCursorDown(EventKeyBinding),
-        EditingPostRequestScriptMoveCursorLeft(EventKeyBinding),
-        EditingPostRequestScriptMoveCursorRight(EventKeyBinding),
-        EditingPostRequestScriptMoveCursorLineStart(EventKeyBinding),
-        EditingPostRequestScriptMoveCursorLineEnd(EventKeyBinding),
-        EditingPostRequestScriptCharInput(EventKeyBinding),
+        ModifyRequestPostRequestScript(EventKeyBinding),
+        CancelEditRequestPostRequestScript(EventKeyBinding),
+        KeyEventEditRequestPostRequestScript(EventKeyBinding),
 
         /* Settings */
 
@@ -475,7 +301,7 @@ get_key_bindings! {
 
 impl App<'_> {
     /// Handle events
-    pub async fn handle_events(&mut self) {
+    pub async fn handle_events(&mut self, terminal: &mut Terminal<CrosstermBackend<Stdout>>) {
         // Refreshes the app every tick_rate
         if event::poll(self.tick_rate).unwrap() {
             // Block while a key is pressed
@@ -486,7 +312,7 @@ impl App<'_> {
                 }
 
                 let key = KeyCombination::from(key_event);
-                let is_input_missed = self.handle_key(key).await;
+                let is_input_missed = self.handle_key(key, terminal).await;
 
                 if !is_input_missed {
                     debug!("Key pressed: {}", key);
@@ -510,7 +336,7 @@ impl App<'_> {
         }
     }
 
-    async fn handle_key(&mut self, key: KeyCombination) -> bool {
+    async fn handle_key(&mut self, key: KeyCombination, terminal: &mut Terminal<CrosstermBackend<Stdout>>) -> bool {
         // Debug tool
         //dbg!("{}", key.to_string());
 
@@ -521,7 +347,6 @@ impl App<'_> {
             if self.should_display_help {
                 match key {
                     key if key == key_bindings.generic.navigation.go_back => self.should_display_help = false,
-
                     key if key == key_bindings.generic.navigation.move_cursor_left => self.help_popup.previous_page(),
                     key if key == key_bindings.generic.navigation.move_cursor_right => self.help_popup.next_page(),
 
@@ -595,17 +420,15 @@ impl App<'_> {
                 CreateEnvVariable(_) => self.tui_create_env_variable(),
                 DeleteEnvVariable(_) => self.tui_delete_env_variable(),
 
-                ModifyEnvVariable(_) => self.tui_modify_env_variable(),
-                EditingEnvVariableDeleteCharBackward(_) => self.env_editor_table.selection_text_input.delete_char_forward(),
-                EditingEnvVariableDeleteCharForward(_) => self.env_editor_table.selection_text_input.delete_char_backward(),
-                EditingEnvVariableMoveCursorLeft(_) => self.env_editor_table.selection_text_input.move_cursor_left(),
-                EditingEnvVariableMoveCursorRight(_) => self.env_editor_table.selection_text_input.move_cursor_right(),
-                EditingEnvVariableMoveCursorLineStart(_) => self.env_editor_table.selection_text_input.move_cursor_line_start(),
-                EditingEnvVariableMoveCursorLineEnd(_) => self.env_editor_table.selection_text_input.move_cursor_line_end(),
-                EditingEnvVariableCharInput(_) => match key {
-                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.env_editor_table.selection_text_input.enter_char(char),
-                    _ => {}
+                ModifyEnvVariable(_) => match self.env_editor_table.selection_text_input.is_in_default_mode() {
+                    true => self.tui_modify_env_variable(),
+                    false => self.env_editor_table.selection_text_input.key_event(key, None),
                 },
+                CancelModifyEnvVariable(_) => match self.env_editor_table.selection_text_input.is_in_default_mode() {
+                    true => self.display_env_editor_state(),
+                    false => self.env_editor_table.selection_text_input.key_event(key, None),
+                },
+                KeyEventModifyEnvVariable(_) => self.env_editor_table.selection_text_input.key_event(key, None),
 
                 /* Cookies */
 
@@ -617,39 +440,44 @@ impl App<'_> {
                 DeleteCookie(_) => self.tui_delete_cookie(),
 
                 /* Logs */
-                
+
                 ScrollLogsUp(_) => self.logs_vertical_scrollbar.page_up(),
                 ScrollLogsDown(_) => self.logs_vertical_scrollbar.page_down(),
                 ScrollLogsLeft(_) => self.logs_horizontal_scrollbar.page_up(),
                 ScrollLogsRight(_) => self.logs_horizontal_scrollbar.page_down(),
-                
+
                 /* Collections */
 
                 ChooseElementToCreateMoveCursorLeft(_) => self.creation_popup.previous(),
                 ChooseElementToCreateMoveCursorRight(_) => self.creation_popup.next(),
                 SelectElementToCreate(_) => self.new_element(),
 
-                CreateNewCollection(_) => self.tui_new_collection(),
-                CreatingCollectionDeleteCharBackward(_) => self.new_collection_input.delete_char_forward(),
-                CreatingCollectionDeleteCharForward(_) => self.new_collection_input.delete_char_backward(),
-                CreatingCollectionMoveCursorLeft(_) => self.new_collection_input.move_cursor_left(),
-                CreatingCollectionMoveCursorRight(_) => self.new_collection_input.move_cursor_right(),
-                CreatingCollectionCharInput(_) => match key {
-                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.new_collection_input.enter_char(char),
-                    _ => {}
-                },
 
-                CreateNewRequest(_) => self.tui_new_request(),
+                CreateNewCollection(_) => match self.new_collection_input.is_in_default_mode() {
+                    true => self.tui_new_collection(),
+                    false => self.new_collection_input.key_event(key, None),
+                },
+                CancelCreateNewCollection(_) => match self.new_collection_input.is_in_default_mode() {
+                    true => self.normal_state(),
+                    false => self.new_collection_input.key_event(key, None),
+                },
+                KeyEventCreateNewCollection(_) => self.new_collection_input.key_event(key, None),
+
+
+                CreateNewRequest(_) => match self.new_request_popup.text_input.is_in_default_mode() {
+                    true => self.tui_new_request(),
+                    false => self.new_request_popup.text_input.key_event(key, None),
+                },
+                CancelCreateNewRequest(_) => match self.new_request_popup.text_input.is_in_default_mode() {
+                    true => self.normal_state(),
+                    false => self.new_request_popup.text_input.key_event(key, None),
+                },
                 CreatingRequestSelectInputUp(_) => self.new_request_popup.previous_input(),
                 CreatingRequestSelectInputDown(_) => self.new_request_popup.next_input(),
                 CreatingRequestInputLeft(_) => self.new_request_popup.input_left(),
                 CreatingRequestInputRight(_) => self.new_request_popup.input_right(),
-                CreatingRequestDeleteCharBackward(_) => self.new_request_popup.text_input.delete_char_forward(),
-                CreatingRequestDeleteCharForward(_) => self.new_request_popup.text_input.delete_char_backward(),
-                CreatingRequestCharInput(_) => match key {
-                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.new_request_popup.text_input.enter_char(char),
-                    _ => {}
-                },
+                KeyEventCreateNewRequest(_) => self.new_request_popup.text_input.key_event(key, None),
+
 
                 DeletingCollectionMoveCursorLeft(_) => self.delete_collection_popup.change_state(),
                 DeletingCollectionMoveCursorRight(_) => self.delete_collection_popup.change_state(),
@@ -657,7 +485,7 @@ impl App<'_> {
                     true => self.tui_delete_collection(),
                     false => self.normal_state(),
                 },
-                
+
                 DeletingRequestMoveCursorLeft(_) => self.delete_request_popup.change_state(),
                 DeletingRequestMoveCursorRight(_) => self.delete_request_popup.change_state(),
                 DeleteRequest(_) => match self.delete_request_popup.state {
@@ -665,30 +493,33 @@ impl App<'_> {
                     false => self.normal_state(),
                 },
 
-                RenameCollection(_) => self.tui_rename_collection(),
-                RenamingCollectionDeleteCharBackward(_) => self.rename_collection_input.delete_char_forward(),
-                RenamingCollectionDeleteCharForward(_) => self.rename_collection_input.delete_char_backward(),
-                RenamingCollectionMoveCursorLeft(_) => self.rename_collection_input.move_cursor_left(),
-                RenamingCollectionMoveCursorRight(_) => self.rename_collection_input.move_cursor_right(),
-                RenamingCollectionCharInput(_) => match key {
-                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.rename_collection_input.enter_char(char),
-                    _ => {}
+
+                RenameCollection(_) => match self.rename_collection_input.is_in_default_mode() {
+                    true => self.tui_rename_collection(),
+                    false => self.rename_collection_input.key_event(key, None),
                 },
-                
-                RenameRequest(_) => self.tui_rename_request(),
-                RenamingRequestDeleteCharBackward(_) => self.rename_request_input.delete_char_forward(),
-                RenamingRequestDeleteCharForward(_) => self.rename_request_input.delete_char_backward(),
-                RenamingRequestMoveCursorLeft(_) => self.rename_request_input.move_cursor_left(),
-                RenamingRequestMoveCursorRight(_) => self.rename_request_input.move_cursor_right(),
-                RenamingRequestCharInput(_) => match key {
-                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.rename_request_input.enter_char(char),
-                    _ => {}
+                CancelRenameCollection(_) => match self.rename_collection_input.is_in_default_mode() {
+                    true => self.normal_state(),
+                    false => self.rename_collection_input.key_event(key, None),
                 },
-                
+                KeyEventRenameCollection(_) => self.rename_collection_input.key_event(key, None),
+
+
+                RenameRequest(_) => match self.rename_request_input.is_in_default_mode() {
+                    true => self.tui_rename_request(),
+                    false => self.rename_request_input.key_event(key, None),
+                },
+                CancelRenameRequest(_) => match self.rename_request_input.is_in_default_mode() {
+                    true => self.normal_state(),
+                    false => self.rename_request_input.key_event(key, None),
+                },
+                KeyEventRenameRequest(_) => self.rename_request_input.key_event(key, None),
+
+
                 /* Selected Request */
 
                 GoBackToRequestMenu(_) => self.select_request_state(),
-                
+
                 EditUrl(_) => self.edit_request_url_state(),
                 EditMethod(_) => self.tui_next_request_method(),
                 EditSettings(_) => self.edit_request_settings_state(),
@@ -800,405 +631,235 @@ impl App<'_> {
                 #[cfg(not(feature = "clipboard"))]
                 CopyRequestExport(_) => {},
 
-                /* Request text inputs */
+                /* Url */
 
-                ModifyRequestUrl(_) => self.tui_modify_request_url(),
-                EditingRequestUrlDeleteCharBackward(_) => self.url_text_input.delete_char_forward(),
-                EditingRequestUrlDeleteCharForward(_) => self.url_text_input.delete_char_backward(),
-                EditingRequestUrlMoveCursorLeft(_) => self.url_text_input.move_cursor_left(),
-                EditingRequestUrlMoveCursorRight(_) => self.url_text_input.move_cursor_right(),
-                EditingRequestUrlMoveCursorLineStart(_) => self.url_text_input.move_cursor_line_start(),
-                EditingRequestUrlMoveCursorLineEnd(_) => self.url_text_input.move_cursor_line_end(),
-                EditingRequestUrlCharInput(_) => match key {
-                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.url_text_input.enter_char(char),
-                    _ => {}
+                ModifyRequestUrl(_) => match self.url_text_input.is_in_default_mode() {
+                    true => self.tui_modify_request_url(),
+                    false => self.url_text_input.key_event(key, None),
                 },
+                CancelEditRequestUrl(_) => match self.url_text_input.is_in_default_mode() {
+                    true => self.select_request_state(),
+                    false => self.url_text_input.key_event(key, None),
+                },
+                KeyEventEditRequestUrl(_) => self.url_text_input.key_event(key, None),
 
-                ModifyRequestQueryParam(_) => self.tui_modify_request_query_param(),
-                EditingRequestQueryParamDeleteCharBackward(_) => self.query_params_table.selection_text_input.delete_char_forward(),
-                EditingRequestQueryParamDeleteCharForward(_) => self.query_params_table.selection_text_input.delete_char_backward(),
-                EditingRequestQueryParamMoveCursorLeft(_) => self.query_params_table.selection_text_input.move_cursor_left(),
-                EditingRequestQueryParamMoveCursorRight(_) => self.query_params_table.selection_text_input.move_cursor_right(),
-                EditingRequestQueryParamMoveCursorLineStart(_) => self.query_params_table.selection_text_input.move_cursor_line_start(),
-                EditingRequestQueryParamMoveCursorLineEnd(_) => self.query_params_table.selection_text_input.move_cursor_line_end(),
-                EditingRequestQueryParamCharInput(_) => match key {
-                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.query_params_table.selection_text_input.enter_char(char),
-                    _ => {}
+                /* Query params */
+
+                ModifyRequestQueryParam(_) => match self.query_params_table.selection_text_input.is_in_default_mode() {
+                    true => self.tui_modify_request_query_param(),
+                    false => self.query_params_table.selection_text_input.key_event(key, None),
                 },
+                CancelEditRequestQueryParam(_) => match self.query_params_table.selection_text_input.is_in_default_mode() {
+                    true => self.select_request_state(),
+                    false => self.query_params_table.selection_text_input.key_event(key, None),
+                },
+                KeyEventEditRequestQueryParam(_) => self.query_params_table.selection_text_input.key_event(key, None),
 
                 /* Auth */
-                
+
                 // self.auth_text_input_selection.usable
 
-                ModifyRequestAuthBasicUsername(_) => self.tui_modify_request_auth_basic_username(),
-                EditingRequestAuthBasicUsernameDeleteCharBackward(_) => self.auth_basic_username_text_input.delete_char_forward(),
-                EditingRequestAuthBasicUsernameDeleteCharForward(_) => self.auth_basic_username_text_input.delete_char_backward(),
-                EditingRequestAuthBasicUsernameMoveCursorLeft(_) => self.auth_basic_username_text_input.move_cursor_left(),
-                EditingRequestAuthBasicUsernameMoveCursorRight(_) => self.auth_basic_username_text_input.move_cursor_right(),
-                EditingRequestAuthBasicUsernameMoveCursorLineStart(_) => self.auth_basic_username_text_input.move_cursor_line_start(),
-                EditingRequestAuthBasicUsernameMoveCursorLineEnd(_) => self.auth_basic_username_text_input.move_cursor_line_end(),
-                EditingRequestAuthBasicUsernameCharInput(_) => match key {
-                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.auth_basic_username_text_input.enter_char(char),
-                    _ => {}
+                ModifyRequestAuthBasicUsername(_) => match self.auth_basic_username_text_input.is_in_default_mode() {
+                    true => self.tui_modify_request_auth_basic_username(),
+                    false => self.auth_basic_username_text_input.key_event(key, None),
                 },
-                
-                ModifyRequestAuthBasicPassword(_) => self.tui_modify_request_auth_basic_password(),
-                EditingRequestAuthBasicPasswordDeleteCharBackward(_) => self.auth_basic_password_text_input.delete_char_forward(),
-                EditingRequestAuthBasicPasswordDeleteCharForward(_) => self.auth_basic_password_text_input.delete_char_backward(),
-                EditingRequestAuthBasicPasswordMoveCursorLeft(_) => self.auth_basic_password_text_input.move_cursor_left(),
-                EditingRequestAuthBasicPasswordMoveCursorRight(_) => self.auth_basic_password_text_input.move_cursor_right(),
-                EditingRequestAuthBasicPasswordMoveCursorLineStart(_) => self.auth_basic_password_text_input.move_cursor_line_start(),
-                EditingRequestAuthBasicPasswordMoveCursorLineEnd(_) => self.auth_basic_password_text_input.move_cursor_line_end(),
-                EditingRequestAuthBasicPasswordCharInput(_) => match key {
-                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.auth_basic_password_text_input.enter_char(char),
-                    _ => {}
+                CancelEditRequestAuthBasicUsername(_) => match self.auth_basic_password_text_input.is_in_default_mode() {
+                    true => self.select_request_state(),
+                    false => self.auth_basic_password_text_input.key_event(key, None),
                 },
-                
-                ModifyRequestAuthBearerToken(_) => self.tui_modify_request_auth_bearer_token(),
-                EditingRequestAuthBearerTokenDeleteCharBackward(_) => self.auth_bearer_token_text_input.delete_char_forward(),
-                EditingRequestAuthBearerTokenDeleteCharForward(_) => self.auth_bearer_token_text_input.delete_char_backward(),
-                EditingRequestAuthBearerTokenMoveCursorLeft(_) => self.auth_bearer_token_text_input.move_cursor_left(),
-                EditingRequestAuthBearerTokenMoveCursorRight(_) => self.auth_bearer_token_text_input.move_cursor_right(),
-                EditingRequestAuthBearerTokenMoveCursorLineStart(_) => self.auth_bearer_token_text_input.move_cursor_line_start(),
-                EditingRequestAuthBearerTokenMoveCursorLineEnd(_) => self.auth_bearer_token_text_input.move_cursor_line_end(),
-                EditingRequestAuthBearerTokenCharInput(_) => match key {
-                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.auth_bearer_token_text_input.enter_char(char),
-                    _ => {}
-                },
+                KeyEventEditRequestAuthBasicUsername(_) => self.auth_basic_password_text_input.key_event(key, None),
 
-                ModifyRequestAuthJwtSecret(_) => self.tui_modify_request_auth_jwt_secret(),
-                EditingRequestAuthJwtSecretDeleteCharBackward(_) => self.auth_jwt_secret_text_input.delete_char_forward(),
-                EditingRequestAuthJwtSecretDeleteCharForward(_) => self.auth_jwt_secret_text_input.delete_char_backward(),
-                EditingRequestAuthJwtSecretMoveCursorLeft(_) => self.auth_jwt_secret_text_input.move_cursor_left(),
-                EditingRequestAuthJwtSecretMoveCursorRight(_) => self.auth_jwt_secret_text_input.move_cursor_right(),
-                EditingRequestAuthJwtSecretMoveCursorLineStart(_) => self.auth_jwt_secret_text_input.move_cursor_line_start(),
-                EditingRequestAuthJwtSecretMoveCursorLineEnd(_) => self.auth_jwt_secret_text_input.move_cursor_line_end(),
-                EditingRequestAuthJwtSecretCharInput(_) => match key {
-                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.auth_jwt_secret_text_input.enter_char(char),
-                    _ => {}
-                },
 
-                EditingRequestAuthJwtPayloadVimInput(_) => match self.auth_jwt_payload_text_area_vim_emulation.transition(key, &mut self.auth_jwt_payload_text_area) {
-                    VimTransition::Mode(mode) if self.auth_jwt_payload_text_area_vim_emulation.mode != mode => {
-                        self.auth_jwt_payload_text_area.set_block(mode.block());
-                        self.auth_jwt_payload_text_area.set_cursor_style(mode.cursor_style());
-                        self.auth_jwt_payload_text_area_vim_emulation = Vim::new(mode);
-                    }
-                    VimTransition::Nop | VimTransition::Mode(_) => {
-                        self.auth_jwt_payload_text_area_vim_emulation = self.auth_jwt_payload_text_area_vim_emulation.clone();
-                    },
-                    VimTransition::Pending(input) => {
-                        self.auth_jwt_payload_text_area_vim_emulation = self.auth_jwt_payload_text_area_vim_emulation.clone().with_pending(input);
-                    },
-                    VimTransition::Quit => self.select_request_state(),
-                    VimTransition::SaveAndQuit => self.tui_modify_request_auth_jwt_payload(),
+                ModifyRequestAuthBasicPassword(_) => match self.auth_basic_password_text_input.is_in_default_mode() {
+                    true => self.tui_modify_request_auth_basic_password(),
+                    false => self.auth_basic_password_text_input.key_event(key, None),
                 },
+                CancelEditRequestAuthBasicPassword(_) => match self.auth_basic_password_text_input.is_in_default_mode() {
+                    true => self.select_request_state(),
+                    false => self.auth_basic_password_text_input.key_event(key, None),
+                },
+                KeyEventEditRequestAuthBasicPassword(_) => self.auth_digest_nonce_text_input.key_event(key, None),
 
-                EditingRequestAuthJwtPayloadSaveAndQuit(_) => self.tui_modify_request_auth_jwt_payload(),
-                EditingRequestAuthJwtPayloadCopy(_) => self.auth_jwt_payload_text_area.copy(),
-                EditingRequestAuthJwtPayloadPaste(_) => {self.auth_jwt_payload_text_area.paste();},
-                EditingRequestAuthJwtPayloadUndo(_) => {self.auth_jwt_payload_text_area.undo();},
-                EditingRequestAuthJwtPayloadRedo(_) => {self.auth_jwt_payload_text_area.redo();},
-                EditingRequestAuthJwtPayloadNewLine(_) => self.auth_jwt_payload_text_area.insert_newline(),
-                EditingRequestAuthJwtPayloadIndent(_) => {
-                    self.auth_jwt_payload_text_area.set_hard_tab_indent(true);
-                    self.auth_jwt_payload_text_area.insert_tab();
-                },
-                EditingRequestAuthJwtPayloadDeleteCharBackward(_) => {self.auth_jwt_payload_text_area.delete_next_char();},
-                EditingRequestAuthJwtPayloadDeleteCharForward(_) => {self.auth_jwt_payload_text_area.delete_char();},
-                EditingRequestAuthJwtPayloadSkipWordLeft(_) => self.auth_jwt_payload_text_area.move_cursor(CursorMove::WordBack),
-                EditingRequestAuthJwtPayloadSkipWordRight(_) => self.auth_jwt_payload_text_area.move_cursor(CursorMove::WordForward),
-                EditingRequestAuthJwtPayloadMoveCursorUp(_) => self.auth_jwt_payload_text_area.move_cursor(CursorMove::Up),
-                EditingRequestAuthJwtPayloadMoveCursorDown(_) => self.auth_jwt_payload_text_area.move_cursor(CursorMove::Bottom),
-                EditingRequestAuthJwtPayloadMoveCursorLeft(_) => self.auth_jwt_payload_text_area.move_cursor(CursorMove::Back),
-                EditingRequestAuthJwtPayloadMoveCursorRight(_) => self.auth_jwt_payload_text_area.move_cursor(CursorMove::Forward),
-                EditingRequestAuthJwtPayloadMoveCursorLineStart(_) => self.auth_jwt_payload_text_area.move_cursor(CursorMove::Head),
-                EditingRequestAuthJwtPayloadMoveCursorLineEnd(_) => self.auth_jwt_payload_text_area.move_cursor(CursorMove::End),
-                EditingRequestAuthJwtPayloadCharInput(_) => match key {
-                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.auth_jwt_payload_text_area.insert_char(char),
-                    _ => {}
-                },
 
-                ModifyRequestAuthDigestUsername(_) => self.tui_modify_request_auth_digest_username(),
-                EditingRequestAuthDigestUsernameDeleteCharBackward(_) => self.auth_digest_username_text_input.delete_char_forward(),
-                EditingRequestAuthDigestUsernameDeleteCharForward(_) => self.auth_digest_username_text_input.delete_char_backward(),
-                EditingRequestAuthDigestUsernameMoveCursorLeft(_) => self.auth_digest_username_text_input.move_cursor_left(),
-                EditingRequestAuthDigestUsernameMoveCursorRight(_) => self.auth_digest_username_text_input.move_cursor_right(),
-                EditingRequestAuthDigestUsernameMoveCursorLineStart(_) => self.auth_digest_username_text_input.move_cursor_line_start(),
-                EditingRequestAuthDigestUsernameMoveCursorLineEnd(_) => self.auth_digest_username_text_input.move_cursor_line_end(),
-                EditingRequestAuthDigestUsernameCharInput(_) => match key {
-                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.auth_digest_username_text_input.enter_char(char),
-                    _ => {}
+                ModifyRequestAuthBearerToken(_) => match self.auth_bearer_token_text_input.is_in_default_mode() {
+                    true => self.tui_modify_request_auth_bearer_token(),
+                    false => self.auth_bearer_token_text_input.key_event(key, None),
                 },
+                CancelEditRequestAuthBearerToken(_) => match self.auth_bearer_token_text_input.is_in_default_mode() {
+                    true => self.select_request_state(),
+                    false => self.auth_bearer_token_text_input.key_event(key, None),
+                },
+                KeyEventEditRequestAuthBearerToken(_) => self.auth_bearer_token_text_input.key_event(key, None),
 
-                ModifyRequestAuthDigestPassword(_) => self.tui_modify_request_auth_digest_password(),
-                EditingRequestAuthDigestPasswordDeleteCharBackward(_) => self.auth_digest_password_text_input.delete_char_forward(),
-                EditingRequestAuthDigestPasswordDeleteCharForward(_) => self.auth_digest_password_text_input.delete_char_backward(),
-                EditingRequestAuthDigestPasswordMoveCursorLeft(_) => self.auth_digest_password_text_input.move_cursor_left(),
-                EditingRequestAuthDigestPasswordMoveCursorRight(_) => self.auth_digest_password_text_input.move_cursor_right(),
-                EditingRequestAuthDigestPasswordMoveCursorLineStart(_) => self.auth_digest_password_text_input.move_cursor_line_start(),
-                EditingRequestAuthDigestPasswordMoveCursorLineEnd(_) => self.auth_digest_password_text_input.move_cursor_line_end(),
-                EditingRequestAuthDigestPasswordCharInput(_) => match key {
-                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.auth_digest_password_text_input.enter_char(char),
-                    _ => {}
-                },
 
-                ModifyRequestAuthDigestDomains(_) => self.tui_modify_request_auth_digest_domains(),
-                EditingRequestAuthDigestDomainsDeleteCharBackward(_) => self.auth_digest_domains_text_input.delete_char_forward(),
-                EditingRequestAuthDigestDomainsDeleteCharForward(_) => self.auth_digest_domains_text_input.delete_char_backward(),
-                EditingRequestAuthDigestDomainsMoveCursorLeft(_) => self.auth_digest_domains_text_input.move_cursor_left(),
-                EditingRequestAuthDigestDomainsMoveCursorRight(_) => self.auth_digest_domains_text_input.move_cursor_right(),
-                EditingRequestAuthDigestDomainsMoveCursorLineStart(_) => self.auth_digest_domains_text_input.move_cursor_line_start(),
-                EditingRequestAuthDigestDomainsMoveCursorLineEnd(_) => self.auth_digest_domains_text_input.move_cursor_line_end(),
-                EditingRequestAuthDigestDomainsCharInput(_) => match key {
-                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.auth_digest_domains_text_input.enter_char(char),
-                    _ => {}
+                ModifyRequestAuthJwtSecret(_) => match self.auth_jwt_secret_text_input.is_in_default_mode() {
+                    true => self.tui_modify_request_auth_jwt_secret(),
+                    false => self.auth_jwt_secret_text_input.key_event(key, None),
                 },
+                CancelEditRequestAuthJwtSecret(_) => match self.auth_jwt_secret_text_input.is_in_default_mode() {
+                    true => self.select_request_state(),
+                    false => self.auth_jwt_secret_text_input.key_event(key, None),
+                },
+                KeyEventEditRequestAuthJwtSecret(_) => self.auth_jwt_secret_text_input.key_event(key, None),
 
-                ModifyRequestAuthDigestRealm(_) => self.tui_modify_request_auth_digest_realm(),
-                EditingRequestAuthDigestRealmDeleteCharBackward(_) => self.auth_digest_realm_text_input.delete_char_forward(),
-                EditingRequestAuthDigestRealmDeleteCharForward(_) => self.auth_digest_realm_text_input.delete_char_backward(),
-                EditingRequestAuthDigestRealmMoveCursorLeft(_) => self.auth_digest_realm_text_input.move_cursor_left(),
-                EditingRequestAuthDigestRealmMoveCursorRight(_) => self.auth_digest_realm_text_input.move_cursor_right(),
-                EditingRequestAuthDigestRealmMoveCursorLineStart(_) => self.auth_digest_realm_text_input.move_cursor_line_start(),
-                EditingRequestAuthDigestRealmMoveCursorLineEnd(_) => self.auth_digest_realm_text_input.move_cursor_line_end(),
-                EditingRequestAuthDigestRealmCharInput(_) => match key {
-                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.auth_digest_realm_text_input.enter_char(char),
-                    _ => {}
-                },
 
-                ModifyRequestAuthDigestNonce(_) => self.tui_modify_request_auth_digest_nonce(),
-                EditingRequestAuthDigestNonceDeleteCharBackward(_) => self.auth_digest_nonce_text_input.delete_char_forward(),
-                EditingRequestAuthDigestNonceDeleteCharForward(_) => self.auth_digest_nonce_text_input.delete_char_backward(),
-                EditingRequestAuthDigestNonceMoveCursorLeft(_) => self.auth_digest_nonce_text_input.move_cursor_left(),
-                EditingRequestAuthDigestNonceMoveCursorRight(_) => self.auth_digest_nonce_text_input.move_cursor_right(),
-                EditingRequestAuthDigestNonceMoveCursorLineStart(_) => self.auth_digest_nonce_text_input.move_cursor_line_start(),
-                EditingRequestAuthDigestNonceMoveCursorLineEnd(_) => self.auth_digest_nonce_text_input.move_cursor_line_end(),
-                EditingRequestAuthDigestNonceCharInput(_) => match key {
-                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.auth_digest_nonce_text_input.enter_char(char),
-                    _ => {}
+                ModifyRequestAuthJwtPayload(_) => match self.auth_jwt_payload_text_area.is_in_default_mode() {
+                    true => self.tui_modify_request_auth_jwt_payload(),
+                    false => self.auth_jwt_payload_text_area.key_event(key, Some(terminal)),
                 },
+                CancelEditRequestAuthJwtPayload(_) => match self.auth_jwt_payload_text_area.is_in_default_mode() {
+                    true => self.select_request_state(),
+                    false => self.auth_jwt_payload_text_area.key_event(key, Some(terminal)),
+                },
+                KeyEventEditRequestAuthJwtPayload(_) => self.auth_jwt_payload_text_area.key_event(key, Some(terminal)),
 
-                ModifyRequestAuthDigestOpaque(_) => self.tui_modify_request_auth_digest_opaque(),
-                EditingRequestAuthDigestOpaqueDeleteCharBackward(_) => self.auth_digest_opaque_text_input.delete_char_forward(),
-                EditingRequestAuthDigestOpaqueDeleteCharForward(_) => self.auth_digest_opaque_text_input.delete_char_backward(),
-                EditingRequestAuthDigestOpaqueMoveCursorLeft(_) => self.auth_digest_opaque_text_input.move_cursor_left(),
-                EditingRequestAuthDigestOpaqueMoveCursorRight(_) => self.auth_digest_opaque_text_input.move_cursor_right(),
-                EditingRequestAuthDigestOpaqueMoveCursorLineStart(_) => self.auth_digest_opaque_text_input.move_cursor_line_start(),
-                EditingRequestAuthDigestOpaqueMoveCursorLineEnd(_) => self.auth_digest_opaque_text_input.move_cursor_line_end(),
-                EditingRequestAuthDigestOpaqueCharInput(_) => match key {
-                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.auth_digest_opaque_text_input.enter_char(char),
-                    _ => {}
+
+                ModifyRequestAuthDigestUsername(_) => match self.auth_digest_username_text_input.is_in_default_mode() {
+                    true => self.tui_modify_request_auth_digest_username(),
+                    false => self.auth_digest_username_text_input.key_event(key, None),
                 },
+                CancelEditRequestAuthDigestUsername(_) => match self.auth_digest_username_text_input.is_in_default_mode() {
+                    true => self.select_request_state(),
+                    false => self.auth_digest_username_text_input.key_event(key, None),
+                },
+                KeyEventEditRequestAuthDigestUsername(_) => self.auth_digest_username_text_input.key_event(key, None),
+
+
+                ModifyRequestAuthDigestPassword(_) => match self.auth_digest_password_text_input.is_in_default_mode() {
+                    true => self.tui_modify_request_auth_digest_password(),
+                    false => self.auth_digest_password_text_input.key_event(key, None),
+                },
+                CancelEditRequestAuthDigestPassword(_) => match self.auth_digest_password_text_input.is_in_default_mode() {
+                    true => self.select_request_state(),
+                    false => self.auth_digest_password_text_input.key_event(key, None),
+                },
+                KeyEventEditRequestAuthDigestPassword(_) => self.auth_digest_password_text_input.key_event(key, None),
+
+
+                ModifyRequestAuthDigestDomains(_) => match self.auth_digest_domains_text_input.is_in_default_mode() {
+                    true => self.tui_modify_request_auth_digest_domains(),
+                    false => self.auth_digest_domains_text_input.key_event(key, None),
+                },
+                CancelEditRequestAuthDigestDomains(_) => match self.auth_digest_domains_text_input.is_in_default_mode() {
+                    true => self.select_request_state(),
+                    false => self.auth_digest_domains_text_input.key_event(key, None),
+                },
+                KeyEventEditRequestAuthDigestDomains(_) => self.auth_digest_domains_text_input.key_event(key, None),
+
+
+                ModifyRequestAuthDigestRealm(_) => match self.auth_digest_realm_text_input.is_in_default_mode() {
+                    true => self.tui_modify_request_auth_digest_realm(),
+                    false => self.auth_digest_realm_text_input.key_event(key, None),
+                },
+                CancelEditRequestAuthDigestRealm(_) => match self.auth_digest_realm_text_input.is_in_default_mode() {
+                    true => self.select_request_state(),
+                    false => self.auth_digest_realm_text_input.key_event(key, None),
+                },
+                KeyEventEditRequestAuthDigestRealm(_) => self.auth_digest_realm_text_input.key_event(key, None),
+
+
+                ModifyRequestAuthDigestNonce(_) => match self.auth_digest_nonce_text_input.is_in_default_mode() {
+                    true => self.tui_modify_request_auth_digest_nonce(),
+                    false => self.auth_digest_nonce_text_input.key_event(key, None),
+                },
+                CancelEditRequestAuthDigestNonce(_) => match self.auth_digest_nonce_text_input.is_in_default_mode() {
+                    true => self.select_request_state(),
+                    false => self.auth_digest_nonce_text_input.key_event(key, None),
+                },
+                KeyEventEditRequestAuthDigestNonce(_) => self.auth_digest_nonce_text_input.key_event(key, None),
+
+
+                ModifyRequestAuthDigestOpaque(_) => match self.auth_digest_opaque_text_input.is_in_default_mode() {
+                    true => self.tui_modify_request_auth_digest_opaque(),
+                    false => self.auth_digest_opaque_text_input.key_event(key, None),
+                },
+                CancelEditRequestAuthDigestOpaque(_) => match self.auth_digest_opaque_text_input.is_in_default_mode() {
+                    true => self.select_request_state(),
+                    false => self.auth_digest_opaque_text_input.key_event(key, None),
+                },
+                KeyEventEditRequestAuthDigestOpaque(_) => self.auth_digest_opaque_text_input.key_event(key, None),
 
                 /* Header */
 
-                ModifyRequestHeader(_) => self.tui_modify_request_header(),
-                EditingRequestHeaderDeleteCharBackward(_) => self.headers_table.selection_text_input.delete_char_forward(),
-                EditingRequestHeaderDeleteCharForward(_) => self.headers_table.selection_text_input.delete_char_backward(),
-                EditingRequestHeaderMoveCursorLeft(_) => self.headers_table.selection_text_input.move_cursor_left(),
-                EditingRequestHeaderMoveCursorRight(_) => self.headers_table.selection_text_input.move_cursor_right(),
-                EditingRequestHeaderMoveCursorLineStart(_) => self.headers_table.selection_text_input.move_cursor_line_start(),
-                EditingRequestHeaderMoveCursorLineEnd(_) => self.headers_table.selection_text_input.move_cursor_line_end(),
-                EditingRequestHeaderCharInput(_) => match key {
-                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.headers_table.selection_text_input.enter_char(char),
-                    _ => {}
+                ModifyRequestHeader(_) => match self.headers_table.selection_text_input.is_in_default_mode() {
+                    true => self.tui_modify_request_header(),
+                    false => self.headers_table.selection_text_input.key_event(key, None),
                 },
+                CancelEditRequestHeader(_) => match self.headers_table.selection_text_input.is_in_default_mode() {
+                    true => self.select_request_state(),
+                    false => self.headers_table.selection_text_input.key_event(key, None),
+                },
+                KeyEventEditRequestHeader(_) => self.headers_table.selection_text_input.key_event(key, None),
 
                 /* Body */
 
-                ModifyRequestBodyTable(_) => self.tui_modify_request_form_data(),
-                EditingRequestBodyTableDeleteCharBackward(_) => self.body_form_table.selection_text_input.delete_char_forward(),
-                EditingRequestBodyTableDeleteCharForward(_) => self.body_form_table.selection_text_input.delete_char_backward(),
-                EditingRequestBodyTableMoveCursorLeft(_) => self.body_form_table.selection_text_input.move_cursor_left(),
-                EditingRequestBodyTableMoveCursorRight(_) => self.body_form_table.selection_text_input.move_cursor_right(),
-                EditingRequestBodyTableMoveCursorLineStart(_) => self.body_form_table.selection_text_input.move_cursor_line_start(),
-                EditingRequestBodyTableMoveCursorLineEnd(_) => self.body_form_table.selection_text_input.move_cursor_line_end(),
-                EditingRequestBodyTableCharInput(_) => match key {
-                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.body_form_table.selection_text_input.enter_char(char),
-                    _ => {}
+                ModifyRequestBodyTable(_) => match self.body_form_table.selection_text_input.is_in_default_mode() {
+                    true => self.tui_modify_request_form_data(),
+                    false => self.body_form_table.selection_text_input.key_event(key, None),
                 },
-                
-                ModifyRequestBodyFile(_) => self.tui_modify_request_body(),
-                EditingRequestBodyFileDeleteCharBackward(_) => self.body_file_text_input.delete_char_forward(),
-                EditingRequestBodyFileDeleteCharForward(_) => self.body_file_text_input.delete_char_backward(),
-                EditingRequestBodyFileMoveCursorLeft(_) => self.body_file_text_input.move_cursor_left(),
-                EditingRequestBodyFileMoveCursorRight(_) => self.body_file_text_input.move_cursor_right(),
-                EditingRequestBodyFileMoveCursorLineStart(_) => self.body_file_text_input.move_cursor_line_start(),
-                EditingRequestBodyFileMoveCursorLineEnd(_) => self.body_file_text_input.move_cursor_line_end(),
-                EditingRequestBodyFileCharInput(_) => match key {
-                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.body_file_text_input.enter_char(char),
-                    _ => {}
+                CancelEditRequestBodyTable(_) => match self.body_form_table.selection_text_input.is_in_default_mode() {
+                    true => self.select_request_state(),
+                    false => self.body_form_table.selection_text_input.key_event(key, None),
                 },
+                KeyEventEditRequestBodyTable(_) => self.body_form_table.selection_text_input.key_event(key, None),
 
-                EditingRequestBodyStringVimInput(_) => match self.body_text_area_vim_emulation.transition(key, &mut self.body_text_area) {
-                    VimTransition::Mode(mode) if self.body_text_area_vim_emulation.mode != mode => {
-                        self.body_text_area.set_block(mode.block());
-                        self.body_text_area.set_cursor_style(mode.cursor_style());
-                        self.body_text_area_vim_emulation = Vim::new(mode);
-                    }
-                    VimTransition::Nop | VimTransition::Mode(_) => {
-                        self.body_text_area_vim_emulation = self.body_text_area_vim_emulation.clone();
-                    },
-                    VimTransition::Pending(input) => {
-                        self.body_text_area_vim_emulation = self.body_text_area_vim_emulation.clone().with_pending(input);
-                    },
-                    VimTransition::Quit => self.select_request_state(),
-                    VimTransition::SaveAndQuit => self.tui_modify_request_body(),
-                },
 
-                EditingRequestBodyStringSaveAndQuit(_) => self.tui_modify_request_body(),
-                EditingRequestBodyStringCopy(_) => self.body_text_area.copy(),
-                EditingRequestBodyStringPaste(_) => {self.body_text_area.paste();},
-                EditingRequestBodyStringUndo(_) => {self.body_text_area.undo();},
-                EditingRequestBodyStringRedo(_) => {self.body_text_area.redo();},
-                EditingRequestBodyStringNewLine(_) => self.body_text_area.insert_newline(),
-                EditingRequestBodyStringIndent(_) => {
-                    self.body_text_area.set_hard_tab_indent(true);
-                    self.body_text_area.insert_tab();
+                ModifyRequestBodyFile(_) => match self.body_file_text_input.is_in_default_mode() {
+                    true => self.tui_modify_request_body(),
+                    false => self.body_file_text_input.key_event(key, None),
                 },
-                EditingRequestBodyStringDeleteCharBackward(_) => {self.body_text_area.delete_next_char();},
-                EditingRequestBodyStringDeleteCharForward(_) => {self.body_text_area.delete_char();},
-                EditingRequestBodyStringSkipWordLeft(_) => self.body_text_area.move_cursor(CursorMove::WordBack),
-                EditingRequestBodyStringSkipWordRight(_) => self.body_text_area.move_cursor(CursorMove::WordForward),
-                EditingRequestBodyStringMoveCursorUp(_) => self.body_text_area.move_cursor(CursorMove::Up),
-                EditingRequestBodyStringMoveCursorDown(_) => self.body_text_area.move_cursor(CursorMove::Bottom),
-                EditingRequestBodyStringMoveCursorLeft(_) => self.body_text_area.move_cursor(CursorMove::Back),
-                EditingRequestBodyStringMoveCursorRight(_) => self.body_text_area.move_cursor(CursorMove::Forward),
-                EditingRequestBodyStringMoveCursorLineStart(_) => self.body_text_area.move_cursor(CursorMove::Head),
-                EditingRequestBodyStringMoveCursorLineEnd(_) => self.body_text_area.move_cursor(CursorMove::End),
-                EditingRequestBodyStringCharInput(_) => match key {
-                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.body_text_area.insert_char(char),
-                    _ => {}
+                CancelEditRequestBodyFile(_) => match self.body_file_text_input.is_in_default_mode() {
+                    true => self.select_request_state(),
+                    false => self.body_file_text_input.key_event(key, None),
                 },
+                KeyEventEditRequestBodyFile(_) => self.body_file_text_input.key_event(key, None),
+
+
+                ModifyRequestBodyString(_) => match self.body_text_area.is_in_default_mode() {
+                    true => self.tui_modify_request_body(),
+                    false => self.body_text_area.key_event(key, Some(terminal)),
+                },
+                CancelEditRequestBodyString(_) => match self.body_text_area.is_in_default_mode() {
+                    true => self.select_request_state(),
+                    false => self.body_text_area.key_event(key, Some(terminal)),
+                },
+                KeyEventEditRequestBodyString(_) => self.body_text_area.key_event(key, Some(terminal)),
 
                 /* Websocket */
 
-                EditingRequestMessageVimInput(_) => match self.message_text_area_vim_emulation.transition(key, &mut self.message_text_area) {
-                    VimTransition::Mode(mode) if self.message_text_area_vim_emulation.mode != mode => {
-                        self.message_text_area.set_block(mode.block());
-                        self.message_text_area.set_cursor_style(mode.cursor_style());
-                        self.message_text_area_vim_emulation = Vim::new(mode);
-                    }
-                    VimTransition::Nop | VimTransition::Mode(_) => {
-                        self.message_text_area_vim_emulation = self.message_text_area_vim_emulation.clone();
-                    },
-                    VimTransition::Pending(input) => {
-                        self.message_text_area_vim_emulation = self.message_text_area_vim_emulation.clone().with_pending(input);
-                    },
-                    VimTransition::Quit => self.select_request_state(),
-                    VimTransition::SaveAndQuit => self.tui_send_request_message().await,
+                ModifyRequestMessage(_) => match self.message_text_area.is_in_default_mode() {
+                    true => self.tui_send_request_message().await,
+                    false => self.message_text_area.key_event(key, Some(terminal)),
                 },
+                CancelEditRequestMessage(_) => match self.message_text_area.is_in_default_mode() {
+                    true => self.select_request_state(),
+                    false => self.message_text_area.key_event(key, Some(terminal)),
+                },
+                KeyEventEditRequestMessage(_) => self.message_text_area.key_event(key, Some(terminal)),
 
-                EditingRequestMessageSaveAndQuit(_) => self.tui_send_request_message().await,
-                EditingRequestMessageCopy(_) => self.message_text_area.copy(),
-                EditingRequestMessagePaste(_) => {self.message_text_area.paste();},
-                EditingRequestMessageUndo(_) => {self.message_text_area.undo();},
-                EditingRequestMessageRedo(_) => {self.message_text_area.redo();},
-                EditingRequestMessageNewLine(_) => self.message_text_area.insert_newline(),
-                EditingRequestMessageIndent(_) => {
-                    self.message_text_area.set_hard_tab_indent(true);
-                    self.message_text_area.insert_tab();
-                },
-                EditingRequestMessageDeleteCharBackward(_) => {self.message_text_area.delete_next_char();},
-                EditingRequestMessageDeleteCharForward(_) => {self.message_text_area.delete_char();},
-                EditingRequestMessageSkipWordLeft(_) => self.message_text_area.move_cursor(CursorMove::WordBack),
-                EditingRequestMessageSkipWordRight(_) => self.message_text_area.move_cursor(CursorMove::WordForward),
-                EditingRequestMessageMoveCursorUp(_) => self.message_text_area.move_cursor(CursorMove::Up),
-                EditingRequestMessageMoveCursorDown(_) => self.message_text_area.move_cursor(CursorMove::Bottom),
-                EditingRequestMessageMoveCursorLeft(_) => self.message_text_area.move_cursor(CursorMove::Back),
-                EditingRequestMessageMoveCursorRight(_) => self.message_text_area.move_cursor(CursorMove::Forward),
-                EditingRequestMessageMoveCursorLineStart(_) => self.message_text_area.move_cursor(CursorMove::Head),
-                EditingRequestMessageMoveCursorLineEnd(_) => self.message_text_area.move_cursor(CursorMove::End),
-                EditingRequestMessageCharInput(_) => match key {
-                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.message_text_area.insert_char(char),
-                    _ => {}
-                },
-                
                 /* Scripts */
 
-                EditingPreRequestScriptVimInput(_) => match self.script_console.vim_emulation.transition(key, &mut self.script_console.pre_request_text_area) {
-                    VimTransition::Mode(mode) if self.script_console.vim_emulation.mode != mode => {
-                        self.script_console.pre_request_text_area.set_block(mode.block());
-                        self.script_console.pre_request_text_area.set_cursor_style(mode.cursor_style());
-                        self.script_console.vim_emulation = Vim::new(mode);
-                    }
-                    VimTransition::Nop | VimTransition::Mode(_) => {
-                        self.script_console.vim_emulation = self.script_console.vim_emulation.clone();
-                    },
-                    VimTransition::Pending(input) => {
-                        self.script_console.vim_emulation = self.script_console.vim_emulation.clone().with_pending(input);
-                    },
-                    VimTransition::Quit => self.select_request_state(),
-                    VimTransition::SaveAndQuit => self.modify_pre_request_script(),
+                ModifyRequestPreRequestScript(_) => match self.script_console.pre_request_text_area.is_in_default_mode() {
+                    true => self.tui_modify_pre_request_script(),
+                    false => self.script_console.pre_request_text_area.key_event(key, Some(terminal)),
                 },
+                CancelEditRequestPreRequestScript(_) => match self.script_console.pre_request_text_area.is_in_default_mode() {
+                    true => self.select_request_state(),
+                    false => self.script_console.pre_request_text_area.key_event(key, Some(terminal)),
+                },
+                KeyEventEditRequestPreRequestScript(_) => self.script_console.pre_request_text_area.key_event(key, Some(terminal)),
 
-                EditingPreRequestScriptSaveAndQuit(_) => self.modify_pre_request_script(),
-                EditingPreRequestScriptCopy(_) => self.script_console.pre_request_text_area.copy(),
-                EditingPreRequestScriptPaste(_) => {self.script_console.pre_request_text_area.paste();},
-                EditingPreRequestScriptUndo(_) => {self.script_console.pre_request_text_area.undo();},
-                EditingPreRequestScriptRedo(_) => {self.script_console.pre_request_text_area.redo();},
-                EditingPreRequestScriptNewLine(_) => self.script_console.pre_request_text_area.insert_newline(),
-                EditingPreRequestScriptIndent(_) => {
-                    self.script_console.pre_request_text_area.set_hard_tab_indent(true);
-                    self.script_console.pre_request_text_area.insert_tab();
-                },
-                EditingPreRequestScriptDeleteCharBackward(_) => {self.script_console.pre_request_text_area.delete_next_char();},
-                EditingPreRequestScriptDeleteCharForward(_) => {self.script_console.pre_request_text_area.delete_char();},
-                EditingPreRequestScriptSkipWordLeft(_) => self.script_console.pre_request_text_area.move_cursor(CursorMove::WordBack),
-                EditingPreRequestScriptSkipWordRight(_) => self.script_console.pre_request_text_area.move_cursor(CursorMove::WordForward),
-                EditingPreRequestScriptMoveCursorUp(_) => self.script_console.pre_request_text_area.move_cursor(CursorMove::Up),
-                EditingPreRequestScriptMoveCursorDown(_) => self.script_console.pre_request_text_area.move_cursor(CursorMove::Bottom),
-                EditingPreRequestScriptMoveCursorLeft(_) => self.script_console.pre_request_text_area.move_cursor(CursorMove::Back),
-                EditingPreRequestScriptMoveCursorRight(_) => self.script_console.pre_request_text_area.move_cursor(CursorMove::Forward),
-                EditingPreRequestScriptMoveCursorLineStart(_) => self.script_console.pre_request_text_area.move_cursor(CursorMove::Head),
-                EditingPreRequestScriptMoveCursorLineEnd(_) => self.script_console.pre_request_text_area.move_cursor(CursorMove::End),
-                EditingPreRequestScriptCharInput(_) => match key {
-                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.script_console.pre_request_text_area.insert_char(char),
-                    _ => {}
-                },
 
-                EditingPostRequestScriptVimInput(_) => match self.script_console.vim_emulation.transition(key, &mut self.script_console.post_request_text_area) {
-                    VimTransition::Mode(mode) if self.script_console.vim_emulation.mode != mode => {
-                        self.script_console.post_request_text_area.set_block(mode.block());
-                        self.script_console.post_request_text_area.set_cursor_style(mode.cursor_style());
-                        self.script_console.vim_emulation = Vim::new(mode);
-                    }
-                    VimTransition::Nop | VimTransition::Mode(_) => {
-                        self.script_console.vim_emulation = self.script_console.vim_emulation.clone();
-                    },
-                    VimTransition::Pending(input) => {
-                        self.script_console.vim_emulation = self.script_console.vim_emulation.clone().with_pending(input);
-                    },
-                    VimTransition::Quit => self.select_request_state(),
-                    VimTransition::SaveAndQuit => self.modify_post_request_script(),
+                ModifyRequestPostRequestScript(_) => match self.script_console.post_request_text_area.is_in_default_mode() {
+                    true => self.tui_modify_post_request_script(),
+                    false => self.script_console.post_request_text_area.key_event(key, None),
                 },
+                CancelEditRequestPostRequestScript(_) => match self.script_console.post_request_text_area.is_in_default_mode() {
+                    true => self.select_request_state(),
+                    false => self.script_console.post_request_text_area.key_event(key, None),
+                },
+                KeyEventEditRequestPostRequestScript(_) => self.script_console.post_request_text_area.key_event(key, None),
 
-                EditingPostRequestScriptSaveAndQuit(_) => self.modify_post_request_script(),
-                EditingPostRequestScriptCopy(_) => self.script_console.post_request_text_area.copy(),
-                EditingPostRequestScriptPaste(_) => {self.script_console.post_request_text_area.paste();},
-                EditingPostRequestScriptUndo(_) => {self.script_console.post_request_text_area.undo();},
-                EditingPostRequestScriptRedo(_) => {self.script_console.post_request_text_area.redo();},
-                EditingPostRequestScriptNewLine(_) => self.script_console.post_request_text_area.insert_newline(),
-                EditingPostRequestScriptIndent(_) => {
-                    self.script_console.post_request_text_area.set_hard_tab_indent(true);
-                    self.script_console.post_request_text_area.insert_tab();
-                },
-                EditingPostRequestScriptDeleteCharBackward(_) => {self.script_console.post_request_text_area.delete_next_char();},
-                EditingPostRequestScriptDeleteCharForward(_) => {self.script_console.post_request_text_area.delete_char();},
-                EditingPostRequestScriptSkipWordLeft(_) => self.script_console.post_request_text_area.move_cursor(CursorMove::WordBack),
-                EditingPostRequestScriptSkipWordRight(_) => self.script_console.post_request_text_area.move_cursor(CursorMove::WordForward),
-                EditingPostRequestScriptMoveCursorUp(_) => self.script_console.post_request_text_area.move_cursor(CursorMove::Up),
-                EditingPostRequestScriptMoveCursorDown(_) => self.script_console.post_request_text_area.move_cursor(CursorMove::Bottom),
-                EditingPostRequestScriptMoveCursorLeft(_) => self.script_console.post_request_text_area.move_cursor(CursorMove::Back),
-                EditingPostRequestScriptMoveCursorRight(_) => self.script_console.post_request_text_area.move_cursor(CursorMove::Forward),
-                EditingPostRequestScriptMoveCursorLineStart(_) => self.script_console.post_request_text_area.move_cursor(CursorMove::Head),
-                EditingPostRequestScriptMoveCursorLineEnd(_) => self.script_console.post_request_text_area.move_cursor(CursorMove::End),
-                EditingPostRequestScriptCharInput(_) => match key {
-                    KeyCombination { codes: One(KeyCode::Char(char)), .. } => self.script_console.post_request_text_area.insert_char(char),
-                    _ => {}
-                },
-                
                 /* Settings */
 
                 RequestSettingsMoveUp(_) => self.request_settings_popup.previous(),
@@ -1209,7 +870,7 @@ impl App<'_> {
 
                 /* Others */
 
-                Documentation(_) => {}
+                Documentation(_) => {},
             }
         };
 
