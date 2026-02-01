@@ -5,7 +5,7 @@ use futures_util::{StreamExt, TryStreamExt};
 use parking_lot::{Mutex, RwLock};
 use rayon::prelude::*;
 use reqwest::header::CONTENT_TYPE;
-use reqwest_websocket::RequestBuilderExt;
+use reqwest_websocket::Upgrade;
 use tokio::time::sleep;
 use tokio_util::sync::CancellationToken;
 use tracing::{error, info, trace};
@@ -25,7 +25,7 @@ pub async fn send_ws_request(prepared_request: reqwest_middleware::RequestBuilde
 
     let cancellation_token = request.cancellation_token.clone();
 
-    let ws_request = request.get_ws_request_mut()?;
+    let ws_request = request.get_ws_request_mut().unwrap();
     ws_request.is_connected = false;
 
     let timeout = tokio::time::sleep(Duration::from_secs(30));

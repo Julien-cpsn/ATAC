@@ -22,10 +22,6 @@ pub struct Config {
     pub save_requests_response: Option<bool>,
     
     #[serde(default)]
-    /// Should not use CORS
-    pub disable_cors: Option<bool>,
-    
-    #[serde(default)]
     /// Should not display images
     pub disable_images_preview: Option<bool>,
 
@@ -66,11 +62,7 @@ impl Config {
             Some(save_requests_response) => !save_requests_response
         });
     }
-    
-    pub fn is_cors_disabled(&self) -> bool {
-        self.disable_cors.unwrap_or(false)
-    }
-    
+
     pub fn is_image_preview_disabled(&self) -> bool {
         self.disable_images_preview.unwrap_or(false)
     }
@@ -146,10 +138,6 @@ impl App<'_> {
 
         if self.config.save_requests_response.is_none() {
             self.config.save_requests_response = global_config.save_requests_response;
-        }
-
-        if self.config.disable_cors.is_none() {
-            self.config.disable_cors = global_config.disable_cors;
         }
 
         if self.config.disable_images_preview.is_none() {

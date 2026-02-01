@@ -45,7 +45,7 @@ pub enum RequestResponseError {
     #[error("COULD NOT DECODE RESPONSE TEXT OR BYTES")]
     CouldNotDecodeResponse,
     #[error(transparent)]
-    WebsocketError(#[from] anyhow::Error),
+    WebsocketError(#[from] reqwest_websocket::Error),
 }
 
 impl App<'_> {
@@ -171,12 +171,6 @@ impl App<'_> {
             method,
             url
         );
-
-        /* CORS */
-
-        if self.config.is_cors_disabled() {
-            request_builder = request_builder.fetch_mode_no_cors();
-        }
 
         /* AUTH */
 

@@ -27,19 +27,19 @@ clipboard = ["arboard"]
 [dependencies]
 # Request
 ## Send requests
-reqwest = { version = "=0.12.28", default-features = false, features = ["cookies", "rustls-tls-native-roots", "multipart", "gzip", "brotli", "deflate", "stream"] }
+reqwest = { version = "=0.13.1", default-features = false, features = ["cookies", "rustls-native-certs", "form", "multipart", "gzip", "brotli", "deflate", "stream"] }
 ## Wrapper around reqwest to allow for client middleware chains
-reqwest-middleware = { version = "=0.4.2", features = ["rustls-tls", "json", "multipart"] }
+reqwest-middleware = { version = "=0.5.0", features = ["rustls", "json", "multipart", "form"] }
 ## Wrapper around reqwest to handle web-socket requests
-reqwest-websocket = { version = "=0.6.0", features = ["json", "middleware"], package = "reqwest-websocket-julien-cpsn" }
-reqwest_cookie_store = "=0.9.0"
+reqwest-websocket = { version = "=0.6.0", features = ["json", "middleware"] }
+reqwest_cookie_store = "=0.10.0"
 cookie_store = "=0.22.0"
 
 # TUI
 ## Terminal UI framework
 ratatui = { version = "=0.30.0", features = ["serde"] }
 ## Used to parse, use key bindings files and some utilities
-crokey = "=1.3.0"
+crokey = "=1.4.0"
 ## Display big texts. Only used for displaying ATAC in the homepage.
 tui-big-text = "=0.8.1"
 ## Display tree-like lists. Used for displaying the collections.
@@ -51,7 +51,7 @@ edtui = { version = "0.11.1", default-features = false, features = ["syntax-high
 ## Display loading UI elements. Used when request is pending.
 throbber-widgets-tui = "=0.10.0"
 ## Display response images.
-ratatui-image = { version = "=10.0.2", default-features = false, features = ["crossterm", "image-defaults"] }
+ratatui-image = { version = "=10.0.4", default-features = false, features = ["crossterm", "image-defaults"] }
 ## Decode images.
 image = "=0.25.9"
 
@@ -60,13 +60,13 @@ image = "=0.25.9"
 syntect = { version = "=5.3.0", features = ["default-fancy"] }
 ## Serialize & Deserialize application data into files
 serde = { version = "=1.0.228", features = ["derive", "rc"] }
-serde_json = "=1.0.147"
+serde_json = "=1.0.149"
 serde_yaml = "=0.9.34"
 serde-versioning = "1.0.228-fix.1"
 ## Pretty print JSON
 jsonxf = "=1.1.1"
 ## Serialize & Deserialize application config files
-toml = "=0.9.10"
+toml = "=0.9.11"
 ## Create Javascript runtimes. Used for pre and post request scripts
 boa_engine = { version = "=0.21.0", default-features = false }
 ## Deserialize Postman collection files
@@ -76,20 +76,20 @@ curl-parser = { version = "=0.6.0", default-features = false }
 ## Parse OpenAPI spec files
 openapiv3 = "2.2.0"
 ## Command Line Argument Parser
-clap = { version = "=4.5.53", features = ["derive", "color", "suggestions"] }
+clap = { version = "=4.5.56", features = ["derive", "color", "suggestions"] }
 ## Use system files
 directories = "=6.0.0"
 ## Copy response body to clipboard
 arboard = { version = "=3.6.1", features = ["wayland-data-control"], optional = true }
 ## Create and encode JSON Web Tokens (JWT)
-jsonwebtoken = { version = "10.2.0", features = ["rust_crypto"] }
+jsonwebtoken = { version = "10.3.0", features = ["rust_crypto"] }
 ## Digest auth
 digest_auth = "0.3.1"
 
 # Async
 ## Handle asynchronous requests
-tokio = { version = "=1.48.0", features = ["rt", "rt-multi-thread", "macros", "io-std", "io-util"] }
-tokio-util = { version = "=0.7.17", features = ["compat"] }
+tokio = { version = "=1.49.0", features = ["rt", "rt-multi-thread", "macros", "io-std", "io-util"] }
+tokio-util = { version = "=0.7.18", features = ["compat"] }
 futures-util = { version = "0.3.31", features = ["sink", "alloc"] }
 ## Smaller, faster and more flexible implementation of RwLock and Mutex. Used everywhere.
 parking_lot = { version = "=0.12.5", features = ["serde", "send_guard"] }
@@ -106,25 +106,25 @@ walkdir = "=2.5.0"
 ## Unescape string
 snailquote = "=0.3.1"
 ## Ordered hashmap. Used in environments to preserve files' values order
-indexmap = { version = "=2.12.1", features = ["serde", "rayon"] }
+indexmap = { version = "=2.13.0", features = ["serde", "rayon"] }
 ## Allows the usage of multiple threads in for loops
 rayon = "=1.11.0"
 ## Create custom errors
-thiserror = "=2.0.17"
+thiserror = "=2.0.18"
 ## Result that can contain any error
 anyhow = "=1.0.100"
 ## Add verbosity flag to the CLI
 clap-verbosity-flag = "=3.0.4"
 ## Generate completion file
-clap_complete = "=4.5.62"
+clap_complete = "=4.5.65"
 ## Generate man pages
 clap_mangen = "=0.2.31"
 ## Regex. Using for parsing requests URL
 regex = "=1.12.2"
 ## Time utils
-chrono = { version = "=0.4.42", default-features = false, features = ["now", "serde"] }
+chrono = { version = "=0.4.43", default-features = false, features = ["now", "serde"] }
 ## UUID generator
-uuid = { version = "=1.19.0", features = ["v4", "v7", "serde"] }
+uuid = { version = "=1.20.0", features = ["v4", "v7", "serde"] }
 ## Decode base64 strings
 base64 = "=0.22.1"
 ## Wrap text to max length
@@ -138,4 +138,4 @@ tracing-subscriber = { version = "=0.3.22", features = ["parking_lot", "chrono",
 ## Log crate compatibility for tracing
 tracing-log = "=0.2.0"
 ## Opentracing middleware implementation for reqwest-middleware
-reqwest-tracing = "=0.5.8"
+reqwest-tracing = "=0.6.0"
