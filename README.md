@@ -222,8 +222,8 @@ cargo run -- -h
 | **View options**                                                               | :white_check_mark:                                                                  | :white_check_mark:   | :white_check_mark:       |
 | **Global configuration file**                                                  | :white_check_mark:                                                                  | :white_check_mark:   | :white_check_mark:       |
 | - HTTP/HTTPS Proxy                                                             | :white_check_mark:                                                                  | :white_check_mark:   | :white_check_mark:       |
-| - Disable CORS                                                                 | :white_check_mark:                                                                  | :x:                  | :x:                      |
 | - Toggle syntax highlighting                                                   | :white_check_mark:                                                                  | :x:                  | :x:                      |
+| - Save responses                                                               | :white_check_mark:                                                                  | :question:           | :question:               |
 | **Import from other file formats**                                             | :white_check_mark:                                                                  | :white_check_mark:   | :white_check_mark:       |
 | - Postman v2.1.0 and Postman environment import                                | :white_check_mark:                                                                  | :white_check_mark:   | :white_check_mark: / :x: |
 | - OpenAPI import                                                               | :white_check_mark: (AI generated, prone to bugs)                                    | :white_check_mark:   | :white_check_mark:       |
@@ -239,7 +239,6 @@ cargo run -- -h
 
 - **To improve**
   - Editing cookies
-  - Request body syntax highlighting
   - Manage multipart Content-type header (auto-generated for now) https://github.com/seanmonstar/reqwest/issues/2259
 
 ### TODO v2.0.0
@@ -304,61 +303,62 @@ You can read more about it here: https://github.com/Julien-cpsn/ATAC/releases/ta
 
 ### Dependencies
 
-| **Category / Library**                                                           | **Version** | **Comment**                                                                            |
-|----------------------------------------------------------------------------------|-------------|----------------------------------------------------------------------------------------|
-| **Request**                                                                      |             |                                                                                        |
-| [reqwest](https://github.com/seanmonstar/reqwest)                                | 0.12.28     | Send requests                                                                          |
-| [reqwest-middleware](https://github.com/TrueLayer/reqwest-middleware)            | 0.4.2       | Wrapper around reqwest to allow for client middleware chains                           |
-| [reqwest-websocket](https://github.com/jgraef/reqwest-websocket)                 | 0.6.0       | Wrapper around reqwest to handle web-socket requests                                   |
-| **TUI**                                                                          |             |                                                                                        |
-| [ratatui](https://github.com/ratatui/ratatui)                                    | 0.29.0      | Terminal UI framework                                                                  |
-| [crokey](https://github.com/Canop/crokey)                                        | 1.1.2       | Used to parse, use key bindings files and some utilities                               |
-| [tui-big-text](https://github.com/joshka/tui-widgets)                            | 0.7.3       | Display big texts. Only used for displaying ATAC in the homepage.                      |
-| [tui-tree-widget](https://github.com/EdJoPaTo/tui-rs-tree-widget)                | 0.23.1      | Display tree-like lists. Used for displaying the collections.                          |
-| [tui-textarea](https://github.com/rhysd/tui-textarea)                            | 0.7.0       | Text area that handle a lot of features. Used for editing request body.                |
-| [throbber-widgets-tui](https://github.com/arkbig/throbber-widgets-tui)           | 0.9.0       | Display loading UI elements. Used when request is pending.                             |
-| [ratatui-image](https://github.com/benjajaja/ratatui-image)                      | 9.0.0       | Display response images.                                                               |
-| [image](https://github.com/image-rs/image)                                       | 0.25.9      | Decode images.                                                                         |
-| **Main functionalities**                                                         |             |                                                                                        |
-| [syntect](https://github.com/trishume/syntect)                                   | 5.3.0       | Syntax highlighting                                                                    |
-| [serde](https://github.com/serde-rs/serde)                                       | 1.0.228     | Serialize & Deserialize application data into files                                    |
-| [jsonxf](https://github.com/gamache/jsonxf)                                      | 1.1.1       | Pretty print JSON                                                                      |
-| [toml](https://github.com/toml-rs/toml)                                          | 0.9.10      | Serialize & Deserialize application config files                                       |
-| [boa_engine](https://github.com/boa-dev/boa)                                     | 0.21.0      | Create Javascript runtimes. Used for pre and post request scripts                      |
-| [parse_postman_collection](https://github.com/julien-cpsn/postman-collection-rs) | 0.2.4       | Deserialize Postman collection files                                                   |
-| [curl-parser](https://github.com/tyrchen/curl-parser)                            | 0.6.0       | Parse cURL request files                                                               |
-| [openapiv3](https://github.com/glademiller/openapiv3)                            | 2.2.0       | Parse OpenAPI spec files                                                               |
-| [clap](https://github.com/clap-rs/clap)                                          | 4.5.53      | Command Line Argument Parser                                                           |
-| [directories](https://github.com/soc/directories-rs)                             | 6.0.0       | Use system files                                                                       |
-| [arboard](https://github.com/1Password/arboard)                                  | 3.6.1       | Copy response body to clipboard                                                        |
-| [jsonwebtoken](https://github.com/Keats/jsonwebtoken)                            | 10.2.0      | Create and encode JSON Web Tokens (JWT)                                                |
-| [digest_auth](https://git.ondrovo.com/packages/digest_auth_rs)                   | 0.3.1       | Decode www-authenticate header and format digest auth authorization                    |
-| **Async**                                                                        |             |                                                                                        |
-| [tokio](https://github.com/tokio-rs/tokio)                                       | 1.48.0      | Handle asynchronous requests                                                           |
-| [parking_lot](https://github.com/Amanieu/parking_lot)                            | 0.12.5      | Smaller, faster and more flexible implementation of RwLock and Mutex. Used everywhere. |
-| **Utils**                                                                        |             |                                                                                        |
-| [strum](https://github.com/Peternator7/strum)                                    | 0.27.2      | Enum facilities                                                                        |
-| [lazy_static](https://github.com/rust-lang-nursery/lazy-static.rs)               | 1.5.0       | Allows for more flexible constants. Mainly used for accessing CLI arguments everywhere |
-| [nestify](https://github.com/snowfoxsh/nestify)                                  | 0.3.3       | Used to nest struct definitions                                                        |
-| [walkdir](https://github.com/BurntSushi/walkdir)                                 | 2.5.0       | Recursively retrieve files                                                             |
-| [snailquote](https://github.com/euank/snailquote)                                | 0.3.1       | Unescape string                                                                        |
-| [indexmap](https://github.com/indexmap-rs/indexmap)                              | 2.12.1      | Ordered hashmap. Used in environments to preserve files' values order                  |
-| [rayon](https://github.com/rayon-rs/rayon)                                       | 1.11.0      | Allows the usage of multiple threads in for loops                                      |
-| [thiserror](https://github.com/dtolnay/thiserror)                                | 2.0.17      | Create custom errors                                                                   |
-| [anyhow](https://github.com/dtolnay/anyhow)                                      | 1.0.100     | Result that can contain any error                                                      |
-| [clap-verbosity-flag](https://github.com/clap-rs/clap-verbosity-flag)            | 3.0.4       | Add verbosity flag to the CLI                                                          |
-| [clap_complete](https://github.com/clap-rs/clap)                                 | 4.5.62      | Generate completion file                                                               |
-| [clap_mangen](https://github.com/clap-rs/clap)                                   | 0.2.31      | Generate man pages                                                                     |
-| [regex](https://github.com/rust-lang/regex)                                      | 1.12.2      | Regex. Using for parsing requests URL                                                  |
-| [chrono](https://github.com/chronotope/chrono)                                   | 0.4.42      | Time utils                                                                             |
-| [uuid](https://github.com/uuid-rs/uuid)                                          | 1.19.0      | UUID generator                                                                         |
-| [base64](https://github.com/marshallpierce/rust-base64)                          | 0.22.1      | Decode base64 strings                                                                  |
-| [textwrap](https://github.com/mgeisler/textwrap)                                 | 0.16.2      | Wrap text to max length                                                                |
-| **Tracing**                                                                      |             |                                                                                        |
-| [tracing](https://github.com/tokio-rs/tracing)                                   | 0.1.44      | Log events                                                                             |
-| [tracing-subscriber](https://github.com/tokio-rs/tracing)                        | 0.3.22      | Utilities for implementing and composing tracing subscribers                           |
-| [tracing-log](https://github.com/tokio-rs/tracing)                               | 0.2.0       | Log crate compatibility for tracing                                                    |
-| [reqwest-tracing](https://github.com/TrueLayer/reqwest-middleware)               | 0.5.8       | Opentracing middleware implementation for reqwest-middleware                           |
+| **Category / Library**                                                           | **Version** | **Comment**                                                                                               |
+|----------------------------------------------------------------------------------|-------------|-----------------------------------------------------------------------------------------------------------|
+| **Request**                                                                      |             |                                                                                                           |
+| [reqwest](https://github.com/seanmonstar/reqwest)                                | 0.13.1      | Send requests                                                                                             |
+| [reqwest-middleware](https://github.com/TrueLayer/reqwest-middleware)            | 0.5.0       | Wrapper around reqwest to allow for client middleware chains                                              |
+| [reqwest-websocket](https://github.com/jgraef/reqwest-websocket)                 | 0.6.0       | Wrapper around reqwest to handle web-socket requests                                                      |
+| **TUI**                                                                          |             |                                                                                                           |
+| [ratatui](https://github.com/ratatui/ratatui)                                    | 0.30.0      | Terminal UI framework                                                                                     |
+| [crokey](https://github.com/Canop/crokey)                                        | 1.4.0       | Used to parse, use key bindings files and some utilities                                                  |
+| [tui-big-text](https://github.com/joshka/tui-widgets)                            | 0.8.1       | Display big texts. Only used for displaying ATAC in the homepage.                                         |
+| [tui-tree-widget](https://github.com/EdJoPaTo/tui-rs-tree-widget)                | 0.24.0      | Display tree-like lists. Used for displaying the collections.                                             |
+| [tui-scrollview](https://github.com/joshka/tui-widgets)                          | 0.6.2       | Display scrollable panels                                                                                 |
+| [edtui](https://github.com/preiter93/edtui)                                      | 0.11.1      | Text area that handle a lot of features. Used for editing request URL, body, messages, payloads, scripts. |
+| [throbber-widgets-tui](https://github.com/arkbig/throbber-widgets-tui)           | 0.10.0      | Display loading UI elements. Used when request is pending.                                                |
+| [ratatui-image](https://github.com/benjajaja/ratatui-image)                      | 10.0.4      | Display response images.                                                                                  |
+| [image](https://github.com/image-rs/image)                                       | 0.25.9      | Decode images.                                                                                            |
+| **Main functionalities**                                                         |             |                                                                                                           |
+| [syntect](https://github.com/trishume/syntect)                                   | 5.3.0       | Syntax highlighting                                                                                       |
+| [serde](https://github.com/serde-rs/serde)                                       | 1.0.228     | Serialize & Deserialize application data into files                                                       |
+| [jsonxf](https://github.com/gamache/jsonxf)                                      | 1.1.1       | Pretty print JSON                                                                                         |
+| [toml](https://github.com/toml-rs/toml)                                          | 0.9.11      | Serialize & Deserialize application config files                                                          |
+| [boa_engine](https://github.com/boa-dev/boa)                                     | 0.21.0      | Create Javascript runtimes. Used for pre and post request scripts                                         |
+| [parse_postman_collection](https://github.com/julien-cpsn/postman-collection-rs) | 0.2.4       | Deserialize Postman collection files                                                                      |
+| [curl-parser](https://github.com/tyrchen/curl-parser)                            | 0.6.0       | Parse cURL request files                                                                                  |
+| [openapiv3](https://github.com/glademiller/openapiv3)                            | 2.2.0       | Parse OpenAPI spec files                                                                                  |
+| [clap](https://github.com/clap-rs/clap)                                          | 4.5.56      | Command Line Argument Parser                                                                              |
+| [directories](https://github.com/soc/directories-rs)                             | 6.0.0       | Use system files                                                                                          |
+| [arboard](https://github.com/1Password/arboard)                                  | 3.6.1       | Copy response body to clipboard                                                                           |
+| [jsonwebtoken](https://github.com/Keats/jsonwebtoken)                            | 10.3.0      | Create and encode JSON Web Tokens (JWT)                                                                   |
+| [digest_auth](https://git.ondrovo.com/packages/digest_auth_rs)                   | 0.3.1       | Digest auth                                                                                               |
+| **Async**                                                                        |             |                                                                                                           |
+| [tokio](https://github.com/tokio-rs/tokio)                                       | 1.49.0      | Handle asynchronous requests                                                                              |
+| [parking_lot](https://github.com/Amanieu/parking_lot)                            | 0.12.5      | Smaller, faster and more flexible implementation of RwLock and Mutex. Used everywhere.                    |
+| **Utils**                                                                        |             |                                                                                                           |
+| [strum](https://github.com/Peternator7/strum)                                    | 0.27.2      | Enum facilities                                                                                           |
+| [lazy_static](https://github.com/rust-lang-nursery/lazy-static.rs)               | 1.5.0       | Allows for more flexible constants. Mainly used for accessing CLI arguments everywhere                    |
+| [nestify](https://github.com/snowfoxsh/nestify)                                  | 0.3.3       | Used to nest struct definitions                                                                           |
+| [walkdir](https://github.com/BurntSushi/walkdir)                                 | 2.5.0       | Recursively retrieve files                                                                                |
+| [snailquote](https://github.com/euank/snailquote)                                | 0.3.1       | Unescape string                                                                                           |
+| [indexmap](https://github.com/indexmap-rs/indexmap)                              | 2.13.0      | Ordered hashmap. Used in environments to preserve files' values order                                     |
+| [rayon](https://github.com/rayon-rs/rayon)                                       | 1.11.0      | Allows the usage of multiple threads in for loops                                                         |
+| [thiserror](https://github.com/dtolnay/thiserror)                                | 2.0.18      | Create custom errors                                                                                      |
+| [anyhow](https://github.com/dtolnay/anyhow)                                      | 1.0.100     | Result that can contain any error                                                                         |
+| [clap-verbosity-flag](https://github.com/clap-rs/clap-verbosity-flag)            | 3.0.4       | Add verbosity flag to the CLI                                                                             |
+| [clap_complete](https://github.com/clap-rs/clap)                                 | 4.5.65      | Generate completion file                                                                                  |
+| [clap_mangen](https://github.com/clap-rs/clap)                                   | 0.2.31      | Generate man pages                                                                                        |
+| [regex](https://github.com/rust-lang/regex)                                      | 1.12.2      | Regex. Using for parsing requests URL                                                                     |
+| [chrono](https://github.com/chronotope/chrono)                                   | 0.4.43      | Time utils                                                                                                |
+| [uuid](https://github.com/uuid-rs/uuid)                                          | 1.20.0      | UUID generator                                                                                            |
+| [base64](https://github.com/marshallpierce/rust-base64)                          | 0.22.1      | Decode base64 strings                                                                                     |
+| [textwrap](https://github.com/mgeisler/textwrap)                                 | 0.16.2      | Wrap text to max length                                                                                   |
+| **Tracing**                                                                      |             |                                                                                                           |
+| [tracing](https://github.com/tokio-rs/tracing)                                   | 0.1.44      | Log events                                                                                                |
+| [tracing-subscriber](https://github.com/tokio-rs/tracing)                        | 0.3.22      | Utilities for implementing and composing tracing subscribers                                              |
+| [tracing-log](https://github.com/tokio-rs/tracing)                               | 0.2.0       | Log crate compatibility for tracing                                                                       |
+| [reqwest-tracing](https://github.com/TrueLayer/reqwest-middleware)               | 0.6.0       | Opentracing middleware implementation for reqwest-middleware                                              |
 
 ### Binary size
 
