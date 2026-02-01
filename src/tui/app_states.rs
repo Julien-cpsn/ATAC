@@ -391,7 +391,6 @@ impl AppState {
                     Documentation(EventKeyBinding::new(vec![key_bindings.generic.display_help], "Display help", Some("Help"))),
 
                     EditUrl(EventKeyBinding::new(vec![key_bindings.request_selected.change_url], "Edit URL", Some("URL"))),
-                    EditMethod(EventKeyBinding::new(vec![key_bindings.request_selected.change_method], "Change method", Some("Method"))),
 
                     EditSettings(EventKeyBinding::new(vec![key_bindings.request_selected.request_settings], "Request settings", None)),
 
@@ -431,6 +430,7 @@ impl AppState {
                     if let Some(protocol) = protocol {
                         let protocol_specific = match protocol {
                             Protocol::HttpRequest(_) => vec![
+                                EditMethod(EventKeyBinding::new(vec![key_bindings.request_selected.change_method], "Change method", Some("Method"))),
                                 ModifyRequestBodyContentType(EventKeyBinding::new(vec![key_bindings.request_selected.param_tabs.change_body_content_type], "Modify body content-type", None)),
                             ],
                             Protocol::WsRequest(_) => vec![
