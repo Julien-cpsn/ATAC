@@ -283,7 +283,17 @@ impl TextInput {
     }
 
     pub fn key_event(&mut self, key: KeyCombination, terminal: Option<&mut Terminal<CrosstermBackend<Stdout>>>) {
-        self.event_handler.as_mut().unwrap().on_key_event::<KeyEvent>(key.into(), &mut self.state);
+        let key_event: KeyEvent = key.into();
+
+        match key_event.code {
+            KeyCode::Char(_) | KeyCode::Enter |
+            KeyCode::Esc | KeyCode::Backspace | KeyCode::Delete |
+            KeyCode::Tab | KeyCode::Left | KeyCode::Right | KeyCode::Up | KeyCode::Down |
+            KeyCode::Home | KeyCode::End => {}
+            _ => return,
+        };
+
+        self.event_handler.as_mut().unwrap().on_key_event(key_event, &mut self.state);
 
         if let Some(terminal) = terminal && system_editor::is_pending(&self.state) {
             system_editor::open(&mut self.state, terminal).ok();
