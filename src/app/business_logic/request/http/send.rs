@@ -1,5 +1,6 @@
 use std::sync::Arc;
 use std::time::{Duration, Instant};
+use std::error::Error;
 use parking_lot::RwLock;
 
 use rayon::prelude::*;
@@ -13,6 +14,126 @@ use crate::models::protocol::http::body::find_file_format_in_content_type;
 use crate::models::environment::Environment;
 use crate::models::request::Request;
 use crate::models::response::{ImageResponse, RequestResponse, ResponseContent};
+
+
+/// Analyzes a reqwest error and returns a more informative error message
+fn format_error_message(error: &reqwest_middleware::Error) -> String {
+    let error_string = error.to_string();
+    
+    // Check the error chain for more specific error types
+    let mut source_chain = String::new();
+    let mut current_source = error.source();
+    while let Some(source) = current_source {
+        let source_str = source.to_string();
+        source_chain.push_str(&source_str);
+        source_chain.push_str("\n");
+        
+        // Check for certificate errors in the chain
+        if source_str.contains("certificate") || source_str.contains("Certificate") || 
+           source_str.contains("UnknownIssuer") || source_str.contains("CertNotValidForName") ||
+           source_str.contains("self-signed") || source_str.contains("TLS") || 
+           source_str.contains("SSL") {
+            
+            if source_str.contains("UnknownIssuer") || source_str.contains("self-signed") || 
+               (source_str.contains("certificate") && source_str.contains("invalid")) {
+                return format!(
+                    "{}\n\n💡 TLS Certificate Error: The server is using a self-signed or untrusted certificate.\n   Solution: Use --accept-invalid-certs flag or enable 'Accept invalid certs' in TUI settings",
+                    error_string
+                );
+            }
+            if source_str.contains("CertNotValidForName") || source_str.contains("hostname") {
+                return format!(
+                    "{}\n\n💡 TLS Hostname Mismatch: The certificate hostname does not match the server.\n   Solution: Use --accept-invalid-hostnames flag or enable 'Accept invalid hostnames' in TUI settings",
+                    error_string
+                );
+            }
+        }
+        
+        current_source = source.source();
+    }
+    
+    // Also check the main error string for certificate-related keywords
+    let error_lower = error_string.to_lowercase();
+    if error_lower.contains("certificate") || error_lower.contains("tls") || error_lower.contains("ssl") {
+        if error_lower.contains("unknownissuer") || error_lower.contains("self-signed") {
+            return format!(
+                "{}\n\n💡 TLS Certificate Error: The server is using a self-signed or untrusted certificate.\n   Solution: Use --accept-invalid-certs flag or enable 'Accept invalid certs' in TUI settings",
+                error_string
+            );
+        }
+        return format!(
+            "{}\n\n💡 TLS Certificate Error: There is an issue with the SSL/TLS certificate.\n   Solution: Try using --accept-invalid-certs and/or --accept-invalid-hostnames flags",
+            error_string
+        );
+    }
+    
+    if error.is_timeout() {
+        return format!(
+            "{}\n\n💡 Timeout Error: The request took too long to complete.\n   Solution: Increase the timeout value (current: check request settings)",
+            error_string
+        );
+    }
+    
+    if error.is_connect() {
+        if error_string.contains("Connection refused") {
+            return format!(
+                "{}\n\n💡 Connection Refused: The server is not accepting connections.\n   Solution: Check if the server is running and the port is correct",
+                error_string
+            );
+        }
+        if error_string.contains("No route to host") || error_string.contains("Network is unreachable") {
+            return format!(
+                "{}\n\n💡 Network Error: Cannot reach the server.\n   Solution: Check your network connection and the URL",
+                error_string
+            );
+        }
+        // For other connect errors, check if it might be certificate-related
+        if error_lower.contains("invalid") || error_lower.contains("failed") {
+            return format!(
+                "{}\n\n💡 Connection Error: Could not establish a secure connection to the server.\n   This might be due to:\n   - Invalid SSL/TLS certificate (try --accept-invalid-certs)\n   - Certificate hostname mismatch (try --accept-invalid-hostnames)\n   - Network connectivity issues\n   - Server not running or wrong port",
+                error_string
+            );
+        }
+        return format!(
+            "{}\n\n💡 Connection Error: Could not establish a connection to the server.\n   Solution: Check the URL, network connectivity, and server availability",
+            error_string
+        );
+    }
+    
+    if error.is_redirect() {
+        return format!(
+            "{}\n\n💡 Redirect Error: Too many redirects or redirect issue.\n   Solution: Enable redirects in request settings or check the redirect chain",
+            error_string
+        );
+    }
+    
+    if error.is_request() {
+        return format!(
+            "{}\n\n💡 Request Error: The request could not be constructed.\n   Solution: Check the URL format and request parameters",
+            error_string
+        );
+    }
+    
+    if error.is_body() {
+        return format!(
+            "{}\n\n💡 Body Error: There was an issue with the request body.\n   Solution: Check the request body format and content",
+            error_string
+        );
+    }
+    
+    if error.is_decode() {
+        return format!(
+            "{}\n\n💡 Decode Error: Could not decode the response body.\n   Solution: The response may be in an unexpected format",
+            error_string
+        );
+    }
+    
+    // Default: return the original error with a generic hint
+    format!(
+        "{}\n\n💡 Tip: Use --verbose flag for more details or check request settings",
+        error_string
+    )
+}
 
 
 pub async fn send_http_request(prepared_request: reqwest_middleware::RequestBuilder, local_request: Arc<RwLock<Request>>, env: &Option<Arc<RwLock<Environment>>>) -> Result<RequestResponse, RequestResponseError> {
@@ -126,7 +247,8 @@ pub async fn send_http_request(prepared_request: reqwest_middleware::RequestBuil
                 }
             },
             Err(error) => {
-                error!("Sending error: {}", error);
+                let formatted_error = format_error_message(&error);
+                error!("Sending error: {}", formatted_error.replace('\n', " | "));
 
                 elapsed_time = request_start.elapsed();
 
@@ -138,7 +260,7 @@ pub async fn send_http_request(prepared_request: reqwest_middleware::RequestBuil
                     response_status_code = None;
                 }
 
-                let result_body = ResponseContent::Body(error.to_string());
+                let result_body = ResponseContent::Body(formatted_error);
 
                 RequestResponse {
                     duration: None,
