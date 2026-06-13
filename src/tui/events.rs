@@ -852,13 +852,13 @@ impl App<'_> {
 
                 ModifyRequestPostRequestScript(_) => match self.script_console.post_request_text_area.is_in_default_mode() {
                     true => self.tui_modify_post_request_script(),
-                    false => self.script_console.post_request_text_area.key_event(key, None),
+                    false => self.script_console.post_request_text_area.key_event(key, Some(terminal)),
                 },
                 CancelEditRequestPostRequestScript(_) => match self.script_console.post_request_text_area.is_in_default_mode() {
                     true => self.select_request_state(),
-                    false => self.script_console.post_request_text_area.key_event(key, None),
+                    false => self.script_console.post_request_text_area.key_event(key, Some(terminal)),
                 },
-                KeyEventEditRequestPostRequestScript(_) => self.script_console.post_request_text_area.key_event(key, None),
+                KeyEventEditRequestPostRequestScript(_) => self.script_console.post_request_text_area.key_event(key, Some(terminal)),
 
                 /* Settings */
 
