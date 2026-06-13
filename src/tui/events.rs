@@ -639,9 +639,9 @@ impl App<'_> {
                 },
                 CancelEditRequestUrl(_) => match self.url_text_input.is_in_default_mode() {
                     true => self.select_request_state(),
-                    false => self.url_text_input.key_event(key, None),
+                    false => self.url_text_input.key_event(key, Some(terminal)),
                 },
-                KeyEventEditRequestUrl(_) => self.url_text_input.key_event(key, None),
+                KeyEventEditRequestUrl(_) => self.url_text_input.key_event(key, Some(terminal)),
 
                 /* Query params */
 

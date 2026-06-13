@@ -7,7 +7,7 @@ use edtui::actions::motion::MoveToFirstRow;
 use edtui::actions::search::StartSearch;
 use edtui::actions::{Composed, CopySelection, DeleteChar, FindNext, FindPrevious, InsertChar, LineBreak, MoveBackward, MoveDown, MoveForward, MoveToEndOfLine, MoveToStartOfLine, MoveUp, MoveWordBackward, MoveWordForward, OpenSystemEditor, Paste, Redo, RemoveChar, RemoveCharFromSearch, SelectCurrentSearch, StopSearch, SwitchMode, Undo};
 use edtui::events::{KeyEventHandler, KeyEventRegister, KeyInput};
-use edtui::{system_editor, EditorEventHandler, EditorMode, EditorState, EditorStatusLine, EditorTheme, EditorView, LineNumbers, SyntaxHighlighter};
+use edtui::{system_editor, EditorEventHandler, EditorMode, EditorState, EditorStatusLine, EditorTheme, EditorView, LineNumbers, Lines, SyntaxHighlighter};
 use ratatui::backend::CrosstermBackend;
 use ratatui::buffer::Buffer;
 use ratatui::crossterm::event::{KeyCode, KeyEvent};
@@ -297,6 +297,17 @@ impl TextInput {
 
         if let Some(terminal) = terminal && system_editor::is_pending(&self.state) {
             system_editor::open(&mut self.state, terminal).ok();
+
+            if self.is_single_line {
+                // TODO: contact edtui developer to come up with methods for this case
+                // use only first line after editing
+                let row = self.state.lines.first_row().unwrap();
+                let row = row.into_iter().collect::<String>();
+
+                self.state.lines.clear();
+                self.state.lines = Lines::from(row);
+            }
+
         }
     }
 }
@@ -312,10 +323,8 @@ fn generate_key_handler(is_single_line: bool, insert_mode_only: bool) -> KeyEven
                 handler.remove(&KeyEventRegister::i(vec![KeyInput::new(KeyCode::Enter)]));
                 handler.remove(&KeyEventRegister::n(vec![KeyInput::new(KeyCode::Char('o'))]));
                 handler.remove(&KeyEventRegister::n(vec![KeyInput::new(KeyCode::Char('O'))]));
+                handler.remove(&KeyEventRegister::n(vec![KeyInput::new(KeyCode::Char('j'))]));
                 handler.remove(&KeyEventRegister::n(vec![KeyInput::new(KeyCode::Char('J'))]));
-
-                // External system editor
-                handler.remove(&KeyEventRegister::n(vec![KeyInput::ctrl(KeyCode::Char('e'))]));
             }
 
             if insert_mode_only {
@@ -332,9 +341,6 @@ fn generate_key_handler(is_single_line: bool, insert_mode_only: bool) -> KeyEven
                 handler.remove(&KeyEventRegister::i(vec![KeyInput::ctrl(KeyCode::Char('o'))]));
                 handler.remove(&KeyEventRegister::i(vec![KeyInput::new(KeyCode::Enter)]));
                 handler.remove(&KeyEventRegister::i(vec![KeyInput::ctrl(KeyCode::Char('j'))]));
-
-                // External system editor
-                handler.remove(&KeyEventRegister::i(vec![KeyInput::alt(KeyCode::Char('e'))]))
             }
 
             if insert_mode_only {
