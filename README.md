@@ -167,6 +167,7 @@ cargo run -- -h
 | **HTTP Client**                                                                | :white_check_mark:                                                                  | :white_check_mark:   | :white_check_mark:       |
 | Methods                                                                        | :white_check_mark:                                                                  | :white_check_mark:   | :white_check_mark:       |
 | - GET                                                                          | :white_check_mark:                                                                  | :white_check_mark:   | :white_check_mark:       |
+| - QUERY                                                                        | :white_check_mark:                                                                  | :x:                  | :x:                      |
 | - POST                                                                         | :white_check_mark:                                                                  | :white_check_mark:   | :white_check_mark:       |
 | - PUT                                                                          | :white_check_mark:                                                                  | :white_check_mark:   | :white_check_mark:       |
 | - PATCH                                                                        | :white_check_mark:                                                                  | :white_check_mark:   | :white_check_mark:       |

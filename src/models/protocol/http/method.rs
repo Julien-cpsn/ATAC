@@ -8,6 +8,8 @@ pub enum Method {
     #[default]
     #[strum(to_string = "GET")]
     GET,
+    #[strum(to_string = "QUERY")]
+    QUERY,
     #[strum(to_string = "POST")]
     POST,
     #[strum(to_string = "PUT")]
@@ -32,6 +34,7 @@ impl Method {
         
         match self {
             Method::GET => theme.http.methods.get,
+            Method::QUERY => theme.http.methods.query,
             Method::POST => theme.http.methods.post,
             Method::PUT => theme.http.methods.put,
             Method::PATCH => theme.http.methods.patch,
@@ -46,6 +49,8 @@ impl Method {
     pub fn to_reqwest(&self) -> reqwest::Method {
         match self {
             Method::GET => reqwest::Method::GET,
+            // reqwest/http has no QUERY constant yet (still an IETF draft), so build it as an extension method
+            Method::QUERY => reqwest::Method::from_bytes(b"QUERY").expect("QUERY is a valid HTTP method token"),
             Method::POST => reqwest::Method::POST,
             Method::PUT => reqwest::Method::PUT,
             Method::PATCH => reqwest::Method::PATCH,
@@ -60,7 +65,8 @@ impl Method {
 
 pub fn next_method(method: &Method) -> Method {
     match method {
-        &Method::GET => Method::POST,
+        &Method::GET => Method::QUERY,
+        &Method::QUERY => Method::POST,
         &Method::POST => Method::PUT,
         &Method::PUT => Method::PATCH,
         &Method::PATCH => Method::DELETE,

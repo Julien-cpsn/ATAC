@@ -13,6 +13,11 @@ use crate::app::app::App;
 use crate::app::files::utils::expand_tilde;
 use crate::panic_error;
 
+/// Fallback color for the QUERY method, used when a custom theme file predates QUERY support
+fn default_query_color() -> Color {
+    Color::LightGreen
+}
+
 nest! {
     #[derive(Serialize, Deserialize)]
     pub struct Theme {
@@ -47,6 +52,8 @@ nest! {
                 pub struct ThemeMethods {
                     #[serde(alias = "GET")]
                     pub get: Color,
+                    #[serde(alias = "QUERY", default = "default_query_color")]
+                    pub query: Color,
                     #[serde(alias = "POST")]
                     pub post: Color,
                     #[serde(alias = "PUT")]
@@ -117,6 +124,7 @@ impl Default for Theme {
             http: ThemeHttp {
                 methods: ThemeMethods {
                     get: Color::Green,
+                    query: default_query_color(),
                     post: Color::Yellow,
                     put: Color::LightBlue,
                     patch: Color::LightCyan,
