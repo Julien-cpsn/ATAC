@@ -663,11 +663,11 @@ impl App<'_> {
                     true => self.tui_modify_request_auth_basic_username(),
                     false => self.auth_basic_username_text_input.key_event(key, None),
                 },
-                CancelEditRequestAuthBasicUsername(_) => match self.auth_basic_password_text_input.is_in_default_mode() {
+                CancelEditRequestAuthBasicUsername(_) => match self.auth_basic_username_text_input.is_in_default_mode() {
                     true => self.select_request_state(),
-                    false => self.auth_basic_password_text_input.key_event(key, None),
+                    false => self.auth_basic_username_text_input.key_event(key, None),
                 },
-                KeyEventEditRequestAuthBasicUsername(_) => self.auth_basic_password_text_input.key_event(key, None),
+                KeyEventEditRequestAuthBasicUsername(_) => self.auth_basic_username_text_input.key_event(key, None),
 
 
                 ModifyRequestAuthBasicPassword(_) => match self.auth_basic_password_text_input.is_in_default_mode() {
@@ -678,7 +678,7 @@ impl App<'_> {
                     true => self.select_request_state(),
                     false => self.auth_basic_password_text_input.key_event(key, None),
                 },
-                KeyEventEditRequestAuthBasicPassword(_) => self.auth_digest_nonce_text_input.key_event(key, None),
+                KeyEventEditRequestAuthBasicPassword(_) => self.auth_basic_password_text_input.key_event(key, None),
 
 
                 ModifyRequestAuthBearerToken(_) => match self.auth_bearer_token_text_input.is_in_default_mode() {
