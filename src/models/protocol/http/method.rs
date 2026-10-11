@@ -10,6 +10,8 @@ pub enum Method {
     GET,
     #[strum(to_string = "POST")]
     POST,
+    #[strum(to_string = "QUERY")]
+    QUERY,
     #[strum(to_string = "PUT")]
     PUT,
     #[strum(to_string = "PATCH")]
@@ -33,6 +35,7 @@ impl Method {
         match self {
             Method::GET => theme.http.methods.get,
             Method::POST => theme.http.methods.post,
+            Method::QUERY => theme.http.methods.query,
             Method::PUT => theme.http.methods.put,
             Method::PATCH => theme.http.methods.patch,
             Method::DELETE => theme.http.methods.delete,
@@ -47,6 +50,8 @@ impl Method {
         match self {
             Method::GET => reqwest::Method::GET,
             Method::POST => reqwest::Method::POST,
+            // TODO: Remove when Reqwest supports the QUERY method
+            Method::QUERY => reqwest::Method::from_bytes(b"QUERY").expect("QUERY is a valid HTTP method token"),
             Method::PUT => reqwest::Method::PUT,
             Method::PATCH => reqwest::Method::PATCH,
             Method::DELETE => reqwest::Method::DELETE,
@@ -61,7 +66,8 @@ impl Method {
 pub fn next_method(method: &Method) -> Method {
     match method {
         &Method::GET => Method::POST,
-        &Method::POST => Method::PUT,
+        &Method::POST => Method::QUERY,
+        &Method::QUERY => Method::PUT,
         &Method::PUT => Method::PATCH,
         &Method::PATCH => Method::DELETE,
         &Method::DELETE => Method::OPTIONS,

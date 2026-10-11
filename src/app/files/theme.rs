@@ -49,6 +49,8 @@ nest! {
                     pub get: Color,
                     #[serde(alias = "POST")]
                     pub post: Color,
+                    #[serde(alias = "QUERY")]
+                    pub query: Color,
                     #[serde(alias = "PUT")]
                     pub put: Color,
                     #[serde(alias = "PATCH")]
@@ -118,6 +120,7 @@ impl Default for Theme {
                 methods: ThemeMethods {
                     get: Color::Green,
                     post: Color::Yellow,
+                    query: Color::LightGreen,
                     put: Color::LightBlue,
                     patch: Color::LightCyan,
                     delete: Color::LightRed,

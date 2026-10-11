@@ -168,6 +168,7 @@ cargo run -- -h
 | Methods                                                                        | :white_check_mark:                                                                  | :white_check_mark:   | :white_check_mark:       |
 | - GET                                                                          | :white_check_mark:                                                                  | :white_check_mark:   | :white_check_mark:       |
 | - POST                                                                         | :white_check_mark:                                                                  | :white_check_mark:   | :white_check_mark:       |
+| - QUERY                                                                        | :white_check_mark:                                                                  | :x:                  | :x:                      |
 | - PUT                                                                          | :white_check_mark:                                                                  | :white_check_mark:   | :white_check_mark:       |
 | - PATCH                                                                        | :white_check_mark:                                                                  | :white_check_mark:   | :white_check_mark:       |
 | - DELETE                                                                       | :white_check_mark:                                                                  | :white_check_mark:   | :white_check_mark:       |
