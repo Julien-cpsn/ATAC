@@ -183,7 +183,15 @@ impl MqttEventLoop {
                         qos: from_v5_qos(publish.qos),
                         retain: publish.retain,
                     }),
-                    Ok(Event::Incoming(Packet::SubAck(suback))) => Ok(MqttEvent::SubAck(format!("{:?}", suback.return_codes))),
+                    Ok(Event::Incoming(Packet::SubAck(suback))) => {
+                        let reason = suback.return_codes
+                            .iter()
+                            .map(|r| format!("{r:?}"))
+                            .collect::<Vec<String>>()
+                            .join(", ");
+                        
+                        Ok(MqttEvent::SubAck(format!("{}", reason)))
+                    },
                     Ok(Event::Incoming(Packet::Disconnect(disconnect))) => Ok(MqttEvent::Disconnect(format!("Disconnected by the broker: {:?}", disconnect.reason_code))),
                     Ok(Event::Outgoing(Outgoing::Disconnect)) => Ok(MqttEvent::Disconnected),
                     Ok(_) => Ok(MqttEvent::Other),

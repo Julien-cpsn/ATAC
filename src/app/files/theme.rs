@@ -15,6 +15,35 @@ use crate::panic_error;
 
 nest! {
     #[derive(Serialize, Deserialize)]
+    pub struct ThemeWebsocket {
+        #[serde(alias = "Connection Statuses")]
+        pub connection_status:
+            #[derive(Serialize, Deserialize)]
+            pub struct ThemeConnectionStatuses {
+                #[serde(alias = "Connected")]
+                pub connected: Color,
+                #[serde(alias = "Disconnected")]
+                pub disconnected: Color,
+            },
+
+        #[serde(alias = "Messages")]
+        pub messages:
+            #[derive(Serialize, Deserialize)]
+            pub struct ThemeMessages {
+                #[serde(alias = "server_foreground_color")]
+                pub server_foreground_color: Color,
+                #[serde(alias = "server_background_color")]
+                pub server_background_color: Color,
+                #[serde(alias = "you_background_color")]
+                pub you_background_color: Color,
+                #[serde(alias = "details_color")]
+                pub details_color: Color,
+            }
+    }
+}
+
+nest! {
+    #[derive(Serialize, Deserialize)]
     pub struct Theme {
         #[serde(alias = "UI")]
         pub ui:
@@ -67,33 +96,10 @@ nest! {
         },
 
         #[serde(alias = "Websocket")]
-        pub websocket:
-            #[derive(Serialize, Deserialize)]
-            pub struct ThemeWebsocket {
-                #[serde(alias = "Connection Statuses")]
-                pub connection_status:
-                    #[derive(Serialize, Deserialize)]
-                    pub struct ThemeConnectionStatuses {
-                        #[serde(alias = "Connected")]
-                        pub connected: Color,
-                        #[serde(alias = "Disconnected")]
-                        pub disconnected: Color,
-                    },
+        pub websocket: ThemeWebsocket,
 
-                #[serde(alias = "Messages")]
-                pub messages:
-                    #[derive(Serialize, Deserialize)]
-                    pub struct ThemeMessages {
-                        #[serde(alias = "server_foreground_color")]
-                        pub server_foreground_color: Color,
-                        #[serde(alias = "server_background_color")]
-                        pub server_background_color: Color,
-                        #[serde(alias = "you_background_color")]
-                        pub you_background_color: Color,
-                        #[serde(alias = "details_color")]
-                        pub details_color: Color,
-                    }
-            }
+        #[serde(alias = "MQTT")]
+        pub mqtt: ThemeWebsocket
     }
 }
 
@@ -128,6 +134,19 @@ impl Default for Theme {
                 },
             },
             websocket: ThemeWebsocket {
+                connection_status: ThemeConnectionStatuses {
+                    connected: Color::Green,
+                    disconnected: Color::Red
+                },
+
+                messages: ThemeMessages {
+                    server_foreground_color: Color::Blue,
+                    server_background_color: Color::DarkGray,
+                    you_background_color: Color::Blue,
+                    details_color: Color::DarkGray
+                }
+            },
+            mqtt: ThemeWebsocket {
                 connection_status: ThemeConnectionStatuses {
                     connected: Color::Green,
                     disconnected: Color::Red

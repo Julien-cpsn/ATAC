@@ -182,8 +182,8 @@ impl Request {
             }
             Protocol::MqttRequest(mqtt_request) => {
                 let color = match mqtt_request.is_connected {
-                    true => THEME.read().websocket.connection_status.connected,
-                    false => THEME.read().websocket.connection_status.disconnected,
+                    true => THEME.read().mqtt.connection_status.connected,
+                    false => THEME.read().mqtt.connection_status.disconnected,
                 };
 
                 Span::from("MQTT")

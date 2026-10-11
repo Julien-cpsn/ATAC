@@ -247,17 +247,22 @@ impl App<'_> {
 
                         match message.sender {
                             Sender::You => {
+                                let bg = match request.protocol {
+                                    Protocol::WsRequest(_) => THEME.read().websocket.messages.you_background_color,
+                                    Protocol::MqttRequest(_) => THEME.read().mqtt.messages.you_background_color,
+                                    _ => unreachable!()
+                                };
+
                                 for line in lines {
                                     let line = match line.is_empty() {
                                         true => " ".repeat(max_length),
                                         false => format!("{line:max_length$}")
                                     };
 
-
                                     messages.push(
                                         Line::raw(line)
                                             .fg(THEME.read().ui.font_color)
-                                            .bg(THEME.read().websocket.messages.you_background_color)
+                                            .bg(bg)
                                             .alignment(alignment)
                                     );
                                 }
@@ -265,11 +270,23 @@ impl App<'_> {
                             Sender::Server => {
                                 alignment = Alignment::Left;
 
+                                let (fg, bg) = match request.protocol {
+                                    Protocol::WsRequest(_) => (
+                                        THEME.read().websocket.messages.server_foreground_color,
+                                        THEME.read().websocket.messages.server_background_color,
+                                    ),
+                                    Protocol::MqttRequest(_) => (
+                                        THEME.read().mqtt.messages.server_foreground_color,
+                                        THEME.read().mqtt.messages.server_background_color,
+                                    ),
+                                    _ => unreachable!()
+                                };
+
                                 if last_sender != Some(&message.sender) {
                                     messages.push(
                                         Line::raw(message.sender.to_string())
                                             .bold()
-                                            .fg(THEME.read().websocket.messages.server_foreground_color)
+                                            .fg(fg)
                                             .alignment(alignment)
                                     );
                                 }
@@ -284,7 +301,7 @@ impl App<'_> {
                                     messages.push(
                                         Line::raw(line)
                                             .fg(THEME.read().ui.font_color)
-                                            .bg(THEME.read().websocket.messages.server_background_color)
+                                            .bg(bg)
                                             .alignment(alignment)
                                     );
                                 }
@@ -298,9 +315,15 @@ impl App<'_> {
 
                         let timestamp = message.timestamp.format(timestamp_format).to_string();
 
+                        let fg_message = match request.protocol {
+                            Protocol::WsRequest(_) => THEME.read().websocket.messages.details_color,
+                            Protocol::MqttRequest(_) => THEME.read().mqtt.messages.details_color,
+                            _ => unreachable!()
+                        };
+
                         messages.push(
                             Line::raw(format!("{} {}", message.details, timestamp))
-                                .fg(THEME.read().websocket.messages.details_color)
+                                .fg(fg_message)
                                 .alignment(alignment)
                         );
 

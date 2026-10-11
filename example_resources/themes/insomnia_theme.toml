@@ -20,24 +20,35 @@ selection_highlight_color = "Yellow"
 environment_variable_highlight_color = "#6dc26d"
 
 [HTTP]
-[HTTP.methods]
-GET = "LightMagenta"
-POST = "LightGreen"
-PUT = "#ffa200"
-PATCH = "#ffdd00"
-DELETE = "LightRed"
-OPTIONS = "LightCyan"
-HEAD = "LightCyan"
-TRACE = "LightGreen"
-CONNECT = "#ffa200"
+    [HTTP.methods]
+    GET = "LightMagenta"
+    POST = "LightGreen"
+    PUT = "#ffa200"
+    PATCH = "#ffdd00"
+    DELETE = "LightRed"
+    OPTIONS = "LightCyan"
+    HEAD = "LightCyan"
+    TRACE = "LightGreen"
+    CONNECT = "#ffa200"
 
 [websocket]
-[websocket.connection_status]
-connected = "LightGreen"
-disconnected = "LightRed"
+    [websocket.connection_status]
+    connected = "LightGreen"
+    disconnected = "LightRed"
+    
+    [websocket.messages]
+    server_foreground_color = "Magenta"
+    server_background_color = "DarkGray"
+    you_background_color = "DarkGray"
+    details_color = "DarkGray"
 
-[websocket.messages]
-server_foreground_color = "Magenta"
-server_background_color = "DarkGray"
-you_background_color = "DarkGray"
-details_color = "DarkGray"
+[MQTT]
+    [MQTT.connection_status]
+    connected = "LightGreen"
+    disconnected = "LightRed"
+
+    [MQTT.messages]
+    server_foreground_color = "Magenta"
+    server_background_color = "DarkGray"
+    you_background_color = "DarkGray"
+    details_color = "DarkGray"

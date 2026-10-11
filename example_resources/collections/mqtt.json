@@ -1,6 +1,6 @@
 {
   "name": "MQTT",
-  "last_position": null,
+  "last_position": 10,
   "requests": [
     {
       "name": "Test",
