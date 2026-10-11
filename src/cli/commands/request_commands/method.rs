@@ -8,7 +8,7 @@ pub enum MethodCommand {
     
     /// Set the request method
     Set {
-        /// Method (GET, QUERY, POST, PUT, PATCH, DELETE, OPTIONS, HEAD, TRACE, CONNECT)
+        /// Method (GET, POST, QUERY, PUT, PATCH, DELETE, OPTIONS, HEAD, TRACE, CONNECT)
         new_method: Method
     }
 }
