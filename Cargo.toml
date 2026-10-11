@@ -37,7 +37,7 @@ cookie_store = "=0.22.1"
 ## MQTT client, 3.1.1 and 5
 rumqttc = "=0.25.1"
 ## Platform root certificates for MQTT over TLS
-rustls-native-certs = "=0.8.3"
+rustls-native-certs = "=0.8.4"
 
 # TUI
 ## Terminal UI framework
@@ -64,7 +64,7 @@ image = "=0.25.10"
 syntect = { version = "=5.3.0", features = ["default-fancy"] }
 ## Serialize & Deserialize application data into files
 serde = { version = "=1.0.229", features = ["derive", "rc"] }
-serde_json = "=1.0.152"
+serde_json = "=1.0.154"
 serde_yaml = "=0.9.34"
 serde-versioning = "1.0.229"
 ## Pretty print JSON

@@ -23,6 +23,7 @@ environment_variable_highlight_color = "Cyan"
     [HTTP.methods]
     GET = "Green"
     POST = "Yellow"
+    QUERY = "LightMagenta"
     PUT = "LightBlue"
     PATCH = "LightCyan"
     DELETE = "LightRed"

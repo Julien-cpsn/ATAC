@@ -24,6 +24,7 @@ environment_variable_highlight_color = "#6272a4"
     [HTTP.methods]
     GET = "#50fa7b"
     POST = "#ffb86c"
+    QUERY = "#ff79c6"
     PUT = "#8be9fd"
     PATCH = "#6272a4"
     DELETE = "#ff5555"
