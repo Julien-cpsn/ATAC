@@ -57,7 +57,7 @@ The philosophy of ATAC is to be free, account-less, and offline for now and fore
 ### Install with cargo
 
 > [!IMPORTANT]
-> First, make sure your rust version is at least 1.82
+> First, make sure your rust version is at least 1.93
 
 Simply use:
 
@@ -142,7 +142,7 @@ The binaries from the latest release can be found [here](https://github.com/Juli
 ### Compile by yourself
 
 > [!IMPORTANT]
-> First, make sure your rust version is at least 1.82
+> First, make sure your rust version is at least 1.93
 
 Simply clone the repository and use:
 
@@ -306,59 +306,59 @@ You can read more about it here: https://github.com/Julien-cpsn/ATAC/releases/ta
 | **Category / Library**                                                           | **Version** | **Comment**                                                                                               |
 |----------------------------------------------------------------------------------|-------------|-----------------------------------------------------------------------------------------------------------|
 | **Request**                                                                      |             |                                                                                                           |
-| [reqwest](https://github.com/seanmonstar/reqwest)                                | 0.13.2      | Send requests                                                                                             |
-| [reqwest-middleware](https://github.com/TrueLayer/reqwest-middleware)            | 0.5.1       | Wrapper around reqwest to allow for client middleware chains                                              |
+| [reqwest](https://github.com/seanmonstar/reqwest)                                | 0.13.5      | Send requests                                                                                             |
+| [reqwest-middleware](https://github.com/TrueLayer/reqwest-middleware)            | 0.5.2       | Wrapper around reqwest to allow for client middleware chains                                              |
 | [reqwest-websocket](https://github.com/jgraef/reqwest-websocket)                 | 0.6.0       | Wrapper around reqwest to handle web-socket requests                                                      |
 | **TUI**                                                                          |             |                                                                                                           |
-| [ratatui](https://github.com/ratatui/ratatui)                                    | 0.30.0      | Terminal UI framework                                                                                     |
-| [crokey](https://github.com/Canop/crokey)                                        | 1.4.0       | Used to parse, use key bindings files and some utilities                                                  |
-| [tui-big-text](https://github.com/ratatui/tui-widgets)                           | 0.8.2       | Display big texts. Only used for displaying ATAC in the homepage.                                         |
-| [tui-tree-widget](https://github.com/EdJoPaTo/tui-rs-tree-widget)                | 0.24.0      | Display tree-like lists. Used for displaying the collections.                                             |
-| [tui-scrollview](https://github.com/joshka/tui-widgets)                          | 0.6.2       | Display scrollable panels                                                                                 |
-| [edtui](https://github.com/preiter93/edtui)                                      | 0.11.1      | Text area that handle a lot of features. Used for editing request URL, body, messages, payloads, scripts. |
-| [throbber-widgets-tui](https://github.com/arkbig/throbber-widgets-tui)           | 0.10.0      | Display loading UI elements. Used when request is pending.                                                |
-| [ratatui-image](https://github.com/benjajaja/ratatui-image)                      | 10.0.5      | Display response images.                                                                                  |
-| [image](https://github.com/image-rs/image)                                       | 0.25.9      | Decode images.                                                                                            |
+| [ratatui](https://github.com/ratatui/ratatui)                                    | 0.30.2      | Terminal UI framework                                                                                     |
+| [crokey](https://github.com/Canop/crokey)                                        | 1.5.0       | Used to parse, use key bindings files and some utilities                                                  |
+| [tui-big-text](https://github.com/ratatui/tui-widgets)                           | 0.8.10      | Display big texts. Only used for displaying ATAC in the homepage.                                         |
+| [tui-tree-widget](https://github.com/EdJoPaTo/tui-rs-tree-widget)                | 0.24.1      | Display tree-like lists. Used for displaying the collections.                                             |
+| [tui-scrollview](https://github.com/ratatui/tui-widgets)                         | 0.6.8       | Display scrollable panels                                                                                 |
+| [edtui](https://github.com/preiter93/edtui)                                      | 0.11.7      | Text area that handle a lot of features. Used for editing request URL, body, messages, payloads, scripts. |
+| [throbber-widgets-tui](https://github.com/arkbig/throbber-widgets-tui)           | 0.11.1      | Display loading UI elements. Used when request is pending.                                                |
+| [ratatui-image](https://github.com/ratatui/ratatui-image)                        | 12.0.0-rc.2 | Display response images.                                                                                  |
+| [image](https://github.com/image-rs/image)                                       | 0.25.10     | Decode images.                                                                                            |
 | **Main functionalities**                                                         |             |                                                                                                           |
 | [syntect](https://github.com/trishume/syntect)                                   | 5.3.0       | Syntax highlighting                                                                                       |
-| [serde](https://github.com/serde-rs/serde)                                       | 1.0.228     | Serialize & Deserialize application data into files                                                       |
+| [serde](https://github.com/serde-rs/serde)                                       | 1.0.229     | Serialize & Deserialize application data into files                                                       |
 | [jsonxf](https://github.com/gamache/jsonxf)                                      | 1.1.1       | Pretty print JSON                                                                                         |
-| [toml](https://github.com/toml-rs/toml)                                          | 0.9.11      | Serialize & Deserialize application config files                                                          |
-| [boa_engine](https://github.com/boa-dev/boa)                                     | 0.21.0      | Create Javascript runtimes. Used for pre and post request scripts                                         |
+| [toml](https://github.com/toml-rs/toml)                                          | 1.1.8       | Serialize & Deserialize application config files                                                          |
+| [boa_engine](https://github.com/boa-dev/boa)                                     | 0.22.0      | Create Javascript runtimes. Used for pre and post request scripts                                         |
 | [parse_postman_collection](https://github.com/julien-cpsn/postman-collection-rs) | 0.2.4       | Deserialize Postman collection files                                                                      |
 | [curl-parser](https://github.com/tyrchen/curl-parser)                            | 0.6.0       | Parse cURL request files                                                                                  |
 | [openapiv3](https://github.com/glademiller/openapiv3)                            | 2.2.0       | Parse OpenAPI spec files                                                                                  |
-| [clap](https://github.com/clap-rs/clap)                                          | 4.5.57      | Command Line Argument Parser                                                                              |
+| [clap](https://github.com/clap-rs/clap)                                          | 4.6.7       | Command Line Argument Parser                                                                              |
 | [directories](https://github.com/soc/directories-rs)                             | 6.0.0       | Use system files                                                                                          |
 | [arboard](https://github.com/1Password/arboard)                                  | 3.6.1       | Copy response body to clipboard                                                                           |
-| [jsonwebtoken](https://github.com/Keats/jsonwebtoken)                            | 10.3.0      | Create and encode JSON Web Tokens (JWT)                                                                   |
+| [jsonwebtoken](https://github.com/Keats/jsonwebtoken)                            | 11.1.0      | Create and encode JSON Web Tokens (JWT)                                                                   |
 | [digest_auth](https://git.ondrovo.com/packages/digest_auth_rs)                   | 0.3.1       | Digest auth                                                                                               |
 | **Async**                                                                        |             |                                                                                                           |
-| [tokio](https://github.com/tokio-rs/tokio)                                       | 1.49.0      | Handle asynchronous requests                                                                              |
+| [tokio](https://github.com/tokio-rs/tokio)                                       | 1.53.2      | Handle asynchronous requests                                                                              |
 | [parking_lot](https://github.com/Amanieu/parking_lot)                            | 0.12.5      | Smaller, faster and more flexible implementation of RwLock and Mutex. Used everywhere.                    |
 | **Utils**                                                                        |             |                                                                                                           |
-| [strum](https://github.com/Peternator7/strum)                                    | 0.27.2      | Enum facilities                                                                                           |
-| [lazy_static](https://github.com/rust-lang-nursery/lazy-static.rs)               | 1.5.0       | Allows for more flexible constants. Mainly used for accessing CLI arguments everywhere                    |
+| [strum](https://github.com/Peternator7/strum)                                    | 0.28.0      | Enum facilities                                                                                           |
+| [lazy_static](https://github.com/rust-lang-nursery/lazy-static.rs)               | 1.5.1       | Allows for more flexible constants. Mainly used for accessing CLI arguments everywhere                    |
 | [nestify](https://github.com/snowfoxsh/nestify)                                  | 0.3.3       | Used to nest struct definitions                                                                           |
 | [walkdir](https://github.com/BurntSushi/walkdir)                                 | 2.5.0       | Recursively retrieve files                                                                                |
 | [snailquote](https://github.com/euank/snailquote)                                | 0.3.1       | Unescape string                                                                                           |
-| [indexmap](https://github.com/indexmap-rs/indexmap)                              | 2.13.0      | Ordered hashmap. Used in environments to preserve files' values order                                     |
-| [rayon](https://github.com/rayon-rs/rayon)                                       | 1.11.0      | Allows the usage of multiple threads in for loops                                                         |
-| [thiserror](https://github.com/dtolnay/thiserror)                                | 2.0.18      | Create custom errors                                                                                      |
-| [anyhow](https://github.com/dtolnay/anyhow)                                      | 1.0.101     | Result that can contain any error                                                                         |
+| [indexmap](https://github.com/indexmap-rs/indexmap)                              | 2.14.2      | Ordered hashmap. Used in environments to preserve files' values order                                     |
+| [rayon](https://github.com/rayon-rs/rayon)                                       | 1.12.0      | Allows the usage of multiple threads in for loops                                                         |
+| [thiserror](https://github.com/dtolnay/thiserror)                                | 2.0.21      | Create custom errors                                                                                      |
+| [anyhow](https://github.com/dtolnay/anyhow)                                      | 1.0.104     | Result that can contain any error                                                                         |
 | [clap-verbosity-flag](https://github.com/clap-rs/clap-verbosity-flag)            | 3.0.4       | Add verbosity flag to the CLI                                                                             |
-| [clap_complete](https://github.com/clap-rs/clap)                                 | 4.5.65      | Generate completion file                                                                                  |
-| [clap_mangen](https://github.com/clap-rs/clap)                                   | 0.2.31      | Generate man pages                                                                                        |
-| [regex](https://github.com/rust-lang/regex)                                      | 1.12.3      | Regex. Using for parsing requests URL                                                                     |
-| [chrono](https://github.com/chronotope/chrono)                                   | 0.4.43      | Time utils                                                                                                |
-| [uuid](https://github.com/uuid-rs/uuid)                                          | 1.20.0      | UUID generator                                                                                            |
-| [base64](https://github.com/marshallpierce/rust-base64)                          | 0.22.1      | Decode base64 strings                                                                                     |
-| [textwrap](https://github.com/mgeisler/textwrap)                                 | 0.16.2      | Wrap text to max length                                                                                   |
+| [clap_complete](https://github.com/clap-rs/clap)                                 | 4.6.11      | Generate completion file                                                                                  |
+| [clap_mangen](https://github.com/clap-rs/clap)                                   | 0.3.3       | Generate man pages                                                                                        |
+| [regex](https://github.com/rust-lang/regex)                                      | 1.13.1      | Regex. Using for parsing requests URL                                                                     |
+| [chrono](https://github.com/chronotope/chrono)                                   | 0.4.45      | Time utils                                                                                                |
+| [uuid](https://github.com/uuid-rs/uuid)                                          | 1.28.0      | UUID generator                                                                                            |
+| [base64](https://github.com/marshallpierce/rust-base64)                          | 0.23.1      | Decode base64 strings                                                                                     |
+| [textwrap](https://github.com/mgeisler/textwrap)                                 | 0.16.4      | Wrap text to max length                                                                                   |
 | **Tracing**                                                                      |             |                                                                                                           |
 | [tracing](https://github.com/tokio-rs/tracing)                                   | 0.1.44      | Log events                                                                                                |
-| [tracing-subscriber](https://github.com/tokio-rs/tracing)                        | 0.3.22      | Utilities for implementing and composing tracing subscribers                                              |
+| [tracing-subscriber](https://github.com/tokio-rs/tracing)                        | 0.3.23      | Utilities for implementing and composing tracing subscribers                                              |
 | [tracing-log](https://github.com/tokio-rs/tracing)                               | 0.2.0       | Log crate compatibility for tracing                                                                       |
-| [reqwest-tracing](https://github.com/TrueLayer/reqwest-middleware)               | 0.7.0       | Opentracing middleware implementation for reqwest-middleware                                              |
+| [reqwest-tracing](https://github.com/TrueLayer/reqwest-middleware)               | 0.7.1       | Opentracing middleware implementation for reqwest-middleware                                              |
 
 ### Binary size
 
