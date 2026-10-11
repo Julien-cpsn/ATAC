@@ -29,6 +29,7 @@ impl App<'_> {
         self.message_text_area.reset_mode();
         self.script_console.pre_request_text_area.reset_mode();
         self.script_console.post_request_text_area.reset_mode();
+        self.export_response_input.reset_mode();
     }
 
     pub fn clear_inputs(&mut self) {
@@ -57,6 +58,7 @@ impl App<'_> {
         self.message_text_area.clear();
         self.script_console.pre_request_text_area.clear();
         self.script_console.post_request_text_area.clear();
+        self.export_response_input.clear();
     }
 
     pub fn reset_cursors(&mut self) {
@@ -85,6 +87,7 @@ impl App<'_> {
         self.message_text_area.reset_cursor_position();
         self.script_console.pre_request_text_area.reset_cursor_position();
         self.script_console.post_request_text_area.reset_cursor_position();
+        self.export_response_input.reset_cursor_position();
 
         self.env_editor_table.selection_text_input.reset_selection();
         self.new_collection_input.reset_selection();
@@ -111,6 +114,7 @@ impl App<'_> {
         self.message_text_area.reset_selection();
         self.script_console.pre_request_text_area.reset_selection();
         self.script_console.post_request_text_area.reset_selection();
+        self.export_response_input.reset_selection();
     }
 
     pub fn update_text_inputs_handler(&mut self) {
@@ -144,6 +148,7 @@ impl App<'_> {
         self.message_text_area.default_mode = default_mode;
         self.script_console.pre_request_text_area.default_mode = default_mode;
         self.script_console.post_request_text_area.default_mode = default_mode;
+        self.export_response_input.default_mode = EditorMode::Insert;
 
         self.reset_inputs_mode();
 
@@ -172,11 +177,13 @@ impl App<'_> {
         self.message_text_area.is_single_line = false;
         self.script_console.pre_request_text_area.is_single_line = false;
         self.script_console.post_request_text_area.is_single_line = false;
+        self.export_response_input.is_single_line = true;
 
         self.env_editor_table.selection_text_input.insert_mode_only = true;
         self.query_params_table.selection_text_input.insert_mode_only = true;
         self.headers_table.selection_text_input.insert_mode_only = true;
         self.body_form_table.selection_text_input.insert_mode_only = true;
+        self.export_response_input.insert_mode_only = true;
 
         self.env_editor_table.selection_text_input.update_handler();
         self.new_collection_input.update_handler();
@@ -203,5 +210,6 @@ impl App<'_> {
         self.message_text_area.update_handler();
         self.script_console.pre_request_text_area.update_handler();
         self.script_console.post_request_text_area.update_handler();
+        self.export_response_input.update_handler();
     }
 }

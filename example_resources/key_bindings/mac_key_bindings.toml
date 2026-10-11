@@ -101,6 +101,7 @@ scroll_down = "Shift-Down"
 scroll_left = "Shift-Left"
 scroll_right = "Shift-Right"
 
+export_response = "e"
 yank_response_part = "y" # Used to yank the current result tab (e.g. body, headers, cookies)
 
 result_next_tab = "Shift-BackTab" # Will use param_next_tab depending on the selected view

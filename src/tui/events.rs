@@ -180,6 +180,13 @@ get_key_bindings! {
 
         CopyResponsePart(EventKeyBinding),
 
+        /* Response export */
+
+        ExportResponse(EventKeyBinding),
+        ModifyExportingResponse(EventKeyBinding),
+        CancelExportingResponse(EventKeyBinding),
+        KeyEventExportingResponse(EventKeyBinding),
+
         /* Request export */
 
         ExportRequest(EventKeyBinding),
@@ -294,7 +301,6 @@ get_key_bindings! {
         ModifyRequestSettings(EventKeyBinding),
 
         /* Others */
-
         Documentation(EventKeyBinding),
     }
 }
@@ -611,8 +617,19 @@ impl App<'_> {
                 #[cfg(not(feature = "clipboard"))]
                 CopyResponsePart(_) => {},
 
-                /* Request Export */
+                /* Response Export */
+                ExportResponse(_) => self.export_response_state(),
+                ModifyExportingResponse(_) => match self.export_response_input.is_in_default_mode() {
+                    true => self.tui_export_response_body(),
+                    false => self.export_response_input.key_event(key, None),
+                },
+                CancelExportingResponse(_) => match self.export_response_input.is_in_default_mode() {
+                    true => self.normal_state(),
+                    false => self.export_response_input.key_event(key, None),
+                },
+                KeyEventExportingResponse(_) => self.export_response_input.key_event(key, None),
 
+                /* Request Export */
                 ExportRequest(_) => self.choose_request_export_format_state(),
 
                 RequestExportFormatMoveCursorLeft(_) => self.export_request.previous(),
@@ -869,7 +886,6 @@ impl App<'_> {
                 ModifyRequestSettings(_) => self.tui_modify_request_settings(),
 
                 /* Others */
-
                 Documentation(_) => {},
             }
         };
