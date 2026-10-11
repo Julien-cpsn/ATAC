@@ -4,6 +4,7 @@ use rayon::prelude::*;
 
 use crate::app::app::App;
 use crate::models::response::ResponseContent;
+use crate::tui::tui_logic::request::messages::get_displayed_messages;
 use crate::tui::ui::result_tabs::RequestResultTabs;
 
 impl App<'_> {
@@ -47,15 +48,14 @@ impl App<'_> {
                 }
             }
             RequestResultTabs::Messages => {
-                let ws_request = selected_request.get_ws_request().unwrap();
-                let text = ws_request.messages
+                let text = get_displayed_messages(&selected_request)
                     .iter()
                     .map(|m| format!(
                         "=== {} - New {} message from {} ===\n{}",
                         m.timestamp.format("%H:%M:%S %d/%m/%Y").to_string(),
-                        m.content.to_string(),
+                        m.details,
                         m.sender,
-                        m.content.to_content()
+                        m.content
                     ))
                     .collect::<Vec<String>>()
                     .join("\n");

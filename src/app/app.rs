@@ -125,6 +125,13 @@ pub struct App<'a> {
     
     pub message_text_area: TextInput,
 
+    /* MQTT */
+
+    /// Selected field in the MQTT connection and publish tabs
+    pub mqtt_form_selection: TextInputSelection,
+    pub mqtt_form_text_input: TextInput,
+    pub mqtt_subscriptions_table: StatefulCustomTable<'a>,
+
     /* Settings */
     
     pub request_settings_popup: SettingsPopup,
@@ -280,6 +287,20 @@ impl App<'_> {
             /* WS message */
             
             message_text_area: TextInput::new(None),
+
+            /* MQTT */
+
+            mqtt_form_selection: TextInputSelection::default(),
+            mqtt_form_text_input: TextInput::new(None),
+            mqtt_subscriptions_table: StatefulCustomTable::new(
+                vec![
+                    Line::default(),
+                    Line::from("No subscriptions").fg(THEME.read().ui.font_color),
+                    Line::from("(Add one with n)").fg(THEME.read().ui.secondary_foreground_color)
+                ],
+                "Topic",
+                "QoS (Enter to change)"
+            ),
 
             /* Settings */
             

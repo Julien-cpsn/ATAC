@@ -7,6 +7,7 @@ use tracing::info;
 use crate::app::app::App;
 use crate::app::business_logic::collection::CollectionError::{CollectionNameAlreadyExists, CollectionNameIsEmpty};
 use crate::app::business_logic::collection::RequestError::RequestNameIsEmpty;
+use crate::app::business_logic::request::mqtt::send::mqtt_disconnect;
 use crate::cli::args::ARGS;
 use crate::models::collection::Collection;
 use crate::models::request::Request;
@@ -92,13 +93,20 @@ impl App<'_> {
         info!("Collection deleted");
 
         let collection = self.collections.remove(collection_index);
+
+        for request in &collection.requests {
+            disconnect_mqtt_request(request);
+        }
+
         self.delete_collection_file(collection);
     }
 
     pub fn delete_request(&mut self, collection_index: usize, request_index: usize) -> anyhow::Result<()> {
         info!("Request deleted");
         
-        self.collections[collection_index].requests.remove(request_index);
+        let request = self.collections[collection_index].requests.remove(request_index);
+        disconnect_mqtt_request(&request);
+
         self.save_collection_to_file(collection_index);
         
         Ok(())
@@ -166,6 +174,13 @@ impl App<'_> {
             info!("Request \"{}\" duplicated", selected_request.name);
 
             selected_request.name = format!("{} copy", selected_request.name);
+
+            // The copy does not share the broker connection
+            if let Ok(mqtt_request) = selected_request.get_mqtt_request_mut() {
+                mqtt_request.connection = None;
+                mqtt_request.is_connected = false;
+            }
+
             self.collections[collection_index].requests.insert(request_index + 1, Arc::new(RwLock::new(selected_request)));
         }
 
@@ -180,5 +195,12 @@ impl App<'_> {
             collection.last_position = Some(index);
             self.save_collection_to_file(index);
         }
+    }
+}
+
+/// A deleted request would otherwise keep its broker connection open in the background
+fn disconnect_mqtt_request(request: &Arc<RwLock<Request>>) {
+    if let Ok(mqtt_request) = request.write().get_mqtt_request_mut() {
+        mqtt_disconnect(mqtt_request);
     }
 }

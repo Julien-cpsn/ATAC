@@ -106,7 +106,7 @@ impl App<'_> {
 
                 match selected_request.protocol {
                     Protocol::HttpRequest(_) => self.render_http_request(frame, inner_layout[1], selected_request),
-                    Protocol::WsRequest(_) => self.render_ws_request(frame, inner_layout[1], selected_request),
+                    Protocol::WsRequest(_) | Protocol::MqttRequest(_) => self.render_ws_or_mqtt_request(frame, inner_layout[1], selected_request),
                 }
             }
         }

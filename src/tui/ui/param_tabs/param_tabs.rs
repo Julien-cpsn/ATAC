@@ -12,7 +12,7 @@ use crate::models::auth::auth::Auth::{BasicAuth, BearerToken, Digest, JwtToken, 
 use crate::models::protocol::http::body::ContentType::*;
 use crate::models::protocol::protocol::Protocol;
 use crate::models::request::Request;
-use crate::tui::app_states::AppState::{EditingRequestBodyString, EditingRequestBodyTable, EditingRequestHeader, EditingRequestMessage, EditingRequestParam};
+use crate::tui::app_states::AppState::{EditingMqttSubscription, EditingRequestBodyString, EditingRequestBodyTable, EditingRequestHeader, EditingRequestMessage, EditingRequestParam};
 use crate::tui::tui_logic::utils::key_value_vec_to_items_list;
 use crate::tui::utils::stateful::text_input::MultiLineTextInput;
 use crate::tui::utils::syntax_highlighting::{ENV_VARIABLE_SYNTAX_REF, HTML_SYNTAX_REF, JSON_SYNTAX_REF, JS_SYNTAX_REF, XML_SYNTAX_REF};
@@ -30,6 +30,12 @@ pub enum RequestParamsTabs {
     Body,
     #[strum(to_string = "Message")]
     Message,
+    #[strum(to_string = "Connect")]
+    MqttConnection,
+    #[strum(to_string = "Subscribe")]
+    MqttSubscriptions,
+    #[strum(to_string = "Publish")]
+    MqttPublish,
     #[strum(to_string = "Scripts")]
     Scripts
 }
@@ -60,6 +66,13 @@ impl App<'_> {
                 RequestParamsTabs::Auth,
                 RequestParamsTabs::Headers,
                 RequestParamsTabs::Message,
+                RequestParamsTabs::Scripts
+            ],
+            Protocol::MqttRequest(_) => vec![
+                RequestParamsTabs::Auth,
+                RequestParamsTabs::MqttConnection,
+                RequestParamsTabs::MqttSubscriptions,
+                RequestParamsTabs::MqttPublish,
                 RequestParamsTabs::Scripts
             ]
         };
@@ -93,6 +106,15 @@ impl App<'_> {
 
                         format!("{} ({})", tab.to_string(), ws_request.message_type.to_string())
                     },
+                    RequestParamsTabs::MqttConnection | RequestParamsTabs::MqttPublish => tab.to_string(),
+                    RequestParamsTabs::MqttSubscriptions => {
+                        let mqtt_request = request.get_mqtt_request().unwrap();
+
+                        match mqtt_request.subscriptions.is_empty() {
+                            true => tab.to_string(),
+                            false => format!("{} ({})", tab.to_string(), mqtt_request.subscriptions.len())
+                        }
+                    },
                     RequestParamsTabs::Scripts => tab.to_string(),
                 };
 
@@ -113,6 +135,14 @@ impl App<'_> {
                 RequestParamsTabs::Auth => 1,
                 RequestParamsTabs::Headers => 2,
                 RequestParamsTabs::Message => 3,
+                RequestParamsTabs::Scripts => 4,
+                _ => unreachable!()
+            }
+            Protocol::MqttRequest(_) => match self.request_param_tab {
+                RequestParamsTabs::Auth => 0,
+                RequestParamsTabs::MqttConnection => 1,
+                RequestParamsTabs::MqttSubscriptions => 2,
+                RequestParamsTabs::MqttPublish => 3,
                 RequestParamsTabs::Scripts => 4,
                 _ => unreachable!()
             }
@@ -212,6 +242,19 @@ impl App<'_> {
                 self.message_text_area.display_cursor = display_cursor;
 
                 frame.render_widget(MultiLineTextInput(&mut self.message_text_area, ENV_VARIABLE_SYNTAX_REF.clone()), request_params_layout[1]);            }
+            RequestParamsTabs::MqttConnection => {
+                self.render_mqtt_connection_tab(frame, request_params_layout[1], request);
+            }
+            RequestParamsTabs::MqttSubscriptions => {
+                self.mqtt_subscriptions_table.is_editing = matches!(self.state, EditingMqttSubscription);
+
+                let mut rows = key_value_vec_to_items_list(&self.get_selected_env_as_local(), &self.mqtt_subscriptions_table.rows);
+
+                frame.render_stateful_widget(&mut self.mqtt_subscriptions_table, request_params_layout[1], &mut rows);
+            }
+            RequestParamsTabs::MqttPublish => {
+                self.render_mqtt_publish_tab(frame, request_params_layout[1], request);
+            }
             RequestParamsTabs::Scripts => {
                 self.render_request_script(frame, request_params_layout[1]);
             }

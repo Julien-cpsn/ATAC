@@ -6,6 +6,7 @@ use tracing::info;
 use crate::app::app::App;
 use crate::models::protocol::ws::message_type::{next_message_type, MessageType};
 use crate::models::protocol::ws::ws::{Message, Sender};
+use crate::tui::tui_logic::request::messages::get_displayed_messages;
 
 impl App<'_> {
     pub async fn tui_send_request_message(&mut self) {
@@ -84,15 +85,15 @@ impl App<'_> {
     pub fn get_messages_lines_count(&self) -> usize {
         let local_selected_request = self.get_selected_request_as_local();
         let selected_request = local_selected_request.read();
-        let ws_request = selected_request.get_ws_request().unwrap();
+        let displayed_messages = get_displayed_messages(&selected_request);
 
         let mut line_count = 0;
         let mut last_sender = None;
 
-        for message in &ws_request.messages {
-            let content = message.content.to_content();
-            let max_length = self.get_max_line_length(&content);
-            let lines = wrap(&content, max_length);
+        for message in &displayed_messages {
+            let content = &message.content;
+            let max_length = self.get_max_line_length(content);
+            let lines = wrap(content, max_length);
 
             match message.sender {
                 Sender::You => line_count += lines.len() + 1,

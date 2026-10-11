@@ -1,0 +1,93 @@
+{
+  "name": "MQTT",
+  "last_position": 10,
+  "requests": [
+    {
+      "name": "Test",
+      "url": "mqtts://test.mosquitto.org:8886",
+      "params": [],
+      "headers": [],
+      "auth": "no_auth",
+      "scripts": {
+        "pre_request_script": null,
+        "post_request_script": null
+      },
+      "settings": {
+        "use_config_proxy": true,
+        "allow_redirects": true,
+        "timeout": 30000,
+        "store_received_cookies": true,
+        "pretty_print_response_content": true,
+        "accept_invalid_certs": false,
+        "accept_invalid_hostnames": false
+      },
+      "protocol": {
+        "type": "mqtt",
+        "version": "5",
+        "client_id": "",
+        "clean_session": true,
+        "session_expiry_interval": 3600,
+        "keep_alive": 60,
+        "max_packet_size": 1048576,
+        "subscriptions": [
+          {
+            "enabled": true,
+            "topic": "atac/example/#",
+            "qos": "at_least_once"
+          }
+        ],
+        "publish": {
+          "topic": "atac/example/hello",
+          "qos": "at_least_once",
+          "retain": false
+        }
+      }
+    },
+    {
+      "name": "Sensors",
+      "url": "mqtt://broker.emqx.io",
+      "params": [],
+      "headers": [],
+      "auth": "no_auth",
+      "scripts": {
+        "pre_request_script": null,
+        "post_request_script": null
+      },
+      "settings": {
+        "use_config_proxy": true,
+        "allow_redirects": true,
+        "timeout": 30000,
+        "store_received_cookies": true,
+        "pretty_print_response_content": true,
+        "accept_invalid_certs": false,
+        "accept_invalid_hostnames": false
+      },
+      "protocol": {
+        "type": "mqtt",
+        "version": "3.1.1",
+        "client_id": "",
+        "clean_session": true,
+        "session_expiry_interval": 3600,
+        "keep_alive": 60,
+        "max_packet_size": 1048576,
+        "subscriptions": [
+          {
+            "enabled": true,
+            "topic": "atac/example/sensors/+",
+            "qos": "at_most_once"
+          },
+          {
+            "enabled": true,
+            "topic": "atac/example/alerts",
+            "qos": "exactly_once"
+          }
+        ],
+        "publish": {
+          "topic": "atac/example/sensors/temperature",
+          "qos": "at_most_once",
+          "retain": false
+        }
+      }
+    }
+  ]
+}

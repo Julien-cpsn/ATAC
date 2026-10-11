@@ -2,7 +2,7 @@ use anyhow::anyhow;
 use clap::ValueEnum;
 use tokio_util::sync::CancellationToken;
 use crate::app::app::App;
-use crate::cli::commands::request_commands::new::{AuthArgs, BodyArgs, NewRequestCommand};
+use crate::cli::commands::request_commands::new::{AuthArgs, BodyArgs, MqttArgs, NewRequestCommand};
 use crate::models::auth::auth::Auth;
 use crate::models::auth::basic::BasicAuth;
 use crate::models::auth::bearer_token::BearerToken;
@@ -10,6 +10,7 @@ use crate::models::auth::digest::{extract_www_authenticate_digest_data, Digest};
 use crate::models::auth::jwt::{JwtAlgorithm, JwtSecretType, JwtToken};
 use crate::models::protocol::http::body::ContentType;
 use crate::models::protocol::http::method::Method;
+use crate::models::protocol::mqtt::mqtt::{MqttRequest, MqttSubscription, QoS};
 use crate::models::protocol::protocol::Protocol;
 use crate::models::request::{ConsoleOutput, KeyValue, Request, DEFAULT_HEADERS};
 use crate::models::response::RequestResponse;
@@ -34,12 +35,17 @@ pub fn create_request_from_new_request_command(request_name: String, new_request
     let headers = string_array_to_key_value_array(new_request_command.add_header);
     let body = get_content_type_from_body_args(new_request_command.body);
 
-    let base_headers = match new_request_command.no_base_headers {
+    // MQTT has no headers
+    let base_headers = match new_request_command.no_base_headers || matches!(new_request_command.protocol, Protocol::MqttRequest(_)) {
         true => vec![],
         false => DEFAULT_HEADERS.clone()
     };
 
     let mut protocol = new_request_command.protocol.clone();
+
+    if new_request_command.mqtt.is_used() && !matches!(protocol, Protocol::MqttRequest(_)) {
+        return Err(anyhow!("MQTT options can only be used with an MQTT request"));
+    }
 
     match &mut protocol {
         Protocol::HttpRequest(http_request) => {
@@ -55,6 +61,23 @@ pub fn create_request_from_new_request_command(request_name: String, new_request
             match body {
                 ContentType::NoBody => {}
                 _ => return Err(anyhow!("Setting a body with a websocket request body is incompatible"))
+            }
+        }
+        Protocol::MqttRequest(mqtt_request) => {
+            set_mqtt_request_from_mqtt_args(mqtt_request, new_request_command.mqtt)?;
+
+            match new_request_command.method {
+                Method::GET => {}
+                _ => return Err(anyhow!("Setting a method with an MQTT request is incompatible"))
+            }
+
+            match body {
+                ContentType::NoBody => {}
+                _ => return Err(anyhow!("Setting a body with an MQTT request is incompatible"))
+            }
+
+            if !headers.is_empty() {
+                return Err(anyhow!("Setting a header with an MQTT request is incompatible"))
             }
         }
     };
@@ -101,6 +124,50 @@ fn string_array_to_key_value_array(string_array: Vec<String>) -> Vec<KeyValue> {
     }
 
     return key_value_array
+}
+
+fn set_mqtt_request_from_mqtt_args(mqtt_request: &mut MqttRequest, mqtt_args: MqttArgs) -> anyhow::Result<()> {
+    if let Some(version) = mqtt_args.mqtt_version {
+        mqtt_request.version = version;
+    }
+
+    if let Some(client_id) = mqtt_args.client_id {
+        mqtt_request.client_id = client_id;
+    }
+
+    mqtt_request.clean_session = !mqtt_args.no_clean_session;
+
+    if let Some(session_expiry) = mqtt_args.session_expiry {
+        mqtt_request.session_expiry_interval = session_expiry;
+    }
+
+    if let Some(keep_alive) = mqtt_args.keep_alive {
+        mqtt_request.keep_alive = keep_alive;
+    }
+
+    if let Some(max_packet_size) = mqtt_args.max_packet_size {
+        mqtt_request.max_packet_size = max_packet_size;
+    }
+
+    for subscription in mqtt_args.add_subscription.chunks(2) {
+        mqtt_request.subscriptions.push(MqttSubscription {
+            enabled: true,
+            topic: subscription[0].clone(),
+            qos: QoS::from_str(&subscription[1], true).map_err(|_| anyhow!("Invalid QoS \"{}\", expected 0, 1 or 2", subscription[1]))?,
+        });
+    }
+
+    if let Some(publish_topic) = mqtt_args.publish_topic {
+        mqtt_request.publish.topic = publish_topic;
+    }
+
+    if let Some(publish_qos) = mqtt_args.publish_qos {
+        mqtt_request.publish.qos = publish_qos;
+    }
+
+    mqtt_request.publish.retain = mqtt_args.publish_retain;
+
+    Ok(())
 }
 
 fn get_auth_from_auth_args(auth_args: AuthArgs) -> anyhow::Result<Auth> {
@@ -185,5 +252,80 @@ fn get_content_type_from_body_args(body_args: BodyArgs) -> ContentType {
     }
     else {
         return ContentType::NoBody;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use clap::Parser;
+    use crate::cli::cli_logic::request::new::create_request_from_new_request_command;
+    use crate::cli::commands::request_commands::new::NewRequestCommand;
+    use crate::models::protocol::mqtt::mqtt::{MqttVersion, QoS};
+    use crate::models::protocol::protocol::Protocol;
+    use crate::models::request::Request;
+
+    #[derive(Parser)]
+    struct TestArgs {
+        #[command(flatten)]
+        command: NewRequestCommand,
+    }
+
+    fn new_request(args: &[&str]) -> anyhow::Result<Request> {
+        let command = TestArgs::try_parse_from(std::iter::once("atac").chain(args.iter().copied()))?.command;
+        create_request_from_new_request_command(String::from("test"), command)
+    }
+
+    #[test]
+    fn mqtt_options_are_applied() {
+        let request = new_request(&[
+            "-p", "MQTT", "-u", "mqtts://broker:8886",
+            "--mqtt-version", "5", "--client-id", "atac", "--no-clean-session", "--session-expiry", "120",
+            "--keep-alive", "30", "--max-packet-size", "4096",
+            "--add-subscription", "a/#", "1", "--add-subscription", "b/+", "2",
+            "--publish-topic", "a/b", "--publish-qos", "2", "--publish-retain",
+        ]).unwrap();
+
+        let Protocol::MqttRequest(mqtt_request) = &request.protocol else { panic!("not an MQTT request") };
+
+        assert_eq!(request.url, "mqtts://broker:8886");
+        assert_eq!(mqtt_request.version, MqttVersion::V5);
+        assert_eq!(mqtt_request.client_id, "atac");
+        assert!(!mqtt_request.clean_session);
+        assert_eq!(mqtt_request.session_expiry_interval, 120);
+        assert_eq!(mqtt_request.keep_alive, 30);
+        assert_eq!(mqtt_request.max_packet_size, 4096);
+        assert_eq!(mqtt_request.subscriptions.len(), 2);
+        assert_eq!((mqtt_request.subscriptions[1].topic.as_str(), mqtt_request.subscriptions[1].qos), ("b/+", QoS::ExactlyOnce));
+        assert_eq!((mqtt_request.publish.topic.as_str(), mqtt_request.publish.qos, mqtt_request.publish.retain), ("a/b", QoS::ExactlyOnce, true));
+    }
+
+    #[test]
+    fn mqtt_requests_have_no_http_headers() {
+        assert!(new_request(&["-p", "MQTT"]).unwrap().headers.is_empty());
+        assert!(!new_request(&["-p", "HTTP"]).unwrap().headers.is_empty());
+    }
+
+    #[test]
+    fn mqtt_options_need_an_mqtt_request() {
+        for protocol in ["HTTP", "websocket"] {
+            assert!(new_request(&["-p", protocol, "--client-id", "atac"]).is_err(), "{protocol}");
+            assert!(new_request(&["-p", protocol, "--add-subscription", "a", "0"]).is_err(), "{protocol}");
+        }
+    }
+
+    #[test]
+    fn http_options_are_refused_on_mqtt_requests() {
+        assert!(new_request(&["-p", "MQTT", "-m", "POST"]).is_err());
+        assert!(new_request(&["-p", "MQTT", "--body-raw", "x"]).is_err());
+        assert!(new_request(&["-p", "MQTT", "--add-header", "a", "b"]).is_err());
+    }
+
+    #[test]
+    fn invalid_values_are_refused() {
+        assert!(new_request(&["-p", "MQTT", "--add-subscription", "a", "3"]).is_err());
+        assert!(new_request(&["-p", "MQTT", "--publish-qos", "3"]).is_err());
+        assert!(new_request(&["-p", "MQTT", "--mqtt-version", "4"]).is_err());
+        assert!(new_request(&["-p", "MQTT", "--max-packet-size", "0"]).is_err());
+        assert!(new_request(&["-p", "MQTT", "--keep-alive", "65536"]).is_err());
     }
 }

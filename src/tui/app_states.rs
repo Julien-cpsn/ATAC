@@ -128,6 +128,12 @@ pub enum AppState {
     #[strum(to_string = "Editing request message")]
     EditingRequestMessage,
 
+    #[strum(to_string = "Editing MQTT field")]
+    EditingMqttFormField,
+
+    #[strum(to_string = "Editing MQTT subscription")]
+    EditingMqttSubscription,
+
     #[strum(to_string = "Editing pre-request script")]
     EditingPreRequestScript,
 
@@ -177,7 +183,9 @@ pub fn next_app_state(app_state: &AppState) -> AppState {
         EditingRequestBodyTable => EditingRequestBodyFile,
         EditingRequestBodyFile => EditingRequestBodyString,
         EditingRequestBodyString => EditingRequestMessage,
-        EditingRequestMessage => EditingPreRequestScript,
+        EditingRequestMessage => EditingMqttFormField,
+        EditingMqttFormField => EditingMqttSubscription,
+        EditingMqttSubscription => EditingPreRequestScript,
         EditingPreRequestScript => EditingPostRequestScript,
         EditingPostRequestScript => EditingRequestSettings,
         EditingRequestSettings => ChoosingRequestExportFormat,
@@ -220,7 +228,9 @@ pub fn previous_app_state(app_state: &AppState) -> AppState {
         EditingRequestBodyFile => EditingRequestBodyTable,
         EditingRequestBodyString => EditingRequestBodyFile,
         EditingRequestMessage => EditingRequestBodyString,
-        EditingPreRequestScript => EditingRequestMessage,
+        EditingMqttFormField => EditingRequestMessage,
+        EditingMqttSubscription => EditingMqttFormField,
+        EditingPreRequestScript => EditingMqttSubscription,
         EditingPostRequestScript => EditingPreRequestScript,
         EditingRequestSettings => EditingPostRequestScript,
         ChoosingRequestExportFormat => EditingRequestSettings,
@@ -435,6 +445,9 @@ impl AppState {
                             ],
                             Protocol::WsRequest(_) => vec![
                                 ModifyRequestMessageType(EventKeyBinding::new(vec![key_bindings.request_selected.param_tabs.change_message_type], "Modify message type", None)),
+                            ],
+                            Protocol::MqttRequest(_) => vec![
+                                ModifyRequestMessageType(EventKeyBinding::new(vec![key_bindings.request_selected.param_tabs.change_message_type], "Modify payload type", None)),
                             ]
                         };
 
@@ -492,6 +505,27 @@ impl AppState {
                         ],
                         RequestParamsTabs::Message => vec![
                             EditRequestMessage(EventKeyBinding::new(vec![key_bindings.generic.list_and_table_actions.edit_element], "Edit message", None)),
+                        ],
+                        RequestParamsTabs::MqttConnection | RequestParamsTabs::MqttPublish => vec![
+                            EditMqttFormField(EventKeyBinding::new(vec![key_bindings.generic.list_and_table_actions.edit_element], "Edit or toggle field", Some("Edit"))),
+
+                            MqttFormMoveUp(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_up], "Move up", None)),
+                            MqttFormMoveDown(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_down], "Move down", None)),
+                            MqttFormMoveLeft(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_left], "Previous value", None)),
+                            MqttFormMoveRight(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_right], "Next value", None)),
+                        ],
+                        RequestParamsTabs::MqttSubscriptions => vec![
+                            EditMqttSubscription(EventKeyBinding::new(vec![key_bindings.generic.list_and_table_actions.edit_element], "Edit subscription", None)),
+
+                            MqttSubscriptionsMoveUp(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_up], "Move up", None)),
+                            MqttSubscriptionsMoveDown(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_down], "Move down", None)),
+                            MqttSubscriptionsMoveLeft(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_left], "Move left", None)),
+                            MqttSubscriptionsMoveRight(EventKeyBinding::new(vec![key_bindings.generic.navigation.move_cursor_right], "Move right", None)),
+
+                            CreateMqttSubscription(EventKeyBinding::new(vec![key_bindings.generic.list_and_table_actions.create_element], "Create subscription", None)),
+                            DeleteMqttSubscription(EventKeyBinding::new(vec![key_bindings.generic.list_and_table_actions.delete_element], "Delete subscription", None)),
+                            ToggleMqttSubscription(EventKeyBinding::new(vec![key_bindings.generic.list_and_table_actions.toggle_element], "Toggle subscription", None)),
+                            DuplicateMqttSubscription(EventKeyBinding::new(vec![key_bindings.generic.list_and_table_actions.duplicate_element], "Duplicate subscription", None)),
                         ],
                         RequestParamsTabs::Scripts => vec![
                             EditRequestScript(EventKeyBinding::new(vec![key_bindings.generic.list_and_table_actions.edit_element], "Edit request script", Some("Edit"))),
@@ -673,6 +707,22 @@ impl AppState {
                     KeyEventEditRequestMessage(EventKeyBinding::new(vec![], "Any input", None)),
                 ],
                 generate_text_input_documentation(key_bindings.generic.text_input.mode, false, false)
+            ].concat(),
+            EditingMqttFormField => [
+                vec![
+                    ModifyMqttFormField(EventKeyBinding::new(vec![key_bindings.generic.text_input.save_and_quit_single_line], "Confirm", Some("Confirm"))),
+                    CancelEditMqttFormField(EventKeyBinding::new(vec![key_bindings.generic.text_input.quit_without_saving], "Cancel", Some("Cancel"))),
+                    KeyEventEditMqttFormField(EventKeyBinding::new(vec![], "Any input", None)),
+                ],
+                generate_text_input_documentation(key_bindings.generic.text_input.mode, true, false)
+            ].concat(),
+            EditingMqttSubscription => [
+                vec![
+                    ModifyMqttSubscription(EventKeyBinding::new(vec![key_bindings.generic.text_input.save_and_quit_single_line], "Confirm", Some("Confirm"))),
+                    CancelEditMqttSubscription(EventKeyBinding::new(vec![key_bindings.generic.text_input.quit_without_saving], "Cancel", Some("Cancel"))),
+                    KeyEventEditMqttSubscription(EventKeyBinding::new(vec![], "Any input", None)),
+                ],
+                generate_text_input_documentation(key_bindings.generic.text_input.mode, true, true)
             ].concat(),
             EditingPreRequestScript => [
                 vec![
@@ -930,6 +980,7 @@ impl App<'_> {
             EditingRequestHeader |
             EditingRequestBodyTable | EditingRequestBodyFile | EditingRequestBodyString |
             EditingRequestMessage |
+            EditingMqttFormField | EditingMqttSubscription |
             EditingPreRequestScript | EditingPostRequestScript |
             EditingRequestSettings |
             ChoosingRequestExportFormat | DisplayingRequestExport
@@ -967,6 +1018,7 @@ impl App<'_> {
             EditingRequestAuthBasicUsername | EditingRequestAuthBasicPassword | EditingRequestAuthBearerToken | EditingRequestAuthJwtSecret | EditingRequestAuthJwtPayload |
             EditingRequestHeader |
             EditingRequestBodyTable | EditingRequestBodyFile | EditingRequestBodyString |
+            EditingMqttFormField | EditingMqttSubscription |
             EditingPreRequestScript | EditingPostRequestScript |
             EditingRequestSettings => true,
             _ => false

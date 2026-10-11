@@ -210,9 +210,9 @@ cargo run -- -h
 | - Ping                                                                         | :white_check_mark:                                                                  | :x:                  | :x:                      |
 | - Pong                                                                         | :white_check_mark:                                                                  | :x:                  | :x:                      |
 | - Close                                                                        | :white_check_mark:                                                                  | :x:                  | :x:                      |
+| **MQTT Client** (3.1.1 & 5, TCP & TLS)                                         | :white_check_mark:                                                                  | :white_check_mark:   | :x:                      |
 | **GraphQL**                                                                    | :x: :soon:                                                                          | :white_check_mark:   | :white_check_mark:       |
 | **gRPC**                                                                       | :x: :soon:                                                                          | :white_check_mark:   | :white_check_mark:       |
-| **MQTT**                                                                       | :x: :soon:                                                                          | :white_check_mark:   | :x:                      |
 | **Free**                                                                       | :white_check_mark:                                                                  | Depends              | Depends                  |
 | **Lightweight, fast and efficient**                                            | :white_check_mark:                                                                  | :x:                  | :x:                      |
 | **Data storage**                                                               | Your own committable, readable, versioned and retro-compatible files (JSON or YAML) | Tied to your account | Tied to your account     |
@@ -246,7 +246,6 @@ cargo run -- -h
 
 - **To add**
   - Maybe GraphQL requests
-  - Maybe MQTT requests
   - Maybe gRPC requests
 
 - **To improve**
@@ -310,6 +309,8 @@ You can read more about it here: https://github.com/Julien-cpsn/ATAC/releases/ta
 | [reqwest](https://github.com/seanmonstar/reqwest)                                | 0.13.5      | Send requests                                                                                             |
 | [reqwest-middleware](https://github.com/TrueLayer/reqwest-middleware)            | 0.5.2       | Wrapper around reqwest to allow for client middleware chains                                              |
 | [reqwest-websocket](https://github.com/jgraef/reqwest-websocket)                 | 0.6.0       | Wrapper around reqwest to handle web-socket requests                                                      |
+| [rumqttc](https://github.com/bytebeamio/rumqtt)                                  | 0.25.1      | MQTT 3.1.1 and 5 client                                                                                   |
+| [rustls-native-certs](https://github.com/rustls/rustls-native-certs)             | 0.8.3       | Load the platform root certificates for MQTT over TLS                                                     |
 | **TUI**                                                                          |             |                                                                                                           |
 | [ratatui](https://github.com/ratatui/ratatui)                                    | 0.30.2      | Terminal UI framework                                                                                     |
 | [crokey](https://github.com/Canop/crokey)                                        | 1.5.0       | Used to parse, use key bindings files and some utilities                                                  |

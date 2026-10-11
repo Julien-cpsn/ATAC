@@ -5,6 +5,8 @@ use tokio::task;
 use tracing::info;
 use crate::app::app::App;
 use crate::app::business_logic::request::http::send::send_http_request;
+use crate::app::business_logic::request::mqtt::send::{mqtt_disconnect, send_mqtt_request};
+use crate::app::business_logic::request::send::PreparedRequest;
 use crate::app::business_logic::request::ws::send::send_ws_request;
 use crate::models::auth::auth::Auth;
 use crate::models::protocol::protocol::Protocol;
@@ -27,6 +29,10 @@ impl App<'_> {
 
         match &mut selected_request.protocol {
             Protocol::HttpRequest(_) => {}
+            Protocol::MqttRequest(mqtt_request) => if mqtt_request.is_connected {
+                mqtt_disconnect(mqtt_request);
+                return;
+            }
             Protocol::WsRequest(ws_request) => if ws_request.is_connected {
                 if let Some(websocket) = ws_request.websocket.clone() {
                     drop(websocket.rx);
@@ -52,7 +58,7 @@ impl App<'_> {
 
         /* PRE-REQUEST SCRIPT */
 
-        let prepared_request = match self.prepare_request(&mut selected_request).await {
+        let prepared_request = match self.prepare_request_for_protocol(&mut selected_request).await {
             Ok(result) => result,
             Err(prepare_request_error) => {
                 selected_request.response.status_code = Some(prepare_request_error.to_string());
@@ -69,9 +75,11 @@ impl App<'_> {
         /* SEND REQUEST */
 
         task::spawn(async move {
-            let response = match protocol {
-                Protocol::HttpRequest(_) => send_http_request(prepared_request, local_selected_request.clone(), &local_env).await,
-                Protocol::WsRequest(_) => send_ws_request(prepared_request, local_selected_request.clone(), &local_env, local_should_refresh_scrollbars.clone()).await
+            let response = match (protocol, prepared_request) {
+                (Protocol::HttpRequest(_), PreparedRequest::Reqwest(prepared_request)) => send_http_request(prepared_request, local_selected_request.clone(), &local_env).await,
+                (Protocol::WsRequest(_), PreparedRequest::Reqwest(prepared_request)) => send_ws_request(prepared_request, local_selected_request.clone(), &local_env, local_should_refresh_scrollbars.clone()).await,
+                (Protocol::MqttRequest(_), PreparedRequest::Mqtt(prepared_request)) => send_mqtt_request(prepared_request, local_selected_request.clone(), &local_env, local_should_refresh_scrollbars.clone()).await,
+                _ => unreachable!()
             };
 
             match response {

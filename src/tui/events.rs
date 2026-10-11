@@ -163,6 +163,22 @@ get_key_bindings! {
 
         EditRequestMessage(EventKeyBinding),
 
+        EditMqttFormField(EventKeyBinding),
+        MqttFormMoveUp(EventKeyBinding),
+        MqttFormMoveDown(EventKeyBinding),
+        MqttFormMoveLeft(EventKeyBinding),
+        MqttFormMoveRight(EventKeyBinding),
+
+        EditMqttSubscription(EventKeyBinding),
+        MqttSubscriptionsMoveUp(EventKeyBinding),
+        MqttSubscriptionsMoveDown(EventKeyBinding),
+        MqttSubscriptionsMoveLeft(EventKeyBinding),
+        MqttSubscriptionsMoveRight(EventKeyBinding),
+        CreateMqttSubscription(EventKeyBinding),
+        DeleteMqttSubscription(EventKeyBinding),
+        ToggleMqttSubscription(EventKeyBinding),
+        DuplicateMqttSubscription(EventKeyBinding),
+
         EditRequestScript(EventKeyBinding),
         // Move up or down
         RequestScriptMove(EventKeyBinding),
@@ -275,6 +291,16 @@ get_key_bindings! {
         CancelEditRequestMessage(EventKeyBinding),
         KeyEventEditRequestMessage(EventKeyBinding),
 
+        /* MQTT */
+
+        ModifyMqttFormField(EventKeyBinding),
+        CancelEditMqttFormField(EventKeyBinding),
+        KeyEventEditMqttFormField(EventKeyBinding),
+
+        ModifyMqttSubscription(EventKeyBinding),
+        CancelEditMqttSubscription(EventKeyBinding),
+        KeyEventEditMqttSubscription(EventKeyBinding),
+
         /* Scripts */
 
         ModifyRequestPreRequestScript(EventKeyBinding),
@@ -322,8 +348,11 @@ impl App<'_> {
 
         let received_response = *self.received_response.lock();
         if received_response {
-            self.tui_highlight_response_body_and_console();
-            self.tui_refresh_result_scrollbars();
+            // A connection can receive messages or end while no request is selected, e.g. once deleted
+            if self.collections_tree.selected.is_some() {
+                self.tui_highlight_response_body_and_console();
+                self.tui_refresh_result_scrollbars();
+            }
 
             if self.config.should_save_requests_response() {
                 let selection = self.collections_tree.state.selected().to_vec();
@@ -533,7 +562,10 @@ impl App<'_> {
 
                 ModifyRequestAuthMethod(_) => self.tui_next_request_auth(),
                 ModifyRequestBodyContentType(_) => self.tui_next_request_content_type(),
-                ModifyRequestMessageType(_) => self.tui_next_request_message_type(),
+                ModifyRequestMessageType(_) => match self.is_selected_request_mqtt() {
+                    true => self.tui_next_mqtt_payload_type(),
+                    false => self.tui_next_request_message_type(),
+                },
 
                 EditRequestQueryParam(_) => match self.query_params_table.is_selected() {
                     true => self.edit_request_param_state(),
@@ -580,6 +612,26 @@ impl App<'_> {
                 },
 
                 EditRequestMessage(_) => self.edit_request_message_state(),
+
+                EditMqttFormField(_) => self.tui_edit_mqtt_form_field(),
+                MqttFormMoveUp(_) => self.mqtt_form_selection.previous(),
+                MqttFormMoveDown(_) => self.mqtt_form_selection.next(),
+                MqttFormMoveLeft(_) => self.tui_change_mqtt_form_field_value(false),
+                MqttFormMoveRight(_) => self.tui_change_mqtt_form_field_value(true),
+
+                EditMqttSubscription(_) => match self.mqtt_subscriptions_table.selection {
+                    // QoS is cycled through instead of typed
+                    Some((_, 1)) => self.tui_next_mqtt_subscription_qos(),
+                    Some(_) => self.edit_mqtt_subscription_state(),
+                    None => {}
+                },
+                MqttSubscriptionsMoveUp(_) => self.mqtt_subscriptions_table.up(),
+                MqttSubscriptionsMoveDown(_) => self.mqtt_subscriptions_table.down(),
+                MqttSubscriptionsMoveLeft(_) | MqttSubscriptionsMoveRight(_) => self.mqtt_subscriptions_table.change_y(),
+                CreateMqttSubscription(_) => self.tui_create_mqtt_subscription(),
+                DeleteMqttSubscription(_) => self.tui_delete_mqtt_subscription(),
+                ToggleMqttSubscription(_) => self.tui_toggle_mqtt_subscription(),
+                DuplicateMqttSubscription(_) => self.tui_duplicate_mqtt_subscription(),
 
                 RequestBodyTableMoveUp(_) => self.body_form_table.up(),
                 RequestBodyTableMoveDown(_) => self.body_form_table.down(),
@@ -828,7 +880,10 @@ impl App<'_> {
                 /* Websocket */
 
                 ModifyRequestMessage(_) => match self.message_text_area.is_in_default_mode() {
-                    true => self.tui_send_request_message().await,
+                    true => match self.is_selected_request_mqtt() {
+                        true => self.tui_publish_mqtt_message(),
+                        false => self.tui_send_request_message().await,
+                    },
                     false => self.message_text_area.key_event(key, Some(terminal)),
                 },
                 CancelEditRequestMessage(_) => match self.message_text_area.is_in_default_mode() {
@@ -836,6 +891,28 @@ impl App<'_> {
                     false => self.message_text_area.key_event(key, Some(terminal)),
                 },
                 KeyEventEditRequestMessage(_) => self.message_text_area.key_event(key, Some(terminal)),
+
+                /* MQTT */
+
+                ModifyMqttFormField(_) => match self.mqtt_form_text_input.is_in_default_mode() {
+                    true => self.tui_modify_mqtt_form_field(),
+                    false => self.mqtt_form_text_input.key_event(key, None),
+                },
+                CancelEditMqttFormField(_) => match self.mqtt_form_text_input.is_in_default_mode() {
+                    true => self.select_request_state(),
+                    false => self.mqtt_form_text_input.key_event(key, None),
+                },
+                KeyEventEditMqttFormField(_) => self.mqtt_form_text_input.key_event(key, None),
+
+                ModifyMqttSubscription(_) => match self.mqtt_subscriptions_table.selection_text_input.is_in_default_mode() {
+                    true => self.tui_modify_mqtt_subscription(),
+                    false => self.mqtt_subscriptions_table.selection_text_input.key_event(key, None),
+                },
+                CancelEditMqttSubscription(_) => match self.mqtt_subscriptions_table.selection_text_input.is_in_default_mode() {
+                    true => self.select_request_state(),
+                    false => self.mqtt_subscriptions_table.selection_text_input.key_event(key, None),
+                },
+                KeyEventEditMqttSubscription(_) => self.mqtt_subscriptions_table.selection_text_input.key_event(key, None),
 
                 /* Scripts */
 

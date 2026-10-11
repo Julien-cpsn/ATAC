@@ -18,6 +18,7 @@ use crate::app::files::theme::THEME;
 use crate::models::protocol::protocol::Protocol;
 use crate::models::protocol::ws::ws::Sender;
 use crate::models::request::Request;
+use crate::tui::tui_logic::request::messages::get_displayed_messages;
 use crate::models::response::ResponseContent;
 use crate::tui::utils::centered_rect::centered_rect;
 
@@ -63,6 +64,11 @@ impl App<'_> {
                 RequestResultTabs::Cookies,
                 RequestResultTabs::Headers,
                 RequestResultTabs::Console
+            ],
+            Protocol::MqttRequest(_) => vec![
+                RequestResultTabs::Messages,
+                RequestResultTabs::Headers,
+                RequestResultTabs::Console
             ]
         };
 
@@ -79,10 +85,10 @@ impl App<'_> {
                         }
                     },
                     RequestResultTabs::Messages => {
-                        let ws_request = request.get_ws_request().unwrap();
+                        let messages_count = get_displayed_messages(request).len();
 
-                        if !ws_request.messages.is_empty() {
-                            Some(format!("{} ({})", tab.to_string(), ws_request.messages.len()))
+                        if messages_count > 0 {
+                            Some(format!("{} ({})", tab.to_string(), messages_count))
                         }
                         else {
                             Some(format!("{}", tab.to_string()))
@@ -117,6 +123,12 @@ impl App<'_> {
                 RequestResultTabs::Cookies => 1,
                 RequestResultTabs::Headers => 2,
                 RequestResultTabs::Console => 3,
+                _ => unreachable!()
+            }
+            Protocol::MqttRequest(_) => match self.request_result_tab {
+                RequestResultTabs::Messages => 0,
+                RequestResultTabs::Headers => 1,
+                RequestResultTabs::Console => 2,
                 _ => unreachable!()
             }
         };
@@ -221,31 +233,36 @@ impl App<'_> {
                     }
                 },
                 RequestResultTabs::Messages => {
-                    let ws_request = request.get_ws_request().unwrap();
+                    let displayed_messages = get_displayed_messages(request);
 
                     let mut messages = vec![];
                     let mut last_sender: Option<&Sender> = None;
 
-                    for message in &ws_request.messages {
+                    for message in &displayed_messages {
                         let mut alignment = Alignment::Right;
 
-                        let content = message.content.to_content();
-                        let max_length = self.get_max_line_length(&content);
+                        let content = &message.content;
+                        let max_length = self.get_max_line_length(content);
                         let lines = wrap(&content, max_length);
 
                         match message.sender {
                             Sender::You => {
+                                let bg = match request.protocol {
+                                    Protocol::WsRequest(_) => THEME.read().websocket.messages.you_background_color,
+                                    Protocol::MqttRequest(_) => THEME.read().mqtt.messages.you_background_color,
+                                    _ => unreachable!()
+                                };
+
                                 for line in lines {
                                     let line = match line.is_empty() {
                                         true => " ".repeat(max_length),
                                         false => format!("{line:max_length$}")
                                     };
 
-
                                     messages.push(
                                         Line::raw(line)
                                             .fg(THEME.read().ui.font_color)
-                                            .bg(THEME.read().websocket.messages.you_background_color)
+                                            .bg(bg)
                                             .alignment(alignment)
                                     );
                                 }
@@ -253,11 +270,23 @@ impl App<'_> {
                             Sender::Server => {
                                 alignment = Alignment::Left;
 
+                                let (fg, bg) = match request.protocol {
+                                    Protocol::WsRequest(_) => (
+                                        THEME.read().websocket.messages.server_foreground_color,
+                                        THEME.read().websocket.messages.server_background_color,
+                                    ),
+                                    Protocol::MqttRequest(_) => (
+                                        THEME.read().mqtt.messages.server_foreground_color,
+                                        THEME.read().mqtt.messages.server_background_color,
+                                    ),
+                                    _ => unreachable!()
+                                };
+
                                 if last_sender != Some(&message.sender) {
                                     messages.push(
                                         Line::raw(message.sender.to_string())
                                             .bold()
-                                            .fg(THEME.read().websocket.messages.server_foreground_color)
+                                            .fg(fg)
                                             .alignment(alignment)
                                     );
                                 }
@@ -272,7 +301,7 @@ impl App<'_> {
                                     messages.push(
                                         Line::raw(line)
                                             .fg(THEME.read().ui.font_color)
-                                            .bg(THEME.read().websocket.messages.server_background_color)
+                                            .bg(bg)
                                             .alignment(alignment)
                                     );
                                 }
@@ -286,9 +315,15 @@ impl App<'_> {
 
                         let timestamp = message.timestamp.format(timestamp_format).to_string();
 
+                        let fg_message = match request.protocol {
+                            Protocol::WsRequest(_) => THEME.read().websocket.messages.details_color,
+                            Protocol::MqttRequest(_) => THEME.read().mqtt.messages.details_color,
+                            _ => unreachable!()
+                        };
+
                         messages.push(
-                            Line::raw(format!("{} {}", message.content.to_string(), timestamp))
-                                .fg(THEME.read().websocket.messages.details_color)
+                            Line::raw(format!("{} {}", message.details, timestamp))
+                                .fg(fg_message)
                                 .alignment(alignment)
                         );
 

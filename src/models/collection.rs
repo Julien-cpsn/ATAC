@@ -54,3 +54,37 @@ impl Collection {
         TreeItem::new(identifier, line, items).unwrap()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+    use std::path::Path;
+    use crate::models::collection::Collection;
+    use crate::models::protocol::protocol::Protocol;
+
+    /// Collections written by earlier versions and for every protocol must keep loading
+    #[test]
+    fn example_collections_load() {
+        let directory = Path::new(env!("CARGO_MANIFEST_DIR")).join("example_resources/collections");
+        let mut loaded = 0;
+
+        for entry in fs::read_dir(directory).unwrap() {
+            let path = entry.unwrap().path();
+            let content = fs::read_to_string(&path).unwrap_or_default();
+
+            let collection: Collection = match path.extension().and_then(|extension| extension.to_str()) {
+                Some("json") => serde_json::from_str(&content).unwrap_or_else(|error| panic!("{}: {error}", path.display())),
+                Some("yaml") => serde_yaml::from_str(&content).unwrap_or_else(|error| panic!("{}: {error}", path.display())),
+                _ => continue,
+            };
+
+            if collection.name == "MQTT" {
+                assert!(collection.requests.iter().all(|request| matches!(request.read().protocol, Protocol::MqttRequest(_))));
+            }
+
+            loaded += 1;
+        }
+
+        assert!(loaded >= 12);
+    }
+}

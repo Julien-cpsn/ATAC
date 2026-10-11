@@ -6,13 +6,14 @@ use ratatui::Frame;
 
 use crate::app::app::App;
 use crate::app::files::theme::THEME;
+use crate::models::protocol::protocol::Protocol;
 use crate::models::request::Request;
 use crate::tui::app_states::AppState;
 use crate::tui::ui::views::RequestView;
 use crate::tui::utils::stateful::text_input::SingleLineTextInput;
 
 impl App<'_> {
-    pub fn render_ws_request(&mut self, frame: &mut Frame, rect: Rect, request: Request) {
+    pub fn render_ws_or_mqtt_request(&mut self, frame: &mut Frame, rect: Rect, request: Request) {
         let request_layout = Layout::new(
             Vertical,
             [
@@ -46,8 +47,6 @@ impl App<'_> {
 
         // REQUEST CONNECTION STATUS
 
-        let ws_request = request.get_ws_request().unwrap();
-
         let connection_status_block = Block::new()
             .title("Status").title_alignment(Alignment::Center)
             .borders(Borders::ALL)
@@ -56,13 +55,25 @@ impl App<'_> {
 
         let connection_status_area = connection_status_block.inner(request_header_layout[0]);
 
-        let connection_status_paragraph = match ws_request.is_connected {
+        let (bg_connected, bg_disconnected) = match request.protocol {
+            Protocol::WsRequest(_) => (
+                THEME.read().websocket.connection_status.connected,
+                THEME.read().websocket.connection_status.disconnected
+            ),
+            Protocol::MqttRequest(_) => (
+                THEME.read().mqtt.connection_status.connected,
+                THEME.read().mqtt.connection_status.disconnected
+            ),
+            _ => unreachable!()
+        };
+
+        let connection_status_paragraph = match request.is_connected() {
             true => Paragraph::new("Connected")
-                .bg(THEME.read().websocket.connection_status.connected)
+                .bg(bg_connected)
                 .fg(THEME.read().ui.font_color)
                 .centered(),
             false => Paragraph::new("Disconnected")
-                .bg(THEME.read().websocket.connection_status.disconnected)
+                .bg(bg_disconnected)
                 .fg(THEME.read().ui.font_color)
                 .centered()
         };

@@ -18,9 +18,13 @@ use tokio::io;
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tracing::info;
 use crate::app::business_logic::request::http::send::send_http_request;
+use crate::app::business_logic::request::mqtt::send::{mqtt_publish, send_mqtt_request};
+use crate::app::business_logic::request::send::PreparedRequest;
 use crate::app::business_logic::request::ws::send::send_ws_request;
 use crate::models::protocol::protocol::Protocol;
 use crate::models::protocol::ws::message_type::MessageType;
+use crate::models::protocol::mqtt::mqtt::MqttMessageContent;
+use crate::models::protocol::mqtt::payload::MqttPayload;
 use crate::models::protocol::ws::ws::{Message, Sender};
 
 impl App<'_> {
@@ -70,7 +74,7 @@ impl App<'_> {
             println!("{}", request.name);
         }
         
-        let prepared_request = match self.prepare_request(&mut request).await {
+        let prepared_request = match self.prepare_request_for_protocol(&mut request).await {
             Ok(prepared_request) => prepared_request,
             Err(error) => {
                 if send_command.console {
@@ -88,9 +92,11 @@ impl App<'_> {
         drop(request);
 
         let local_env = self.get_selected_env_as_local();
-        let response = match protocol {
-            Protocol::HttpRequest(_) => send_http_request(prepared_request, local_request.clone(), &local_env).await?,
-            Protocol::WsRequest(_) => send_ws_request(prepared_request, local_request.clone(), &local_env, self.received_response.clone()).await?,
+        let response = match (&protocol, prepared_request) {
+            (Protocol::HttpRequest(_), PreparedRequest::Reqwest(prepared_request)) => send_http_request(prepared_request, local_request.clone(), &local_env).await?,
+            (Protocol::WsRequest(_), PreparedRequest::Reqwest(prepared_request)) => send_ws_request(prepared_request, local_request.clone(), &local_env, self.received_response.clone()).await?,
+            (Protocol::MqttRequest(_), PreparedRequest::Mqtt(prepared_request)) => send_mqtt_request(prepared_request, local_request.clone(), &local_env, self.received_response.clone()).await?,
+            _ => unreachable!()
         };
 
         let request = local_request.read();
@@ -103,8 +109,9 @@ impl App<'_> {
             println!("{}", response.duration.unwrap());
         }
 
-        if send_command.cookies {
-            println!("{}", response.cookies.unwrap());
+        // MQTT and failed requests have no cookies
+        if send_command.cookies && let Some(cookies) = &response.cookies {
+            println!("{cookies}");
         }
 
         if send_command.headers {
@@ -240,6 +247,69 @@ impl App<'_> {
 
                     last_length = ws_request.messages.len();
                 }
+            }
+        }
+
+        if let Protocol::MqttRequest(mqtt_request) = &protocol {
+            let mut last_length = 0;
+            let publish_topic = self.replace_env_keys_by_value(&mqtt_request.publish.topic);
+            let publish_options = mqtt_request.publish.clone();
+            let local_local_request = local_request.clone();
+
+            // Each line read from stdin is published to the publish topic.
+            // Read from a plain thread, the runtime would wait for a pending stdin read before exiting once disconnected
+            if !publish_topic.is_empty() {
+                std::thread::spawn(move || {
+                    for line in std::io::stdin().lines() {
+                        let Ok(line) = line else {
+                            break;
+                        };
+
+                        let mut request = local_local_request.write();
+                        let Ok(mqtt_request) = request.get_mqtt_request_mut() else {
+                            break;
+                        };
+
+                        mqtt_publish(mqtt_request, publish_topic.clone(), MqttPayload::Text(line), publish_options.qos, publish_options.retain);
+                    }
+                });
+            }
+
+            loop {
+                // Copied so that the lock is not held while printing, a slow stdout would block the connection
+                let (new_messages, is_connected) = {
+                    let request = local_request.read();
+                    let mqtt_request = request.get_mqtt_request()?;
+                    let new_messages = mqtt_request.messages[last_length..].to_vec();
+
+                    last_length = mqtt_request.messages.len();
+
+                    (new_messages, mqtt_request.is_connected)
+                };
+
+                for message in &new_messages {
+                    let timestamp = message.timestamp.format("%H:%M:%S %d/%m/%Y").to_string();
+
+                    match &message.content {
+                        MqttMessageContent::Publish { topic, payload, qos, retain } => println!(
+                            "=== {} - {} message from {} on \"{}\" ({}{}) ===\n{}",
+                            timestamp,
+                            payload.to_string(),
+                            message.sender,
+                            topic,
+                            qos,
+                            if *retain { ", retained" } else { "" },
+                            payload.to_content()
+                        ),
+                        MqttMessageContent::Event(event) => println!("=== {} - {} ===", timestamp, event)
+                    }
+                }
+
+                if !is_connected {
+                    break;
+                }
+
+                tokio::time::sleep(std::time::Duration::from_millis(50)).await;
             }
         }
 

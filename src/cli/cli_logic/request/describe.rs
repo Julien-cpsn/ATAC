@@ -1,4 +1,6 @@
+use ratatui::style::Stylize;
 use crate::app::app::App;
+use crate::app::files::theme::THEME;
 use crate::app::business_logic::key_value::print_key_value_vector;
 use crate::models::auth::auth::Auth;
 use crate::models::auth::basic::BasicAuth;
@@ -21,6 +23,32 @@ impl App<'_> {
         }
 
         println!("url: {}", request.url_with_params_to_string());
+
+        if let Protocol::MqttRequest(mqtt_request) = &request.protocol {
+            println!("mqtt version: {}", mqtt_request.version);
+            println!("client id: {}", mqtt_request.client_id);
+            println!("clean session: {}", mqtt_request.clean_session);
+            println!("session expiry: {}s", mqtt_request.session_expiry_interval);
+            println!("keep alive: {}s", mqtt_request.keep_alive);
+            println!("max packet size: {} bytes", mqtt_request.max_packet_size);
+
+            if !mqtt_request.subscriptions.is_empty() {
+                println!("subscriptions:");
+
+                for subscription in &mqtt_request.subscriptions {
+                    let text = format!("\t{} ({})", subscription.topic, subscription.qos);
+
+                    match subscription.enabled {
+                        true => println!("{text}"),
+                        false => println!("{}", text.fg(THEME.read().ui.secondary_foreground_color)),
+                    }
+                }
+            }
+
+            if !mqtt_request.publish.topic.is_empty() {
+                println!("publish: {} ({}{})", mqtt_request.publish.topic, mqtt_request.publish.qos, if mqtt_request.publish.retain { ", retained" } else { "" });
+            }
+        }
 
         if !request.headers.is_empty() {
             println!("headers:");

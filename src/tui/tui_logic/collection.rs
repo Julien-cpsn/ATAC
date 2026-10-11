@@ -6,9 +6,11 @@ use crate::models::auth::digest::Digest;
 use crate::models::auth::jwt::JwtToken;
 use crate::models::protocol::http::body::ContentType;
 use crate::models::protocol::protocol::Protocol;
+use crate::models::protocol::mqtt::payload::MqttPayload;
 use crate::models::protocol::ws::message_type::MessageType;
 use crate::models::request::{Request, DEFAULT_HEADERS};
 use crate::models::settings::RequestSettings;
+use crate::tui::tui_logic::request::mqtt::{get_mqtt_form_fields, subscriptions_to_rows};
 
 impl App<'_> {
     pub fn update_inputs(&mut self) {
@@ -124,6 +126,43 @@ impl App<'_> {
 
                 self.message_text_area.push_str(&content);
             }
+            Protocol::MqttRequest(mqtt_request) => {
+                let content = match &mqtt_request.payload {
+                    MqttPayload::Text(text) => text.clone(),
+                    MqttPayload::Binary(bytes) => String::from_utf8_lossy(bytes.as_ref()).to_string()
+                };
+
+                self.message_text_area.push_str(&content);
+
+                /* Connection and publish forms */
+
+                let form_fields = get_mqtt_form_fields(self.request_param_tab);
+                self.mqtt_form_selection.max_selection = form_fields.len();
+                self.mqtt_form_selection.usable = !form_fields.is_empty();
+
+                if let Some(field) = form_fields.get(self.mqtt_form_selection.selected) {
+                    self.mqtt_form_text_input.block_title = Some(field.label().to_string());
+
+                    if field.is_text() {
+                        self.mqtt_form_text_input.push_str(&field.value(mqtt_request));
+                    }
+                }
+
+                /* Subscriptions */
+
+                self.mqtt_subscriptions_table.rows = subscriptions_to_rows(&mqtt_request.subscriptions);
+
+                if let Some(selection) = self.mqtt_subscriptions_table.selection {
+                    if let Some(row) = self.mqtt_subscriptions_table.rows.get(selection.0) {
+                        let subscription_text = match selection.1 {
+                            0 => row.data.0.clone(),
+                            _ => row.data.1.clone(),
+                        };
+
+                        self.mqtt_subscriptions_table.selection_text_input.push_str(&subscription_text);
+                    }
+                }
+            }
         }
 
         let pre_request_script = match &selected_request.scripts.pre_request_script {
@@ -156,6 +195,9 @@ impl App<'_> {
                     self.tui_update_body_table_selection();
                 }
                 Protocol::WsRequest(_) => {}
+                Protocol::MqttRequest(_) => {
+                    self.tui_update_mqtt_subscriptions_selection();
+                }
             }
 
             *self.received_response.lock() = true;
@@ -206,10 +248,16 @@ impl App<'_> {
         let selected_collection_index = self.new_request_popup.selected_collection;
         let protocol = self.new_request_popup.protocol.clone();
 
+        // MQTT has no headers
+        let headers = match protocol {
+            Protocol::MqttRequest(_) => vec![],
+            _ => DEFAULT_HEADERS.clone()
+        };
+
         let new_request = Request {
             name: new_request_name,
             protocol,
-            headers: DEFAULT_HEADERS.clone(),
+            headers,
             settings: RequestSettings::default(),
             ..Default::default()
         };

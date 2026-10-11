@@ -8,3 +8,4 @@ pub mod scripts;
 pub mod export;
 pub mod http;
 pub mod ws;
+pub mod mqtt;

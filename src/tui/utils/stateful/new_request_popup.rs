@@ -1,6 +1,7 @@
 use crate::models::protocol::http::http::HttpRequest;
 use crate::models::protocol::protocol::Protocol;
 use crate::models::protocol::ws::ws::WsRequest;
+use crate::models::protocol::mqtt::mqtt::MqttRequest;
 use crate::tui::utils::stateful::text_input::TextInput;
 
 pub struct NewRequestPopup {
@@ -84,14 +85,16 @@ impl NewRequestPopup {
     pub fn next_protocol(&mut self) {
         self.protocol = match self.protocol {
             Protocol::HttpRequest(_) => Protocol::WsRequest(WsRequest::default()),
-            Protocol::WsRequest(_) => Protocol::HttpRequest(HttpRequest::default()),
+            Protocol::WsRequest(_) => Protocol::MqttRequest(MqttRequest::default()),
+            Protocol::MqttRequest(_) => Protocol::HttpRequest(HttpRequest::default()),
         }
     }
 
     pub fn previous_protocol(&mut self) {
         self.protocol = match self.protocol {
-            Protocol::HttpRequest(_) => Protocol::WsRequest(WsRequest::default()),
+            Protocol::HttpRequest(_) => Protocol::MqttRequest(MqttRequest::default()),
             Protocol::WsRequest(_) => Protocol::HttpRequest(HttpRequest::default()),
+            Protocol::MqttRequest(_) => Protocol::WsRequest(WsRequest::default()),
         }
     }
 }

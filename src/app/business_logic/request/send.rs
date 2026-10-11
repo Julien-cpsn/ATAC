@@ -11,6 +11,7 @@ use reqwest_tracing::{DisableOtelPropagation, OtelName, TracingMiddleware};
 use thiserror::Error;
 use tracing_log::log::trace;
 use crate::app::app::App;
+use crate::app::business_logic::request::mqtt::client::PreparedMqttRequest;
 use crate::app::business_logic::request::scripts::{execute_post_request_script, execute_pre_request_script};
 use crate::app::business_logic::request::send::RequestResponseError::PostRequestScript;
 use crate::app::files::environment::save_environment_to_file;
@@ -30,8 +31,20 @@ use crate::panic_error;
 pub enum PrepareRequestError {
     #[error("(CONSOLE) PRE-REQUEST SCRIPT ERROR")]
     PreRequestScript,
+    #[error("PRE-REQUEST SCRIPT CANNOT CHANGE THE PROTOCOL")]
+    PreRequestScriptChangedProtocol,
     #[error("INVALID URL")]
     InvalidUrl,
+    #[error("MQTT URL MUST START WITH mqtt://, mqtts://, tcp:// OR ssl://")]
+    InvalidMqttUrlScheme,
+    #[error("MQTT ONLY SUPPORTS BASIC AUTH")]
+    UnsupportedMqttAuth,
+    #[error("MQTT 3.1.1 CLIENT ID IS REQUIRED WHEN CLEAN SESSION IS OFF")]
+    MqttClientIdRequired,
+    #[error("MQTT 5 KEEP ALIVE MUST BE AT LEAST 5 SECONDS")]
+    MqttKeepAliveTooShort,
+    #[error("MQTT MAX PACKET SIZE MUST BE AT LEAST 1 BYTE")]
+    MqttMaxPacketSizeZero,
     #[error("COULD NOT OPEN FILE")]
     CouldNotOpenFile,
     #[error("{0}")]
@@ -48,7 +61,20 @@ pub enum RequestResponseError {
     WebsocketError(#[from] reqwest_websocket::Error),
 }
 
+/// MQTT doesn't go through reqwest, so it has its own prepared request
+pub enum PreparedRequest {
+    Reqwest(reqwest_middleware::RequestBuilder),
+    Mqtt(PreparedMqttRequest),
+}
+
 impl App<'_> {
+    pub async fn prepare_request_for_protocol(&self, request: &mut Request) -> Result<PreparedRequest, PrepareRequestError> {
+        match request.protocol {
+            Protocol::HttpRequest(_) | Protocol::WsRequest(_) => Ok(PreparedRequest::Reqwest(self.prepare_request(request).await?)),
+            Protocol::MqttRequest(_) => Ok(PreparedRequest::Mqtt(self.prepare_mqtt_request(request)?)),
+        }
+    }
+
     #[allow(deprecated)]
     pub async fn prepare_request(&self, request: &mut Request) -> Result<reqwest_middleware::RequestBuilder, PrepareRequestError> {
         trace!("Preparing request");
@@ -164,7 +190,7 @@ impl App<'_> {
 
         let method = match &modified_request.protocol {
             Protocol::HttpRequest(http_request) => http_request.method.to_reqwest(),
-            Protocol::WsRequest(_) => reqwest::Method::GET,
+            Protocol::WsRequest(_) | Protocol::MqttRequest(_) => reqwest::Method::GET,
         };
 
         let mut request_builder = client.request(

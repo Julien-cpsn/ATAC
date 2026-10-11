@@ -310,6 +310,16 @@ impl App<'_> {
         self.set_app_state(AppState::EditingRequestMessage);
     }
 
+    pub fn edit_mqtt_form_field_state(&mut self) {
+        self.set_app_state(AppState::EditingMqttFormField);
+        self.update_inputs();
+    }
+
+    pub fn edit_mqtt_subscription_state(&mut self) {
+        self.set_app_state(AppState::EditingMqttSubscription);
+        self.update_inputs();
+    }
+
     pub fn edit_request_script_state(&mut self) {
         self.request_param_tab = RequestParamsTabs::Scripts;
         
@@ -341,7 +351,8 @@ impl App<'_> {
 
         self.export_request.choices = match selected_request.protocol {
             Protocol::HttpRequest(_) => ExportFormat::VARIANTS.to_vec(),
-            Protocol::WsRequest(_) => vec![ExportFormat::RustReqwest]
+            Protocol::WsRequest(_) => vec![ExportFormat::RustReqwest],
+            Protocol::MqttRequest(_) => return
         };
 
         self.set_app_state(AppState::ChoosingRequestExportFormat);

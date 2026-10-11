@@ -5,3 +5,4 @@ mod jwt_token_tab;
 mod body_file_tab;
 mod digest_tab;
 mod script;
+mod mqtt_tabs;

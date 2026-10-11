@@ -62,6 +62,7 @@ impl App<'_> {
                 RustReqwest => self.rust_request(output, request, url, headers),
                 PhpGuzzle | NodeJsAxios | HTTP | Curl => return Err(anyhow!(ExportFormatNotSupported(request.protocol.to_string())))
             }
+            Protocol::MqttRequest(_) => return Err(anyhow!(ExportFormatNotSupported(request.protocol.to_string())))
         };
 
         export
@@ -694,7 +695,8 @@ impl App<'_> {
 
         let method = match &request.protocol {
             Protocol::HttpRequest(http_request) => http_request.method.to_string(),
-            Protocol::WsRequest(_) => Method::GET.to_string()
+            Protocol::WsRequest(_) => Method::GET.to_string(),
+            Protocol::MqttRequest(_) => unreachable!()
         };
 
         /* Headers */
@@ -775,6 +777,7 @@ impl App<'_> {
             Protocol::WsRequest(_) => {
                 output += "use reqwest_websocket::{Error, Message, RequestBuilderExt};\nuse futures_util::{SinkExt, StreamExt, TryStreamExt};\n";
             }
+            Protocol::MqttRequest(_) => unreachable!()
         }
 
         /* Main function */
@@ -838,6 +841,7 @@ impl App<'_> {
                 }
             }
             Protocol::WsRequest(_) => {}
+            Protocol::MqttRequest(_) => unreachable!()
         }
 
         /* Request and response */
@@ -891,6 +895,7 @@ impl App<'_> {
 "#;
 
             }
+            Protocol::MqttRequest(_) => unreachable!()
         }
 
         output += "    Ok(())\n";
