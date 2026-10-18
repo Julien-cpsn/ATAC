@@ -157,7 +157,7 @@ pub async fn send_http_request(prepared_request: reqwest_middleware::RequestBuil
 
     /* POST-REQUEST SCRIPT */
 
-    let (modified_response, post_request_output) = App::handle_post_request_script(&request, response, env)?;
+    let (modified_response, post_request_output) = App::handle_post_request_script(&request, response, env);
 
     drop(request);
 
@@ -169,5 +169,66 @@ pub async fn send_http_request(prepared_request: reqwest_middleware::RequestBuil
         request.cancellation_token = CancellationToken::new();
     }
         
-    return Ok(modified_response);
+    return modified_response;
+}
+
+#[cfg(test)]
+mod tests {
+    use std::io::{Read, Write};
+    use std::net::TcpListener;
+    use std::sync::Arc;
+    use parking_lot::RwLock;
+    use crate::app::business_logic::request::http::send::send_http_request;
+    use crate::app::business_logic::request::send::RequestResponseError;
+    use crate::models::request::Request;
+
+    /// Answers a single request with a small 200 response, then closes the connection
+    fn one_response_server() -> String {
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let address = listener.local_addr().unwrap();
+
+        std::thread::spawn(move || {
+            let (mut stream, _) = listener.accept().unwrap();
+            let mut buffer = [0; 4096];
+            let mut received = Vec::new();
+
+            while !received.windows(4).any(|window| window == b"\r\n\r\n") {
+                let read = stream.read(&mut buffer).unwrap();
+
+                if read == 0 {
+                    break;
+                }
+
+                received.extend_from_slice(&buffer[..read]);
+            }
+
+            stream.write_all(b"HTTP/1.1 200 OK\r\nContent-Length: 2\r\nConnection: close\r\n\r\nok").unwrap();
+        });
+
+        format!("http://{address}/")
+    }
+
+    #[tokio::test]
+    async fn failing_post_request_script_does_not_leave_the_request_pending() {
+        let url = one_response_server();
+
+        let mut request = Request {
+            url: url.clone(),
+            ..Default::default()
+        };
+        request.scripts.post_request_script = Some(String::from(r#"throw new Error("post-request script failure");"#));
+
+        let local_request = Arc::new(RwLock::new(request));
+        let prepared_request = reqwest_middleware::ClientBuilder::new(reqwest::Client::new()).build().get(&url);
+
+        let response = send_http_request(prepared_request, local_request.clone(), &None).await;
+
+        assert!(matches!(response, Err(RequestResponseError::PostRequestScript)));
+
+        let request = local_request.read();
+        assert!(!request.is_pending);
+
+        let console_output = request.console_output.post_request_output.as_deref().unwrap_or_default();
+        assert!(console_output.contains("post-request script failure"), "{console_output:?}");
+    }
 }

@@ -132,16 +132,18 @@ pub async fn send_ws_request(prepared_request: reqwest_middleware::RequestBuilde
 
     /* POST-REQUEST SCRIPT */
 
-    let (modified_response, post_request_output) = App::handle_post_request_script(&request, response, env)?;
+    let (modified_response, post_request_output) = App::handle_post_request_script(&request, response, env);
 
     drop(request);
 
-    {
+    let modified_response = {
         let mut request = local_request.write();
 
         request.console_output.post_request_output = post_request_output;
         request.is_pending = false;
         request.cancellation_token = CancellationToken::new();
+
+        let modified_response = modified_response?;
 
         let ws_request = request.get_ws_request_mut().unwrap();
         ws_request.messages = vec![];
@@ -152,7 +154,9 @@ pub async fn send_ws_request(prepared_request: reqwest_middleware::RequestBuilde
         else {
             ws_request.is_connected = true;
         }
-    }
+
+        modified_response
+    };
 
     let local_request = local_request.clone();
     let mut request = local_request.write();
@@ -217,4 +221,43 @@ pub async fn send_ws_request(prepared_request: reqwest_middleware::RequestBuilde
     });
 
     return Ok(modified_response);
+}
+
+#[cfg(test)]
+mod tests {
+    use std::sync::Arc;
+    use parking_lot::{Mutex, RwLock};
+    use crate::app::business_logic::request::send::RequestResponseError;
+    use crate::app::business_logic::request::ws::send::send_ws_request;
+    use crate::models::protocol::protocol::Protocol;
+    use crate::models::protocol::ws::ws::WsRequest;
+    use crate::models::request::Request;
+
+    #[tokio::test]
+    async fn failing_post_request_script_does_not_leave_the_request_pending() {
+        // Nothing listens on this port, so the connection is refused
+        let port = std::net::TcpListener::bind("127.0.0.1:0").unwrap().local_addr().unwrap().port();
+        let url = format!("http://127.0.0.1:{port}/");
+
+        let mut request = Request {
+            url: url.clone(),
+            protocol: Protocol::WsRequest(WsRequest::default()),
+            ..Default::default()
+        };
+        request.scripts.post_request_script = Some(String::from(r#"throw new Error("post-request script failure");"#));
+
+        let local_request = Arc::new(RwLock::new(request));
+        let prepared_request = reqwest_middleware::ClientBuilder::new(reqwest::Client::new()).build().get(&url);
+
+        let response = send_ws_request(prepared_request, local_request.clone(), &None, Arc::new(Mutex::new(false))).await;
+
+        assert!(matches!(response, Err(RequestResponseError::PostRequestScript)));
+
+        let request = local_request.read();
+        assert!(!request.is_pending);
+        assert!(!request.get_ws_request().unwrap().is_connected);
+
+        let console_output = request.console_output.post_request_output.as_deref().unwrap_or_default();
+        assert!(console_output.contains("post-request script failure"), "{console_output:?}");
+    }
 }
