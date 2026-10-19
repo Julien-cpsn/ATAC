@@ -93,10 +93,21 @@ impl App<'_> {
 
         let local_env = self.get_selected_env_as_local();
         let response = match (&protocol, prepared_request) {
-            (Protocol::HttpRequest(_), PreparedRequest::Reqwest(prepared_request)) => send_http_request(prepared_request, local_request.clone(), &local_env).await?,
-            (Protocol::WsRequest(_), PreparedRequest::Reqwest(prepared_request)) => send_ws_request(prepared_request, local_request.clone(), &local_env, self.received_response.clone()).await?,
-            (Protocol::MqttRequest(_), PreparedRequest::Mqtt(prepared_request)) => send_mqtt_request(prepared_request, local_request.clone(), &local_env, self.received_response.clone()).await?,
+            (Protocol::HttpRequest(_), PreparedRequest::Reqwest(prepared_request)) => send_http_request(prepared_request, local_request.clone(), &local_env).await,
+            (Protocol::WsRequest(_), PreparedRequest::Reqwest(prepared_request)) => send_ws_request(prepared_request, local_request.clone(), &local_env, self.received_response.clone()).await,
+            (Protocol::MqttRequest(_), PreparedRequest::Mqtt(prepared_request)) => send_mqtt_request(prepared_request, local_request.clone(), &local_env, self.received_response.clone()).await,
             _ => unreachable!()
+        };
+
+        let response = match response {
+            Ok(response) => response,
+            Err(error) => {
+                if send_command.console && let Some(post_request_output) = &local_request.read().console_output.post_request_output {
+                    println!("{}", post_request_output);
+                }
+
+                return Err(anyhow!(error));
+            }
         };
 
         let request = local_request.read();

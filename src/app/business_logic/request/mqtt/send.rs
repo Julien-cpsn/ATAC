@@ -180,7 +180,7 @@ pub async fn send_mqtt_request(prepared_request: PreparedMqttRequest, local_requ
     /* POST-REQUEST SCRIPT */
 
     let request = local_request.read();
-    let (modified_response, post_request_output) = App::handle_post_request_script(&request, response, env)?;
+    let (modified_response, post_request_output) = App::handle_post_request_script(&request, response, env);
     drop(request);
 
     let mut request = local_request.write();
@@ -188,6 +188,8 @@ pub async fn send_mqtt_request(prepared_request: PreparedMqttRequest, local_requ
     request.console_output.post_request_output = post_request_output;
     request.is_pending = false;
     request.cancellation_token = CancellationToken::new();
+
+    let modified_response = modified_response?;
 
     let mqtt_request = request.get_mqtt_request_mut().unwrap();
     mqtt_request.messages = vec![];
@@ -385,11 +387,11 @@ fn error_response(error: String) -> RequestResponse {
 mod tests {
     use std::sync::Arc;
     use indexmap::IndexMap;
-    use parking_lot::RwLock;
+    use parking_lot::{Mutex, RwLock};
     use crate::app::app::App;
     use crate::app::business_logic::request::mqtt::client::PreparedMqttRequest;
-    use crate::app::business_logic::request::mqtt::send::mqtt_publish;
-    use crate::app::business_logic::request::send::PrepareRequestError;
+    use crate::app::business_logic::request::mqtt::send::{mqtt_publish, send_mqtt_request};
+    use crate::app::business_logic::request::send::{PrepareRequestError, RequestResponseError};
     use crate::models::auth::auth::Auth;
     use crate::models::auth::basic::BasicAuth;
     use crate::models::auth::bearer_token::BearerToken;
@@ -611,6 +613,28 @@ mod tests {
 
         mqtt_publish(&mut mqtt_request, String::from("t"), MqttPayload::Text(String::from("x")), QoS::AtMostOnce, false);
         assert!(mqtt_request.messages.is_empty());
+    }
+
+    #[tokio::test]
+    async fn failing_post_request_script_does_not_leave_the_request_pending() {
+        // Nothing listens on this port, so the connection is refused
+        let port = std::net::TcpListener::bind("127.0.0.1:0").unwrap().local_addr().unwrap().port();
+
+        let mut failing = request(&format!("mqtt://127.0.0.1:{port}"), |_| {});
+        failing.scripts.post_request_script = Some(String::from(r#"throw new Error("post-request script failure");"#));
+
+        let prepared = prepare(&mut failing).unwrap();
+        let local_request = Arc::new(RwLock::new(failing));
+
+        let response = send_mqtt_request(prepared, local_request.clone(), &None, Arc::new(Mutex::new(false))).await;
+
+        assert!(matches!(response, Err(RequestResponseError::PostRequestScript)));
+
+        let request = local_request.read();
+        assert!(!request.is_pending);
+
+        let console_output = request.console_output.post_request_output.as_deref().unwrap_or_default();
+        assert!(console_output.contains("post-request script failure"), "{console_output:?}");
     }
 
     #[test]

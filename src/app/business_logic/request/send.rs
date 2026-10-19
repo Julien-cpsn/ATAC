@@ -357,10 +357,11 @@ impl App<'_> {
         }
     }
 
-    pub fn handle_post_request_script(request: &Request, response: RequestResponse, env: &Option<Arc<RwLock<Environment>>>) -> anyhow::Result<(RequestResponse, Option<String>), RequestResponseError> {
+    /// The console output is returned even when the script fails, so the error can be read in the console
+    pub fn handle_post_request_script(request: &Request, response: RequestResponse, env: &Option<Arc<RwLock<Environment>>>) -> (Result<RequestResponse, RequestResponseError>, Option<String>) {
         match &request.scripts.post_request_script {
             None => {
-                Ok((response, None))
+                (Ok(response), None)
             },
             Some(post_request_script) => {
                 let env_values = match &env {
@@ -386,8 +387,8 @@ impl App<'_> {
                 }
 
                 match result_response {
-                    None => Err(PostRequestScript),
-                    Some(result_response) => Ok((result_response, Some(result_console_output)))
+                    None => (Err(PostRequestScript), Some(result_console_output)),
+                    Some(result_response) => (Ok(result_response), Some(result_console_output))
                 }
             }
         }
