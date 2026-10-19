@@ -119,7 +119,7 @@ impl App<'_> {
         }
 
         if send_command.console {
-            let console_output = match (&request.console_output.post_request_output, &request.console_output.post_request_output) {
+            let console_output = match (&request.console_output.pre_request_output, &request.console_output.post_request_output) {
                 (None, None) => &String::new(),
                 (Some(pre_request_console_output), None) => pre_request_console_output,
                 (None, Some(post_request_console_output)) => post_request_console_output,
