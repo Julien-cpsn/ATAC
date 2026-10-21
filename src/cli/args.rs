@@ -4,7 +4,8 @@ use std::path::PathBuf;
 use clap::{Parser, Subcommand};
 use clap::builder::Styles;
 use clap_verbosity_flag::Verbosity;
-use directories::ProjectDirs;
+#[cfg(unix)]
+use directories::BaseDirs;
 use lazy_static::lazy_static;
 use regex::Regex;
 use crate::cli::commands::collection_commands::collection_commands::CollectionCommand;
@@ -154,23 +155,29 @@ lazy_static! {
 }
 
 fn get_app_config_dir() -> Option<PathBuf> {
-    let project_directory = ProjectDirs::from("com", "Julien-cpsn", "ATAC");
-
-    let config_directory = match project_directory {
-        Some(project_directory) => {
-            let config_directory = project_directory.config_dir().to_path_buf();
-
-            // Create the config dir if it does not exist
-            if !config_directory.exists() {
-                fs::create_dir_all(&config_directory).expect(&format!("Could not recursively create folder \"{}\"", config_directory.display()));
-            }
-
-            Some(config_directory)
-        },
-        None => None
+    let config_directory = {
+        #[cfg(unix)]
+        {
+            let base = match env::var_os("XDG_CONFIG_HOME").filter(|s| !s.is_empty()) {
+                Some(h) => PathBuf::from(h),
+                None => BaseDirs::new()?.home_dir().join(".config"),
+            };
+            base.join("ATAC")
+        }
+        #[cfg(not(unix))]
+        {
+            ProjectDirs::from("com", "Julien-cpsn", "ATAC")?.config_dir().to_path_buf()
+        }
     };
 
-    return config_directory;
+    if !config_directory.exists() {
+        fs::create_dir_all(&config_directory).expect(&format!(
+            "Could not recursively create folder \"{}\"",
+            config_directory.display()
+        ));
+    }
+
+    Some(config_directory)
 }
 
 fn choose_app_directory(path_buf: Option<PathBuf>, config_directory: &Option<PathBuf>) -> PathBuf {
