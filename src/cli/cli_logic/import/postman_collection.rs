@@ -234,7 +234,14 @@ fn parse_request(item: Items) -> anyhow::Result<Request> {
 
             match retrieve_query_params(&request_class) {
                 None => {}
-                Some(query_params) => request.params = query_params
+                Some(query_params) => {
+                    request.params = query_params;
+
+                    // The raw URL repeats the query, which is sent from the params
+                    if let Some((url, _)) = request.url.split_once('?') {
+                        request.url = url.to_string();
+                    }
+                }
             }
 
             /* METHOD */
@@ -580,4 +587,30 @@ fn retrieve_settings(item: &Items) -> Option<RequestSettings> {
     }
     
     Some(settings)
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn query_params_are_not_kept_in_the_url() {
+        let item: Items = serde_json::from_str(r#"{
+            "name": "List orders",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "https://api.example.com/orders?status=open",
+                    "protocol": "https",
+                    "host": ["api", "example", "com"],
+                    "path": ["orders"],
+                    "query": [{ "key": "status", "value": "open" }]
+                }
+            }
+        }"#).unwrap();
+
+        let request = parse_request(item).unwrap();
+
+        assert_eq!(request.url, "https://api.example.com/orders");
+        assert_eq!(request.url_with_params_to_string(), "https://api.example.com/orders?status=open");
+    }
 }
