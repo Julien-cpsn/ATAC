@@ -108,11 +108,11 @@ impl App<'_> {
             collections.remove(0);
         }
 
-        let collections_length = collections.len();
+        let first_new_index = self.collections.len();
 
         self.collections.extend(collections);
 
-        for collection_index in 0..collections_length {
+        for collection_index in first_new_index..self.collections.len() {
             self.save_collection_to_file(collection_index);
         }
 
