@@ -13,6 +13,7 @@ impl App<'_> {
     pub fn render_creating_new_request_popup(&mut self, frame: &mut Frame) {
         let popup_block = Block::default()
             .borders(Borders::ALL)
+            .border_style(THEME.read().ui.border_style())
             .fg(THEME.read().ui.main_foreground_color)
             .bg(THEME.read().ui.main_background_color);
 
@@ -41,6 +42,7 @@ impl App<'_> {
                 Block::new()
                     .title("Collection ← →")
                     .borders(Borders::ALL)
+                    .border_style(THEME.read().ui.border_style())
                     .fg(selection_collection_block_color)
             );
 
@@ -55,6 +57,7 @@ impl App<'_> {
                 Block::new()
                     .title("Protocol ← →")
                     .borders(Borders::ALL)
+                    .border_style(THEME.read().ui.border_style())
                     .fg(selected_protocol_block_color)
             );
         

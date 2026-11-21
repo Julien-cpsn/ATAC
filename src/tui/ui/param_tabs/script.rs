@@ -43,6 +43,7 @@ impl App<'_> {
 
         let inter_script_block = Block::default()
             .borders(Borders::BOTTOM)
+            .border_style(THEME.read().ui.border_style())
             .title_bottom(title)
             .title_alignment(Alignment::Center)
             .fg(THEME.read().ui.main_foreground_color);

@@ -32,6 +32,7 @@ impl<'a> App<'a> {
                 Block::default()
                     .title("Collections")
                     .borders(Borders::ALL)
+                    .border_style(THEME.read().ui.border_style())
                     .fg(THEME.read().ui.main_foreground_color)
             );
 

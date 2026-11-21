@@ -22,6 +22,7 @@ impl App<'_> {
     pub fn render_help_popup(&mut self, frame: &mut Frame) {
         let popup_block = Block::default()
             .borders(Borders::ALL)
+            .border_style(THEME.read().ui.border_style())
             .fg(THEME.read().ui.main_foreground_color)
             .bg(THEME.read().ui.secondary_background_color);
 

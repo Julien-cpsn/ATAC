@@ -153,6 +153,7 @@ impl App<'_> {
             .select(selected_param_tab_index)
             .block(
                 Block::new().borders(Borders::BOTTOM)
+                    .border_style(THEME.read().ui.border_style())
                     .fg(THEME.read().ui.main_foreground_color)
             );
 

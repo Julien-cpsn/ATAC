@@ -35,11 +35,13 @@ impl App<'_> {
         let mut algorithm_block = Block::new()
             .title("Algorithm ← →")
             .borders(Borders::ALL)
+            .border_style(THEME.read().ui.border_style())
             .fg(THEME.read().ui.main_foreground_color);
 
         let mut secret_type_block = Block::new()
             .title("Secret type ← →")
             .borders(Borders::ALL)
+            .border_style(THEME.read().ui.border_style())
             .fg(THEME.read().ui.main_foreground_color);
 
         let mut should_color_blocks = false;

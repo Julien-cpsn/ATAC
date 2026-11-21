@@ -9,6 +9,11 @@ font_color = "White"
 # This can be null to preserve original terminal background
 # app_background = "Black"
 
+# Optional. Color of every box border and separator line (default: unchanged)
+# border_color = "DarkGray"
+# Optional. Color of the scrollbars (default: font_color)
+# scrollbar_color = "DarkGray"
+
 main_foreground_color = "White"
 secondary_foreground_color = "DarkGray"
 

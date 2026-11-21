@@ -174,6 +174,7 @@ impl<'a> StatefulWidget for &'a mut StatefulCustomTable<'_> {
                     .block(
                         Block::new()
                             .borders(Borders::BOTTOM | Borders::RIGHT)
+                            .border_style(THEME.read().ui.border_style())
                             .fg(THEME.read().ui.secondary_foreground_color)
                     )
                     .fg(THEME.read().ui.secondary_foreground_color);
@@ -183,6 +184,7 @@ impl<'a> StatefulWidget for &'a mut StatefulCustomTable<'_> {
                     .block(
                         Block::new()
                             .borders(Borders::BOTTOM)
+                            .border_style(THEME.read().ui.border_style())
                             .fg(THEME.read().ui.secondary_foreground_color)
                     )
                     .fg(THEME.read().ui.secondary_foreground_color);
