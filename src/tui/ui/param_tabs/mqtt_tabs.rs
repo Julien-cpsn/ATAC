@@ -71,6 +71,7 @@ impl App<'_> {
             .title(format!("{} ({})", MqttFormField::PublishPayload.label(), mqtt_request.payload))
             .title_bottom(hint)
             .borders(Borders::ALL)
+            .border_style(THEME.read().ui.border_style())
             .fg(match is_selected && matches!(self.state, SelectedRequest | EditingRequestMessage) {
                 true => THEME.read().others.selection_highlight_color,
                 false => THEME.read().ui.main_foreground_color,
@@ -110,6 +111,7 @@ impl App<'_> {
         let block = Block::new()
             .title(field.label())
             .borders(Borders::ALL)
+            .border_style(THEME.read().ui.border_style())
             .padding(Padding::horizontal(1))
             .fg(match should_highlight {
                 true => THEME.read().others.selection_highlight_color,

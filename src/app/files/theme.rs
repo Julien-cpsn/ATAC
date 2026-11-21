@@ -5,7 +5,7 @@ use std::path::PathBuf;
 use lazy_static::lazy_static;
 use nestify::nest;
 use parking_lot::RwLock;
-use ratatui::style::Color;
+use ratatui::style::{Color, Style};
 use tracing::{trace, warn};
 use serde::{Deserialize, Serialize};
 
@@ -51,6 +51,11 @@ nest! {
             pub struct ThemeUI {
                 pub font_color: Color,
                 pub app_background: Option<Color>,
+
+                /// Color of every box border and separator line. Unset = current behavior.
+                pub border_color: Option<Color>,
+                /// Color of the scrollbars. Unset = font_color (current behavior).
+                pub scrollbar_color: Option<Color>,
 
                 pub main_foreground_color: Color,
                 pub secondary_foreground_color: Color,
@@ -105,12 +110,31 @@ nest! {
     }
 }
 
+impl ThemeUI {
+    /// Style to apply on block borders. Empty when `border_color` is not set,
+    /// which keeps the previous look.
+    pub fn border_style(&self) -> Style {
+        match self.border_color {
+            Some(color) => Style::new().fg(color),
+            None => Style::new(),
+        }
+    }
+
+    /// Scrollbar color, falling back to `font_color`.
+    pub fn scrollbar_color(&self) -> Color {
+        self.scrollbar_color.unwrap_or(self.font_color)
+    }
+}
+
 impl Default for Theme {
     fn default() -> Self {
         Theme {
             ui: ThemeUI {
                 font_color: Color::White,
                 app_background: None,
+
+                border_color: None,
+                scrollbar_color: None,
 
                 main_foreground_color: Color::White,
                 secondary_foreground_color: Color::DarkGray,

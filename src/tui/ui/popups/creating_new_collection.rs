@@ -12,6 +12,7 @@ impl App<'_> {
         let popup_block = Block::default()
             .title("Enter the new collection name")
             .borders(Borders::ALL)
+            .border_style(THEME.read().ui.border_style())
             .fg(THEME.read().ui.main_foreground_color)
             .bg(THEME.read().ui.main_background_color);
 

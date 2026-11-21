@@ -22,6 +22,7 @@ impl DisplayPopup {
         let popup_block = Block::default()
             .title(format!("{} export", self.title))
             .borders(Borders::ALL)
+            .border_style(THEME.read().ui.border_style())
             .fg(THEME.read().ui.main_foreground_color)
             .bg(THEME.read().ui.secondary_background_color);
 
@@ -50,9 +51,9 @@ impl DisplayPopup {
         frame.render_widget(content, layout[0]);
 
         let vertical_scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight)
-            .style(Style::new().fg(THEME.read().ui.font_color));
+            .style(Style::new().fg(THEME.read().ui.scrollbar_color()));
         let horizontal_scrollbar = Scrollbar::new(ScrollbarOrientation::HorizontalBottom)
-            .style(Style::new().fg(THEME.read().ui.font_color))
+            .style(Style::new().fg(THEME.read().ui.scrollbar_color()))
             .thumb_symbol("■");
 
         frame.render_stateful_widget(

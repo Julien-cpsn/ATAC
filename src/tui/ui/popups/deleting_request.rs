@@ -14,6 +14,7 @@ impl App<'_> {
         let popup_block = Block::default()
             .title("Confirm delete request")
             .borders(Borders::ALL)
+            .border_style(THEME.read().ui.border_style())
             .style(Style::default().bg(THEME.read().ui.main_background_color));
 
         let area = centered_rect(30, 3, frame.area());

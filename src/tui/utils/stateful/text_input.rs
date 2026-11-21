@@ -43,6 +43,7 @@ impl<'a> Widget for SingleLineTextInput<'a> {
                 let mut block = Block::new()
                     .title(block_title.as_str())
                     .borders(Borders::ALL)
+                    .border_style(THEME.read().ui.border_style())
                     .padding(Padding::horizontal(1));
 
                 block = match self.0.highlight_block {
@@ -149,6 +150,7 @@ impl<'a> Widget for MultiLineTextInput<'a> {
             let mut block = Block::new()
                 .title(block_title.as_str())
                 .borders(Borders::ALL)
+                .border_style(THEME.read().ui.border_style())
                 .padding(Padding::horizontal(1));
 
             block = match self.0.highlight_block {

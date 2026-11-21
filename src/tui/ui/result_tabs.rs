@@ -138,6 +138,7 @@ impl App<'_> {
             .select(selected_result_tab_index)
             .block(
                 Block::new().borders(Borders::BOTTOM)
+                    .border_style(THEME.read().ui.border_style())
                     .fg(THEME.read().ui.main_foreground_color)
             );
 
@@ -394,9 +395,9 @@ impl App<'_> {
         }
 
         let result_vertical_scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight)
-            .style(Style::new().fg(THEME.read().ui.font_color));
+            .style(Style::new().fg(THEME.read().ui.scrollbar_color()));
         let result_horizontal_scrollbar = Scrollbar::new(ScrollbarOrientation::HorizontalBottom)
-            .style(Style::new().fg(THEME.read().ui.font_color))
+            .style(Style::new().fg(THEME.read().ui.scrollbar_color()))
             .thumb_symbol("■"); // Better than the default full block
 
         frame.render_stateful_widget(

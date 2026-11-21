@@ -44,26 +44,31 @@ impl App<'_> {
         let mut stale_block = Block::new()
             .title("Stale ← →")
             .borders(Borders::ALL)
+            .border_style(THEME.read().ui.border_style())
             .fg(THEME.read().ui.main_foreground_color);
 
         let mut algorithm_block = Block::new()
             .title("Algorithm ← →")
             .borders(Borders::ALL)
+            .border_style(THEME.read().ui.border_style())
             .fg(THEME.read().ui.main_foreground_color);
 
         let mut qop_block = Block::new()
             .title("QOP ← →")
             .borders(Borders::ALL)
+            .border_style(THEME.read().ui.border_style())
             .fg(THEME.read().ui.main_foreground_color);
 
         let mut user_hash_block = Block::new()
             .title("User hash ← →")
             .borders(Borders::ALL)
+            .border_style(THEME.read().ui.border_style())
             .fg(THEME.read().ui.main_foreground_color);
 
         let mut charset_block = Block::new()
             .title("Charset ← →")
             .borders(Borders::ALL)
+            .border_style(THEME.read().ui.border_style())
             .fg(THEME.read().ui.main_foreground_color);
 
 

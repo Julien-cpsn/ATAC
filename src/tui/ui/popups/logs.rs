@@ -15,6 +15,7 @@ impl App<'_> {
         let popup_block = Block::default()
             .title("Logs")
             .borders(Borders::ALL)
+            .border_style(THEME.read().ui.border_style())
             .fg(THEME.read().ui.main_foreground_color)
             .bg(THEME.read().ui.secondary_background_color);
 
@@ -70,9 +71,9 @@ impl App<'_> {
 
         // For mysterious reasons, they won't show up...
         let logger_vertical_scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight)
-            .style(Style::new().fg(font_color));
+            .style(Style::new().fg(THEME.read().ui.scrollbar_color()));
         let logger_horizontal_scrollbar = Scrollbar::new(ScrollbarOrientation::HorizontalBottom)
-            .style(Style::new().fg(font_color))
+            .style(Style::new().fg(THEME.read().ui.scrollbar_color()))
             .thumb_symbol("■");
         
         frame.render_stateful_widget(

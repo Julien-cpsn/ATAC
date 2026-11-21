@@ -1,4 +1,5 @@
 use crate::app::app::App;
+use crate::app::files::theme::THEME;
 use crate::tui::utils::centered_rect::centered_rect;
 use ratatui::Frame;
 use ratatui::layout::Direction::Horizontal;
@@ -13,6 +14,7 @@ impl App<'_> {
         let popup_block = Block::default()
             .title("Choose request export format")
             .borders(Borders::ALL)
+            .border_style(THEME.read().ui.border_style())
             .style(Style::default().bg(Color::DarkGray));
 
 

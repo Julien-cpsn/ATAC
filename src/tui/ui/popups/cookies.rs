@@ -15,6 +15,7 @@ impl App<'_> {
         let popup_block = Block::default()
             .title("Cookies")
             .borders(Borders::ALL)
+            .border_style(THEME.read().ui.border_style())
             .fg(THEME.read().ui.font_color)
             .bg(THEME.read().ui.main_background_color);
 
@@ -56,7 +57,8 @@ impl App<'_> {
         for (index, header_name) in header_names.iter().enumerate() {
             let paragraph = Paragraph::new(header_name.as_str())
                 .centered()
-                .block(Block::new().borders(Borders::BOTTOM | Borders::RIGHT))
+                .block(Block::new().borders(Borders::BOTTOM | Borders::RIGHT)
+                .border_style(THEME.read().ui.border_style()))
                 .fg(THEME.read().ui.font_color);
 
             frame.render_widget(paragraph, inner_cookies_layout[index]);

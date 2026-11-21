@@ -16,6 +16,7 @@ impl App<'_> {
         let popup_block = Block::default()
             .title(format!("Editing {}", env.name))
             .borders(Borders::ALL)
+            .border_style(THEME.read().ui.border_style())
             .fg(THEME.read().ui.main_foreground_color)
             .bg(THEME.read().ui.secondary_background_color);
 

@@ -20,6 +20,7 @@ impl<'a> App<'a> {
                 Block::default()
                     .title("Environment")
                     .borders(Borders::ALL)
+                    .border_style(THEME.read().ui.border_style())
                     .style(Style::new().fg(THEME.read().ui.secondary_foreground_color))
             );
 

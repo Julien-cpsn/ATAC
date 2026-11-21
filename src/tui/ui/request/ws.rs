@@ -50,6 +50,7 @@ impl App<'_> {
         let connection_status_block = Block::new()
             .title("Status").title_alignment(Alignment::Center)
             .borders(Borders::ALL)
+            .border_style(THEME.read().ui.border_style())
             .padding(Padding::horizontal(1))
             .fg(THEME.read().ui.main_foreground_color);
 
@@ -121,6 +122,7 @@ impl App<'_> {
         if should_render_params {
             let params_block = Block::new()
                 .borders(Borders::RIGHT)
+                .border_style(THEME.read().ui.border_style())
                 .fg(THEME.read().ui.main_foreground_color);
 
             let request_params_area = params_block.inner(request_main_layout[0]);

@@ -44,7 +44,8 @@ impl App<'_> {
             .add_modifier(Modifier::BOLD)
             .add_modifier(Modifier::ITALIC)
             .title_alignment(Alignment::Center)
-            .borders(Borders::TOP);
+            .borders(Borders::TOP)
+            .border_style(THEME.read().ui.border_style());
 
         frame.render_widget(header, main_layout[0]);
 
