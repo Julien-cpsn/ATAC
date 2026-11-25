@@ -8,7 +8,7 @@ use std::sync::Arc;
 use indexmap::IndexMap;
 use lazy_static::lazy_static;
 use parking_lot::RwLock;
-use snailquote::unescape;
+use snailquote::{escape, unescape};
 use tracing::{info, trace, warn};
 use rayon::prelude::*;
 
@@ -92,6 +92,11 @@ fn parse_line(entry: &[u8]) -> Option<(String, String)> {
     })
 }
 
+/// One `key=value` line, quoted as needed so that `parse_line` reads back the same value
+fn format_line(key: &str, value: &str) -> String {
+    format!("{key}={}\n", escape(value))
+}
+
 /// Save app environment in a file through a temporary file
 pub fn save_environment_to_file(environment: &Environment) {
     if !ARGS.should_save {
@@ -112,10 +117,10 @@ pub fn save_environment_to_file(environment: &Environment) {
         .open(&temp_file_path)
         .expect("Could not open temp file");
 
+    // In file order, so a saved file keeps its key order
     let mut data: String = environment.values
         .iter()
-        .par_bridge()
-        .map(|(key, value)| format!("{key}={value}\n"))
+        .map(|(key, value)| format_line(key, value))
         .collect();
     
     // Remove trailing \n
@@ -127,4 +132,17 @@ pub fn save_environment_to_file(environment: &Environment) {
     fs::rename(temp_file_path, &environment.path).expect("Could not move temp file to environment file");
 
     trace!("Environment saved")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{format_line, parse_line};
+
+    #[test]
+    fn saved_values_read_back_unchanged() {
+        for value in ["1", r#"{"id":42}"#, "it's ok", r"C:\path", "a b"] {
+            let line = format_line("key", value);
+            assert_eq!(parse_line(line.trim_end().as_bytes()), Some(("key".to_owned(), value.to_owned())));
+        }
+    }
 }
